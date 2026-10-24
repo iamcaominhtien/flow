@@ -19,7 +19,7 @@ Drawing diagrams by hand is slow, and AI-generated diagrams are often hard to ed
 
 ## Supported diagram types
 
-Flow aims to cover **nearly every common diagram type**, grouped by category. Each category is delivered as a plugin (or a set of plugins).
+Flow aims to cover **nearly every common diagram type**, grouped into 8 categories. Each category is delivered as a plugin (or a set of plugins).
 
 | Category | Diagram types | Status |
 | --- | --- | --- |
@@ -29,6 +29,7 @@ Flow aims to cover **nearly every common diagram type**, grouped by category. Ea
 | Architecture & infrastructure | Architecture, C4 model, Cloud (AWS / GCP / Azure), Network, Deployment | Planned |
 | Planning & management | Gantt, Org chart, Mind map, Roadmap / Kanban | Planned |
 | UI design | Wireframe / mockup | Planned |
+| Explainer / infographic | Layered flow (icon-based tiers/lanes), Tree / hierarchy, Side-by-side comparison, Concept illustration | Planned |
 | Editing | Update or restyle existing `.drawio` files | Planned |
 
 ## Getting started
