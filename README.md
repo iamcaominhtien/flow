@@ -41,7 +41,9 @@ The visual language is designed first, on a canvas of sample artboards, before a
 | Wireframe | Done: rules, annotated phone flow, annotated desktop screen, responsive set, state set |
 | BPMN | Done: rules, notation, basic example, advanced features, three-pool delivery, complex order-to-delivery case |
 | C4 | Done: rules, level 1 context, level 2 containers, level 3 components (one delivery platform at three zooms) |
-| The rest | Not started |
+| Cloud | Done: rules, basic one-VPC app, delivery platform on two zones, network joining offices to the cloud |
+| DFD | Done: rules, notation with forbidden connections, levels 0, 1 and 2 of the delivery system |
+| Editing existing .drawio files | Not started |
 
 Not yet verified: whether draw.io's `flowAnimation` edge style survives export well enough to reproduce the animated lines.
 
@@ -66,8 +68,8 @@ Installation and usage instructions will be added once the first plugin is avail
 
 ## Roadmap
 
-- [x] Design foundation, icon sets, Screen flow, Flowchart, Sequence, ER, Architecture, Explainer, Planning, UML, Wireframe, BPMN and C4 notation
-- [ ] Design the remaining diagram types (cloud and network, DFD, ...)
+- [x] Design foundation, icon sets, Screen flow, Flowchart, Sequence, ER, Architecture, Explainer, Planning, UML, Wireframe, BPMN, C4, Cloud and DFD notation
+- [ ] Design how plugins edit existing `.drawio` files, then a cross-type review
 - [ ] Test draw.io animated edges and export
 - [ ] Define the plugin interface and project structure
 - [ ] Generate valid draw.io XML from a text prompt
