@@ -38,6 +38,7 @@ The visual language is designed first, on a canvas of sample artboards, before a
 | Explainer | Done: rules, four shapes (layers, tree, comparison, concept) and a complete card-payment explainer |
 | Planning (Gantt, org chart, mind map, Kanban, roadmap) | Done: rules and an example of each; org chart and mind map also in an illustrated style, plus a large four-level mind map |
 | UML (state machine, use case, class) | Done: rules and an example of each; use case also in an illustrated style |
+| Wireframe | Done: rules, annotated phone flow, annotated desktop screen, responsive set, state set |
 | The rest | Not started |
 
 Not yet verified: whether draw.io's `flowAnimation` edge style survives export well enough to reproduce the animated lines.
@@ -63,8 +64,8 @@ Installation and usage instructions will be added once the first plugin is avail
 
 ## Roadmap
 
-- [x] Design foundation, icon sets, Screen flow, Flowchart, Sequence, ER, Architecture, Explainer, Planning and UML notation
-- [ ] Design the remaining diagram types (BPMN, DFD, C4 and cloud, wireframe, ...)
+- [x] Design foundation, icon sets, Screen flow, Flowchart, Sequence, ER, Architecture, Explainer, Planning, UML and Wireframe notation
+- [ ] Design the remaining diagram types (BPMN, DFD, C4 and cloud, ...)
 - [ ] Test draw.io animated edges and export
 - [ ] Define the plugin interface and project structure
 - [ ] Generate valid draw.io XML from a text prompt
