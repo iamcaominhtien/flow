@@ -17,15 +17,19 @@ Drawing diagrams by hand is slow, and AI-generated diagrams are often hard to ed
 - **Native output**: produce standard draw.io XML (`.drawio`) so results stay fully editable.
 - **Pluggable**: a collection of focused plugins, each handling one kind of diagram or task.
 
-## Planned plugins
+## Supported diagram types
 
-| Plugin | Description | Status |
+Flow aims to cover **nearly every common diagram type**, grouped by category. Each category is delivered as a plugin (or a set of plugins).
+
+| Category | Diagram types | Status |
 | --- | --- | --- |
-| Flowchart | Process and decision flows | Planned |
-| Sequence diagram | Interactions between actors/services | Planned |
-| Architecture diagram | System and cloud architecture | Planned |
-| ER diagram | Database schema and relationships | Planned |
-| Diagram editor | Update or restyle existing `.drawio` files | Planned |
+| Process & business | Flowchart, Swimlane / cross-functional, BPMN, User flow | Planned |
+| UML behavior | Sequence, Use case, Activity, State machine | Planned |
+| Structure & data | ER diagram, Class diagram, Data flow diagram (DFD) | Planned |
+| Architecture & infrastructure | Architecture, C4 model, Cloud (AWS / GCP / Azure), Network, Deployment | Planned |
+| Planning & management | Gantt, Org chart, Mind map, Roadmap / Kanban | Planned |
+| UI design | Wireframe / mockup | Planned |
+| Editing | Update or restyle existing `.drawio` files | Planned |
 
 ## Getting started
 
@@ -35,7 +39,8 @@ Installation and usage instructions will be added once the first plugin is avail
 
 - [ ] Define the plugin interface and project structure
 - [ ] Generate valid draw.io XML from a text prompt
-- [ ] First plugin: flowchart
+- [ ] First plugins: flowchart, sequence, ER, architecture
+- [ ] Expand to the remaining categories above
 - [ ] Support editing existing `.drawio` files
 - [ ] Documentation and examples
 
