@@ -16,6 +16,25 @@ Drawing diagrams by hand is slow, and AI-generated diagrams are often hard to ed
 - **Edit with AI**: modify existing diagrams ("add a cache between the API and the database").
 - **Native output**: produce standard draw.io XML (`.drawio`) so results stay fully editable.
 - **Pluggable**: a collection of focused plugins, each handling one kind of diagram or task.
+- **One consistent look**: a shared theme (colours, fonts, icons, line styles) for every diagram type, in a plain and an illustrated style.
+
+## Design system
+
+The visual language is designed first, on a canvas of sample artboards, before any plugin code is written. The canvas currently lives outside this repository; the decisions it holds are summarised here.
+
+- **Foundation**: a flat pastel palette with ink outlines, Inter and JetBrains Mono, 12 px node radius, 2 px strokes.
+- **Icons**: a flat set of 98 icons and a detailed set that has a twin for every one of them (shaded, with highlights and accents).
+- **Line roles**: next step, yes / success, no / failure, return (dashed), one animated main path, and a slower animated data stream.
+- **Two styles**: *plain* (shapes with text, optional small icon; the default) and *illustrated* (cards with a name pill, one line of explanation and a large icon, tinted by swimlane). Styles can be mixed in one diagram.
+- **Per-type notation**: each diagram type gets its own rules page, patterns and complete examples, so a plugin can rely on written conventions instead of guessing.
+
+| Diagram type | Design status |
+| --- | --- |
+| Screen flow | Done: rules, fidelity levels, conditions, tabs, overlays, devices, full examples |
+| Flowchart | Done: rules, patterns, plain and illustrated examples, swimlane, complete delivery flow |
+| Sequence, ER, Architecture, Explainer and the rest | Not started |
+
+Not yet verified: whether draw.io's `flowAnimation` edge style survives export well enough to reproduce the animated lines.
 
 ## Supported diagram types
 
@@ -38,6 +57,9 @@ Installation and usage instructions will be added once the first plugin is avail
 
 ## Roadmap
 
+- [x] Design foundation, icon sets, Screen flow and Flowchart notation
+- [ ] Design the remaining diagram types (Sequence, ER, Architecture, Explainer, ...)
+- [ ] Test draw.io animated edges and export
 - [ ] Define the plugin interface and project structure
 - [ ] Generate valid draw.io XML from a text prompt
 - [ ] First plugins: flowchart, sequence, ER, architecture
