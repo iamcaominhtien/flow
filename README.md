@@ -32,7 +32,8 @@ The visual language is designed first, on a canvas of sample artboards, before a
 | --- | --- |
 | Screen flow | Done: rules, fidelity levels, conditions, tabs, overlays, devices, full examples |
 | Flowchart | Done: rules, patterns, plain and illustrated examples, swimlane, complete delivery flow |
-| Sequence, ER, Architecture, Explainer and the rest | Not started |
+| Sequence | Done: rules, message kinds, fragments, basic example, complete delivery flow (plain and illustrated) |
+| ER, Architecture, Explainer and the rest | Not started |
 
 Not yet verified: whether draw.io's `flowAnimation` edge style survives export well enough to reproduce the animated lines.
 
@@ -57,8 +58,8 @@ Installation and usage instructions will be added once the first plugin is avail
 
 ## Roadmap
 
-- [x] Design foundation, icon sets, Screen flow and Flowchart notation
-- [ ] Design the remaining diagram types (Sequence, ER, Architecture, Explainer, ...)
+- [x] Design foundation, icon sets, Screen flow, Flowchart and Sequence notation
+- [ ] Design the remaining diagram types (ER, Architecture, Explainer, ...)
 - [ ] Test draw.io animated edges and export
 - [ ] Define the plugin interface and project structure
 - [ ] Generate valid draw.io XML from a text prompt
