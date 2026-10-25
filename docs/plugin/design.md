@@ -92,18 +92,22 @@ Every engine takes its numbers from one `theme` file (gaps of 56/70 px for flowc
 
 ## 5. The scene
 
-A scene is plain geometry in pixels, independent of HTML and draw.io:
+A scene is plain geometry in pixels, independent of HTML and draw.io. `x` and `y` are the top-left corner of a node or frame; an edge carries its own routed points and the position of its label:
 
 ```json
 {
   "size": [1400, 900],
+  "title": "Place an order",
   "frames": [{"id": "lane1", "x": 0, "y": 80, "w": 1400, "h": 220, "label": "Customer", "tone": "blue"}],
   "nodes":  [{"id": "pay", "shape": "process", "x": 540, "y": 120, "w": 280, "h": 92,
-              "text": ["Pay by card"], "tone": "amber", "icon": "card"}],
+              "text": ["Pay by card"], "tone": "amber", "icon": "card", "number": "2"}],
   "edges":  [{"id": "e1", "from": "start", "to": "pay", "role": "main",
-              "points": [[680, 60], [680, 120]], "label": null, "arrow": "end"}]
+              "points": [[680, 60], [680, 120]],
+              "label": {"text": "Pay", "at": [700, 90], "kind": "plain"}, "arrow": "end"}]
 }
 ```
+
+`shape`, `role`, `tone`, `icon` and label `kind` are checked against `theme.json` and `icons.json`; `scene.validate` returns every problem at once.
 
 The scene is also the thing the **check** reads and the thing tests compare against (§8). A user can keep or edit it: it is the "intermediate file" that makes editing existing diagrams possible later.
 

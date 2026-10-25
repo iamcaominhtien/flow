@@ -97,7 +97,7 @@ For draw.io export, also run `/plugin marketplace add jgraph/drawio-mcp` and `/p
 
 The project is just getting started. Ideas and issues are welcome; contribution guidelines will follow.
 
-Python code is checked with [ruff](https://docs.astral.sh/ruff/) (`pip install ruff`; settings in `pyproject.toml`; the `docs/` folder is skipped):
+Python code is checked with [ruff](https://docs.astral.sh/ruff/) and tested with pytest (`pip install ruff pytest`; run `python3 -m pytest`; settings in `pyproject.toml`; the `docs/` folder is skipped):
 
 ```
 ruff format .

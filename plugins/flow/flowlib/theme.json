@@ -1,0 +1,45 @@
+{
+  "fonts": {"sans": "Inter", "mono": "JetBrains Mono"},
+  "ink": "#0F172A",
+  "slate": "#475569",
+  "canvas": "#F8FAFC",
+  "shapes": {
+    "terminator": {"fill": "#DCF5E1", "stroke": "#1E7A3C"},
+    "fail": {"fill": "#FDE4E4", "stroke": "#B42318"},
+    "process": {"fill": "#DCEEFB", "stroke": "#1E5AA8"},
+    "decision": {"fill": "#FFF1DD", "stroke": "#B45309"},
+    "io": {"fill": "#E6E3FB", "stroke": "#4F46A5"},
+    "document": {"fill": "#FFFFFF", "stroke": "#334155"},
+    "subprocess": {"fill": "#DCEEFB", "stroke": "#1E5AA8"},
+    "preparation": {"fill": "#D3F3EF", "stroke": "#0F766E"},
+    "connector": {"fill": "#FDE4E4", "stroke": "#B42318"}
+  },
+  "tones": {
+    "blue": {"box": "#DCEEFB", "pill": "#BFDBFE"},
+    "violet": {"box": "#E6E3FB", "pill": "#CFC8F7"},
+    "amber": {"box": "#FFF1DD", "pill": "#FFD9A3"},
+    "green": {"box": "#DCF5E1", "pill": "#B5EBC1"},
+    "teal": {"box": "#D3F3EF", "pill": "#A8E6DE"},
+    "gray": {"box": "#F1F5F9", "pill": "#E2E8F0"}
+  },
+  "roles": {
+    "next": {"color": "#0F172A", "dash": null, "width": 2, "head": 5, "gap": 5},
+    "yes": {"color": "#15803D", "dash": null, "width": 2, "head": 5, "gap": 5},
+    "no": {"color": "#B42318", "dash": null, "width": 2, "head": 5, "gap": 5},
+    "back": {"color": "#475569", "dash": "6 5", "width": 2, "head": 5, "gap": 5},
+    "main": {"color": "#1D4ED8", "dash": "10 8", "width": 4, "head": 4, "gap": 8,
+             "animation": "flow"},
+    "data": {"color": "#7C3AED", "dash": "6 6", "width": 2, "head": 5, "gap": 5,
+             "animation": "flow2"}
+  },
+  "animations": {
+    "flow": {"offset": -18, "seconds": 0.7},
+    "flow2": {"offset": -12, "seconds": 1.8}
+  },
+  "chips": {
+    "yes": {"bg": "#DCF5E1", "fg": "#15803D"},
+    "no": {"bg": "#FDE4E4", "fg": "#B42318"},
+    "back": {"bg": "#E2E8F0", "fg": "#334155"},
+    "plain": {"bg": "#F1F5F9", "fg": "#334155"}
+  }
+}

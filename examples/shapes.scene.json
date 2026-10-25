@@ -1,0 +1,233 @@
+{
+ "size": [
+  1100,
+  540
+ ],
+ "title": "Shapes, icons, frames and line roles",
+ "frames": [
+  {
+   "id": "zone",
+   "x": 30,
+   "y": 90,
+   "w": 1020,
+   "h": 200,
+   "label": "Checkout",
+   "tone": "blue"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "a",
+   "shape": "terminator",
+   "x": 60,
+   "y": 160,
+   "w": 160,
+   "h": 52,
+   "text": "Start"
+  },
+  {
+   "id": "b",
+   "shape": "process",
+   "x": 300,
+   "y": 158,
+   "w": 180,
+   "h": 56,
+   "text": "Pay by card",
+   "icon": "card",
+   "tone": "amber",
+   "number": "1"
+  },
+  {
+   "id": "c",
+   "shape": "decision",
+   "x": 560,
+   "y": 140,
+   "w": 190,
+   "h": 92,
+   "text": "Accepted?"
+  },
+  {
+   "id": "d",
+   "shape": "subprocess",
+   "x": 820,
+   "y": 158,
+   "w": 190,
+   "h": 56,
+   "text": "Send receipt",
+   "icon": "bell"
+  },
+  {
+   "id": "e",
+   "shape": "document",
+   "x": 60,
+   "y": 300,
+   "w": 170,
+   "h": 70,
+   "text": "Invoice"
+  },
+  {
+   "id": "f",
+   "shape": "preparation",
+   "x": 300,
+   "y": 308,
+   "w": 190,
+   "h": 56,
+   "text": "Prepare order",
+   "icon": "pot"
+  },
+  {
+   "id": "g",
+   "shape": "io",
+   "x": 560,
+   "y": 308,
+   "w": 200,
+   "h": 56,
+   "text": "Read card",
+   "icon": "phone"
+  },
+  {
+   "id": "h",
+   "shape": "connector",
+   "x": 880,
+   "y": 306,
+   "w": 60,
+   "h": 60,
+   "text": "A"
+  },
+  {
+   "id": "i",
+   "shape": "fail",
+   "x": 60,
+   "y": 450,
+   "w": 170,
+   "h": 52,
+   "text": "Declined"
+  }
+ ],
+ "edges": [
+  {
+   "id": "m1",
+   "role": "main",
+   "points": [
+    [
+     220,
+     186
+    ],
+    [
+     300,
+     186
+    ]
+   ]
+  },
+  {
+   "id": "m2",
+   "role": "main",
+   "points": [
+    [
+     480,
+     186
+    ],
+    [
+     560,
+     186
+    ]
+   ]
+  },
+  {
+   "id": "y1",
+   "role": "yes",
+   "points": [
+    [
+     750,
+     186
+    ],
+    [
+     820,
+     186
+    ]
+   ],
+   "label": {
+    "text": "Yes",
+    "at": [
+     785,
+     186
+    ],
+    "kind": "yes"
+   }
+  },
+  {
+   "id": "d1",
+   "role": "data",
+   "points": [
+    [
+     915,
+     214
+    ],
+    [
+     915,
+     260
+    ],
+    [
+     145,
+     260
+    ],
+    [
+     145,
+     300
+    ]
+   ],
+   "label": {
+    "text": "event: paid",
+    "at": [
+     250,
+     260
+    ]
+   }
+  },
+  {
+   "id": "n1",
+   "role": "no",
+   "points": [
+    [
+     655,
+     232
+    ],
+    [
+     655,
+     276
+    ],
+    [
+     400,
+     276
+    ],
+    [
+     400,
+     308
+    ]
+   ],
+   "label": {
+    "text": "No",
+    "at": [
+     540,
+     276
+    ],
+    "kind": "no"
+   }
+  },
+  {
+   "id": "b1",
+   "role": "back",
+   "points": [
+    [
+     145,
+     370
+    ],
+    [
+     145,
+     450
+    ]
+   ],
+   "arrow": "none"
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "user": "<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8\"/>",
+ "phone": "<rect x=\"7\" y=\"2\" width=\"10\" height=\"20\" rx=\"2.5\"/><path d=\"M11 18h2\"/>",
+ "cart": "<path d=\"M3 4h3l2.5 11h10L21 7H7\"/><circle cx=\"10\" cy=\"19.5\" r=\"1.5\"/><circle cx=\"17\" cy=\"19.5\" r=\"1.5\"/>",
+ "card": "<rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2.5\"/><path d=\"M2 10h20M6 15h4\"/>",
+ "bell": "<path d=\"M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z\"/><path d=\"M10 21h4\"/>",
+ "clock": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>",
+ "pin": "<path d=\"M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z\"/><circle cx=\"12\" cy=\"10\" r=\"2.5\"/>",
+ "pot": "<path d=\"M4 11h16v3a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6z\"/><path d=\"M8 7c0-2 2-2 2-4M14 7c0-2 2-2 2-4\"/>",
+ "check": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M8 12l3 3 5-6\"/>",
+ "box": "<path d=\"M3 8l9-5 9 5v9l-9 5-9-5z\"/><path d=\"M3 8l9 5 9-5M12 13v9\"/>",
+ "bike": "<circle cx=\"6\" cy=\"17\" r=\"3.5\"/><circle cx=\"18\" cy=\"17\" r=\"3.5\"/><path d=\"M6 17l4-8h5l3 8M10 9L8.5 6H6\"/>",
+ "refund": "<path d=\"M4 12a8 8 0 1 1 2.5 5.8\"/><path d=\"M4 5v7h7\"/>",
+ "warn": "<path d=\"M12 3l10 18H2z\"/><path d=\"M12 10v5M12 18v.5\"/>",
+ "star": "<path d=\"M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1L3.2 9.4l6.1-.8z\"/>",
+ "doc": "<path d=\"M6 3h9l4 4v14H6z\"/><path d=\"M15 3v4h4M9 12h7M9 16h7\"/>",
+ "store": "<path d=\"M3 9l1.5-5h15L21 9\"/><path d=\"M4 9v11h16V9M9 20v-6h6v6\"/>"
+}
