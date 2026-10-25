@@ -84,6 +84,7 @@ For draw.io export, also run `/plugin marketplace add jgraph/drawio-mcp` and `/p
 - [ ] Design how plugins edit existing `.drawio` files
 - [ ] Test an exported SVG with animated edges on its own
 - [x] Plugin skeleton: marketplace, `flow` plugin, `doctor` skill, installs locally; the draw.io plugin is optional
+- [x] Write the [plugin design](docs/plugin/design.md) (pipeline, spec, layout, renderers, checks)
 - [ ] Shared library: diagram description (JSON), one layout step, HTML/SVG renderer
 - [ ] draw.io renderer from the same description
 - [ ] Generate valid draw.io XML from a text prompt
