@@ -1,0 +1,10 @@
+{
+  "type": "mindmap",
+  "title": "Mind map: launch plan",
+  "desc": "The main branches of a product launch and what each one needs.",
+  "root": {"label": "Launch", "children": [
+    {"label": "Product", "children": [{"label": "Final tests"}, {"label": "Docs"}]},
+    {"label": "Marketing", "children": [{"label": "Landing page"}, {"label": "Email"}, {"label": "Press"}]},
+    {"label": "Support", "children": [{"label": "Help centre"}, {"label": "On-call rota"}]}
+  ]}
+}

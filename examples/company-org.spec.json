@@ -1,0 +1,12 @@
+{
+  "type": "org",
+  "title": "Org chart: a small company",
+  "desc": "The CEO has three directors; engineering and operations have teams below them.",
+  "root": {"label": "CEO", "detail": "Ana Lee", "tone": "violet", "children": [
+    {"label": "Engineering", "detail": "Ben Ortiz", "tone": "blue", "children": [
+      {"label": "Platform team"}, {"label": "App team"}]},
+    {"label": "Operations", "detail": "Chi Tran", "tone": "green", "children": [
+      {"label": "Support"}, {"label": "Logistics"}]},
+    {"label": "Finance", "detail": "Dara Okoye", "tone": "amber"}
+  ]}
+}

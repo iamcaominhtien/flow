@@ -124,7 +124,7 @@ def rules_for(spec: Spec, rules: LayoutRules) -> LayoutRules:
     return rules
 
 
-def _fit(node: SpecNode, rules: LayoutRules) -> FittedNode:
+def fit_content(node: SpecNode, rules: LayoutRules) -> FittedNode:
     """Fit one node to its content: a table to its rows, any other shape to its text."""
     has_icon = node.icon is not None
     if node.kind is Shape.TABLE:
@@ -134,7 +134,7 @@ def _fit(node: SpecNode, rules: LayoutRules) -> FittedNode:
 
 def _layout_sizes(spec: Spec, rules: LayoutRules) -> dict[str, FittedNode]:
     """Fit every node to its content and, for a left-to-right chart, swap width and height."""
-    fitted = {node.id: _fit(node, rules) for node in spec.nodes}
+    fitted = {node.id: fit_content(node, rules) for node in spec.nodes}
     if spec.direction is Direction.DOWN:
         return fitted
     return {
@@ -172,7 +172,7 @@ def _lane_frames(
     )
 
 
-def _origin(spec: Spec, rules: LayoutRules) -> tuple[float, float]:
+def page_origin(spec: Spec, rules: LayoutRules) -> tuple[float, float]:
     """Return the left and top of the first column and row, leaving room for the title.
 
     The title sits at the top of the page. In layout space the page top is the top for a
@@ -193,7 +193,7 @@ def _node_width(node: SpecNode, size: FittedNode, column_width: float, spec: Spe
     return column_width
 
 
-def _make_node(node: SpecNode, size: FittedNode, center: Point, width: float) -> Node:
+def make_node(node: SpecNode, size: FittedNode, center: Point, width: float) -> Node:
     """Build a scene node from its spec, its fitted size and the centre it is placed at."""
     return Node(
         id=node.id,
@@ -235,7 +235,7 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
     heights: dict[int, float] = defaultdict(float)
     for node_id, size in fitted.items():
         heights[grid.rank[node_id]] = max(heights[grid.rank[node_id]], size.height)
-    left, top = _origin(spec, rules)
+    left, top = page_origin(spec, rules)
     column_gaps = (
         (0.0, 0.0) if spec.lanes else (rules.gap_horizontal, rules.gap_horizontal_labelled)
     )
@@ -245,7 +245,7 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
     labelled_rows = _labelled_boundaries(grid.forward, grid.rank)
     center_y = _centers(dict(heights), labelled_rows, row_gaps, top)
     nodes = {
-        node.id: _make_node(
+        node.id: make_node(
             node,
             fitted[node.id],
             (center_x[grid.column[node.id]], center_y[grid.rank[node.id]]),
