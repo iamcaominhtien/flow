@@ -4,7 +4,7 @@ from collections.abc import Callable
 
 from ..model import Scene
 from ..reader import SpecError
-from . import architecture, er, flowchart, sequence, state
+from . import architecture, catalog, er, flowchart, graph, sequence, state
 
 Layout = Callable[[object], Scene]
 
@@ -14,6 +14,7 @@ LAYOUTS: dict[str, Layout] = {
     "sequence": sequence.layout_raw,
     "state": state.layout_raw,
     "er": er.layout_raw,
+    **{name: graph.layout_with(each) for name, each in catalog.TYPES.items()},
 }
 
 

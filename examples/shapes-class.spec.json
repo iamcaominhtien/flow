@@ -1,0 +1,5 @@
+{"type":"class","title":"Class diagram","desc":"Shapes.","classes":[
+ {"id":"shape","label":"Shape","attributes":["+name: str"],"methods":["+area(): float"]},
+ {"id":"circle","label":"Circle","attributes":["-radius: float"],"methods":["+area(): float"]},
+ {"id":"canvas","label":"Canvas","attributes":["-shapes: list"],"methods":["+draw()"]}],
+ "relations":[{"from":"circle","to":"shape","style":"inheritance"},{"from":"canvas","to":"shape","style":"aggregation","to_label":"*"}]}

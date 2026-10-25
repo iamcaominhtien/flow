@@ -129,5 +129,5 @@ def test_drawio_uses_frame_shape_for_fragments_and_plain_lifelines() -> None:
 
 def test_unknown_diagram_type_lists_the_types() -> None:
     """A spec with an unknown type is rejected with the list of known types."""
-    with pytest.raises(SpecError, match="flowchart, sequence"):
+    with pytest.raises(SpecError, match=r"flowchart.*sequence"):
         diagrams.layout({"type": "pie"})

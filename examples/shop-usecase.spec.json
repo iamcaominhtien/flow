@@ -1,0 +1,20 @@
+{
+  "type": "usecase",
+  "title": "Use cases: online shop",
+  "desc": "A shopper browses and orders; ordering includes paying; an admin manages products.",
+  "zones": [{"id": "shop", "label": "Online shop", "tone": "gray"}],
+  "items": [
+    {"id": "shopper", "label": "Shopper", "kind": "actor"},
+    {"id": "admin", "label": "Admin", "kind": "actor"},
+    {"id": "browse", "label": "Browse products", "zone": "shop"},
+    {"id": "order", "label": "Place an order", "zone": "shop"},
+    {"id": "pay", "label": "Pay", "zone": "shop"},
+    {"id": "manage", "label": "Manage products", "zone": "shop"}
+  ],
+  "links": [
+    {"from": "shopper", "to": "browse"},
+    {"from": "shopper", "to": "order"},
+    {"from": "order", "to": "pay", "style": "include", "label": "include"},
+    {"from": "admin", "to": "manage"}
+  ]
+}

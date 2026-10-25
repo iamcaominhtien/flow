@@ -1,0 +1,21 @@
+{
+  "type": "bpmn",
+  "title": "BPMN: refund request",
+  "desc": "A refund request is checked; an eligible one is paid, the others are declined.",
+  "elements": [
+    {"id": "begin", "kind": "start"},
+    {"id": "check", "label": "Check the request"},
+    {"id": "ok", "kind": "gateway", "label": "Eligible?"},
+    {"id": "pay", "label": "Pay the refund"},
+    {"id": "decline", "label": "Send a refusal"},
+    {"id": "done", "kind": "end"}
+  ],
+  "flows": [
+    {"from": "begin", "to": "check"},
+    {"from": "check", "to": "ok"},
+    {"from": "ok", "to": "pay", "label": "Yes", "main": true},
+    {"from": "ok", "to": "decline", "label": "No"},
+    {"from": "pay", "to": "done"},
+    {"from": "decline", "to": "done"}
+  ]
+}
