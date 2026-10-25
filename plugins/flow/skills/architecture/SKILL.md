@@ -47,6 +47,6 @@ You write a short **spec**: the zones, the components and the links. A script pl
 
 ## Limits to tell the user
 
-- A zone is a frame around the components in it; the layout does not yet keep two unrelated components out of a zone's frame, so check the picture if zones overlap.
+- A zone is a frame around the bounding box of its components. Whether an unrelated component can fall inside that box is not verified; look at the picture if zones are crowded.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
 - Fixes beyond the spec: see the flowchart skill (overrides file).
