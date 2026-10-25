@@ -21,7 +21,7 @@ from .reader import Reader, SpecError, suggestion
 from .theme import load_icons
 
 SPEC_KEYS = {"type", "title", "desc", "direction", "lanes", "nodes", "edges", "style"}
-NODE_KEYS = {"id", "kind", "text", "icon", "tone", "number", "side", "lane"}
+NODE_KEYS = {"id", "kind", "text", "icon", "tone", "number", "side", "lane", "detail"}
 LANE_KEYS = {"id", "label", "tone"}
 EDGE_KEYS = {"from", "to", "role", "label"}
 FLOWCHART = "flowchart"
@@ -211,6 +211,7 @@ class _SpecParser:
             number=read.text(raw, "number", where),
             side=read.enum(Side, raw, "side", where),
             lane=self._lane_of(raw, where, lane_ids),
+            detail=read.text(raw, "detail", where) or "",
         )
 
     def _lane_of(self, raw: dict[str, Any], where: str, lane_ids: list[str]) -> str | None:

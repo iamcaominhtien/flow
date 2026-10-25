@@ -92,6 +92,10 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 - Optional `at: [row, column]` on an item places it on an explicit grid cell. Use it only when the automatic placement is wrong.
 - Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
 
+## Illustrated style
+
+Add `"style": "illustrated"` at the top level to draw each box that has an `icon` as a card: a large icon on a tinted disc, the name in a pill, and the `detail` text under it. Boxes without an icon stay plain. Cards are bigger, so use it for a few boxes (about eight or fewer), give each a `tone` and a short `detail`, and keep names short: the name stays on one line. The default is `"style": "plain"`.
+
 ## Limits to tell the user
 
 - Actor names sit under the figure and a line that leaves the figure can cross the name. Several actors that reach the same row can share a stretch of line.

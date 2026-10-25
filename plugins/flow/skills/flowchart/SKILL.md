@@ -40,7 +40,7 @@ Scope today: flowcharts in the plain style, top to bottom or left to right, with
 
 - `kind`: `terminator` (start or end, green), `process` (one action, blue), `decision` (a question, amber), `io` (data in or out, violet), `document` (a readable output), `subprocess` (a step with its own chart), `preparation` (setup, teal), `fail` (a failed end, rose), `connector` (off-page link, one letter).
 - `role` of an edge: `next` (default, a normal step), `yes`, `no`, `back` (returns to an earlier step), `main` (the one most important path, drawn thick and animated), `data` (an event or data flow, drawn violet and animated slowly). Use `main` on at most one connected path.
-- Optional on a node: `icon` (one of `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`), `tone` (`blue violet amber green teal gray`, marks the owner or domain, never a meaning), `number` (a short chip such as `3`), `side` (`left` or `right`, asks for a branch on that side).
+- Optional on a node: `detail` (a small second line under the text), `icon` (one of `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`), `tone` (`blue violet amber green teal gray`, marks the owner or domain, never a meaning), `number` (a short chip such as `3`), `side` (`left` or `right`, asks for a branch on that side).
 - Edge `label`: short; `Yes` and `No` for decision exits.
 - `direction`: `down` (default) for up to about ten steps, `right` for pipelines and timelines. Never mix them.
 - Swimlanes: add `"lanes": [{"id": "support", "label": "Support", "tone": "violet"}, ...]` and give every node a `"lane"`. One lane per actor (person, team or system); the actor who starts goes first. Swimlanes read best with `"direction": "right"`. A step sits in exactly one lane, and with lanes the `side` hint is ignored.
@@ -69,6 +69,10 @@ If those steps do not clear an error, fix it by hand with an **overrides** file 
 ```
 
 `x` and `y` are the top-left corner of a node; edge ids are `e1`, `e2`... in spec order; a route is a list of `[x, y]` points that runs along horizontal and vertical segments. The build applies the file to both the page and the draw.io file, so a fix is kept when you rebuild. Moving a node does not move its lines: re-route them in the same file. Do not edit the HTML or the `.drawio` file by hand: a rebuild would overwrite the edit.
+
+## Illustrated style
+
+Add `"style": "illustrated"` at the top level to draw each box that has an `icon` as a card: a large icon on a tinted disc, the name in a pill, and the `detail` text under it. Boxes without an icon stay plain. Cards are bigger, so use it for a few boxes (about eight or fewer), give each a `tone` and a short `detail`, and keep names short: the name stays on one line. The default is `"style": "plain"`.
 
 ## Known limits
 

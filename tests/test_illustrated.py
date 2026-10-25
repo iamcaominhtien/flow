@@ -98,3 +98,13 @@ def test_flowchart_and_kanban_accept_the_style() -> None:
     board = json.loads((EXAMPLES / "sprint-kanban.spec.json").read_text())
     board["style"] = "illustrated"
     assert any(node.card for node in diagrams.layout(board).nodes)
+
+
+def test_flowchart_node_detail_shows_under_the_text() -> None:
+    """A flowchart node can carry a detail line, which a card shows under its pill."""
+    flow = json.loads((EXAMPLES / "order-flow.spec.json").read_text())
+    flow["style"] = "illustrated"
+    node = next(item for item in flow["nodes"] if item.get("icon"))
+    node["detail"] = "One line about it"
+    shown = next(each for each in diagrams.layout(flow).nodes if each.id == node["id"])
+    assert shown.detail == ("One line about it",)
