@@ -75,6 +75,19 @@ class LayoutRules:
     gap_horizontal: float
     gap_horizontal_labelled: float
     margin: float
+    table_header_height: float
+    table_row_height: float
+    table_section_gap: float
+    table_min_width: float
+    table_row_gap: float
+    table_padding_x: float
+    table_bottom_pad: float
+    table_extra_width: float
+    detail_font_size: float
+    detail_line_height: float
+    caption_height: float
+    zone_padding: float
+    zone_label_room: float
     lane_padding: float
     lane_min_size: float
     min_canvas_width: float

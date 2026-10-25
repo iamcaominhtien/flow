@@ -8,8 +8,8 @@ is ``char_width_em`` times the font size. The estimate has a safety margin built
 import math
 from dataclasses import dataclass
 
-from .model import DEFAULT_FONT_SIZE_PX, Shape
-from .text_area import text_area_width
+from .model import DEFAULT_FONT_SIZE_PX, Row, Shape
+from .text_area import ICON_TEXT_RESERVE_PX, text_area_width
 from .theme import LayoutRules
 
 WIDTH_STEP_PX = 10  # a node is widened in steps of this size until its text fits
@@ -23,6 +23,7 @@ class FittedNode:
     width: float
     height: float
     lines: tuple[str, ...]
+    detail: tuple[str, ...] = ()
 
 
 def estimate_text_width(text: str, rules: LayoutRules, font_size: float) -> float:
@@ -65,29 +66,84 @@ def wrap_text(text: str, rules: LayoutRules, max_width: float, font_size: float)
     return lines
 
 
-def fit_node(shape: Shape, text: str, has_icon: bool, rules: LayoutRules) -> FittedNode:
+@dataclass(frozen=True)
+class NodeContent:
+    """The text of a node as the author wrote it, and whether it shows an icon."""
+
+    title: str
+    detail: str = ""
+    has_icon: bool = False
+
+
+def fit_node(shape: Shape, content: NodeContent, rules: LayoutRules) -> FittedNode:
     """Choose the smallest size that holds the text in at most ``max_text_lines`` lines.
 
     The node starts at the minimum size for its shape and is widened, never made taller,
-    until the text fits. Only when the widest allowed node still needs more lines does the
-    node grow taller.
+    until the title fits. Only when the widest allowed node still needs more lines does the
+    node grow taller. A detail text goes under the title in a smaller font and may add height.
 
     Args:
         shape: The node shape.
-        text: The node text, not yet wrapped.
-        has_icon: Whether the node shows an icon.
+        content: The title, an optional detail text for under it, and whether there is an icon.
         rules: The layout rules.
 
     Returns:
-        The width, height and wrapped lines.
+        The width, height, wrapped title lines and wrapped detail lines.
     """
     min_width, min_height = rules.min_sizes[shape]
     font_size = DEFAULT_FONT_SIZE_PX
     width = min_width
     while True:
-        lines = wrap_text(text, rules, text_area_width(shape, width, has_icon), font_size)
+        room = text_area_width(shape, width, content.has_icon)
+        lines = wrap_text(content.title, rules, room, font_size)
         if len(lines) <= rules.max_text_lines or width >= rules.max_node_width:
             break
         width += WIDTH_STEP_PX
-    needed = math.ceil(len(lines) * font_size * LINE_HEIGHT_FACTOR) + 2 * rules.line_padding
-    return FittedNode(width=width, height=max(min_height, needed), lines=tuple(lines))
+    detail = content.detail
+    detail_lines = wrap_text(detail, rules, room, rules.detail_font_size) if detail else []
+    needed = math.ceil(len(lines) * font_size * LINE_HEIGHT_FACTOR)
+    needed += len(detail_lines) * rules.detail_line_height + 2 * rules.line_padding
+    return FittedNode(width, max(min_height, needed), tuple(lines), tuple(detail_lines))
+
+
+def fit_table(
+    title: str, sections: tuple[tuple[Row, ...], ...], has_icon: bool, rules: LayoutRules
+) -> FittedNode:
+    """Size a table node from its title and its rows.
+
+    Args:
+        title: The table name, shown in the header.
+        sections: The groups of rows, with a divider between groups.
+        has_icon: Whether the header shows an icon.
+        rules: The layout rules.
+
+    Returns:
+        The size; ``lines`` holds the title.
+    """
+    mono_width = rules.char_width_em * rules.detail_font_size
+    widest_row = max(
+        (
+            (len(row.left) + len(row.right)) * mono_width + rules.table_row_gap
+            for section in sections
+            for row in section
+        ),
+        default=0,
+    )
+    header = estimate_text_width(title, rules, DEFAULT_FONT_SIZE_PX) + (
+        ICON_TEXT_RESERVE_PX if has_icon else 0
+    )
+    width = max(
+        rules.table_min_width,
+        widest_row + 2 * rules.table_padding_x,
+        header + 2 * rules.table_padding_x,
+    )
+    rows = sum(len(section) for section in sections)
+    gaps = max(len(sections) - 1, 0) * rules.table_section_gap
+    height = (
+        rules.table_header_height + rows * rules.table_row_height + gaps + rules.table_bottom_pad
+    )
+    return FittedNode(
+        width=min(width, rules.max_node_width + rules.table_extra_width),
+        height=height,
+        lines=(title,),
+    )

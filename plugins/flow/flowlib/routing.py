@@ -5,16 +5,21 @@ columns, and around the flow when a node is in the way. A returning line always 
 the flow, in a channel outside the nodes.
 """
 
-from dataclasses import dataclass
+import math
+from dataclasses import dataclass, field
 from enum import StrEnum
 from itertools import pairwise
 
 from .layered import Grid
-from .model import Edge, EdgeLabel, LabelKind, Node, Point, Role
+from .model import SYMBOL_HEADS, Edge, EdgeLabel, LabelKind, Node, Point, Role, Shape
 from .placement import Placement
 from .spec import Spec, SpecEdge
 from .theme import LayoutRules
 
+END_LABEL_ALONG_PX = 24.0  # distance of an end label from the end of its line
+END_LABEL_ACROSS_PX = 12.0  # and how far it sits to the side of the line
+BUS_ABOVE_TARGET_PX = 28.0  # a line between columns turns this far above its target
+BUS_BELOW_SOURCE_PX = 12.0  # but never closer than this to the bottom of its source
 SAME_LINE_TOLERANCE_PX = 1.0  # two centres closer than this count as on one line
 CLEARANCE_PX = 4.0  # how far a line must stay from a node it passes
 
@@ -49,6 +54,7 @@ class _Context:
     rules: LayoutRules
     used_ports: set[tuple[str, Port]]
     channels_used: dict[Port, int]
+    slots: dict[SpecEdge, tuple[float, float]] = field(default_factory=dict)
 
 
 def _attach(node: Node, port: Port) -> Point:
@@ -105,21 +111,87 @@ def _center(node: Node) -> Point:
     return node.x + node.width / 2, node.y + node.height / 2
 
 
-def _forward_points(source: Node, target: Node) -> tuple[list[Point], Port]:
+def _goes_down(source: Node, target: Node) -> bool:
+    """Tell whether a line between two nodes runs from one row to a lower one."""
+    return _center(target)[1] - _center(source)[1] > SAME_LINE_TOLERANCE_PX
+
+
+def _spread(positions: list[tuple[SpecEdge, float]], node: Node) -> dict[SpecEdge, float]:
+    """Spread the points where several lines meet one side of a node, in the order of ``positions``.
+
+    Args:
+        positions: The edges and the x of their far end, in any order.
+        node: The node whose side the lines meet.
+
+    Returns:
+        Edge to the x where it meets the node: the middle for a single line, otherwise evenly
+        spaced across the width and ordered like the far ends, so that the lines do not cross.
+    """
+    ordered = sorted(positions, key=lambda item: item[1])
+    count = len(ordered)
+    return {
+        edge: node.x + node.width * (index + 1) / (count + 1) if count > 1 else _center(node)[0]
+        for index, (edge, _) in enumerate(ordered)
+    }
+
+
+def _centered(positions: list[tuple[SpecEdge, float]], node: Node) -> dict[SpecEdge, float]:
+    """Meet the middle of a side of a node with every line, so that lines that merge share it."""
+    return {edge: _center(node)[0] for edge, _ in positions}
+
+
+def _slots(edges: list[SpecEdge], nodes: dict[str, Node]) -> dict[SpecEdge, tuple[float, float]]:
+    """Choose where each downward line leaves its source and where it enters its target.
+
+    Args:
+        edges: The forward edges.
+        nodes: The placed nodes.
+
+    Returns:
+        Edge to ``(exit x, entry x)``, only for lines that run to a lower row.
+    """
+    down = [e for e in edges if _goes_down(nodes[e.source], nodes[e.target])]
+    leaving: dict[str, list[tuple[SpecEdge, float]]] = {}
+    arriving: dict[str, list[tuple[SpecEdge, float]]] = {}
+    for edge in down:
+        leaving.setdefault(edge.source, []).append((edge, _center(nodes[edge.target])[0]))
+        arriving.setdefault(edge.target, []).append((edge, _center(nodes[edge.source])[0]))
+    exit_x: dict[SpecEdge, float] = {}
+    entry_x: dict[SpecEdge, float] = {}
+    for name, group in leaving.items():
+        needs_room = any(edge.tail in SYMBOL_HEADS for edge, _ in group)
+        exit_x.update(_spread(group, nodes[name]) if needs_room else _centered(group, nodes[name]))
+    for name, group in arriving.items():
+        needs_room = any(edge.head in SYMBOL_HEADS for edge, _ in group)
+        entry_x.update(_spread(group, nodes[name]) if needs_room else _centered(group, nodes[name]))
+    return {edge: (exit_x[edge], entry_x[edge]) for edge in down}
+
+
+def _forward_points(
+    source: Node, target: Node, slot: tuple[float, float] | None
+) -> tuple[list[Point], Port]:
     """Return the direct route between two nodes and the port it leaves from.
 
     Args:
         source: Where the line starts.
         target: Where the line ends.
+        slot: Where the line leaves the bottom of the source and enters the top of the target,
+            when it runs to a lower row.
 
     Returns:
         The points, and the port of the source that the line leaves from.
     """
     (source_x, source_y), (target_x, target_y) = _center(source), _center(target)
-    if abs(source_x - target_x) < SAME_LINE_TOLERANCE_PX:
-        return [_attach(source, Port.BOTTOM), _attach(target, Port.TOP)], Port.BOTTOM
+    same_row = abs(source_y - target_y) < SAME_LINE_TOLERANCE_PX
+    if slot is not None and not (source.shape is Shape.DECISION and source_x != slot[0]):
+        exit_x, entry_x = slot
+        start, end = (exit_x, source.y + source.height), (entry_x, target.y)
+        if abs(exit_x - entry_x) < SAME_LINE_TOLERANCE_PX:
+            return [start, end], Port.BOTTOM
+        bus_y = max(start[1] + BUS_BELOW_SOURCE_PX, end[1] - BUS_ABOVE_TARGET_PX)
+        return [start, (exit_x, bus_y), (entry_x, bus_y), end], Port.BOTTOM
     leaving = Port.RIGHT if target_x > source_x else Port.LEFT
-    if abs(source_y - target_y) < SAME_LINE_TOLERANCE_PX:
+    if same_row:
         arriving = Port.LEFT if leaving is Port.RIGHT else Port.RIGHT
         return [_attach(source, leaving), _attach(target, arriving)], leaving
     corner = (target_x, source_y)
@@ -241,6 +313,25 @@ def _label_at(points: list[Point], role: Role, rules: LayoutRules) -> Point:
     return middle
 
 
+def _end_labels(spec_edge: SpecEdge, points: list[Point]) -> tuple[EdgeLabel, ...]:
+    """Build the small labels at the two ends of a line, such as multiplicities."""
+    found = []
+    for text, near, toward in (
+        (spec_edge.start_label, points[0], points[1]),
+        (spec_edge.end_label, points[-1], points[-2]),
+    ):
+        if text:
+            length = max(math.dist(near, toward), 1.0)
+            along = (toward[0] - near[0]) / length
+            across = (toward[1] - near[1]) / length
+            at = (
+                near[0] + along * END_LABEL_ALONG_PX - across * END_LABEL_ACROSS_PX,
+                near[1] + across * END_LABEL_ALONG_PX + along * END_LABEL_ACROSS_PX,
+            )
+            found.append(EdgeLabel(text=text, at=at, kind=LabelKind.TEXT))
+    return tuple(found)
+
+
 def _route_one(spec_edge: SpecEdge, returning: bool, context: _Context) -> list[Point]:
     """Route one edge, registering the ports it uses.
 
@@ -253,7 +344,7 @@ def _route_one(spec_edge: SpecEdge, returning: bool, context: _Context) -> list[
         The points of the route.
     """
     source, target = context.nodes[spec_edge.source], context.nodes[spec_edge.target]
-    points, port = _forward_points(source, target)
+    points, port = _forward_points(source, target, context.slots.get(spec_edge))
     route = _Route(points, leaves=port, arrives=Port.TOP, channel=None)
     if returning or not _is_clear(points, context, (source.id, target.id)):
         route = _returning_route(source, target, context)
@@ -276,6 +367,7 @@ def route_edges(spec: Spec, grid: Grid, placement: Placement, rules: LayoutRules
     """
     context = _Context(placement.nodes, rules, set(), {})
     returning = set(grid.returning)
+    context.slots = _slots(list(grid.forward), placement.nodes)
     order = sorted(spec.edges, key=lambda edge: edge in returning)
     routed = {edge: _route_one(edge, edge in returning, context) for edge in order}
     edges = []
@@ -294,6 +386,10 @@ def route_edges(spec: Spec, grid: Grid, placement: Placement, rules: LayoutRules
                 label=label,
                 source=spec_edge.source,
                 target=spec_edge.target,
+                head=spec_edge.head,
+                tail=spec_edge.tail,
+                dashed=spec_edge.dashed,
+                extras=_end_labels(spec_edge, points),
             )
         )
     return edges

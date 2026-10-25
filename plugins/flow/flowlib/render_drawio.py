@@ -50,6 +50,17 @@ HEXAGON_SLANT_DIVISOR = 5
 DOCUMENT_WAVE_FRACTION = 0.2
 PILL_ARC_PERCENT = 50
 NOTE_FOLD_PX = 16
+TABLE_ARC_PERCENT = 6
+TABLE_TEXT_INSET_PX = 12
+ROW_PADDING_PX = 12
+CYLINDER_CAP_PX = 10
+START_STROKE_WIDTH_PX = 2
+END_STROKE_WIDTH_PX = 5
+DETAIL_FONT_SIZE_PX = 11
+BELOW = {
+    "verticalLabelPosition": "bottom",
+    "verticalAlign": "top",
+}  # the label sits under the shape
 BAR_STROKE_WIDTH_PX = 1.5
 FRAGMENT_TAG_WIDTH_PX = 60
 FRAGMENT_TAG_HEIGHT_PX = 18
@@ -126,6 +137,58 @@ def _cross_style(node: Node) -> dict[str, object]:
     return {"shape": "umlDestroy"}
 
 
+def _table_style(node: Node) -> dict[str, object]:
+    """Style pairs for a table: a swimlane whose header is the title and whose rows are children."""
+    return {
+        "swimlane": "",
+        "horizontal": 1,
+        "collapsible": 0,
+        "align": "left",
+        "rounded": 1,
+        "arcSize": TABLE_ARC_PERCENT,
+    }
+
+
+def _cylinder_style(node: Node) -> dict[str, object]:
+    """Style pairs for a can, the symbol of a database."""
+    return {"shape": "cylinder3", "boundedLbl": 1, "backgroundOutline": 1, "size": CYLINDER_CAP_PX}
+
+
+def _entity_style(node: Node) -> dict[str, object]:
+    """Style pairs for a rectangle with square corners."""
+    return {"rounded": 0}
+
+
+def _store_style(node: Node) -> dict[str, object]:
+    """Style pairs for a box open on the right, the symbol of a data store."""
+    return {"shape": "partialRectangle", "right": 0}
+
+
+def _start_style(node: Node) -> dict[str, object]:
+    """Style pairs for a thin circle."""
+    return {"ellipse": "", "strokeWidth": START_STROKE_WIDTH_PX, **BELOW}
+
+
+def _end_style(node: Node) -> dict[str, object]:
+    """Style pairs for a thick circle."""
+    return {"ellipse": "", "strokeWidth": END_STROKE_WIDTH_PX, **BELOW}
+
+
+def _intermediate_style(node: Node) -> dict[str, object]:
+    """Style pairs for a double circle."""
+    return {"shape": "doubleEllipse", **BELOW}
+
+
+def _actor_style(node: Node) -> dict[str, object]:
+    """Style pairs for a stick figure whose name is written below it."""
+    return {"shape": "umlActor", **BELOW}
+
+
+def _ellipse_style(node: Node) -> dict[str, object]:
+    """Style pairs for an ellipse."""
+    return {"ellipse": ""}
+
+
 def _circle_style(node: Node) -> dict[str, object]:
     """Style pairs for an ellipse, which is a circle when the node is square."""
     return {"ellipse": ""}
@@ -144,6 +207,15 @@ SHAPE_STYLES: dict[Shape, Callable[[Node], dict[str, object]]] = {
     Shape.BAR: _bar_style,
     Shape.NOTE: _note_style,
     Shape.CROSS: _cross_style,
+    Shape.TABLE: _table_style,
+    Shape.CYLINDER: _cylinder_style,
+    Shape.ENTITY: _entity_style,
+    Shape.STORE: _store_style,
+    Shape.START: _start_style,
+    Shape.END: _end_style,
+    Shape.INTERMEDIATE: _intermediate_style,
+    Shape.ACTOR: _actor_style,
+    Shape.ELLIPSE: _ellipse_style,
 }
 
 
@@ -165,7 +237,16 @@ def _node_style(node: Node, theme: Theme) -> str:
     style.update(SHAPE_STYLES[node.shape](node))
     if node.shape is Shape.NOTE:
         style.update({"fontStyle": 0, "fontColor": theme.slate})
-    if node.icon:
+    if node.shape is Shape.TABLE:
+        icon_room = ICON_LEFT_PX + ICON_SIZE_PX if node.icon else 0
+        style.update(
+            {
+                "startSize": theme.layout.table_header_height,
+                "swimlaneFillColor": "#FFFFFF",
+                "spacingLeft": TABLE_TEXT_INSET_PX + icon_room,
+            }
+        )
+    if node.icon and node.shape is not Shape.TABLE:
         style["spacingLeft"] = ICON_TEXT_RESERVE_PX
     return style_string(style)
 
@@ -173,6 +254,17 @@ def _node_style(node: Node, theme: Theme) -> str:
 def _label_value(lines: tuple[str, ...]) -> str:
     """Join text lines with ``<br>``, escaping each so that markup in the text stays text."""
     return "<br>".join(esc(line) for line in lines)
+
+
+def _node_value(node: Node, theme: Theme) -> str:
+    """Return the label of a node: its caption, or its title followed by its detail lines."""
+    if node.caption:
+        return esc(node.caption)
+    title = _label_value(node.text)
+    if not node.detail:
+        return title
+    style = f"font-size:{DETAIL_FONT_SIZE_PX}px;font-weight:normal;color:{theme.slate}"
+    return f'{title}<br><span style="{style}">{_label_value(node.detail)}</span>'
 
 
 def _icon_data_uri(name: str, stroke: str) -> str:
@@ -190,18 +282,67 @@ def _icon_data_uri(name: str, stroke: str) -> str:
 
 def _add_node(root: ET.Element, node: Node, theme: Theme) -> None:
     """Add a node, its icon (as a child cell) and its number badge."""
-    cell = add_vertex(root, f"node-{node.id}", _label_value(node.text), _node_style(node, theme))
+    cell = add_vertex(root, f"node-{node.id}", _node_value(node, theme), _node_style(node, theme))
     add_geometry(cell, (node.x, node.y, node.width, node.height))
+    if node.shape is Shape.TABLE:
+        _add_table_rows(root, node, theme)
     if node.icon:
         icon_style = style_string(
             {"shape": "image", "image": _icon_data_uri(node.icon, theme.shapes[node.shape].stroke)}
         )
         icon = add_vertex(root, f"icon-{node.id}", "", icon_style)
         icon.set("parent", f"node-{node.id}")  # a child cell moves with its node
-        icon_top = (node.height - ICON_SIZE_PX) / 2
+        band = theme.layout.table_header_height if node.shape is Shape.TABLE else node.height
+        icon_top = (band - ICON_SIZE_PX) / 2
         add_geometry(icon, (ICON_LEFT_PX, icon_top, ICON_SIZE_PX, ICON_SIZE_PX))
     if node.number:
         _add_badge(root, node, theme)
+
+
+def _row_value(left: str, right: str) -> str:
+    """Return a table row as a one-line HTML table with the name left and the note right."""
+    return (
+        '<table style="width:100%;border-collapse:collapse"><tr>'
+        f'<td style="padding-left:{ROW_PADDING_PX}px">{esc(left)}</td>'
+        f'<td align="right" style="padding-right:{ROW_PADDING_PX}px">{esc(right)}</td>'
+        "</tr></table>"
+    )
+
+
+def _add_table_rows(root: ET.Element, node: Node, theme: Theme) -> None:
+    """Add each row of a table as a child cell, so that the rows move with the table."""
+    rules = theme.layout
+    style = style_string(
+        {
+            "text": "",
+            "html": 1,
+            "whiteSpace": "wrap",
+            "overflow": "fill",
+            "align": "left",
+            "verticalAlign": "middle",
+            "spacingLeft": 8,
+            "spacingRight": 8,
+            "strokeColor": "none",
+            "fillColor": "none",
+            "fontSize": DETAIL_FONT_SIZE_PX,
+            "fontColor": theme.ink,
+            "fontFamily": theme.fonts.mono,
+        }
+    )
+    y = rules.table_header_height
+    for section_index, section in enumerate(node.sections):
+        if section_index:
+            y += rules.table_section_gap
+        for row_index, row in enumerate(section):
+            cell = add_vertex(
+                root,
+                f"row-{node.id}-{section_index}-{row_index}",
+                _row_value(row.left, row.right),
+                style,
+            )
+            cell.set("parent", f"node-{node.id}")
+            add_geometry(cell, (0, y, node.width, rules.table_row_height))
+            y += rules.table_row_height
 
 
 def _add_badge(root: ET.Element, node: Node, theme: Theme) -> None:

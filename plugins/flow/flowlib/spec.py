@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from .model import Direction, Role, Shape, Side, Tone
+from .model import Direction, Head, Role, Row, Shape, Side, Tone
 from .reader import Reader, SpecError, suggestion
 from .theme import load_icons
 
@@ -48,6 +48,21 @@ class SpecNode:
     number: str | None
     side: Side | None
     lane: str | None
+    detail: str = ""
+    caption: str | None = None
+    sections: tuple[tuple[Row, ...], ...] = ()
+    at: tuple[int, int] | None = None  # (row, column) on an explicit grid
+    zone: str | None = None
+
+
+@dataclass(frozen=True)
+class SpecZone:
+    """A frame that groups nodes, and may sit inside another zone."""
+
+    id: str
+    label: str
+    tone: Tone
+    parent: str | None = None
 
 
 @dataclass(frozen=True)
@@ -58,6 +73,11 @@ class SpecEdge:
     target: str
     role: Role
     label: str | None
+    head: Head = Head.FILLED
+    tail: Head = Head.NONE
+    dashed: bool = False
+    start_label: str | None = None
+    end_label: str | None = None
 
 
 @dataclass(frozen=True)
@@ -70,6 +90,7 @@ class Spec:
     lanes: tuple[SpecLane, ...]
     nodes: tuple[SpecNode, ...]
     edges: tuple[SpecEdge, ...]
+    zones: tuple[SpecZone, ...] = ()
 
 
 def load(path: str | Path) -> Spec:

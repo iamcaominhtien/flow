@@ -4,9 +4,9 @@ import math
 import xml.etree.ElementTree as ET
 from itertools import pairwise
 
-from .drawio_common import FONT_BOLD, LAYER_CELL_ID, style_string
+from .drawio_common import FONT_BOLD, LAYER_CELL_ID, add_geometry, add_vertex, style_string
 from .markup import esc, fmt
-from .model import Edge, Head, Node, Point
+from .model import SYMBOL_HEADS, Edge, EdgeLabel, Head, Node, Point
 from .theme import LineStyle, Theme
 
 CHIP_FONT_SIZE_PX = 11
@@ -16,8 +16,25 @@ DRAWIO_CYCLE_PX = 16  # draw.io spends ``flowAnimationDuration`` ms per 16 px of
 ARROW_SIZE_PER_STROKE = 3  # ``endSize`` per pixel of line width, tuned by eye against the HTML
 NO_COLOR = "none"
 DEFAULT_DASH = "6 5"  # for a line that is dashed by choice, not by its role
-HEAD_ARROWS = {Head.NONE: "none", Head.FILLED: "block", Head.OPEN: "open", Head.DOT: "oval"}
-FILLED_HEADS = (Head.FILLED, Head.DOT)
+HEAD_ARROWS = {
+    Head.NONE: "none",
+    Head.FILLED: "block",
+    Head.OPEN: "open",
+    Head.DOT: "oval",
+    Head.TRIANGLE: "block",
+    Head.DIAMOND: "diamond",
+    Head.DIAMOND_FILLED: "diamond",
+    Head.ONE: "ERone",
+    Head.MANY: "ERmany",
+    Head.ONE_ONLY: "ERmandOne",
+    Head.ZERO_ONE: "ERzeroToOne",
+    Head.ZERO_MANY: "ERzeroToMany",
+    Head.ONE_MANY: "ERoneToMany",
+}
+FILLED_HEADS = (Head.FILLED, Head.DOT, Head.DIAMOND_FILLED)
+SYMBOL_HEAD_SIZE_PX = 12
+EXTRA_LABEL_WIDTH_PX = 60
+EXTRA_LABEL_HEIGHT_PX = 20
 
 
 def _port(node: Node, point: Point) -> tuple[float, float]:
@@ -100,14 +117,14 @@ def _flow_duration_ms(dash: str | None, seconds: float) -> int:
 
 def _end_style(edge: Edge, line: LineStyle) -> dict[str, object]:
     """Return the style pairs for the arrowhead and the tail of an edge."""
-    size = fmt(line.head_size * ARROW_SIZE_PER_STROKE / 2)
+    arrow_size = fmt(line.head_size * ARROW_SIZE_PER_STROKE / 2)
     return {
         "endArrow": HEAD_ARROWS[edge.head],
         "endFill": int(edge.head in FILLED_HEADS),
-        "endSize": size,
+        "endSize": SYMBOL_HEAD_SIZE_PX if edge.head in SYMBOL_HEADS else arrow_size,
         "startArrow": HEAD_ARROWS[edge.tail],
         "startFill": int(edge.tail in FILLED_HEADS),
-        "startSize": size,
+        "startSize": SYMBOL_HEAD_SIZE_PX if edge.tail in SYMBOL_HEADS else arrow_size,
     }
 
 
@@ -210,6 +227,33 @@ def add_edge(root: ET.Element, edge: Edge, nodes: dict[str, Node], theme: Theme)
         ET.SubElement(
             geometry, "mxPoint", {"x": fmt(offset[0]), "y": fmt(offset[1]), "as": "offset"}
         )
+    for index, extra in enumerate(edge.extras, start=1):
+        _add_extra(root, f"edge-{edge.id}-end{index}", extra, theme)
+
+
+def _add_extra(root: ET.Element, cell_id: str, extra: EdgeLabel, theme: Theme) -> None:
+    """Add a small free-standing text next to the end of a line, such as a multiplicity."""
+    chip = theme.chips[extra.kind]
+    style = style_string(
+        {
+            "text": "",
+            "html": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "strokeColor": "none",
+            "fillColor": "none",
+            "fontSize": CHIP_FONT_SIZE_PX,
+            "fontStyle": FONT_BOLD,
+            "fontColor": chip.foreground,
+            "fontFamily": theme.fonts.mono,
+        }
+    )
+    cell = add_vertex(root, cell_id, esc(extra.text), style)
+    x, y = extra.at
+    half_width, half_height = EXTRA_LABEL_WIDTH_PX / 2, EXTRA_LABEL_HEIGHT_PX / 2
+    add_geometry(
+        cell, (x - half_width, y - half_height, EXTRA_LABEL_WIDTH_PX, EXTRA_LABEL_HEIGHT_PX)
+    )
 
 
 def add_divider(root: ET.Element, cell_id: str, ends: tuple[Point, Point], color: str) -> None:

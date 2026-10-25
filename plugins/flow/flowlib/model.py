@@ -27,6 +27,15 @@ class Shape(StrEnum):
     BAR = "bar"
     NOTE = "note"
     CROSS = "cross"
+    TABLE = "table"
+    CYLINDER = "cylinder"
+    ENTITY = "entity"
+    STORE = "store"
+    START = "start"
+    END = "end"
+    INTERMEDIATE = "intermediate"
+    ACTOR = "actor"
+    ELLIPSE = "ellipse"
 
 
 class Role(StrEnum):
@@ -70,6 +79,28 @@ class Head(StrEnum):
     FILLED = "filled"
     OPEN = "open"
     DOT = "dot"
+    TRIANGLE = "triangle"
+    DIAMOND = "diamond"
+    DIAMOND_FILLED = "diamond_filled"
+    ONE = "one"
+    MANY = "many"
+    ONE_ONLY = "one_only"
+    ZERO_ONE = "zero_one"
+    ZERO_MANY = "zero_many"
+    ONE_MANY = "one_many"
+
+
+SYMBOL_HEADS = (
+    Head.TRIANGLE,
+    Head.DIAMOND,
+    Head.DIAMOND_FILLED,
+    Head.ONE,
+    Head.MANY,
+    Head.ONE_ONLY,
+    Head.ZERO_ONE,
+    Head.ZERO_MANY,
+    Head.ONE_MANY,
+)  # heads that need room of their own where several lines meet a node
 
 
 class FrameVariant(StrEnum):
@@ -125,6 +156,14 @@ class Frame:
 
 
 @dataclass(frozen=True)
+class Row:
+    """One row of a table node: a name on the left and, optionally, a note on the right."""
+
+    left: str
+    right: str = ""
+
+
+@dataclass(frozen=True)
 class Node:
     """One box of the diagram."""
 
@@ -139,6 +178,9 @@ class Node:
     tone: Tone | None
     number: str | None
     font_size: float
+    detail: tuple[str, ...] = ()
+    caption: str | None = None
+    sections: tuple[tuple[Row, ...], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -164,6 +206,7 @@ class Edge:
     head: Head = Head.FILLED
     tail: Head = Head.NONE
     dashed: bool = False
+    extras: tuple[EdgeLabel, ...] = ()
 
 
 @dataclass(frozen=True)

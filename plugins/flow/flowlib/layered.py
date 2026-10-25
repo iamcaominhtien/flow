@@ -5,7 +5,7 @@ leaves sideways. Lines that return to an earlier step are kept out of the placem
 are routed around the flow later.
 """
 
-from collections import defaultdict, deque
+from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
 
 from .model import Role, Side
@@ -154,16 +154,20 @@ def assign_columns(
     roots = [node.id for node in spec.nodes if node.id not in has_parent]
     for position, root in enumerate(roots):
         place(root, position, 1)
+    waiting = Counter(edge.target for edge in forward)
+    wants: dict[str, list[int]] = defaultdict(list)
     pending = deque(roots)
     while pending:
         node_id = pending.popleft()
         for index, edge in enumerate(_children_in_order(node_id, forward)):
-            if edge.target in column:
-                continue
             step = -1 if sides[edge.target] is Side.LEFT else 1
             offset = 0 if index == 0 and edge not in sideways else step
-            place(edge.target, column[node_id] + offset, step)
-            pending.append(edge.target)
+            wants[edge.target].append(column[node_id] + offset)
+            waiting[edge.target] -= 1
+            if waiting[edge.target] == 0:
+                average = sum(wants[edge.target]) / len(wants[edge.target])
+                place(edge.target, round(average), step)
+                pending.append(edge.target)
     return column
 
 
@@ -217,8 +221,9 @@ def assign_lane_columns(spec: Spec) -> dict[str, int]:
 def build_grid(spec: Spec) -> Grid:
     """Place every node of a flowchart on the grid.
 
-    With swimlanes, a node's column is its lane and no exit leaves sideways; without them,
-    the happy path takes one column and branches take the columns beside it.
+    With explicit grid cells (``at``), the cells are used as given. With swimlanes, a node's
+    column is its lane and no exit leaves sideways; without them, the happy path takes one
+    column and branches take the columns beside it.
 
     Args:
         spec: The flowchart description.
@@ -227,6 +232,10 @@ def build_grid(spec: Spec) -> Grid:
         The rows, the columns, and the edges split into forward and returning ones.
     """
     forward, returning = split_returning(spec)
+    if any(node.at is not None for node in spec.nodes):
+        rank = {node.id: node.at[0] for node in spec.nodes if node.at is not None}
+        column = {node.id: node.at[1] for node in spec.nodes if node.at is not None}
+        return Grid(rank=rank, column=column, forward=tuple(forward), returning=tuple(returning))
     if spec.lanes:
         column = assign_lane_columns(spec)
         rank = separate_lane_cells(spec, forward, column)

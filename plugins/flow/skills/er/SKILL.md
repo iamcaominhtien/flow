@@ -1,0 +1,48 @@
+---
+description: Draw an entity-relationship diagram (tables, columns, keys and how tables relate) as an animated HTML page and a draw.io file. Use when the user asks for an ER diagram, a database schema, or how tables link to each other.
+allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py *)
+---
+
+# ER diagram
+
+You write a short **spec**: the tables, their columns and the relations. A script lays the tables out, draws the cardinality marks (crow's foot), checks the result and writes the files. Never write coordinates or HTML yourself.
+
+## Steps
+
+1. List the tables with their columns, then the relations between them.
+2. Write `diagrams/<name>.spec.json` in the current project.
+3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` and `<name>.drawio` next to the spec and prints a check report. Exit code 0: no error; 2: errors found (files still written); 1: the spec is invalid and the message lists every problem.
+4. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Do not say the diagram "looks good": you have not seen it.
+5. Tell the user where the HTML and the `.drawio` file are.
+
+## The spec
+
+```json
+{
+  "type": "er",
+  "title": "ER: food delivery",
+  "desc": "One sentence that says what the diagram shows.",
+  "tables": [
+    {"id": "customers", "name": "customers", "icon": "user", "tone": "blue", "columns": [
+      {"name": "id", "type": "bigint", "flags": ["pk"]},
+      {"name": "email", "type": "text", "flags": ["uq"]}]},
+    {"id": "orders", "name": "orders", "tone": "violet", "columns": [
+      {"name": "id", "type": "bigint", "flags": ["pk"]},
+      {"name": "customer_id", "type": "bigint", "flags": ["fk"]}]}
+  ],
+  "relations": [
+    {"from": "customers", "to": "orders", "label": "places", "main": true}
+  ]
+}
+```
+
+- **Table**: `id`, `name`, `columns`, optional `icon` and `tone`.
+- **Column**: `name`, optional `type`, optional `flags` from `pk`, `fk`, `uq`, `null`.
+- **Relation**: `from`, `to`, optional `label`. `from_end` and `to_end` set the mark at each end: `one`, `many`, `zero_one`, `zero_many`, `one_many`. The default is one at `from` and many at `to`. `style` is `solid` (a foreign key) or `logical` (dashed, no real key). `main: true` highlights and animates the relation to follow first. Mark one or two, not all.
+- Optional `from_column` and `to_column` name the columns the relation joins; they are not drawn yet.
+
+## Limits to tell the user
+
+- Text width is estimated, not measured; a long column name may be tight.
+- The draw.io file was checked in a viewer, not in the draw.io editor.
+- Fixes beyond the spec: see the flowchart skill (overrides file).

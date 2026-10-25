@@ -54,6 +54,42 @@
     "cross": {
       "fill": "none",
       "stroke": "#B42318"
+    },
+    "table": {
+      "fill": "#FFFFFF",
+      "stroke": "#334155"
+    },
+    "cylinder": {
+      "fill": "#E6E3FB",
+      "stroke": "#4F46A5"
+    },
+    "entity": {
+      "fill": "#F1F5F9",
+      "stroke": "#0F172A"
+    },
+    "store": {
+      "fill": "#FFF1DD",
+      "stroke": "#0F172A"
+    },
+    "start": {
+      "fill": "#DCF5E1",
+      "stroke": "#1E7A3C"
+    },
+    "end": {
+      "fill": "#FDE4E4",
+      "stroke": "#B42318"
+    },
+    "intermediate": {
+      "fill": "#FFF1DD",
+      "stroke": "#B45309"
+    },
+    "actor": {
+      "fill": "#FFFFFF",
+      "stroke": "#0F172A"
+    },
+    "ellipse": {
+      "fill": "#DCEEFB",
+      "stroke": "#1E5AA8"
     }
   },
   "tones": {
@@ -218,6 +254,54 @@
       "connector": [
         38,
         38
+      ],
+      "table": [
+        200,
+        56
+      ],
+      "cylinder": [
+        170,
+        76
+      ],
+      "entity": [
+        170,
+        56
+      ],
+      "store": [
+        190,
+        48
+      ],
+      "start": [
+        38,
+        38
+      ],
+      "end": [
+        38,
+        38
+      ],
+      "intermediate": [
+        38,
+        38
+      ],
+      "actor": [
+        56,
+        84
+      ],
+      "ellipse": [
+        180,
+        72
+      ],
+      "bar": [
+        12,
+        24
+      ],
+      "note": [
+        160,
+        48
+      ],
+      "cross": [
+        24,
+        24
       ]
     },
     "max_node_width": 320,
@@ -239,7 +323,20 @@
     "min_canvas_width": 640,
     "chip_font_size": 11,
     "lane_padding": 36,
-    "lane_min_size": 180
+    "lane_min_size": 180,
+    "table_header_height": 32,
+    "table_row_height": 24,
+    "table_section_gap": 8,
+    "table_min_width": 200,
+    "detail_font_size": 11,
+    "detail_line_height": 15,
+    "caption_height": 22,
+    "zone_padding": 28,
+    "zone_label_room": 30,
+    "table_row_gap": 24,
+    "table_padding_x": 14,
+    "table_bottom_pad": 8,
+    "table_extra_width": 100
   },
   "sequence": {
     "participant_width": 135,

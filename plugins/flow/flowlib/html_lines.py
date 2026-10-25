@@ -9,6 +9,27 @@ from .theme import Theme
 DEFAULT_DASH = "6 5"  # for a line that is dashed by choice, not by its role
 OPEN_HEAD_STROKE = 1  # in marker units, so it grows with the line width
 HEAD_MARKERS = (Head.FILLED, Head.OPEN, Head.DOT)
+# Symbol heads (UML and entity-relationship) are drawn in pixels, whatever the line width. Each
+# shape is a list of SVG parts in a box 24 px high whose x runs from -24 to 0, where the line
+# ends at x = 0 and y = 12. ``{c}`` stands for the line colour and ``{w}`` for white.
+SYMBOL_BOX_PX = 24
+SYMBOL_MIDDLE_PX = 12
+LINE = 'stroke="{c}" stroke-width="1.5"'
+CROWS_FOOT = f'<path d="M-14 12L0 4M-14 12H0M-14 12L0 20" fill="none" {LINE}/>'
+ONE_BAR = f'<path d="M-9 4V20" {LINE}/>'
+DIAMOND_PATH = "M0 12L-8 6L-16 12L-8 18Z"
+SYMBOL_SHAPES: dict[Head, str] = {
+    Head.TRIANGLE: f'<path d="M0 12L-14 5V19Z" fill="{{w}}" {LINE}/>',
+    Head.DIAMOND: f'<path d="{DIAMOND_PATH}" fill="{{w}}" {LINE}/>',
+    Head.DIAMOND_FILLED: f'<path d="{DIAMOND_PATH}" fill="{{c}}" {LINE}/>',
+    Head.ONE: ONE_BAR,
+    Head.MANY: CROWS_FOOT,
+    Head.ONE_ONLY: f'<path d="M-8 4V20M-13 4V20" {LINE}/>',
+    Head.ZERO_ONE: f'<circle cx="-17" cy="12" r="4" fill="{{w}}" {LINE}/>{ONE_BAR}',
+    Head.ZERO_MANY: f'<circle cx="-20" cy="12" r="4" fill="{{w}}" {LINE}/>{CROWS_FOOT}',
+    Head.ONE_MANY: f'<path d="M-18 4V20" {LINE}/>{CROWS_FOOT}',
+}
+WHITE = "#FFFFFF"
 
 
 def _pull_back(points: tuple[Point, ...], gap: float) -> list[Point]:
@@ -32,11 +53,14 @@ def _pull_back(points: tuple[Point, ...], gap: float) -> list[Point]:
 
 
 def _route(edge: Edge, gap: float) -> list[Point]:
-    """Return the points to draw: the route with each marked end pulled back by ``gap``."""
+    """Return the points to draw: the route with each arrowhead end pulled back by ``gap``.
+
+    Symbol heads sit on the end of the line and are not pulled back.
+    """
     route = list(edge.points)
-    if edge.head is not Head.NONE:
+    if edge.head in HEAD_MARKERS:
         route = _pull_back(tuple(route), gap)
-    if edge.tail is not Head.NONE:
+    if edge.tail in HEAD_MARKERS:
         route = _pull_back(tuple(reversed(route)), gap)[::-1]
     return route
 
@@ -118,7 +142,23 @@ def arrowheads(theme: Theme) -> str:
                 f'refY="{fmt(middle)}" overflow="visible">'
                 f"{_head_shape(head, size, line.color)}</marker>"
             )
-    return "<defs>" + "".join(markers) + "</defs>"
+    return "<defs>" + "".join(markers + _symbol_markers(theme)) + "</defs>"
+
+
+def _symbol_markers(theme: Theme) -> list[str]:
+    """Return the markers for symbol heads, one per line role and symbol."""
+    markers = []
+    for role, line in theme.roles.items():
+        for head, shape in SYMBOL_SHAPES.items():
+            body = shape.format(c=line.color, w=WHITE)
+            markers.append(
+                f'<marker id="head-{role.value}-{head.value}" orient="auto-start-reverse" '
+                f'markerUnits="userSpaceOnUse" markerWidth="{SYMBOL_BOX_PX}" '
+                f'markerHeight="{SYMBOL_BOX_PX}" '
+                f'viewBox="-{SYMBOL_BOX_PX} 0 {SYMBOL_BOX_PX} {SYMBOL_BOX_PX}" '
+                f'refX="0" refY="{SYMBOL_MIDDLE_PX}" overflow="visible">{body}</marker>'
+            )
+    return markers
 
 
 def lines_layer(edges: tuple[Edge, ...], theme: Theme, size: tuple[float, float]) -> str:

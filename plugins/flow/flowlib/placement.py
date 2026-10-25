@@ -4,10 +4,11 @@ from collections import defaultdict
 from dataclasses import dataclass, replace
 
 from .layered import Grid
-from .model import DEFAULT_FONT_SIZE_PX, Direction, Frame, Node, Point
-from .sizing import FittedNode, fit_node
+from .model import DEFAULT_FONT_SIZE_PX, Direction, Frame, Node, Point, Shape
+from .sizing import FittedNode, NodeContent, fit_node, fit_table
 from .spec import Spec, SpecEdge, SpecNode
 from .theme import LayoutRules
+from .zones import zone_frames
 
 
 @dataclass(frozen=True)
@@ -52,91 +53,90 @@ def _column_widths(fitted: dict[str, FittedNode], column: dict[str, int]) -> dic
     return dict(widths)
 
 
-def _column_centers(
-    widths: dict[int, float], labelled: set[int], gaps: tuple[float, float], left: float
+def _crosses_label(previous: int, index: int, labelled: set[int]) -> bool:
+    """Tell whether a labelled edge crosses any gap between two positions."""
+    return any(boundary in labelled for boundary in range(previous, index))
+
+
+def _centers(
+    sizes: dict[int, float], labelled: set[int], gaps: tuple[float, float], start: float
 ) -> dict[int, float]:
-    """Return the x of each column's centre line, left to right.
+    """Return the centre line of each column (or row), in order, with the right gap between.
+
+    Positions need not be consecutive: an empty column or row does not add a gap.
 
     Args:
-        widths: Column index to its width.
-        labelled: The columns whose right-hand gap a labelled edge crosses.
-        gaps: The gap between two columns, plain and labelled.
-        left: The x where the first column starts.
+        sizes: Position index to the width (or height) of that column (or row).
+        labelled: The gaps that a labelled edge crosses, which need extra room.
+        gaps: The gap between two neighbours, plain and labelled.
+        start: Where the first column (or row) starts.
 
     Returns:
-        Column index to the x of its centre line.
+        Position index to the coordinate of its centre line.
     """
     plain_gap, labelled_gap = gaps
     centers: dict[int, float] = {}
+    edge = start
     previous: int | None = None
-    for index in sorted(widths):
+    for index in sorted(sizes):
         if previous is not None:
-            wide = previous in labelled and previous + 1 == index
-            left += labelled_gap if wide else plain_gap
-        centers[index] = left + widths[index] / 2
-        left += widths[index]
+            edge += labelled_gap if _crosses_label(previous, index, labelled) else plain_gap
+        centers[index] = edge + sizes[index] / 2
+        edge += sizes[index]
         previous = index
     return centers
 
 
-def _row_centers(
-    heights: dict[int, float], labelled: set[int], gaps: tuple[float, float], top: float
-) -> dict[int, float]:
-    """Return the y of each row's centre line, top to bottom.
-
-    Args:
-        heights: Row index to its height.
-        labelled: The rows whose following gap a labelled edge crosses.
-        gaps: The gap between two rows, plain and labelled.
-        top: The y where the first row starts.
-
-    Returns:
-        Row index to the y of its centre line.
-    """
-    plain_gap, labelled_gap = gaps
-    centers: dict[int, float] = {}
-    edge = top
-    for index in sorted(heights):
-        if index - 1 in heights:
-            edge += labelled_gap if index - 1 in labelled else plain_gap
-        centers[index] = edge + heights[index] / 2
-        edge += heights[index]
-    return centers
-
-
-def rules_for(direction: Direction, rules: LayoutRules) -> LayoutRules:
+def rules_for(spec: Spec, rules: LayoutRules) -> LayoutRules:
     """Return the rules to lay out with, in layout space.
 
-    For a left-to-right flow the gaps along and across the flow swap, because layout space
-    is mirrored: the design's horizontal gap must apply along the flow.
+    For a left-to-right flow the gaps along and across the flow swap, because layout space is
+    mirrored: the design's horizontal gap must apply along the flow. With zones, the gaps grow
+    so that the frames of two neighbouring zones do not touch.
 
     Args:
-        direction: The direction of the flow.
+        spec: The description, which gives the direction and the zones.
         rules: The layout rules.
 
     Returns:
-        The same rules, or a copy with the vertical and horizontal gaps exchanged.
+        The rules, adjusted.
     """
-    if direction is Direction.DOWN:
-        return rules
-    return replace(
-        rules,
-        gap_vertical=rules.gap_horizontal,
-        gap_vertical_labelled=rules.gap_horizontal_labelled,
-        gap_horizontal=rules.gap_vertical,
-        gap_horizontal_labelled=rules.gap_vertical_labelled,
-    )
+    if spec.direction is Direction.RIGHT:
+        rules = replace(
+            rules,
+            gap_vertical=rules.gap_horizontal,
+            gap_vertical_labelled=rules.gap_horizontal_labelled,
+            gap_horizontal=rules.gap_vertical,
+            gap_horizontal_labelled=rules.gap_vertical_labelled,
+        )
+    if spec.zones:
+        room = 2 * rules.zone_padding
+        rules = replace(
+            rules,
+            gap_vertical=max(rules.gap_vertical, room + rules.zone_label_room),
+            gap_vertical_labelled=max(rules.gap_vertical_labelled, room + rules.zone_label_room),
+            gap_horizontal=max(rules.gap_horizontal, room + rules.zone_padding / 2),
+            gap_horizontal_labelled=max(rules.gap_horizontal_labelled, room + rules.zone_padding),
+        )
+    return rules
+
+
+def _fit(node: SpecNode, rules: LayoutRules) -> FittedNode:
+    """Fit one node to its content: a table to its rows, any other shape to its text."""
+    has_icon = node.icon is not None
+    if node.kind is Shape.TABLE:
+        return fit_table(node.text, node.sections, has_icon, rules)
+    return fit_node(node.kind, NodeContent(node.text, node.detail, has_icon), rules)
 
 
 def _layout_sizes(spec: Spec, rules: LayoutRules) -> dict[str, FittedNode]:
-    """Fit every node to its text and, for a left-to-right chart, swap width and height."""
-    fitted = {
-        node.id: fit_node(node.kind, node.text, node.icon is not None, rules) for node in spec.nodes
-    }
+    """Fit every node to its content and, for a left-to-right chart, swap width and height."""
+    fitted = {node.id: _fit(node, rules) for node in spec.nodes}
     if spec.direction is Direction.DOWN:
         return fitted
     return {
-        node_id: FittedNode(size.height, size.width, size.lines) for node_id, size in fitted.items()
+        node_id: replace(size, width=size.height, height=size.width)
+        for node_id, size in fitted.items()
     }
 
 
@@ -197,6 +197,9 @@ def _make_node(node: SpecNode, size: FittedNode, center: Point, width: float) ->
         tone=node.tone,
         number=node.number,
         font_size=DEFAULT_FONT_SIZE_PX,
+        detail=size.detail,
+        caption=node.caption,
+        sections=node.sections,
     )
 
 
@@ -211,7 +214,7 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
     Returns:
         The nodes, the swimlane frames, and the right and bottom edge of the area they cover.
     """
-    rules = rules_for(spec.direction, base_rules)
+    rules = rules_for(spec, base_rules)
     fitted = _layout_sizes(spec, base_rules)
     widths = _column_widths(fitted, grid.column)
     if spec.lanes:
@@ -227,10 +230,10 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
         (0.0, 0.0) if spec.lanes else (rules.gap_horizontal, rules.gap_horizontal_labelled)
     )
     labelled_columns = _labelled_boundaries(grid.forward, grid.column)
-    center_x = _column_centers(widths, labelled_columns, column_gaps, left)
+    center_x = _centers(widths, labelled_columns, column_gaps, left)
     row_gaps = (rules.gap_vertical, rules.gap_vertical_labelled)
     labelled_rows = _labelled_boundaries(grid.forward, grid.rank)
-    center_y = _row_centers(dict(heights), labelled_rows, row_gaps, top)
+    center_y = _centers(dict(heights), labelled_rows, row_gaps, top)
     nodes = {
         node.id: _make_node(
             node,
@@ -240,6 +243,27 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
         )
         for node in spec.nodes
     }
+    return _with_frames(spec, nodes, (widths, center_x), rules)
+
+
+def _with_frames(
+    spec: Spec,
+    nodes: dict[str, Node],
+    columns: tuple[dict[int, float], dict[int, float]],
+    rules: LayoutRules,
+) -> Placement:
+    """Add the swimlane and zone frames to placed nodes, and measure the area they cover.
+
+    Args:
+        spec: The description.
+        nodes: The placed nodes.
+        columns: The width and the centre x of each column, which give the lane bands.
+        rules: The layout rules.
+
+    Returns:
+        The finished placement.
+    """
+    widths, center_x = columns
     right = max(node.x + node.width for node in nodes.values())
     bottom = max(node.y + node.height for node in nodes.values())
     frames: tuple[Frame, ...] = ()
@@ -247,6 +271,9 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
         bands = {index: (center_x[index] - widths[index] / 2, widths[index]) for index in widths}
         row_span = (min(node.y for node in nodes.values()), bottom)
         frames = _lane_frames(spec, bands, row_span, rules.lane_padding)
-        right = max(frame.x + frame.width for frame in frames)
-        bottom = max(frame.y + frame.height for frame in frames)
+    if spec.zones:
+        frames = frames + zone_frames(spec, nodes, rules)
+    if frames:
+        right = max([right, *(frame.x + frame.width for frame in frames)])
+        bottom = max([bottom, *(frame.y + frame.height for frame in frames)])
     return Placement(nodes=nodes, frames=frames, right=right, bottom=bottom)

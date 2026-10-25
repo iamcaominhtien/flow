@@ -1,11 +1,10 @@
 """Render a scene as one self-contained HTML file: boxes, inline SVG and CSS animation."""
 
 from .html_lines import lines_layer
+from .html_nodes import node_html
 from .markup import esc, fmt, px, tag
-from .model import Divider, EdgeLabel, Frame, FrameVariant, Node, Role, Scene, Shape
-from .shapes import outline_svg
-from .text_area import text_area_width
-from .theme import ShapeColors, Theme, load_icons, load_theme
+from .model import Divider, EdgeLabel, Frame, FrameVariant, Role, Scene, Shape
+from .theme import Theme, load_theme
 
 FONTS_URL = (
     "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800"
@@ -77,91 +76,6 @@ TITLE_GAP_PX = 8
 
 ABSOLUTE = {"position": "absolute"}
 CENTERED_ON_POINT = "translate(-50%,-50%)"
-
-
-def _icon_html(node: Node, stroke: str) -> str:
-    """Draw the icon of a node at its left side, or return nothing if it has none."""
-    if node.icon is None:
-        return ""
-    left = ICON_LEFT_PX.get(node.shape, DEFAULT_ICON_LEFT_PX)
-    top = (node.height - ICON_SIZE_PX) / 2
-    if node.shape is Shape.DOCUMENT:
-        top -= DOCUMENT_ICON_LIFT_PX
-    return (
-        f'<svg width="{ICON_SIZE_PX}" height="{ICON_SIZE_PX}" viewBox="0 0 24 24" '
-        f'style="position:absolute;left:{px(left)};top:{px(top)}" fill="none" '
-        f'stroke="{stroke}" stroke-width="{ICON_STROKE_WIDTH}" stroke-linecap="round" '
-        f'stroke-linejoin="round" aria-hidden="true">{load_icons()[node.icon]}</svg>'
-    )
-
-
-def _label_html(node: Node, theme: Theme) -> str:
-    """Draw the text of a node, centred in the space the shape leaves for it."""
-    if not node.text:
-        return ""
-    has_icon = node.icon is not None
-    width = text_area_width(node.shape, node.width, has_icon)
-    shift = ICON_TEXT_SHIFT_PX if has_icon else 0.0
-    height = node.height - (DOCUMENT_LABEL_TRIM_PX if node.shape is Shape.DOCUMENT else 0)
-    is_note = node.shape is Shape.NOTE
-    style = {
-        **ABSOLUTE,
-        "left": px((node.width - width) / 2 + shift),
-        "top": "0",
-        "width": px(width),
-        "height": px(height),
-        "display": "flex",
-        "align-items": "center",
-        "justify-content": "flex-start" if is_note else "center",
-        "text-align": "left" if is_note else "center",
-        "font-size": px(node.font_size),
-        "line-height": px(int(node.font_size * LINE_HEIGHT_FACTOR)),
-        "font-weight": str(NOTE_TEXT_WEIGHT if is_note else NODE_TEXT_WEIGHT),
-        "color": theme.slate if is_note else theme.ink,
-    }
-    return tag("div", style, "<br>".join(esc(line) for line in node.text))
-
-
-def _badge_html(node: Node, theme: Theme) -> str:
-    """Draw the number badge on the top-left corner of a node, or return nothing."""
-    if node.number is None:
-        return ""
-    style = {
-        **ABSOLUTE,
-        "left": px(node.x - BADGE_OVERHANG_LEFT_PX),
-        "top": px(node.y - BADGE_OVERHANG_TOP_PX),
-        "min-width": px(BADGE_MIN_WIDTH_PX),
-        "height": px(BADGE_HEIGHT_PX),
-        "padding": f"0 {px(BADGE_PADDING_X_PX)}",
-        "box-sizing": "border-box",
-        "border-radius": px(PILL_RADIUS_PX),
-        "background": theme.badge.background,
-        "color": theme.badge.foreground,
-        "font": f"700 {px(BADGE_FONT_SIZE_PX)}/{px(BADGE_HEIGHT_PX)} "
-        f"'{theme.fonts.mono}',monospace",
-        "text-align": "center",
-    }
-    return tag("div", style, esc(node.number))
-
-
-def _node_html(node: Node, theme: Theme) -> str:
-    """Draw one node: its outline, icon and text, and its number badge when it has one."""
-    colors = theme.shapes[node.shape]
-    if node.tone is not None:
-        colors = ShapeColors(fill=theme.tones[node.tone].box, stroke=colors.stroke)
-    inside = (
-        outline_svg(node.shape, node.width, node.height, colors)
-        + _icon_html(node, colors.stroke)
-        + _label_html(node, theme)
-    )
-    box = {
-        **ABSOLUTE,
-        "left": px(node.x),
-        "top": px(node.y),
-        "width": px(node.width),
-        "height": px(node.height),
-    }
-    return tag("div", box, inside, data_id=node.id) + _badge_html(node, theme)
 
 
 def _frame_html(frame: Frame, theme: Theme) -> str:
@@ -369,7 +283,7 @@ def render(scene: Scene) -> str:
     overlay = tuple(edge for edge in scene.edges if edge.role is not Role.LIFELINE)
     layers = [_frame_html(frame, theme) for frame in scene.frames]
     layers.append(lines_layer(underlay, theme, size))
-    layers += [_node_html(node, theme) for node in scene.nodes]
+    layers += [node_html(node, theme) for node in scene.nodes]
     layers.append(lines_layer(overlay, theme, size))
     layers += [_label_chip_html(edge.label, theme) for edge in scene.edges if edge.label]
     layers.append(_title_html(scene, theme))

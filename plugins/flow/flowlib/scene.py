@@ -6,9 +6,11 @@ The JSON format::
      "frames": [{"id", "x", "y", "width", "height", "label", "tone", "variant", "guard",
                  "dividers": [{"y", "guard"}]}],
      "nodes":  [{"id", "shape", "x", "y", "width", "height", "text", "icon", "tone",
-                 "number", "font_size"}],
+                 "number", "font_size", "detail": [...], "caption",
+                 "sections": [[{"left", "right"}]]}],
      "edges":  [{"id", "from", "to", "role", "points": [[x, y], ...], "head", "tail", "dashed",
-                 "label": {"text", "at": [x, y], "kind", "number"}}]}
+                 "label": {"text", "at": [x, y], "kind", "number"},
+                 "extras": [{"text", "at": [x, y], "kind"}]}]}
 """
 
 import json
@@ -29,6 +31,7 @@ from .model import (
     Node,
     Point,
     Role,
+    Row,
     Scene,
     Shape,
     Tone,
@@ -42,8 +45,9 @@ SCENE_KEYS = {"size", "title", "desc", "frames", "nodes", "edges"}
 FRAME_KEYS = {"id", "x", "y", "width", "height", "label", "tone", "variant", "guard", "dividers"}
 DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
-NODE_KEYS |= {"number", "font_size"}
-EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label"}
+NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections"}
+ROW_KEYS = {"left", "right"}
+EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label", "extras"}
 LABEL_KEYS = {"text", "at", "kind", "number"}
 MIN_ROUTE_POINTS = 2
 
@@ -162,6 +166,14 @@ def _dump_node(node: Node) -> dict[str, Any]:
         written["tone"] = node.tone.value
     if node.number:
         written["number"] = node.number
+    if node.detail:
+        written["detail"] = list(node.detail)
+    if node.caption:
+        written["caption"] = node.caption
+    if node.sections:
+        written["sections"] = [
+            [{"left": row.left, "right": row.right} for row in section] for section in node.sections
+        ]
     return written
 
 
@@ -187,6 +199,11 @@ def _dump_edge(edge: Edge) -> dict[str, Any]:
         }
         if edge.label.number:
             written["label"]["number"] = edge.label.number
+    if edge.extras:
+        written["extras"] = [
+            {"text": extra.text, "at": list(extra.at), "kind": extra.kind.value}
+            for extra in edge.extras
+        ]
     return written
 
 
@@ -320,7 +337,33 @@ class _SceneParser:
             tone=read.enum(Tone, raw, "tone", where),
             number=read.text(raw, "number", where),
             font_size=raw.get("font_size", DEFAULT_FONT_SIZE_PX),
+            detail=self._lines(raw.get("detail", []), where),
+            caption=read.text(raw, "caption", where),
+            sections=self._sections(raw.get("sections", []), where),
         )
+
+    def _sections(self, raw: object, where: str) -> tuple[tuple[Row, ...], ...]:
+        """Read the row groups of a table node."""
+        if not isinstance(raw, list):
+            self._read.report(where, "'sections' must be a list of lists of rows")
+            return ()
+        sections = []
+        for index, group in enumerate(raw):
+            rows = []
+            for row_index, item in enumerate(group if isinstance(group, list) else []):
+                place = f"{where}.sections[{index}][{row_index}]"
+                if not isinstance(item, dict):
+                    self._read.report(place, "must be an object")
+                    continue
+                self._read.check_keys(item, ROW_KEYS, place)
+                rows.append(
+                    Row(
+                        left=self._read.text(item, "left", place) or "",
+                        right=self._read.text(item, "right", place) or "",
+                    )
+                )
+            sections.append(tuple(rows))
+        return tuple(sections)
 
     def _lines(self, raw: object, where: str) -> tuple[str, ...]:
         """Read node text, given as one string or as a list of lines."""
@@ -364,7 +407,16 @@ class _SceneParser:
             head=read.enum(Head, raw, "head", where) or Head.FILLED,
             tail=read.enum(Head, raw, "tail", where) or Head.NONE,
             dashed=raw.get("dashed", False) is True,
+            extras=self._extras(raw.get("extras", []), where),
         )
+
+    def _extras(self, raw: object, where: str) -> tuple[EdgeLabel, ...]:
+        """Read the small labels at the ends of an edge."""
+        if not isinstance(raw, list):
+            self._read.report(where, "'extras' must be a list")
+            return ()
+        found = [self._label(item, f"{where}.extras[{index}]") for index, item in enumerate(raw)]
+        return tuple(label for label in found if label is not None)
 
     def _route(self, raw: object, where: str) -> tuple[Point, ...]:
         """Read the routed points of an edge, at least two of them."""
