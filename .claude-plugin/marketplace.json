@@ -1,0 +1,14 @@
+{
+  "name": "flow",
+  "owner": { "name": "iamcaominhtien" },
+  "description": "Plugins that draw diagrams in draw.io.",
+  "allowCrossMarketplaceDependenciesOn": ["drawio"],
+  "plugins": [
+    {
+      "name": "flow",
+      "source": "./plugins/flow",
+      "description": "Draw diagrams in draw.io from a short brief, following one design system across every diagram type.",
+      "category": "diagrams"
+    }
+  ]
+}

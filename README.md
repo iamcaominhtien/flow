@@ -66,7 +66,15 @@ Flow aims to cover **nearly every common diagram type**, grouped into 8 categori
 
 ## Getting started
 
-Installation and usage instructions will be added once the first plugin is available.
+Flow installs as a Claude Code plugin from this repository. It depends on the official draw.io plugin, so add both marketplaces first:
+
+```
+/plugin marketplace add jgraph/drawio-mcp
+/plugin marketplace add iamcaominhtien/flow
+/plugin install flow@flow
+```
+
+Claude Code only installs the dependency when its marketplace is already added, so the order matters. Then run the `doctor` skill (`/flow:doctor`) to check the install. The plugin currently holds only that skill; the diagram skills come next.
 
 ## Roadmap
 
@@ -75,7 +83,8 @@ Installation and usage instructions will be added once the first plugin is avail
 - [x] Write the [design document](docs/design/README.md) (18 pages, 104 pictures)
 - [ ] Design how plugins edit existing `.drawio` files
 - [ ] Test an exported SVG with animated edges on its own
-- [ ] Define the plugin interface and project structure
+- [x] Plugin skeleton: marketplace, `flow` plugin, `doctor` skill, installs locally and depends on the draw.io plugin
+- [ ] Define the plugin interface and shared library
 - [ ] Generate valid draw.io XML from a text prompt
 - [ ] First plugins: flowchart, sequence, ER, architecture
 - [ ] Expand to the remaining categories above
