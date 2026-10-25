@@ -4,7 +4,19 @@ from collections.abc import Callable
 
 from ..model import Scene
 from ..reader import SpecError
-from . import architecture, boards, catalog, er, flowchart, graph, sequence, state, timeline, tree
+from . import (
+    architecture,
+    boards,
+    catalog,
+    concept,
+    er,
+    flowchart,
+    graph,
+    sequence,
+    state,
+    timeline,
+    tree,
+)
 
 Layout = Callable[[object], Scene]
 
@@ -15,6 +27,7 @@ LAYOUTS: dict[str, Layout] = {
     "state": state.layout_raw,
     "er": er.layout_raw,
     "org": tree.layout_org,
+    "concept": concept.layout_raw,
     "kanban": boards.layout_kanban,
     "layers": boards.layout_layers,
     "wireframe": boards.layout_wireframe,

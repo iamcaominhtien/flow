@@ -15,6 +15,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 from .canvas import fit_canvas
+from .geometry import border_point, center_of
 from .model import (
     Edge,
     EdgeLabel,
@@ -215,23 +216,6 @@ def _frame(cell: ET.Element, style: dict[str, str], box: Box) -> Frame:
     )
 
 
-def _clip(inside: Node, toward: Point) -> Point:
-    """Return where a line from the centre of a node toward a point leaves its box."""
-    center_x, center_y = inside.x + inside.width / 2, inside.y + inside.height / 2
-    delta_x, delta_y = toward[0] - center_x, toward[1] - center_y
-    if delta_x == 0 and delta_y == 0:
-        return (center_x, center_y)
-    scale_x = (inside.width / 2) / abs(delta_x) if delta_x else float("inf")
-    scale_y = (inside.height / 2) / abs(delta_y) if delta_y else float("inf")
-    scale = min(scale_x, scale_y)
-    return (center_x + delta_x * scale, center_y + delta_y * scale)
-
-
-def _center(node: Node) -> Point:
-    """Return the centre of a node."""
-    return (node.x + node.width / 2, node.y + node.height / 2)
-
-
 def _terminal_point(cell: ET.Element, name: str, offset: Point) -> Point | None:
     """Return the ``sourcePoint`` or ``targetPoint`` of an edge, moved by ``offset``."""
     point = cell.find(f"mxGeometry/mxPoint[@as='{name}']")
@@ -255,11 +239,11 @@ def _route(cell: ET.Element, nodes: dict[str, Node], offset: Point) -> tuple[Poi
     start = _terminal_point(cell, "sourcePoint", offset)
     end = _terminal_point(cell, "targetPoint", offset)
     if source is not None:
-        aim = bends[0] if bends else (_center(target) if target else end)
-        start = _clip(source, aim) if aim else None
+        aim = bends[0] if bends else (center_of(target) if target else end)
+        start = border_point(source, aim) if aim else None
     if target is not None:
-        aim = bends[-1] if bends else (_center(source) if source else start)
-        end = _clip(target, aim) if aim else None
+        aim = bends[-1] if bends else (center_of(source) if source else start)
+        end = border_point(target, aim) if aim else None
     if start is None or end is None:
         return None
     return (start, *bends, end)
