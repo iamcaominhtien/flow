@@ -38,7 +38,7 @@ You write a short **spec**: the tables, their columns and the relations. A scrip
 
 - **Table**: `id`, `name`, `columns`, optional `icon` and `tone`.
 - **Column**: `name`, optional `type`, optional `flags` from `pk`, `fk`, `uq`, `null`.
-- **Relation**: `from`, `to`, optional `label`. `from_end` and `to_end` set the mark at each end: `one`, `many`, `zero_one`, `zero_many`, `one_many`. The default is one at `from` and many at `to`. `style` is `solid` (a foreign key) or `logical` (dashed, no real key). `main: true` highlights and animates the relation to follow first. Mark one or two, not all.
+- **Relation**: `from`, `to`, optional `label`. `from_end` and `to_end` set the mark at each end: `one`, `zero_one`, `one_many`, `zero_many`. The default is `one` at `from` and `zero_many` at `to`. `style` is `solid` (a foreign key) or `logical` (dashed, no real key). `main: true` highlights and animates the relation to follow first. Mark one or two, not all.
 - Optional `from_column` and `to_column` name the columns the relation joins; they are not drawn yet.
 
 ## Limits to tell the user
