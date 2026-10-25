@@ -5,6 +5,7 @@ import math
 from .markup import esc, fmt, px, tag
 from .model import ArrowEnd, Edge, EdgeLabel, Frame, Node, Point, Scene, Shape
 from .shapes import outline_svg
+from .text_area import text_area_width
 from .theme import ShapeColors, Theme, load_icons, load_theme
 
 FONTS_URL = (
@@ -13,9 +14,6 @@ FONTS_URL = (
 )
 
 # Text inside a node
-DECISION_TEXT_WIDTH_FRACTION = 0.64  # a diamond only has room for the middle of its width
-PLAIN_TEXT_INSET_PX = 20  # total horizontal padding of text in an upright shape
-SLANTED_TEXT_INSET_PX = 36  # total horizontal padding in shapes with slanted sides
 LINE_HEIGHT_FACTOR = 1.25
 NODE_TEXT_WEIGHT = 600
 DOCUMENT_LABEL_TRIM_PX = 6  # the wavy bottom of a document leaves less room for text
@@ -24,7 +22,6 @@ DOCUMENT_ICON_LIFT_PX = 3
 # Icon inside a node
 ICON_SIZE_PX = 18
 ICON_STROKE_WIDTH = 2
-ICON_TEXT_RESERVE_PX = 24  # text width given up to make room for an icon
 ICON_TEXT_SHIFT_PX = 12  # text moves right by half of that
 ICON_LEFT_PX: dict[Shape, float] = {
     Shape.SUBPROCESS: 22,
@@ -70,14 +67,6 @@ ABSOLUTE = {"position": "absolute"}
 CENTERED_ON_POINT = "translate(-50%,-50%)"
 
 
-def _text_width(node: Node) -> float:
-    """Return how wide the text of a node may be, before any icon is taken into account."""
-    if node.shape is Shape.DECISION:
-        return node.width * DECISION_TEXT_WIDTH_FRACTION
-    slanted = node.shape in (Shape.IO, Shape.PREPARATION, Shape.SUBPROCESS)
-    return node.width - (SLANTED_TEXT_INSET_PX if slanted else PLAIN_TEXT_INSET_PX)
-
-
 def _icon_html(node: Node, stroke: str) -> str:
     """Draw the icon of a node at its left side, or return nothing if it has none."""
     if node.icon is None:
@@ -98,11 +87,9 @@ def _label_html(node: Node, theme: Theme) -> str:
     """Draw the text of a node, centred in the space the shape leaves for it."""
     if not node.text:
         return ""
-    width = _text_width(node)
-    shift = 0.0
-    if node.icon is not None:
-        width -= ICON_TEXT_RESERVE_PX
-        shift = ICON_TEXT_SHIFT_PX
+    has_icon = node.icon is not None
+    width = text_area_width(node.shape, node.width, has_icon)
+    shift = ICON_TEXT_SHIFT_PX if has_icon else 0.0
     height = node.height - (DOCUMENT_LABEL_TRIM_PX if node.shape is Shape.DOCUMENT else 0)
     style = {
         **ABSOLUTE,

@@ -147,5 +147,63 @@
   "badge": {
     "background": "#0F172A",
     "foreground": "#7DD3CB"
+  },
+  "layout": {
+    "min_sizes": {
+      "terminator": [
+        150,
+        48
+      ],
+      "fail": [
+        150,
+        48
+      ],
+      "process": [
+        160,
+        56
+      ],
+      "decision": [
+        170,
+        100
+      ],
+      "io": [
+        190,
+        56
+      ],
+      "document": [
+        130,
+        60
+      ],
+      "subprocess": [
+        160,
+        56
+      ],
+      "preparation": [
+        140,
+        56
+      ],
+      "connector": [
+        38,
+        38
+      ]
+    },
+    "max_node_width": 320,
+    "gap_vertical": 56,
+    "gap_vertical_labelled": 70,
+    "gap_horizontal": 70,
+    "gap_horizontal_labelled": 90,
+    "margin": 64,
+    "title_block_height": 100,
+    "channel_offset": 40,
+    "channel_step": 28,
+    "label_offset": 22,
+    "char_width_em": 0.55,
+    "line_padding": 8,
+    "max_text_lines": 2,
+    "chip_height": 20,
+    "chip_padding_x": 16,
+    "chip_char_width_em": 0.62,
+    "min_canvas_width": 640,
+    "chip_font_size": 11
   }
 }

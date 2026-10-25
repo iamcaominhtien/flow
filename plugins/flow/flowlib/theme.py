@@ -64,6 +64,31 @@ class AnimationSpeed:
 
 
 @dataclass(frozen=True)
+class LayoutRules:
+    """Sizes and gaps the layout follows. Lengths are in pixels."""
+
+    min_sizes: dict[Shape, tuple[float, float]]
+    max_node_width: float
+    gap_vertical: float
+    gap_vertical_labelled: float
+    gap_horizontal: float
+    gap_horizontal_labelled: float
+    margin: float
+    min_canvas_width: float
+    title_block_height: float
+    channel_offset: float
+    channel_step: float
+    label_offset: float
+    char_width_em: float
+    line_padding: float
+    max_text_lines: int
+    chip_font_size: float
+    chip_height: float
+    chip_padding_x: float
+    chip_char_width_em: float
+
+
+@dataclass(frozen=True)
 class Theme:
     """Every colour, line style and animation the renderers use."""
 
@@ -77,6 +102,7 @@ class Theme:
     roles: dict[Role, LineStyle]
     animations: dict[Animation, AnimationSpeed]
     chips: dict[LabelKind, ChipColors]
+    layout: LayoutRules
 
 
 def _line_style(raw: dict[str, Any]) -> LineStyle:
@@ -97,6 +123,19 @@ def _line_style(raw: dict[str, Any]) -> LineStyle:
         gap=raw["gap"],
         animation=Animation(animation) if animation else None,
     )
+
+
+def _layout_rules(raw: dict[str, Any]) -> LayoutRules:
+    """Build the layout rules from their JSON object.
+
+    Args:
+        raw: The ``layout`` object of ``theme.json``.
+
+    Returns:
+        The rules, with each minimum size as a ``(width, height)`` tuple.
+    """
+    sizes = {Shape(name): (size[0], size[1]) for name, size in raw["min_sizes"].items()}
+    return LayoutRules(**{**raw, "min_sizes": sizes})
 
 
 def _build_theme(raw: dict[str, Any]) -> Theme:
@@ -121,6 +160,7 @@ def _build_theme(raw: dict[str, Any]) -> Theme:
             Animation(name): AnimationSpeed(**speed) for name, speed in raw["animations"].items()
         },
         chips={LabelKind(name): ChipColors(**colors) for name, colors in raw["chips"].items()},
+        layout=_layout_rules(raw["layout"]),
     )
 
 

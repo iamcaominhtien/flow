@@ -1,0 +1,38 @@
+{
+  "type": "flowchart",
+  "title": "Place and deliver an order",
+  "desc": "From the cart to the door. Payment and the restaurant can each stop the order; a missing courier loops back.",
+  "nodes": [
+    {"id": "start", "kind": "terminator", "text": "Customer opens the app"},
+    {"id": "cart", "kind": "process", "text": "Fill the cart", "icon": "cart"},
+    {"id": "pay", "kind": "process", "text": "Pay by card", "icon": "card", "tone": "amber"},
+    {"id": "paid", "kind": "decision", "text": "Payment accepted?"},
+    {"id": "error", "kind": "process", "text": "Show payment error", "icon": "warn"},
+    {"id": "send", "kind": "io", "text": "Send order to restaurant", "icon": "store"},
+    {"id": "accepts", "kind": "decision", "text": "Restaurant accepts?"},
+    {"id": "refund", "kind": "process", "text": "Refund the payment", "icon": "refund"},
+    {"id": "cancelled", "kind": "fail", "text": "Order cancelled"},
+    {"id": "cook", "kind": "process", "text": "Cook the order", "icon": "pot"},
+    {"id": "find", "kind": "decision", "text": "Courier found?"},
+    {"id": "wait", "kind": "process", "text": "Wait for a courier", "icon": "clock"},
+    {"id": "deliver", "kind": "process", "text": "Deliver to the customer", "icon": "bike"},
+    {"id": "done", "kind": "terminator", "text": "Order delivered"}
+  ],
+  "edges": [
+    {"from": "start", "to": "cart"},
+    {"from": "cart", "to": "pay"},
+    {"from": "pay", "to": "paid"},
+    {"from": "paid", "to": "send", "role": "yes", "label": "Yes"},
+    {"from": "paid", "to": "error", "role": "no", "label": "No"},
+    {"from": "error", "to": "pay", "role": "back", "label": "Try again"},
+    {"from": "send", "to": "accepts"},
+    {"from": "accepts", "to": "cook", "role": "yes", "label": "Yes"},
+    {"from": "accepts", "to": "refund", "role": "no", "label": "No"},
+    {"from": "refund", "to": "cancelled"},
+    {"from": "cook", "to": "find"},
+    {"from": "find", "to": "deliver", "role": "yes", "label": "Yes"},
+    {"from": "find", "to": "wait", "role": "no", "label": "No"},
+    {"from": "wait", "to": "find", "role": "back", "label": "Check again"},
+    {"from": "deliver", "to": "done"}
+  ]
+}

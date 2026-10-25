@@ -1,0 +1,180 @@
+"""Place the nodes of a flowchart on a grid of ranks (rows) and columns.
+
+The happy path runs straight down one column. A branch that is not the main continuation
+leaves sideways. Lines that return to an earlier step are kept out of the placement and
+are routed around the flow later.
+"""
+
+from collections import defaultdict, deque
+from dataclasses import dataclass
+
+from .model import Role, Side
+from .spec import Spec, SpecEdge
+
+CONTINUATION_ORDER = {Role.MAIN: 0, Role.YES: 0, Role.NEXT: 0, Role.DATA: 1, Role.NO: 2}
+LATE_ORDER = 3  # roles not listed above are placed after the others
+SIDEWAYS_ROLES = (Role.NO,)  # a "no" exit stays on the row of its decision ...
+CONTINUING_ROLES = (Role.YES, Role.NEXT, Role.MAIN)  # ... when another exit continues the flow
+
+
+@dataclass(frozen=True)
+class Grid:
+    """Where every node sits: its row, its column, and which edges loop back."""
+
+    rank: dict[str, int]
+    column: dict[str, int]
+    forward: tuple[SpecEdge, ...]
+    returning: tuple[SpecEdge, ...]
+
+
+def split_returning(spec: Spec) -> tuple[list[SpecEdge], list[SpecEdge]]:
+    """Separate the edges that go forward from the ones that loop back.
+
+    An edge loops back when its role is ``back`` or when it closes a cycle that the earlier
+    edges already form.
+
+    Args:
+        spec: The flowchart description.
+
+    Returns:
+        The forward edges and the returning edges, each in spec order.
+    """
+    forward: list[SpecEdge] = []
+    returning: list[SpecEdge] = []
+    for edge in spec.edges:
+        closes_cycle = edge.source in _descendants(edge.target, forward)
+        if edge.role is Role.BACK or closes_cycle:
+            returning.append(edge)
+        else:
+            forward.append(edge)
+    return forward, returning
+
+
+def _descendants(start: str, edges: list[SpecEdge]) -> set[str]:
+    """Return every node reachable from ``start``, including ``start`` itself."""
+    children: dict[str, list[str]] = defaultdict(list)
+    for edge in edges:
+        children[edge.source].append(edge.target)
+    seen = {start}
+    pending = [start]
+    while pending:
+        for child in children[pending.pop()]:
+            if child not in seen:
+                seen.add(child)
+                pending.append(child)
+    return seen
+
+
+def sideways_edges(forward: list[SpecEdge]) -> set[SpecEdge]:
+    """Pick the exits that leave sideways instead of continuing down.
+
+    A "no" exit leaves sideways only when its node has another exit that continues the flow;
+    when it is the only forward exit, it is the continuation and goes down.
+
+    Args:
+        forward: The forward edges.
+
+    Returns:
+        The edges that are placed beside their source, on the same row.
+    """
+    continuing = {edge.source for edge in forward if edge.role in CONTINUING_ROLES}
+    return {edge for edge in forward if edge.role in SIDEWAYS_ROLES and edge.source in continuing}
+
+
+def assign_ranks(spec: Spec, forward: list[SpecEdge], sideways: set[SpecEdge]) -> dict[str, int]:
+    """Give each node the row of its longest forward path from a start node.
+
+    A sideways exit does not move its target down, so it lands on the row of its source.
+
+    Args:
+        spec: The flowchart description.
+        forward: The forward edges, without cycles.
+        sideways: The edges that stay on the row of their source.
+
+    Returns:
+        Node id to row number, starting at 0.
+    """
+    rank = {node.id: 0 for node in spec.nodes}
+    for _ in spec.nodes:
+        for edge in forward:
+            step = 0 if edge in sideways else 1
+            rank[edge.target] = max(rank[edge.target], rank[edge.source] + step)
+    return rank
+
+
+def _children_in_order(node_id: str, forward: list[SpecEdge]) -> list[SpecEdge]:
+    """Return the forward edges of a node, the main continuation first."""
+    own = [edge for edge in forward if edge.source == node_id]
+    return sorted(own, key=lambda edge: CONTINUATION_ORDER.get(edge.role, LATE_ORDER))
+
+
+def _free_column(taken: set[tuple[int, int]], start: int, row: int, step: int) -> int:
+    """Find the nearest column from ``start``, moving by ``step``, that is free in ``row``."""
+    column = start
+    while (row, column) in taken:
+        column += step
+    return column
+
+
+def assign_columns(
+    spec: Spec, rank: dict[str, int], forward: list[SpecEdge], sideways: set[SpecEdge]
+) -> dict[str, int]:
+    """Choose a column for every node.
+
+    A node's main continuation stays in its column; other exits take the nearest free column
+    on the requested side (right by default). Start nodes are spread to the right.
+
+    Args:
+        spec: The flowchart description.
+        rank: Node id to row, from ``assign_ranks``.
+        forward: The forward edges.
+        sideways: The edges that leave beside their source.
+
+    Returns:
+        Node id to column; columns may be negative when a branch asks for the left side.
+    """
+    sides = {node.id: node.side for node in spec.nodes}
+    has_parent = {edge.target for edge in forward}
+    column: dict[str, int] = {}
+    taken: set[tuple[int, int]] = set()
+
+    def place(node_id: str, wanted: int, step: int) -> None:
+        """Put a node in the nearest free column at or after ``wanted``."""
+        chosen = _free_column(taken, wanted, rank[node_id], step)
+        column[node_id] = chosen
+        taken.add((rank[node_id], chosen))
+
+    roots = [node.id for node in spec.nodes if node.id not in has_parent]
+    for position, root in enumerate(roots):
+        place(root, position, 1)
+    pending = deque(roots)
+    while pending:
+        node_id = pending.popleft()
+        for index, edge in enumerate(_children_in_order(node_id, forward)):
+            if edge.target in column:
+                continue
+            step = -1 if sides[edge.target] is Side.LEFT else 1
+            offset = 0 if index == 0 and edge not in sideways else step
+            place(edge.target, column[node_id] + offset, step)
+            pending.append(edge.target)
+    return column
+
+
+def build_grid(spec: Spec) -> Grid:
+    """Place every node of a flowchart on the grid.
+
+    Args:
+        spec: The flowchart description.
+
+    Returns:
+        The rows, the columns, and the edges split into forward and returning ones.
+    """
+    forward, returning = split_returning(spec)
+    sideways = sideways_edges(forward)
+    rank = assign_ranks(spec, forward, sideways)
+    return Grid(
+        rank=rank,
+        column=assign_columns(spec, rank, forward, sideways),
+        forward=tuple(forward),
+        returning=tuple(returning),
+    )

@@ -74,7 +74,7 @@ Flow installs as a Claude Code plugin from this repository. The draw.io output w
 /plugin install flow@flow
 ```
 
-For draw.io export, also run `/plugin marketplace add jgraph/drawio-mcp` and `/plugin install drawio@drawio`. Then run the `doctor` skill (`/flow:doctor`) to check the install. The plugin currently holds only that skill; the diagram skills come next.
+For draw.io export, also run `/plugin marketplace add jgraph/drawio-mcp` and `/plugin install drawio@drawio`. Then run the `doctor` skill (`/flow:doctor`) to check the install. Then ask for a flowchart, for example `/flow:flowchart how a customer pays and gets an order delivered`. Claude writes a short spec; a script places the boxes, routes the lines, checks the result and writes an animated HTML page next to the spec. Today this covers top-to-bottom flowcharts in the plain style (no swimlanes, no left-to-right); the other diagram types come next.
 
 ## Roadmap
 
@@ -85,7 +85,7 @@ For draw.io export, also run `/plugin marketplace add jgraph/drawio-mcp` and `/p
 - [ ] Test an exported SVG with animated edges on its own
 - [x] Plugin skeleton: marketplace, `flow` plugin, `doctor` skill, installs locally; the draw.io plugin is optional
 - [x] Write the [plugin design](docs/plugin/design.md) (pipeline, spec, layout, renderers, checks)
-- [ ] Shared library: diagram description (JSON), one layout step, HTML/SVG renderer
+- [x] Shared library: diagram description (JSON), one layout step, HTML/SVG renderer, checks, and the first skill (flowchart, top to bottom)
 - [ ] draw.io renderer from the same description
 - [ ] Generate valid draw.io XML from a text prompt
 - [ ] First plugins: flowchart, sequence, ER, architecture

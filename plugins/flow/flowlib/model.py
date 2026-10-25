@@ -64,6 +64,13 @@ class ArrowEnd(StrEnum):
     NONE = "none"
 
 
+class Side(StrEnum):
+    """Which side of the main flow a branch is placed on."""
+
+    LEFT = "left"
+    RIGHT = "right"
+
+
 class Animation(StrEnum):
     """The animated tiers; the value is the CSS class and keyframes name."""
 
