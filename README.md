@@ -90,7 +90,7 @@ To export to PNG, SVG or PDF, also run `/plugin marketplace add jgraph/drawio-mc
 | `/flow:edit-drawio` | Changes an existing `.drawio` file in place: rename, move, resize, recolour, add, delete; the rest of the file stays as it was |
 | `/flow:doctor` | Checks the install |
 
-The icon library is 40 flat line icons plus 97 detailed icons (23 of them are the detailed form of a flat one). You can also add your own flat icons: Claude writes `icons.local.json` next to the spec, and the build checks it before use. The illustrated style is partial: add `"style": "illustrated"` and boxes with an icon become cards (large icon on a disc, name pill, detail line) in the flowchart, architecture, cloud, C4, BPMN, use case, DFD, screen flow, Kanban and layers skills, in both outputs. Cards use the 97 detailed 64 px icons from the design when the icon has one; the per-type illustrated notation of the design pages is not built. Not built: BPMN event types and pools with message flow checks, an explainer "concept" shape, and editing a `.drawio` file in place. The types above are simpler than the design pages describe (for example no device frames, no provider icons, no dates in the Gantt chart). Nothing has been tested in the draw.io editor, in claude.ai or in Cowork, or on Windows.
+The icon library is 40 flat line icons plus 97 detailed icons (23 of them are the detailed form of a flat one). You can also add your own flat icons: Claude writes `icons.local.json` next to the spec, and the build checks it before use. The illustrated style is partial: add `"style": "illustrated"` and boxes with an icon become cards (large icon on a disc, name pill, detail line) in the flowchart, architecture, cloud, C4, BPMN, use case, DFD, screen flow, Kanban and layers skills, in both outputs. Cards use the 97 detailed 64 px icons from the design when the icon has one; the per-type illustrated notation of the design pages is not built. Not built: BPMN event types and pools with message flow checks, an explainer "concept" shape, and restyling a whole existing diagram. The types above are simpler than the design pages describe (for example no device frames, no provider icons, no dates in the Gantt chart). Nothing has been tested in the draw.io editor, in claude.ai or in Cowork, or on Windows.
 
 ## Roadmap
 
@@ -106,7 +106,7 @@ The icon library is 40 flat line icons plus 97 detailed icons (23 of them are th
 - [x] Generate valid draw.io XML from a text prompt (flowchart, sequence, ER, architecture, state)
 - [x] First plugins: flowchart, sequence, ER, architecture, state
 - [x] Expand to the remaining categories above (simplified; see the table)
-- [ ] Support editing existing `.drawio` files (import exists; editing in place does not)
+- [x] Support editing existing `.drawio` files (`flow.py edit` with a fixed list of operations; no layout)
 - [ ] Documentation and examples
 
 ## Contributing

@@ -213,7 +213,7 @@ Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build 
 5. **Icons in draw.io** (inline SVG images) draw in the viewer; editing them in the editor and exporting to PNG/PDF are untested.
 6. **Claude.ai and Cowork:** skills run there, but whether the scripts can run is not verified. If they cannot, the plugin is for Claude Code only until that changes.
 7. **Icons for any subject.** The plugin ships the sets drawn for the design (simple line icons and 73 detailed ones). For anything else Claude draws the icon itself; see §6a.
-8. **Editing existing `.drawio` files:** a first version reads a file into a scene (`flow.py import`). It is best effort: icons, free text and automatically routed bends are lost, and nothing changes the original file. Changing the result goes through the overrides file. Editing a file in place is not designed.
+8. **Editing existing `.drawio` files:** `flow.py import` reads a file into a scene (best effort: icons, free text and automatically routed bends are lost). `flow.py edit` changes the file itself as XML with a fixed list of operations (set_text, move, resize, tone, set_style, add_node, add_edge, delete); the rest of the file is kept. Neither lays out a diagram: moving many boxes sensibly is left to the person or to describing the diagram again.
 9. **Cross-type links** (a node on a C4 diagram that points to a flowchart) have no scheme yet.
 
 ## 11. Build order
@@ -225,7 +225,7 @@ Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build 
 | C | draw.io renderer | Done; checked in the draw.io viewer, not in the editor |
 | D | Second family: sequence diagram | Done; the scene and renderers needed new frame, bar and symbol-head support but no rewrite |
 | E | Remaining types, family by family | Done in a simplified form: ER, architecture, cloud, C4, state, BPMN, use case, class, DFD, screen flow (all on the layered engine), org chart and mind map (tidy tree), Gantt and roadmap (timeline), Kanban, layers and wireframe (boards). Not built: per-type illustrated notation and the concept explainer. A first illustrated style exists: `style: illustrated` turns boxes with an icon into cards (see decision 11) |
-| F | Editing existing files, publishing | Import done (best effort). Editing in place and publishing to a directory: not done |
+| F | Editing existing files, publishing | Import and edit done. Publishing to a plugin directory: not done |
 
 Types that fit the layered engine are declared as data in `diagrams/catalog.py` (words, kinds and line styles) and read by `diagrams/graph.py`. Trees use `tidy.py`, because the layered engine merges the buses of different parents. Gantt and roadmap are in `diagrams/timeline.py`, and Kanban, layers and wireframe in `diagrams/boards.py`; both build the scene directly.
 
@@ -242,3 +242,4 @@ Types that fit the layered engine are declared as data in `diagrams/catalog.py` 
 9. **Graph types are data.** A new type of the graph family is a `GraphType` value (words, kinds, line styles), not a new parser. Unknown kinds and styles are refused with the list of valid ones.
 10. **Dates are not read.** A timeline names its own periods (`W1`, `Q2`) and bars use whole periods.
 11. **Illustrated style is a spec switch, not a second renderer.** `style: illustrated` marks each box that has an icon as a `card` node; the sizing step gives it a card size and both renderers draw a disc, a pill and a detail line. A card uses the detailed 64 px icon when the name has one (97 drawings taken from the design source, repaired where their attributes were duplicated), else the flat icon enlarged on a tinted disc. A detailed-only name used in a plain diagram is drawn small in its detailed form. Custom icons are still flat 24 px.
+12. **Edits are operations, not a prompt to a layout engine.** `flow.py edit` takes a checked list; one wrong operation refuses the whole list and the file is untouched. The default output is a new file; `--in-place` keeps a `.bak` copy.
