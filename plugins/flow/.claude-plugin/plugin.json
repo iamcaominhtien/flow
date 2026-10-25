@@ -1,13 +1,19 @@
 {
   "name": "flow",
   "version": "0.0.1",
-  "description": "Draw diagrams in draw.io from a short brief, following one design system across every diagram type.",
-  "author": { "name": "iamcaominhtien" },
+  "description": "Draw diagrams as animated HTML/SVG or draw.io files from a short brief, following one design system across every diagram type.",
+  "author": {
+    "name": "iamcaominhtien"
+  },
   "homepage": "https://github.com/iamcaominhtien/flow",
   "repository": "https://github.com/iamcaominhtien/flow",
   "license": "MIT",
-  "keywords": ["diagram", "draw.io", "drawio", "flowchart"],
-  "dependencies": [
-    { "name": "drawio", "marketplace": "drawio" }
+  "keywords": [
+    "diagram",
+    "draw.io",
+    "drawio",
+    "flowchart",
+    "svg",
+    "html"
   ]
 }

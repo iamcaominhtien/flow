@@ -1,18 +1,19 @@
 # Flow
 
-**A set of AI plugins for creating and editing diagrams in [draw.io](https://www.drawio.com/) (diagrams.net).**
+**A set of AI plugins for drawing diagrams, as animated HTML/SVG or as editable [draw.io](https://www.drawio.com/) files.**
 
-Describe a diagram in plain language and let AI draw it for you: flowcharts, sequence diagrams, architecture diagrams, ER diagrams, and more, all as editable draw.io files.
+Describe a diagram in plain language and let AI draw it for you: flowcharts, sequence diagrams, architecture diagrams, ER diagrams, and more, as a web page you can view and share, or as a draw.io file you can keep editing.
 
 > 🚧 **Status: early development.** The project has just started. APIs, structure, and features described below will change.
 
 ## Why Flow?
 
-Drawing diagrams by hand is slow, and AI-generated diagrams are often hard to edit afterward. Flow aims to bridge the two by letting AI produce and modify native draw.io diagrams that you can keep refining in the editor.
+Drawing diagrams by hand is slow, and AI-generated diagrams are often hard to edit afterward. Flow aims to bridge the two. Every diagram is described once, laid out once, and drawn in two ways: HTML/SVG (viewable anywhere, with animation) and native draw.io (editable in the editor).
 
 ## Goals
 
-- **Text to diagram**: generate draw.io diagrams from a natural-language description.
+- **Text to diagram**: generate diagrams from a natural-language description.
+- **Two outputs, one layout**: HTML/SVG first, then draw.io, both drawn from the same description and positions so they do not drift apart.
 - **Edit with AI**: modify existing diagrams ("add a cache between the API and the database").
 - **Native output**: produce standard draw.io XML (`.drawio`) so results stay fully editable.
 - **Pluggable**: a collection of focused plugins, each handling one kind of diagram or task.
@@ -66,15 +67,14 @@ Flow aims to cover **nearly every common diagram type**, grouped into 8 categori
 
 ## Getting started
 
-Flow installs as a Claude Code plugin from this repository. It depends on the official draw.io plugin, so add both marketplaces first:
+Flow installs as a Claude Code plugin from this repository. The draw.io output will use the official draw.io plugin, which is optional. To install Flow alone:
 
 ```
-/plugin marketplace add jgraph/drawio-mcp
 /plugin marketplace add iamcaominhtien/flow
 /plugin install flow@flow
 ```
 
-Claude Code only installs the dependency when its marketplace is already added, so the order matters. Then run the `doctor` skill (`/flow:doctor`) to check the install. The plugin currently holds only that skill; the diagram skills come next.
+For draw.io export, also run `/plugin marketplace add jgraph/drawio-mcp` and `/plugin install drawio@drawio`. Then run the `doctor` skill (`/flow:doctor`) to check the install. The plugin currently holds only that skill; the diagram skills come next.
 
 ## Roadmap
 
@@ -83,8 +83,9 @@ Claude Code only installs the dependency when its marketplace is already added, 
 - [x] Write the [design document](docs/design/README.md) (18 pages, 104 pictures)
 - [ ] Design how plugins edit existing `.drawio` files
 - [ ] Test an exported SVG with animated edges on its own
-- [x] Plugin skeleton: marketplace, `flow` plugin, `doctor` skill, installs locally and depends on the draw.io plugin
-- [ ] Define the plugin interface and shared library
+- [x] Plugin skeleton: marketplace, `flow` plugin, `doctor` skill, installs locally; the draw.io plugin is optional
+- [ ] Shared library: diagram description (JSON), one layout step, HTML/SVG renderer
+- [ ] draw.io renderer from the same description
 - [ ] Generate valid draw.io XML from a text prompt
 - [ ] First plugins: flowchart, sequence, ER, architecture
 - [ ] Expand to the remaining categories above

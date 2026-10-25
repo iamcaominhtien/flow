@@ -15,6 +15,6 @@ print(f"OK   python {sys.version.split()[0]}")
 skills = sorted(p.parent.name for p in (root / "skills").glob("*/SKILL.md"))
 print(f"OK   skills: {', '.join(skills)}")
 
-for dep in manifest.get("dependencies", []):
-    name = dep["name"] if isinstance(dep, dict) else dep
-    print(f"INFO depends on {name}; check with `claude plugin list`")
+print(
+    "INFO draw.io export needs the optional `drawio@drawio` plugin; check with `claude plugin list`"
+)

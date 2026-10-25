@@ -1,13 +1,14 @@
 {
   "name": "flow",
-  "owner": { "name": "iamcaominhtien" },
-  "description": "Plugins that draw diagrams in draw.io.",
-  "allowCrossMarketplaceDependenciesOn": ["drawio"],
+  "owner": {
+    "name": "iamcaominhtien"
+  },
+  "description": "Plugins that draw diagrams as HTML/SVG or draw.io.",
   "plugins": [
     {
       "name": "flow",
       "source": "./plugins/flow",
-      "description": "Draw diagrams in draw.io from a short brief, following one design system across every diagram type.",
+      "description": "Draw diagrams as animated HTML/SVG or draw.io files from a short brief, following one design system across every diagram type.",
       "category": "diagrams"
     }
   ]
