@@ -12,7 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from flowlib import build, check, render_html, scene, spec
+from flowlib import build, check, overrides, render_html, scene, spec
 
 EXIT_OK = 0
 EXIT_INVALID_INPUT = 1
@@ -56,6 +56,9 @@ def run_build(arguments: argparse.Namespace) -> int:
         result = build.build(spec_path, Path(arguments.output or spec_path.parent))
     except spec.SpecError as error:
         print(f"{spec_path} is not a valid spec:\n{error}", file=sys.stderr)
+        return EXIT_INVALID_INPUT
+    except overrides.OverridesError as error:
+        print(f"the overrides next to {spec_path} are not valid:\n{error}", file=sys.stderr)
         return EXIT_INVALID_INPUT
     print(f"wrote {result.scene_path}\nwrote {result.html_path}\nwrote {result.drawio_path}")
     print(check.format_report(result.findings))

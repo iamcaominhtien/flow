@@ -204,6 +204,8 @@
     "chip_padding_x": 16,
     "chip_char_width_em": 0.62,
     "min_canvas_width": 640,
-    "chip_font_size": 11
+    "chip_font_size": 11,
+    "lane_padding": 36,
+    "lane_min_size": 180
   }
 }

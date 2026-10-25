@@ -1,5 +1,5 @@
 ---
-description: Draw a top-to-bottom flowchart (steps, decisions, loops) as an animated HTML page and a draw.io file from a short description. Use when the user asks for a flowchart, a process flow, or the steps and decisions of a procedure.
+description: Draw a flowchart (steps, decisions, loops, optional swimlanes, top-to-bottom or left-to-right) as an animated HTML page and a draw.io file from a short description. Use when the user asks for a flowchart, a process flow, or the steps and decisions of a procedure.
 allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py *)
 ---
 
@@ -7,7 +7,7 @@ allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py *)
 
 You write a short **spec** (the steps and how they connect). A script places every box, routes the lines, checks the result and writes the HTML. Never write coordinates or HTML yourself.
 
-Scope today: top-to-bottom flowcharts without swimlanes, in the plain style. For anything else (left-to-right, lanes, illustrated, other diagram types), say that it is not built yet.
+Scope today: flowcharts in the plain style, top to bottom or left to right, with or without swimlanes. For anything else (illustrated, other diagram types), say that it is not built yet.
 
 ## Steps
 
@@ -42,6 +42,8 @@ Scope today: top-to-bottom flowcharts without swimlanes, in the plain style. For
 - `role` of an edge: `next` (default, a normal step), `yes`, `no`, `back` (returns to an earlier step), `main` (the one most important path, drawn thick and animated), `data` (an event or data flow, drawn violet and animated slowly). Use `main` on at most one connected path.
 - Optional on a node: `icon` (one of `user phone cart card bell clock pin pot check box bike refund warn star doc store`), `tone` (`blue violet amber green teal gray`, marks the owner or domain, never a meaning), `number` (a short chip such as `3`), `side` (`left` or `right`, asks for a branch on that side).
 - Edge `label`: short; `Yes` and `No` for decision exits.
+- `direction`: `down` (default) for up to about ten steps, `right` for pipelines and timelines. Never mix them.
+- Swimlanes: add `"lanes": [{"id": "support", "label": "Support", "tone": "violet"}, ...]` and give every node a `"lane"`. One lane per actor (person, team or system); the actor who starts goes first. Swimlanes read best with `"direction": "right"`. A step sits in exactly one lane, and with lanes the `side` hint is ignored.
 
 ## Writing good content
 
@@ -59,7 +61,14 @@ Scope today: top-to-bottom flowcharts without swimlanes, in the plain style. For
 2. Moving a branch with `side`, or changing which exit has the role `yes`.
 3. Splitting the chart into two with a `subprocess` or a `connector`.
 
-You cannot move a box by hand yet; if the three steps above do not clear an error, report it to the user instead of editing the HTML.
+If those steps do not clear an error, fix it by hand with an **overrides** file next to the spec, `<name>.overrides.json`. Read the positions in `<name>.scene.json`, then write only what changes:
+
+```json
+{"nodes": {"pay": {"x": 120, "y": 340}},
+ "edges": {"e3": {"points": [[10, 10], [10, 90]], "label_at": [30, 50]}}}
+```
+
+`x` and `y` are the top-left corner of a node; edge ids are `e1`, `e2`... in spec order; a route is a list of `[x, y]` points that runs along horizontal and vertical segments. The build applies the file to both the page and the draw.io file, so a fix is kept when you rebuild. Moving a node does not move its lines: re-route them in the same file. Do not edit the HTML or the `.drawio` file by hand: a rebuild would overwrite the edit.
 
 ## Known limits
 

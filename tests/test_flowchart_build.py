@@ -12,12 +12,13 @@ PLUGIN_DIR = ROOT / "plugins" / "flow"
 FLOW_CLI = PLUGIN_DIR / "scripts" / "flow.py"
 EXAMPLE_SPECS = sorted((ROOT / "examples").glob("*.spec.json"))
 LOGIN_SPEC = ROOT / "examples" / "login-flow.spec.json"
+REFUND_SPEC = ROOT / "examples" / "refund-swimlane.spec.json"
 EXIT_OK = 0
 EXIT_INVALID_INPUT = 1
 
 sys.path.insert(0, str(PLUGIN_DIR))
 
-from flowlib import build, scene, spec  # noqa: E402
+from flowlib import build, overrides, scene, spec  # noqa: E402
 from flowlib.check import Severity, check_scene  # noqa: E402
 from flowlib.model import Role, Scene  # noqa: E402
 
@@ -125,11 +126,62 @@ def test_spec_reports_every_problem_and_suggests_a_node() -> None:
     assert "wiggly" in message
 
 
-def test_spec_rejects_a_direction_that_is_not_built_yet() -> None:
-    """Left-to-right charts are not supported yet and the error says so."""
-    bad = {"type": "flowchart", "direction": "right", "nodes": [{"id": "a", "kind": "process"}]}
-    with pytest.raises(spec.SpecError, match="direction"):
+def test_spec_rejects_an_unknown_direction() -> None:
+    """Only down and right are directions, and the error lists them."""
+    bad = {"type": "flowchart", "direction": "diagonal", "nodes": [{"id": "a", "kind": "process"}]}
+    with pytest.raises(spec.SpecError, match="down, right"):
         spec.parse(bad)
+
+
+def test_spec_rejects_a_lane_without_lanes_and_a_missing_lane() -> None:
+    """A node may name a lane only when lanes exist, and must name one when they do."""
+    node = {"id": "a", "kind": "process", "lane": "x"}
+    with pytest.raises(spec.SpecError, match="needs a 'lanes' list"):
+        spec.parse({"type": "flowchart", "nodes": [node]})
+    lanes = [{"id": "x", "label": "X"}]
+    with pytest.raises(spec.SpecError, match="must be one of: x"):
+        spec.parse({"type": "flowchart", "lanes": lanes, "nodes": [{"id": "a", "kind": "process"}]})
+
+
+def test_left_to_right_flow_runs_along_x() -> None:
+    """In a left-to-right chart the steps of a path have increasing x."""
+    chart = laid_out(REFUND_SPEC)
+    by_id = {node.id: node for node in chart.nodes}
+    assert by_id["ask"].x < by_id["review"].x < by_id["eligible"].x < by_id["pay"].x
+
+
+def test_every_node_sits_inside_its_lane() -> None:
+    """A swimlane frame covers each of its nodes completely."""
+    chart = laid_out(REFUND_SPEC)
+    lane_of = {node.id: node.lane for node in spec.load(REFUND_SPEC).nodes}
+    frames = {frame.id: frame for frame in chart.frames}
+    for node in chart.nodes:
+        frame = frames[f"lane-{lane_of[node.id]}"]
+        assert frame.x <= node.x and node.x + node.width <= frame.x + frame.width
+        assert frame.y <= node.y and node.y + node.height <= frame.y + frame.height
+
+
+def test_overrides_move_a_node_and_a_route(tmp_path: Path) -> None:
+    """An overrides file beside the spec changes the built scene, and only what it names."""
+    spec_path = tmp_path / "chart.spec.json"
+    spec_path.write_text(LOGIN_SPEC.read_text())
+    plain = build.build(spec_path, tmp_path / "plain")
+    (tmp_path / "chart.overrides.json").write_text(
+        json.dumps({"nodes": {"dash": {"x": 500}}, "edges": {"e1": {"label_at": [5, 5]}}})
+    )
+    moved = build.build(spec_path, tmp_path / "moved")
+    before = {node.id: node for node in scene.load(plain.scene_path).nodes}
+    after = {node.id: node for node in scene.load(moved.scene_path).nodes}
+    assert after["dash"].x == 500
+    assert after["dash"].y == before["dash"].y
+    assert after["start"] == before["start"]
+
+
+def test_overrides_naming_a_missing_node_are_rejected() -> None:
+    """An override for a node that does not exist is reported, not ignored."""
+    chart = laid_out(LOGIN_SPEC)
+    with pytest.raises(overrides.OverridesError, match="no such node"):
+        overrides.apply(chart, overrides.parse({"nodes": {"ghost": {"x": 1}}}))
 
 
 def test_build_command_writes_the_files(tmp_path: Path) -> None:

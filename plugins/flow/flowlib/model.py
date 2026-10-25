@@ -71,6 +71,13 @@ class Side(StrEnum):
     RIGHT = "right"
 
 
+class Direction(StrEnum):
+    """Which way a flow runs: top to bottom, or left to right."""
+
+    DOWN = "down"
+    RIGHT = "right"
+
+
 class Animation(StrEnum):
     """The animated tiers; the value is the CSS class and keyframes name."""
 

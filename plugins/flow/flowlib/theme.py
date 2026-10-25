@@ -74,6 +74,8 @@ class LayoutRules:
     gap_horizontal: float
     gap_horizontal_labelled: float
     margin: float
+    lane_padding: float
+    lane_min_size: float
     min_canvas_width: float
     title_block_height: float
     channel_offset: float

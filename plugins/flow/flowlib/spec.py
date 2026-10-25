@@ -3,10 +3,12 @@
 The JSON format of a flowchart::
 
     {"type": "flowchart", "title": "...", "desc": "...", "direction": "down",
-     "nodes": [{"id", "kind", "text", "icon", "tone", "number", "side"}],
+     "lanes": [{"id", "label", "tone"}],
+     "nodes": [{"id", "kind", "text", "icon", "tone", "number", "side", "lane"}],
      "edges": [{"from", "to", "role", "label"}]}
 
-``kind`` is a shape name; ``side`` (``left`` or ``right``) asks for a branch on that side.
+``kind`` is a shape name; ``side`` (``left`` or ``right``) asks for a branch on that side;
+``direction`` is ``down`` (default) or ``right``; with ``lanes``, every node names its lane.
 """
 
 import json
@@ -15,15 +17,15 @@ from difflib import get_close_matches
 from pathlib import Path
 from typing import Any
 
-from .model import Role, Shape, Side, Tone
+from .model import Direction, Role, Shape, Side, Tone
 from .reader import Reader
 from .theme import load_icons
 
-SPEC_KEYS = {"type", "title", "desc", "direction", "nodes", "edges"}
-NODE_KEYS = {"id", "kind", "text", "icon", "tone", "number", "side"}
+SPEC_KEYS = {"type", "title", "desc", "direction", "lanes", "nodes", "edges"}
+NODE_KEYS = {"id", "kind", "text", "icon", "tone", "number", "side", "lane"}
+LANE_KEYS = {"id", "label", "tone"}
 EDGE_KEYS = {"from", "to", "role", "label"}
 FLOWCHART = "flowchart"
-DIRECTION_DOWN = "down"
 MAX_SUGGESTIONS = 1
 
 
@@ -41,6 +43,15 @@ class SpecError(ValueError):
 
 
 @dataclass(frozen=True)
+class SpecLane:
+    """A swimlane: a band that holds the steps of one actor."""
+
+    id: str
+    label: str
+    tone: Tone
+
+
+@dataclass(frozen=True)
 class SpecNode:
     """One step of the diagram, as the author describes it."""
 
@@ -51,6 +62,7 @@ class SpecNode:
     tone: Tone | None
     number: str | None
     side: Side | None
+    lane: str | None
 
 
 @dataclass(frozen=True)
@@ -69,6 +81,8 @@ class Spec:
 
     title: str | None
     description: str | None
+    direction: Direction
+    lanes: tuple[SpecLane, ...]
     nodes: tuple[SpecNode, ...]
     edges: tuple[SpecEdge, ...]
 
@@ -127,32 +141,46 @@ class _SpecParser:
             raise SpecError(["the spec must be a JSON object"])
         read = self._read
         read.check_keys(raw, SPEC_KEYS, "spec")
-        self._check_type(raw)
-        nodes = [self._node(item, f"nodes[{i}]") for i, item in enumerate(raw.get("nodes", []))]
+        if raw.get("type") != FLOWCHART:
+            read.report("spec", f"'type' must be '{FLOWCHART}' (the only type so far)")
+        lanes = [self._lane(item, f"lanes[{i}]") for i, item in enumerate(raw.get("lanes", []))]
+        lane_ids = [lane.id for lane in lanes if lane is not None]
+        nodes = [
+            self._node(item, f"nodes[{i}]", lane_ids) for i, item in enumerate(raw.get("nodes", []))
+        ]
         node_ids = [node.id for node in nodes if node is not None]
         if not node_ids:
             read.report("spec", "'nodes' must list at least one node")
         edges = [
             self._edge(item, f"edges[{i}]", node_ids) for i, item in enumerate(raw.get("edges", []))
         ]
+        direction = read.enum(Direction, raw, "direction", "spec") or Direction.DOWN
+        title, description = read.text(raw, "title", "spec"), read.text(raw, "desc", "spec")
         if read.problems:
             raise SpecError(read.problems)
         return Spec(
-            title=read.text(raw, "title", "spec"),
-            description=read.text(raw, "desc", "spec"),
+            title=title,
+            description=description,
+            direction=direction,
+            lanes=tuple(lane for lane in lanes if lane is not None),
             nodes=tuple(node for node in nodes if node is not None),
             edges=tuple(edge for edge in edges if edge is not None),
         )
 
-    def _check_type(self, raw: dict[str, Any]) -> None:
-        """Report a spec that is not a top-to-bottom flowchart, the only kind built so far."""
-        if raw.get("type") != FLOWCHART:
-            self._read.report("spec", f"'type' must be '{FLOWCHART}' (the only type so far)")
-        direction = raw.get("direction", DIRECTION_DOWN)
-        if direction != DIRECTION_DOWN:
-            self._read.report("spec", f"'direction' must be '{DIRECTION_DOWN}' (only one so far)")
+    def _lane(self, raw: object, where: str) -> SpecLane | None:
+        """Build one swimlane, or report why it cannot be built."""
+        read = self._read
+        if not isinstance(raw, dict):
+            read.report(where, "must be an object")
+            return None
+        read.check_keys(raw, LANE_KEYS, where)
+        return SpecLane(
+            id=read.identifier(raw, where),
+            label=read.text(raw, "label", where) or "",
+            tone=read.enum(Tone, raw, "tone", where) or Tone.GRAY,
+        )
 
-    def _node(self, raw: object, where: str) -> SpecNode | None:
+    def _node(self, raw: object, where: str, lane_ids: list[str]) -> SpecNode | None:
         """Build one node, or report why it cannot be built."""
         read = self._read
         if not isinstance(raw, dict):
@@ -172,7 +200,17 @@ class _SpecParser:
             tone=read.enum(Tone, raw, "tone", where),
             number=read.text(raw, "number", where),
             side=read.enum(Side, raw, "side", where),
+            lane=self._lane_of(raw, where, lane_ids),
         )
+
+    def _lane_of(self, raw: dict[str, Any], where: str, lane_ids: list[str]) -> str | None:
+        """Read the lane of a node: required when lanes exist, forbidden when none do."""
+        lane = raw.get("lane")
+        if lane_ids and lane not in lane_ids:
+            self._read.report(where, f"'lane' must be one of: {', '.join(lane_ids)}")
+        elif not lane_ids and lane is not None:
+            self._read.report(where, "'lane' needs a 'lanes' list at the top of the spec")
+        return lane
 
     def _edge(self, raw: object, where: str, node_ids: list[str]) -> SpecEdge | None:
         """Build one edge, checking that both ends name a node."""

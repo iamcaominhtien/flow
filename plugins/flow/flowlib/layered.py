@@ -81,7 +81,12 @@ def sideways_edges(forward: list[SpecEdge]) -> set[SpecEdge]:
     return {edge for edge in forward if edge.role in SIDEWAYS_ROLES and edge.source in continuing}
 
 
-def assign_ranks(spec: Spec, forward: list[SpecEdge], sideways: set[SpecEdge]) -> dict[str, int]:
+def assign_ranks(
+    spec: Spec,
+    forward: list[SpecEdge],
+    sideways: set[SpecEdge],
+    minimum: dict[str, int] | None = None,
+) -> dict[str, int]:
     """Give each node the row of its longest forward path from a start node.
 
     A sideways exit does not move its target down, so it lands on the row of its source.
@@ -90,11 +95,13 @@ def assign_ranks(spec: Spec, forward: list[SpecEdge], sideways: set[SpecEdge]) -
         spec: The flowchart description.
         forward: The forward edges, without cycles.
         sideways: The edges that stay on the row of their source.
+        minimum: A row below which a node may not be placed; used to separate nodes that
+            would otherwise share a lane and a row.
 
     Returns:
         Node id to row number, starting at 0.
     """
-    rank = {node.id: 0 for node in spec.nodes}
+    rank = {node.id: (minimum or {}).get(node.id, 0) for node in spec.nodes}
     for _ in spec.nodes:
         for edge in forward:
             step = 0 if edge in sideways else 1
@@ -160,8 +167,58 @@ def assign_columns(
     return column
 
 
+def separate_lane_cells(
+    spec: Spec,
+    forward: list[SpecEdge],
+    column: dict[str, int],
+) -> dict[str, int]:
+    """Give every node its own row within its lane, pushing later nodes down.
+
+    Two nodes of one lane may reach the same row by different paths; the one that comes later
+    in the spec moves down a row, and what follows it moves with it.
+
+    Args:
+        spec: The flowchart description.
+        forward: The forward edges.
+        column: Node id to its lane's column.
+
+    Returns:
+        Node id to row, with at most one node per lane and row.
+    """
+    minimum: dict[str, int] = {}
+    while True:
+        rank = assign_ranks(spec, forward, set(), minimum)
+        taken: dict[tuple[int, int], str] = {}
+        clash = None
+        for node in spec.nodes:
+            cell = (rank[node.id], column[node.id])
+            if cell in taken:
+                clash = node.id
+                break
+            taken[cell] = node.id
+        if clash is None:
+            return rank
+        minimum[clash] = rank[clash] + 1
+
+
+def assign_lane_columns(spec: Spec) -> dict[str, int]:
+    """Give each node the column of its swimlane.
+
+    Args:
+        spec: A flowchart description whose nodes all name a lane.
+
+    Returns:
+        Node id to the position of its lane in ``spec.lanes``.
+    """
+    position = {lane.id: index for index, lane in enumerate(spec.lanes)}
+    return {node.id: position[node.lane] for node in spec.nodes if node.lane is not None}
+
+
 def build_grid(spec: Spec) -> Grid:
     """Place every node of a flowchart on the grid.
+
+    With swimlanes, a node's column is its lane and no exit leaves sideways; without them,
+    the happy path takes one column and branches take the columns beside it.
 
     Args:
         spec: The flowchart description.
@@ -170,11 +227,11 @@ def build_grid(spec: Spec) -> Grid:
         The rows, the columns, and the edges split into forward and returning ones.
     """
     forward, returning = split_returning(spec)
+    if spec.lanes:
+        column = assign_lane_columns(spec)
+        rank = separate_lane_cells(spec, forward, column)
+        return Grid(rank=rank, column=column, forward=tuple(forward), returning=tuple(returning))
     sideways = sideways_edges(forward)
     rank = assign_ranks(spec, forward, sideways)
-    return Grid(
-        rank=rank,
-        column=assign_columns(spec, rank, forward, sideways),
-        forward=tuple(forward),
-        returning=tuple(returning),
-    )
+    column = assign_columns(spec, rank, forward, sideways)
+    return Grid(rank=rank, column=column, forward=tuple(forward), returning=tuple(returning))
