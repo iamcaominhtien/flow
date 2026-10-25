@@ -175,29 +175,27 @@ Output is a short list with the ids involved, so Claude can edit the spec (`"ran
 ```
 plugins/flow/
 ├── .claude-plugin/plugin.json
-├── skills/
-│   ├── flowchart/SKILL.md        # when to use, how to write the spec, the loop
-│   ├── sequence/SKILL.md  ...    # one per type, started from the design pages
-│   └── doctor/SKILL.md
+├── skills/                       # doctor, flowchart, sequence, er, architecture, state, import-drawio
 ├── scripts/
-│   └── flow.py                   # CLI: build | check | schema | doctor
+│   ├── flow.py                   # CLI: build | check | render | import
+│   └── doctor.py
 └── flowlib/                      # Python package, standard library only
-    ├── theme.json                # tones, line roles, sizes, spacing (from the design)
-    ├── icons.json                # the icon set (already in the repo)
-    ├── spec.py                   # load and validate
-    ├── layout/                   # layered.py, lanes.py, timeline.py, tables.py, tree.py
-    ├── scene.py                  # scene + overrides
-    ├── icons.py                  # library lookup, inline SVG validation
-    ├── render_html.py
-    ├── render_drawio.py
-    ├── check.py
-    └── types/                    # per-type vocabulary: kinds, roles, defaults
+    ├── theme.json, icons.json    # design tokens and the icon library
+    ├── model.py, scene.py        # scene dataclasses; scene JSON read and write
+    ├── reader.py, spec.py        # spec reading helpers; the flowchart-family spec
+    ├── diagrams/                 # one module per type: flowchart, er, architecture, state, sequence
+    ├── layered.py, placement.py, sizing.py, routing.py, zones.py, transpose.py
+    ├── overrides.py, canvas.py, check.py, build.py
+    ├── shapes.py, markup.py, render_html.py, html_nodes.py, html_lines.py
+    ├── render_drawio.py, drawio_common.py, drawio_lines.py
+    ├── icon_check.py             # custom icon validation
+    └── import_drawio.py          # .drawio to scene
 tests/                            # development only, not part of the plugin
 ```
 
 Each skill is short: it tells Claude when it applies, which fields the spec has for that type (copied from the design page), then the loop *write spec → `flow.py build` → read the report → fix → show the result*. The long rules stay in the skill's reference file and are read only when needed, which keeps the context cost of an installed plugin low.
 
-Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build spec.json --format html,drawio --out ./diagrams`. The skills pre-approve exactly that command pattern, so users are not asked for permission on every run.
+Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/name.spec.json` (writes the scene, the HTML and the draw.io file next to the spec). The skills pre-approve exactly that command pattern, so users are not asked for permission on every run.
 
 ## 9. Testing
 
@@ -215,21 +213,21 @@ Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build 
 5. **Icons in draw.io** (inline SVG images) draw in the viewer; editing them in the editor and exporting to PNG/PDF are untested.
 6. **Claude.ai and Cowork:** skills run there, but whether the scripts can run is not verified. If they cannot, the plugin is for Claude Code only until that changes.
 7. **Icons for any subject.** The plugin ships the sets drawn for the design (simple line icons and 73 detailed ones). For anything else Claude draws the icon itself; see §6a.
-8. **Editing existing `.drawio` files** is not designed (deferred). The scene is the likely route: parse a file back into a scene, change it, render again.
+8. **Editing existing `.drawio` files:** a first version reads a file into a scene (`flow.py import`). It is best effort: icons, free text and automatically routed bends are lost, and nothing changes the original file. Changing the result goes through the overrides file. Editing a file in place is not designed.
 9. **Cross-type links** (a node on a C4 diagram that points to a flowchart) have no scheme yet.
 
 ## 11. Build order
 
-| Step | What | Done when |
+| Step | What | State |
 | --- | --- | --- |
-| A | `theme.json`, `icons.json`, scene format, HTML renderer for **hand-written scenes** | The "Place an order" scene renders like the canvas flowchart |
-| B | Spec, validator, layered layout, `flow.py build`, check; the `flowchart` skill | A brief produces a flowchart HTML that passes the check, installed from the marketplace |
-| C | draw.io renderer | The same scene opens in draw.io with matching positions, animation included |
-| D | Second type from a different family (sequence or ER) to test that the scene and renderers are not flowchart-shaped | Two families work with no change to the renderers |
-| E | Remaining types, family by family; illustrated style | Each type passes the design's own examples |
-| F | Editing existing files, publishing to the plugin directory | Later |
+| A | `theme.json`, `icons.json`, scene format, HTML renderer for hand-written scenes | Done |
+| B | Spec, validator, layered layout, `flow.py build`, check; the `flowchart` skill; swimlanes, left to right, overrides, back-edge routing | Done |
+| C | draw.io renderer | Done; checked in the draw.io viewer, not in the editor |
+| D | Second family: sequence diagram | Done; the scene and renderers needed new frame, bar and symbol-head support but no rewrite |
+| E | Remaining types, family by family | ER, architecture and state done. Not built: BPMN, C4, cloud, DFD, UML class and use case, screen flow, explainer, Gantt, org chart, mind map, Kanban, roadmap, wireframe, illustrated style |
+| F | Editing existing files, publishing | Import done (best effort). Editing in place and publishing to a directory: not done |
 
-Steps A and C are cheap because the renderers only draw geometry; B is where the real uncertainty is, so it comes with a plan to stop and review after the first working flowchart.
+Types that fit the layered engine (C4, cloud, DFD, BPMN, UML) are adapters like `architecture` and `state`: a parser that turns the spec into nodes, edges and zones. The planning types and the wireframe need layouts of their own (a time axis, a tree, a column board, a free grid).
 
 ## 12. Decisions taken
 
@@ -238,3 +236,6 @@ Steps A and C are cheap because the renderers only draw geometry; B is where the
 3. **Line weights:** the same in both outputs (2, 4, 2), checked in draw.io later.
 4. **Both styles are supported.** Plain works for any subject; illustrated uses library icons and icons Claude draws (§6a). Plain ships first, illustrated follows once the flowchart works.
 5. **Files kept:** the spec, the overrides and the scene sit beside the outputs (`diagram.spec.json`, `diagram.scene.json`, `diagram.html`, `diagram.drawio`) so a diagram can be rebuilt.
+6. **Custom icons are names, not inline SVG.** `icons.local.json` beside the spec maps a name to the inner markup of a 24 px line icon; the build checks it (allow-listed elements and attributes, numbers inside the grid, size limits) and refuses anything else. The detailed 64 px style is not supported yet. The built-in library has 40 icons.
+7. **One engine for the graph family.** Flowchart, ER, architecture and state share ranking, placement, routing and zones. Each type is a parser in `flowlib/diagrams/` plus a skill.
+8. **Marks keep their own size.** Start, end, connector and actor nodes are not stretched to the width of their column; a stretched circle would be an ellipse in draw.io.

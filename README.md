@@ -44,7 +44,7 @@ The visual language is designed first, on a canvas of sample artboards, before a
 | C4 | Done: rules, level 1 context, level 2 containers, level 3 components (one delivery platform at three zooms) |
 | Cloud | Done: rules, basic one-VPC app, delivery platform on two zones, network joining offices to the cloud |
 | DFD | Done: rules, notation with forbidden connections, levels 0, 1 and 2 of the delivery system, plain and illustrated |
-| Editing existing .drawio files | Not started |
+| Editing existing .drawio files | Not designed; a first import exists (see the [plugin design](docs/plugin/design.md)) |
 
 Cross-type review (done): the automatic overlap check covers every board; the lint tool now also knows the Gantt and swimlane frames; the same thing now has the same icon and tint everywhere (Payment provider, Orders database).
 
@@ -56,14 +56,14 @@ Flow aims to cover **nearly every common diagram type**, grouped into 8 categori
 
 | Category | Diagram types | Status |
 | --- | --- | --- |
-| Process & business | Flowchart, Swimlane / cross-functional, BPMN, User flow | Planned |
-| UML behavior | Sequence, Use case, Activity, State machine | Planned |
-| Structure & data | ER diagram, Class diagram, Data flow diagram (DFD) | Planned |
-| Architecture & infrastructure | Architecture, C4 model, Cloud (AWS / GCP / Azure), Network, Deployment | Planned |
+| Process & business | Flowchart, Swimlane / cross-functional, BPMN, User flow | Flowchart and swimlane built; the rest planned |
+| UML behavior | Sequence, Use case, Activity, State machine | Sequence and state machine built; the rest planned |
+| Structure & data | ER diagram, Class diagram, Data flow diagram (DFD) | ER built; the rest planned |
+| Architecture & infrastructure | Architecture, C4 model, Cloud (AWS / GCP / Azure), Network, Deployment | Architecture built; the rest planned |
 | Planning & management | Gantt, Org chart, Mind map, Roadmap / Kanban | Planned |
 | UI design | Wireframe / mockup | Planned |
 | Explainer / infographic | Layered flow (icon-based tiers/lanes), Tree / hierarchy, Side-by-side comparison, Concept illustration | Planned |
-| Editing | Update or restyle existing `.drawio` files | Planned |
+| Editing | Update or restyle existing `.drawio` files | Import only (best effort) |
 
 ## Getting started
 
@@ -74,7 +74,19 @@ Flow installs as a Claude Code plugin from this repository. Flow writes `.drawio
 /plugin install flow@flow
 ```
 
-To export to PNG, SVG or PDF, also run `/plugin marketplace add jgraph/drawio-mcp` and `/plugin install drawio@drawio`. Then run the `doctor` skill (`/flow:doctor`) to check the install. Then ask for a flowchart, for example `/flow:flowchart how a customer pays and gets an order delivered`. Claude writes a short spec; a script places the boxes, routes the lines, checks the result and writes an animated HTML page and a `.drawio` file next to the spec. Today this covers top-to-bottom flowcharts in the plain style (no swimlanes, no left-to-right); the other diagram types come next.
+To export to PNG, SVG or PDF, also run `/plugin marketplace add jgraph/drawio-mcp` and `/plugin install drawio@drawio`. Then run the `doctor` skill (`/flow:doctor`) to check the install. Then ask for a flowchart, for example `/flow:flowchart how a customer pays and gets an order delivered`. Claude writes a short spec; a script places the boxes, routes the lines, checks the result and writes an animated HTML page and a `.drawio` file next to the spec. Today the plugin has these skills, all in the plain style:
+
+| Skill | Draws |
+| --- | --- |
+| `/flow:flowchart` | Flowcharts, top to bottom or left to right, with swimlanes and an overrides file for fixes |
+| `/flow:sequence` | Sequence diagrams: activation bars, fragments, notes, create and destroy |
+| `/flow:er` | ER diagrams: tables, keys, crow's-foot cardinality |
+| `/flow:architecture` | Architecture diagrams: components in nested zones |
+| `/flow:state` | State diagrams |
+| `/flow:import-drawio` | Reads an existing `.drawio` file into a scene (best effort) |
+| `/flow:doctor` | Checks the install |
+
+You can also add your own icons: Claude writes `icons.local.json` next to the spec, and the build checks it before use. The other diagram types (BPMN, C4, cloud, DFD, UML class and use case, planning types, wireframe, explainer, screen flow) are designed but not built. Nothing has been tested in the draw.io editor, in claude.ai or in Cowork, or on Windows.
 
 ## Roadmap
 
@@ -87,10 +99,10 @@ To export to PNG, SVG or PDF, also run `/plugin marketplace add jgraph/drawio-mc
 - [x] Write the [plugin design](docs/plugin/design.md) (pipeline, spec, layout, renderers, checks)
 - [x] Shared library: diagram description (JSON), one layout step, HTML/SVG renderer, checks, and the first skill (flowchart, top to bottom)
 - [x] draw.io renderer from the same description (checked in the draw.io viewer; not yet in the editor)
-- [ ] Generate valid draw.io XML from a text prompt
-- [ ] First plugins: flowchart, sequence, ER, architecture
+- [x] Generate valid draw.io XML from a text prompt (flowchart, sequence, ER, architecture, state)
+- [x] First plugins: flowchart, sequence, ER, architecture, state
 - [ ] Expand to the remaining categories above
-- [ ] Support editing existing `.drawio` files
+- [ ] Support editing existing `.drawio` files (import exists; editing in place does not)
 - [ ] Documentation and examples
 
 ## Contributing
