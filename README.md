@@ -45,7 +45,9 @@ The visual language is designed first, on a canvas of sample artboards, before a
 | DFD | Done: rules, notation with forbidden connections, levels 0, 1 and 2 of the delivery system, plain and illustrated |
 | Editing existing .drawio files | Not started |
 
-Not yet verified: whether draw.io's `flowAnimation` edge style survives export well enough to reproduce the animated lines.
+Cross-type review (done): the automatic overlap check covers every board; the lint tool now also knows the Gantt and swimlane frames; the same thing now has the same icon and tint everywhere (Payment provider, Orders database).
+
+Animation in draw.io (checked in the draw.io viewer code, and by rendering a file with two edges): each edge has its own `flowAnimation=1`, `flowAnimationDuration` (default 500), `flowAnimationTimingFunction` and `flowAnimationDirection`. So the two tiers of the design work: main route `strokeWidth=3;flowAnimation=1;flowAnimationDuration=500`, event stream `strokeWidth=1;flowAnimation=1;flowAnimationDuration=1500`. The viewer adds the keyframes at render time and its SVG export writes them into the file. Still not tested: opening an exported SVG file on its own, and the PNG/PDF export (which cannot animate).
 
 ## Supported diagram types
 
@@ -69,8 +71,9 @@ Installation and usage instructions will be added once the first plugin is avail
 ## Roadmap
 
 - [x] Design foundation, icon sets, Screen flow, Flowchart, Sequence, ER, Architecture, Explainer, Planning, UML, Wireframe, BPMN, C4, Cloud and DFD notation
-- [ ] Design how plugins edit existing `.drawio` files, then a cross-type review
-- [ ] Test draw.io animated edges and export
+- [x] Cross-type review and a first test of draw.io animated edges
+- [ ] Design how plugins edit existing `.drawio` files
+- [ ] Test an exported SVG with animated edges on its own
 - [ ] Define the plugin interface and project structure
 - [ ] Generate valid draw.io XML from a text prompt
 - [ ] First plugins: flowchart, sequence, ER, architecture
