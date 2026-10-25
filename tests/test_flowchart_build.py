@@ -10,7 +10,11 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 PLUGIN_DIR = ROOT / "plugins" / "flow"
 FLOW_CLI = PLUGIN_DIR / "scripts" / "flow.py"
-EXAMPLE_SPECS = sorted((ROOT / "examples").glob("*.spec.json"))
+EXAMPLE_SPECS = [
+    path
+    for path in sorted((ROOT / "examples").glob("*.spec.json"))
+    if json.loads(path.read_text())["type"] == "flowchart"
+]
 LOGIN_SPEC = ROOT / "examples" / "login-flow.spec.json"
 REFUND_SPEC = ROOT / "examples" / "refund-swimlane.spec.json"
 EXIT_OK = 0

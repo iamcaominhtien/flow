@@ -1,0 +1,36 @@
+{
+  "type": "sequence",
+  "title": "Sequence: pay for an order",
+  "desc": "Every message kind in one flow: calls, returns, a self call, a created worker, a lost and a found message, and nested fragments.",
+  "participants": [
+    {"id": "app", "label": "Customer app", "icon": "phone", "tone": "blue"},
+    {"id": "orders", "label": "Order service", "icon": "box", "tone": "violet"},
+    {"id": "pay", "label": "Payment provider", "icon": "card", "tone": "gray"},
+    {"id": "worker", "label": "Receipt worker", "icon": "bell", "tone": "teal"}
+  ],
+  "items": [
+    {"kind": "sync", "from": "app", "to": "orders", "label": "POST /orders", "role": "main", "number": "1"},
+    {"kind": "self", "from": "orders", "to": "orders", "label": "validate", "number": "2"},
+    {"kind": "sync", "from": "orders", "to": "pay", "label": "Charge card", "role": "main", "number": "3"},
+    {"fragment": "alt", "sections": [
+      {"guard": "charge accepted", "items": [
+        {"kind": "return", "from": "pay", "to": "orders", "label": "Paid", "role": "main", "number": "4a"},
+        {"kind": "create", "from": "orders", "to": "worker", "label": "new Receipt()", "number": "5a"},
+        {"kind": "async", "from": "orders", "to": "worker", "label": "Send receipt", "role": "event", "number": "6a"},
+        {"kind": "return", "from": "orders", "to": "app", "label": "201 Created", "role": "main", "number": "7a"}
+      ]},
+      {"guard": "else", "items": [
+        {"fragment": "loop", "sections": [
+          {"guard": "up to 3 times", "items": [
+            {"kind": "sync", "from": "orders", "to": "pay", "label": "Retry charge", "number": "4b"},
+            {"kind": "return", "from": "pay", "to": "orders", "label": "402", "role": "fail", "number": "5b"}
+          ]}
+        ]},
+        {"kind": "return", "from": "orders", "to": "app", "label": "402 Payment failed", "role": "fail", "number": "6b"}
+      ]}
+    ]},
+    {"kind": "found", "to": "orders", "label": "webhook: chargeback", "number": "8"},
+    {"kind": "lost", "from": "orders", "label": "timeout", "role": "fail", "number": "9"},
+    {"destroy": "worker"}
+  ]
+}

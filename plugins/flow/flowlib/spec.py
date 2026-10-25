@@ -13,12 +13,11 @@ The JSON format of a flowchart::
 
 import json
 from dataclasses import dataclass
-from difflib import get_close_matches
 from pathlib import Path
 from typing import Any
 
 from .model import Direction, Role, Shape, Side, Tone
-from .reader import Reader, SpecError
+from .reader import Reader, SpecError, suggestion
 from .theme import load_icons
 
 SPEC_KEYS = {"type", "title", "desc", "direction", "lanes", "nodes", "edges"}
@@ -26,7 +25,6 @@ NODE_KEYS = {"id", "kind", "text", "icon", "tone", "number", "side", "lane"}
 LANE_KEYS = {"id", "label", "tone"}
 EDGE_KEYS = {"from", "to", "role", "label"}
 FLOWCHART = "flowchart"
-MAX_SUGGESTIONS = 1
 
 
 @dataclass(frozen=True)
@@ -219,9 +217,6 @@ class _SpecParser:
         name = raw.get(end)
         if name in node_ids:
             return name
-        hint = ""
-        if isinstance(name, str):
-            close = get_close_matches(name, node_ids, n=MAX_SUGGESTIONS)
-            hint = f"; did you mean '{close[0]}'?" if close else ""
+        hint = suggestion(name, node_ids)
         self._read.report(where, f"'{end}' names '{name}', which is not a node{hint}")
         return ""

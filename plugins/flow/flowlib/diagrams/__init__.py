@@ -4,12 +4,13 @@ from collections.abc import Callable
 
 from ..model import Scene
 from ..reader import SpecError
-from . import flowchart
+from . import flowchart, sequence
 
 Layout = Callable[[object], Scene]
 
 LAYOUTS: dict[str, Layout] = {
     "flowchart": flowchart.layout_raw,
+    "sequence": sequence.layout_raw,
 }
 
 

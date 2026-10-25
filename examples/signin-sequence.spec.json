@@ -1,0 +1,32 @@
+{
+  "type": "sequence",
+  "title": "Sequence: sign in",
+  "desc": "Time runs down. Each lifeline is one participant, each arrow one message. The happy path is blue; the failure branch is rose.",
+  "participants": [
+    {"id": "user", "label": "User", "icon": "user", "tone": "gray"},
+    {"id": "app", "label": "App", "icon": "phone", "tone": "blue"},
+    {"id": "api", "label": "API", "icon": "box", "tone": "violet"},
+    {"id": "auth", "label": "Auth service", "icon": "check", "tone": "amber"},
+    {"id": "db", "label": "Database", "icon": "doc", "tone": "green"}
+  ],
+  "items": [
+    {"kind": "sync", "from": "user", "to": "app", "label": "Tap Sign in", "role": "main", "number": "1"},
+    {"kind": "sync", "from": "app", "to": "api", "label": "POST /login", "role": "main", "number": "2"},
+    {"kind": "sync", "from": "api", "to": "auth", "label": "Verify credentials", "role": "main", "number": "3"},
+    {"note": "Passwords are compared as hashes", "over": "db", "side": "right"},
+    {"kind": "sync", "from": "auth", "to": "db", "label": "Find user by email", "number": "4"},
+    {"kind": "return", "from": "db", "to": "auth", "label": "User record", "number": "5"},
+    {"fragment": "alt", "sections": [
+      {"guard": "password matches", "items": [
+        {"kind": "return", "from": "auth", "to": "api", "label": "Token", "role": "main", "number": "6a"},
+        {"kind": "return", "from": "api", "to": "app", "label": "200 + session", "role": "main", "number": "7a"},
+        {"kind": "return", "from": "app", "to": "user", "label": "Open dashboard", "role": "main", "number": "8a"}
+      ]},
+      {"guard": "else", "items": [
+        {"kind": "return", "from": "auth", "to": "api", "label": "Invalid", "role": "fail", "number": "6b"},
+        {"kind": "return", "from": "api", "to": "app", "label": "401", "role": "fail", "number": "7b"},
+        {"kind": "sync", "from": "app", "to": "user", "label": "Show error", "role": "fail", "number": "8b"}
+      ]}
+    ]}
+  ]
+}

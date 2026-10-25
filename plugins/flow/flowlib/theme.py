@@ -92,6 +92,39 @@ class LayoutRules:
 
 
 @dataclass(frozen=True)
+class SequenceRules:
+    """Sizes and gaps of a sequence diagram. Lengths are in pixels."""
+
+    participant_width: float
+    participant_height: float
+    pitch: float
+    min_gap_between_boxes: float
+    first_message_gap: float
+    row_height: float
+    self_row_extra: float
+    label_rise: float
+    bar_width: float
+    bar_overshoot: float
+    bar_step: float
+    fragment_enter: float
+    fragment_exit: float
+    fragment_pad_x: float
+    fragment_inset_x: float
+    divider_gap: float
+    max_fragment_depth: int
+    note_width: float
+    note_offset: float
+    note_line_height: float
+    note_padding: float
+    lost_length: float
+    self_width: float
+    self_height: float
+    destroy_size: float
+    tail_gap: float
+    bottom_gap: float
+
+
+@dataclass(frozen=True)
 class Theme:
     """Every colour, line style and animation the renderers use."""
 
@@ -106,6 +139,7 @@ class Theme:
     animations: dict[Animation, AnimationSpeed]
     chips: dict[LabelKind, ChipColors]
     layout: LayoutRules
+    sequence: SequenceRules
 
 
 def _line_style(raw: dict[str, Any]) -> LineStyle:
@@ -164,6 +198,7 @@ def _build_theme(raw: dict[str, Any]) -> Theme:
         },
         chips={LabelKind(name): ChipColors(**colors) for name, colors in raw["chips"].items()},
         layout=_layout_rules(raw["layout"]),
+        sequence=SequenceRules(**raw["sequence"]),
     )
 
 

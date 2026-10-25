@@ -7,7 +7,7 @@ allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py *)
 
 You write a short **spec** (the steps and how they connect). A script places every box, routes the lines, checks the result and writes the HTML. Never write coordinates or HTML yourself.
 
-Scope today: flowcharts in the plain style, top to bottom or left to right, with or without swimlanes. For anything else (illustrated, other diagram types), say that it is not built yet.
+Scope today: flowcharts in the plain style, top to bottom or left to right, with or without swimlanes. For anything else (illustrated, other diagram types such as ER or architecture), say that it is not built yet. For the order of messages between systems, use the sequence skill.
 
 ## Steps
 

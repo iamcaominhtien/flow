@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from itertools import combinations, pairwise
 
-from .model import Edge, Node, Point, Scene
+from .model import Edge, Node, Point, Role, Scene
 from .sizing import LINE_HEIGHT_FACTOR, estimate_text_width
 from .text_area import text_area_width
 from .theme import LayoutRules, load_theme
@@ -107,6 +107,8 @@ def check_lines_through_nodes(scene: Scene) -> list[Finding]:
     """Report every line that passes through a node it does not start or end at."""
     findings = []
     for edge in scene.edges:
+        if edge.role is Role.LIFELINE:
+            continue
         for node in scene.nodes:
             if node.id in (edge.source, edge.target):
                 continue
@@ -196,6 +198,8 @@ def check_text_fit(scene: Scene, rules: LayoutRules) -> list[Finding]:
     """Report nodes whose text probably does not fit, judging by the estimated text width."""
     findings = []
     for node in scene.nodes:
+        if not node.text:
+            continue
         room = text_area_width(node.shape, node.width, node.icon is not None)
         widest = max(
             (estimate_text_width(line, rules, node.font_size) for line in node.text), default=0
@@ -231,7 +235,8 @@ def _crosses(first: tuple[Point, Point], second: tuple[Point, Point]) -> bool:
 def check_crossings(scene: Scene) -> list[Finding]:
     """Report every pair of lines that cross each other."""
     findings = []
-    for first, second in combinations(scene.edges, 2):
+    drawn = [edge for edge in scene.edges if edge.role is not Role.LIFELINE]
+    for first, second in combinations(drawn, 2):
         crossing = any(
             _crosses(a, b) for a in pairwise(first.points) for b in pairwise(second.points)
         )

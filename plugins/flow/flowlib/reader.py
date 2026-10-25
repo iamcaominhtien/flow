@@ -1,5 +1,7 @@
 """Shared checks for reading JSON documents (scenes and specs) while collecting every problem."""
 
+from collections.abc import Collection
+from difflib import get_close_matches
 from enum import StrEnum
 from typing import Any, TypeVar
 
@@ -21,6 +23,22 @@ class SpecError(ValueError):
         """
         self.problems = problems
         super().__init__("\n".join(problems))
+
+
+def suggestion(name: object, candidates: Collection[str]) -> str:
+    """Return a hint such as ``; did you mean 'pay'?`` for a mistyped id, or an empty string.
+
+    Args:
+        name: The id that was written.
+        candidates: The ids that exist.
+
+    Returns:
+        The hint to append to a message, or an empty string when nothing is close.
+    """
+    if not isinstance(name, str):
+        return ""
+    close = get_close_matches(name, list(candidates), n=1)
+    return f"; did you mean '{close[0]}'?" if close else ""
 
 
 def is_number(value: object) -> bool:
