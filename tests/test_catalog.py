@@ -99,3 +99,20 @@ def test_a_link_to_a_missing_item_gets_a_suggestion() -> None:
     raw["flows"][0]["to"] = "procs"
     with pytest.raises(SpecError, match="proc"):
         diagrams.layout(raw)
+
+
+def test_multiplicity_label_is_drawn_in_html() -> None:
+    """The end label of a class relation appears as a chip in the HTML page."""
+    from flowlib import render_html  # noqa: PLC0415
+
+    scene = diagrams.layout(raw_example("shapes-class.spec.json"))
+    assert [extra.text for edge in scene.edges for extra in edge.extras] == ["*"]
+    assert ">*<" in render_html.render(scene).replace(" ", "")
+
+
+def test_a_line_leaves_an_actor_below_its_name() -> None:
+    """The line from an actor starts under the caption, not through the name."""
+    scene = diagrams.layout(raw_example("shop-usecase.spec.json"))
+    shopper = next(node for node in scene.nodes if node.id == "shopper")
+    line = next(edge for edge in scene.edges if edge.source == "shopper")
+    assert line.points[0][1] > shopper.y + shopper.height

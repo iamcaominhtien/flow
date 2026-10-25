@@ -14,7 +14,7 @@ from .layered import Grid
 from .model import SYMBOL_HEADS, Edge, EdgeLabel, LabelKind, Node, Point, Role, Shape
 from .placement import Placement
 from .spec import Spec, SpecEdge
-from .theme import LayoutRules
+from .theme import LayoutRules, load_theme
 
 END_LABEL_ALONG_PX = 24.0  # distance of an end label from the end of its line
 END_LABEL_ACROSS_PX = 12.0  # and how far it sits to the side of the line
@@ -57,12 +57,18 @@ class _Context:
     slots: dict[SpecEdge, tuple[float, float]] = field(default_factory=dict)
 
 
+def _bottom(node: Node) -> float:
+    """Return where a line leaves the bottom of a node: under its caption when it has one."""
+    caption = load_theme().layout.caption_height if node.caption else 0.0
+    return node.y + node.height + caption
+
+
 def _attach(node: Node, port: Port) -> Point:
     """Return the point in the middle of one side of a node."""
     center_x, center_y = node.x + node.width / 2, node.y + node.height / 2
     return {
         Port.TOP: (center_x, node.y),
-        Port.BOTTOM: (center_x, node.y + node.height),
+        Port.BOTTOM: (center_x, _bottom(node)),
         Port.LEFT: (node.x, center_y),
         Port.RIGHT: (node.x + node.width, center_y),
     }[port]
@@ -185,7 +191,7 @@ def _forward_points(
     same_row = abs(source_y - target_y) < SAME_LINE_TOLERANCE_PX
     if slot is not None and not (source.shape is Shape.DECISION and source_x != slot[0]):
         exit_x, entry_x = slot
-        start, end = (exit_x, source.y + source.height), (entry_x, target.y)
+        start, end = (exit_x, _bottom(source)), (entry_x, target.y)
         if abs(exit_x - entry_x) < SAME_LINE_TOLERANCE_PX:
             return [start, end], Port.BOTTOM
         bus_y = max(start[1] + BUS_BELOW_SOURCE_PX, end[1] - BUS_ABOVE_TARGET_PX)

@@ -286,6 +286,7 @@ def render(scene: Scene) -> str:
     layers += [node_html(node, theme) for node in scene.nodes]
     layers.append(lines_layer(overlay, theme, size))
     layers += [_label_chip_html(edge.label, theme) for edge in scene.edges if edge.label]
+    layers += [_label_chip_html(extra, theme) for edge in scene.edges for extra in edge.extras]
     layers.append(_title_html(scene, theme))
     canvas = {
         "position": "relative",
