@@ -22,7 +22,7 @@ CASES = {
 
 sys.path.insert(0, str(PLUGIN_DIR))
 
-from flowlib import diagrams, render_drawio  # noqa: E402
+from flowlib import diagrams, render_drawio, render_html  # noqa: E402
 from flowlib.check import Severity, check_scene  # noqa: E402
 from flowlib.model import Head, Shape  # noqa: E402
 from flowlib.reader import SpecError  # noqa: E402
@@ -103,8 +103,6 @@ def test_a_link_to_a_missing_item_gets_a_suggestion() -> None:
 
 def test_multiplicity_label_is_drawn_in_html() -> None:
     """The end label of a class relation appears as a chip in the HTML page."""
-    from flowlib import render_html  # noqa: PLC0415
-
     scene = diagrams.layout(raw_example("shapes-class.spec.json"))
     assert [extra.text for edge in scene.edges for extra in edge.extras] == ["*"]
     assert ">*<" in render_html.render(scene).replace(" ", "")
