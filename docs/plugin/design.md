@@ -122,7 +122,28 @@ The scene is also the thing the **check** reads and the thing tests compare agai
 - Animation uses the per-edge style from the first test: main `strokeWidth=3;flowAnimation=1;flowAnimationDuration=500`, events `strokeWidth=1;flowAnimation=1;flowAnimationDuration=1500`.
 - Icons are written as `shape=image` with an inline SVG data URI built from the same icon paths. **Not tested yet**: how that looks in the editor and in PNG/PDF export.
 - The output is plain XML written by a script, never by Claude, so the `.drawio` is valid by construction. If the optional draw.io plugin is installed, Claude can offer to export PNG/SVG/PDF with it.
-- Known gap: line weights. The canvas uses 2 and 4 px; the draw.io recipe uses 1 and 3. This must be decided before the renderer is written (§10).
+- Line weights: the same numbers as the HTML (2 px ordinary, 4 px main path, 2 px event stream). The earlier draw.io recipe (3 and 1) is dropped unless the draw.io test shows a problem.
+
+### 6a. Icons: library first, drawn on demand
+
+A real subject (a bank, a hospital, a game) will need icons the library does not have. Drawing one is not hard for Claude: the plain icons are about 150 characters of SVG on a 24 px grid, and the detailed ones about 800 characters on a 64 px grid (the design already has 73). So the rule is:
+
+- A node's `icon` is a **name** from the library, or an **inline SVG** that Claude wrote following the icon rules (grid, outline weight, the three tones, highlight, ground shadow).
+- The script **validates** inline SVG before use: allowed elements only (no scripts, no external links, no images), the right viewBox, a size limit. This also keeps the HTML safe.
+- Drawn icons are saved in `icons.local.json` beside the diagram, so the same subject keeps the same icon across diagrams and rebuilds.
+- Nothing can confirm that a drawn icon looks right except looking at it. The report lists the new icons so the user can check them, and Claude can swap one for a library icon or for no icon.
+
+Risks: icons drawn in different sessions may differ in style, and detailed icons cost more tokens than plain ones. The plain style needs only the simple icons; both styles are supported.
+
+### When the code is not enough: three levels of fixing
+
+Automatic layout will not always give a good result. Claude fixes a diagram at the lowest level that works:
+
+1. **Spec hints** (`rank`, `lane`, `side`, shorter text). Both outputs stay in step, because they are rebuilt.
+2. **Scene overrides**: a small `overrides` list kept beside the spec (move node `pay` to x, y; route edge `e3` through these points). It is applied after layout, so HTML and draw.io both get the fix and the diagram can still be rebuilt.
+3. **Edit the HTML directly.** Always allowed as the last resort. It cannot be carried into the draw.io file or rebuilt from the spec, so the file is marked `hand-edited`, a rebuild asks before overwriting it, and the Python check does not cover it.
+
+Python is required; there is no script-free mode.
 
 ## 7. Checks
 
@@ -156,7 +177,8 @@ plugins/flow/
     ├── icons.json                # the icon set (already in the repo)
     ├── spec.py                   # load and validate
     ├── layout/                   # layered.py, lanes.py, timeline.py, tables.py, tree.py
-    ├── scene.py
+    ├── scene.py                  # scene + overrides
+    ├── icons.py                  # library lookup, inline SVG validation
     ├── render_html.py
     ├── render_drawio.py
     ├── check.py
@@ -178,12 +200,12 @@ Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build 
 ## 10. Risks and open questions
 
 1. **Layout quality is the project.** A home-made layered layout will not match a good hand layout on large graphs. Mitigation: start with small and medium graphs, expose hints, report honestly when the result is poor. Not planned: calling Graphviz, because it is not guaranteed to be installed.
-2. **Python must exist on the user's machine.** Claude Code does not ship it. `doctor` checks, and the skill should say what to do if `python3` is missing. (Not verified how common this is on Windows; the command may be `python` or `py`.)
+2. **Python is a requirement.** Claude Code does not ship it. `doctor` checks and says what to install if it is missing. (Not verified: on Windows the command may be `python` or `py`.)
 3. **Text measurement** is an approximation; wide scripts and long labels will sometimes overflow.
-4. **Line weights** differ between canvas (2/4) and draw.io (1/3). Choose one mapping before writing the draw.io renderer.
+4. **Line weights:** the same numbers in both outputs (§6); to be confirmed when the draw.io renderer is tried.
 5. **Icons in draw.io** (inline SVG images) are untested for editing and export.
-6. **Claude.ai and Cowork:** skills run there, but whether the scripts can run is not verified. If they cannot, the fallback is a skill that writes the HTML directly from the rules, without the pipeline.
-7. **Illustrated style** needs detail icons per subject; the plugin has only the sets drawn for the delivery example. Decide whether the plugin ships them, and what it does for a subject without a matching icon (fall back to plain).
+6. **Claude.ai and Cowork:** skills run there, but whether the scripts can run is not verified. If they cannot, the plugin is for Claude Code only until that changes.
+7. **Icons for any subject.** The plugin ships the sets drawn for the design (simple line icons and 73 detailed ones). For anything else Claude draws the icon itself; see §6a.
 8. **Editing existing `.drawio` files** is not designed (deferred). The scene is the likely route: parse a file back into a scene, change it, render again.
 9. **Cross-type links** (a node on a C4 diagram that points to a flowchart) have no scheme yet.
 
@@ -200,10 +222,10 @@ Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build 
 
 Steps A and C are cheap because the renderers only draw geometry; B is where the real uncertainty is, so it comes with a plan to stop and review after the first working flowchart.
 
-## 12. Decisions needed
+## 12. Decisions taken
 
-1. **Flowchart first** as the type that proves the pipeline (step B), or another type?
-2. **Python on the user's machine:** accept it as a requirement, or also plan a no-script fallback (Claude writes the HTML from the rules) from the start?
-3. **Line weights:** keep the canvas weights (2/4) in HTML and use 1/3 in draw.io, or change the design to one pair?
-4. **Illustrated style in the first release,** or plain only?
-5. **Where the spec and scene files live** for the user: next to the output (`diagram.spec.json`, `diagram.html`, `diagram.drawio`) so the diagram can be rebuilt, or only the outputs?
+1. **Flowchart first** proves the pipeline (step B).
+2. **Python is required.** Fixing a diagram has three levels, the last being a direct HTML edit (§6).
+3. **Line weights:** the same in both outputs (2, 4, 2), checked in draw.io later.
+4. **Both styles are supported.** Plain works for any subject; illustrated uses library icons and icons Claude draws (§6a). Plain ships first, illustrated follows once the flowchart works.
+5. **Files kept:** the spec, the overrides and the scene sit beside the outputs (`diagram.spec.json`, `diagram.scene.json`, `diagram.html`, `diagram.drawio`) so a diagram can be rebuilt.
