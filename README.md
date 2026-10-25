@@ -44,7 +44,7 @@ The visual language is designed first, on a canvas of sample artboards, before a
 | C4 | Done: rules, level 1 context, level 2 containers, level 3 components (one delivery platform at three zooms) |
 | Cloud | Done: rules, basic one-VPC app, delivery platform on two zones, network joining offices to the cloud |
 | DFD | Done: rules, notation with forbidden connections, levels 0, 1 and 2 of the delivery system, plain and illustrated |
-| Editing existing .drawio files | Not designed; a first import exists (see the [plugin design](docs/plugin/design.md)) |
+| Editing existing .drawio files | Not designed; built from the plugin design: import and edit (see the [plugin design](docs/plugin/design.md)) |
 
 Cross-type review (done): the automatic overlap check covers every board; the lint tool now also knows the Gantt and swimlane frames; the same thing now has the same icon and tint everywhere (Payment provider, Orders database).
 
@@ -63,7 +63,7 @@ Flow aims to cover **nearly every common diagram type**, grouped into 8 categori
 | Planning & management | Gantt, Org chart, Mind map, Roadmap / Kanban | Built |
 | UI design | Wireframe / mockup | Built (a simple stack of boxes) |
 | Explainer / infographic | Layered flow (icon-based tiers/lanes), Tree / hierarchy, Side-by-side comparison, Concept illustration | Layers, tree and comparison (through Kanban) built; concept illustration not built |
-| Editing | Update or restyle existing `.drawio` files | Import only (best effort) |
+| Editing | Update or restyle existing `.drawio` files | Built: import (best effort) and an edit command with a fixed list of operations |
 
 ## Getting started
 
@@ -87,6 +87,7 @@ To export to PNG, SVG or PDF, also run `/plugin marketplace add jgraph/drawio-mc
 | `/flow:gantt`, `/flow:roadmap` | Time axis in named periods; lanes of items |
 | `/flow:kanban`, `/flow:layers`, `/flow:wireframe` | Columns of cards (also a comparison); stacked bands; low-fidelity screens |
 | `/flow:import-drawio` | Reads an existing `.drawio` file into a scene (best effort) |
+| `/flow:edit-drawio` | Changes an existing `.drawio` file in place: rename, move, resize, recolour, add, delete; the rest of the file stays as it was |
 | `/flow:doctor` | Checks the install |
 
 The icon library is 40 flat line icons plus 97 detailed icons (23 of them are the detailed form of a flat one). You can also add your own flat icons: Claude writes `icons.local.json` next to the spec, and the build checks it before use. The illustrated style is partial: add `"style": "illustrated"` and boxes with an icon become cards (large icon on a disc, name pill, detail line) in the flowchart, architecture, cloud, C4, BPMN, use case, DFD, screen flow, Kanban and layers skills, in both outputs. Cards use the 97 detailed 64 px icons from the design when the icon has one; the per-type illustrated notation of the design pages is not built. Not built: BPMN event types and pools with message flow checks, an explainer "concept" shape, and editing a `.drawio` file in place. The types above are simpler than the design pages describe (for example no device frames, no provider icons, no dates in the Gantt chart). Nothing has been tested in the draw.io editor, in claude.ai or in Cowork, or on Windows.

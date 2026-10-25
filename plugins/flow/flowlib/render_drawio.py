@@ -298,7 +298,7 @@ def _detailed_data_uri(name: str, stroke: str, size: float) -> str:
     return "data:image/svg+xml," + base64.b64encode(svg.encode()).decode()
 
 
-def _add_node(root: ET.Element, node: Node, theme: Theme) -> None:
+def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
     """Add a node, its icon (as a child cell) and its number badge."""
     cell = add_vertex(root, f"node-{node.id}", _node_value(node, theme), _node_style(node, theme))
     add_geometry(cell, (node.x, node.y, node.width, node.height))
@@ -599,7 +599,7 @@ def render(scene: Scene) -> str:
     for frame in scene.frames:
         _add_frame(root, frame, theme)
     for node in scene.nodes:
-        _add_node(root, node, theme)
+        add_node(root, node, theme)
     for edge in scene.edges:
         add_edge(root, edge, nodes, theme)
     ET.indent(mxfile)

@@ -5,13 +5,13 @@ allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py *)
 
 # Import a draw.io file
 
-This reads a `.drawio` file into Flow's scene format. It is a best-effort conversion, not an editor: you cannot move a box in the original file with it.
+This reads a `.drawio` file into Flow's scene format. It is a best-effort conversion and never changes the original file; to change that, use the `edit-drawio` skill.
 
 ## Steps
 
 1. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py import path/to/file.drawio -o diagrams`. It writes `<name>.scene.json`, `<name>.html` and `<name>.imported.drawio` and prints notes about what it skipped, then a check report. The original file is never changed. Exit code 0: no error; 2: errors found (files still written); 1: the file cannot be read.
 2. Tell the user the notes in plain words (for example "3 icons were not read back").
-3. To change the result, edit the scene through an overrides file (see the flowchart skill) or ask the user what to change in the original; do not edit the HTML or the `.drawio` by hand.
+3. To change the original file itself, use the `edit-drawio` skill. To change the imported scene, use an overrides file (see the flowchart skill). Do not edit the HTML or the `.drawio` text by hand.
 
 ## What is read
 

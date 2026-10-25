@@ -5,9 +5,12 @@ flow.py build spec.json [-o dir]           place, check and draw a flowchart spe
 flow.py check scene.json                   check a scene
 flow.py render scene.json [-o out.html]    draw a scene as HTML
 flow.py import file.drawio [-o dir]        read a draw.io file into a scene (HTML and draw.io)
+flow.py edit file.drawio ops.json [-o out]  change a draw.io file: move, rename, recolour, delete
 """
 
 import argparse
+import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -16,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from flowlib import (
     build,
     check,
+    edit_drawio,
     icon_check,
     import_drawio,
     overrides,
@@ -136,6 +140,41 @@ def run_import(arguments: argparse.Namespace) -> int:
     return EXIT_ERRORS_FOUND if has_errors else EXIT_OK
 
 
+def run_edit(arguments: argparse.Namespace) -> int:
+    """Apply a list of operations to a draw.io file and write the result.
+
+    Args:
+        arguments: The parsed command line; ``drawio`` is the file, ``operations`` the JSON
+            file of operations, ``output`` the optional output path (default: the file with
+            ``.edited`` before the suffix) and ``in_place`` overwrites the file after keeping a
+            ``.bak`` copy.
+
+    Returns:
+        0 when the file was written, 1 when the file or the operations are not valid.
+    """
+    source = Path(arguments.drawio)
+    try:
+        operations = json.loads(Path(arguments.operations).read_text(encoding="utf-8"))
+        model, notes = edit_drawio.apply_operations(source, operations)
+    except (OSError, json.JSONDecodeError) as error:
+        print(f"cannot read the operations: {error}", file=sys.stderr)
+        return EXIT_INVALID_INPUT
+    except spec.SpecError as error:
+        print(f"the operations cannot be applied to {source}:\n{error}", file=sys.stderr)
+        return EXIT_INVALID_INPUT
+    if arguments.in_place:
+        backup = source.with_name(source.name + ".bak")
+        shutil.copyfile(source, backup)
+        print(f"kept {backup}")
+        destination = source
+    else:
+        destination = Path(arguments.output or source.with_suffix(".edited.drawio"))
+    edit_drawio.write_edited(source, model, destination)
+    print(f"wrote {destination}")
+    print("\n".join(f"note: {note}" for note in dict.fromkeys(notes)))
+    return EXIT_OK
+
+
 def run_check(arguments: argparse.Namespace) -> int:
     """Check a scene file and print what is wrong.
 
@@ -180,6 +219,14 @@ def build_parser() -> argparse.ArgumentParser:
     import_command.add_argument("drawio")
     import_command.add_argument("-o", "--output")
     import_command.set_defaults(run=run_import)
+    edit_command = commands.add_parser(
+        "edit", help="change a draw.io file with a list of operations"
+    )
+    edit_command.add_argument("drawio")
+    edit_command.add_argument("operations")
+    edit_command.add_argument("-o", "--output")
+    edit_command.add_argument("--in-place", action="store_true")
+    edit_command.set_defaults(run=run_edit)
     return parser
 
 
