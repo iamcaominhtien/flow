@@ -113,7 +113,7 @@ The scene is also the thing the **check** reads and the thing tests compare agai
 
 - A single self-contained `.html`: absolutely positioned boxes and inline SVG for shapes, icons and lines. No JavaScript is needed.
 - The two animation tiers are CSS (`stroke-dashoffset` keyframes): main path blue 4 px fast, event stream violet 2 px slow. This is what the canvas already does.
-- Light and dark themes through CSS variables, as in the design system.
+- The three themes of the foundation page (Pastel infographic, Technical clean, Midnight) become sets of CSS variables, so a diagram can switch theme without a new layout.
 - The existing generators in [`docs/design/source/generators`](../design/source/generators) are the starting point: they already contain the shape SVGs, tones and icons. What changes is that they read a scene instead of hand-written coordinates.
 
 ### draw.io
