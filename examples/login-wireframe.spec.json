@@ -1,0 +1,18 @@
+{
+  "type": "wireframe",
+  "title": "Wireframe: sign in",
+  "desc": "Two screens: the sign-in form and the home screen after it.",
+  "screens": [
+    {"label": "Sign in", "elements": [
+      {"kind": "header", "label": "My app"},
+      {"kind": "image", "label": "logo"},
+      {"kind": "input", "label": "Email"},
+      {"kind": "input", "label": "Password"},
+      {"kind": "button", "label": "Sign in"},
+      {"kind": "text", "label": "Forgot your password?"}]},
+    {"label": "Home", "elements": [
+      {"kind": "header", "label": "Home"},
+      {"kind": "list", "items": ["Orders", "Messages", "Settings"]},
+      {"kind": "button", "label": "New order"}]}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "type": "layers",
+  "flow": true,
+  "title": "Layers: how a web request is served",
+  "desc": "A request passes down through the layers and the answer comes back up.",
+  "layers": [
+    {"label": "Client", "tone": "blue", "items": [{"label": "Browser", "icon": "globe"}, {"label": "Mobile app", "icon": "phone"}]},
+    {"label": "Edge", "tone": "violet", "items": [{"label": "CDN"}, {"label": "Load balancer"}]},
+    {"label": "Application", "tone": "green", "items": [{"label": "Web server", "icon": "server"}, {"label": "Worker"}, {"label": "Cache"}]},
+    {"label": "Data", "tone": "amber", "items": [{"label": "Database", "icon": "database"}]}
+  ]
+}

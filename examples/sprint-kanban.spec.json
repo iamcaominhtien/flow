@@ -1,0 +1,10 @@
+{
+  "type": "kanban",
+  "title": "Kanban: this sprint",
+  "desc": "Cards by status; the finished column is green.",
+  "columns": [
+    {"label": "To do", "tone": "gray", "cards": [{"label": "Write the release notes"}, {"label": "Add dark mode", "detail": "Design is ready"}]},
+    {"label": "Doing", "tone": "blue", "cards": [{"label": "Fix the login timeout", "icon": "bug"}]},
+    {"label": "Done", "tone": "green", "cards": [{"label": "Upgrade the database", "icon": "database"}, {"label": "Set up monitoring"}]}
+  ]
+}
