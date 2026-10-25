@@ -12,11 +12,31 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from flowlib import build, check, overrides, render_html, scene, spec
+from flowlib import build, check, icon_check, overrides, render_html, scene, spec
 
 EXIT_OK = 0
 EXIT_INVALID_INPUT = 1
 EXIT_ERRORS_FOUND = 2
+
+
+def load_local_icons(directory: Path) -> int | None:
+    """Load the custom icons next to an input file, printing the problems if there are any.
+
+    Args:
+        directory: The folder of the spec or scene file.
+
+    Returns:
+        None when the icons loaded (or there are none), else the exit code to stop with.
+    """
+    try:
+        icon_check.use_local_icons(directory)
+    except spec.SpecError as error:
+        print(
+            f"the icons in {directory / icon_check.LOCAL_ICONS_FILE} are not valid:\n{error}",
+            file=sys.stderr,
+        )
+        return EXIT_INVALID_INPUT
+    return None
 
 
 def run_render(arguments: argparse.Namespace) -> int:
@@ -29,6 +49,9 @@ def run_render(arguments: argparse.Namespace) -> int:
     Returns:
         The exit code: 0 when the file was written, 1 when the scene is not valid.
     """
+    failed = load_local_icons(Path(arguments.scene).resolve().parent)
+    if failed is not None:
+        return failed
     try:
         parsed = scene.load(arguments.scene)
     except scene.SceneError as error:
@@ -52,6 +75,9 @@ def run_build(arguments: argparse.Namespace) -> int:
         least one error (the files are still written), 1 when the spec is not valid.
     """
     spec_path = Path(arguments.spec)
+    failed = load_local_icons(spec_path.resolve().parent)
+    if failed is not None:
+        return failed
     try:
         result = build.build(spec_path, Path(arguments.output or spec_path.parent))
     except spec.SpecError as error:
@@ -75,6 +101,9 @@ def run_check(arguments: argparse.Namespace) -> int:
     Returns:
         0 when there is no error, 2 when there is at least one, 1 when the scene is not valid.
     """
+    failed = load_local_icons(Path(arguments.scene).resolve().parent)
+    if failed is not None:
+        return failed
     try:
         parsed = scene.load(arguments.scene)
     except scene.SceneError as error:

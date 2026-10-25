@@ -40,7 +40,7 @@ Scope today: flowcharts in the plain style, top to bottom or left to right, with
 
 - `kind`: `terminator` (start or end, green), `process` (one action, blue), `decision` (a question, amber), `io` (data in or out, violet), `document` (a readable output), `subprocess` (a step with its own chart), `preparation` (setup, teal), `fail` (a failed end, rose), `connector` (off-page link, one letter).
 - `role` of an edge: `next` (default, a normal step), `yes`, `no`, `back` (returns to an earlier step), `main` (the one most important path, drawn thick and animated), `data` (an event or data flow, drawn violet and animated slowly). Use `main` on at most one connected path.
-- Optional on a node: `icon` (one of `user phone cart card bell clock pin pot check box bike refund warn star doc store`), `tone` (`blue violet amber green teal gray`, marks the owner or domain, never a meaning), `number` (a short chip such as `3`), `side` (`left` or `right`, asks for a branch on that side).
+- Optional on a node: `icon` (one of `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`), `tone` (`blue violet amber green teal gray`, marks the owner or domain, never a meaning), `number` (a short chip such as `3`), `side` (`left` or `right`, asks for a branch on that side).
 - Edge `label`: short; `Yes` and `No` for decision exits.
 - `direction`: `down` (default) for up to about ten steps, `right` for pipelines and timelines. Never mix them.
 - Swimlanes: add `"lanes": [{"id": "support", "label": "Support", "tone": "violet"}, ...]` and give every node a `"lane"`. One lane per actor (person, team or system); the actor who starts goes first. Swimlanes read best with `"direction": "right"`. A step sits in exactly one lane, and with lanes the `side` hint is ignored.
@@ -73,3 +73,7 @@ If those steps do not clear an error, fix it by hand with an **overrides** file 
 ## Known limits
 
 Back edges between two nodes on the same row arc over the top and meet the incoming line of their target. Several back edges that start from the same node share a side. Text width is estimated, not measured. In the `.drawio` file, edge labels are plain text with a background (no rounded chip), and the fonts Inter and JetBrains Mono must be installed or draw.io substitutes another font. Nothing here has been run in claude.ai or Cowork.
+
+## Icons
+
+Built-in icon names: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`. When none fits, draw one: write `icons.local.json` next to the spec, an object of name to the inner SVG of a 24 x 24 line icon, for example `{"teapot": "<path d=\"M6 9h10v6a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4z\"/>"}`. Allowed elements: `path circle ellipse rect line polyline polygon g`. Allowed attributes: `d cx cy r rx ry x y width height x1 y1 x2 y2 points`, with coordinates between -2 and 26. Names are lowercase letters, digits and `-`, and must not reuse a built-in name. The build refuses anything else with exit code 1 and says why. Keep the icon file with the spec; the scene and overrides files live there too.

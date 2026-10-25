@@ -44,7 +44,7 @@ Items run top to bottom in the order written. An item is one of:
 - **A destroy**: `{"destroy": "<participant>"}` ends a lifeline with a cross.
 - **A fragment**: `{"fragment": "alt", "sections": [{"guard": "password matches", "items": [...]}, {"guard": "else", "items": [...]}]}`. Kinds: `alt` (alternatives, one section per branch), `opt`, `loop`, `par`, `break`, `critical`, `ref`. The guard says under which condition the section happens. Fragments nest at most two levels.
 
-Participants: `id` (used in messages), `label`, optional `icon` (`user phone cart card bell clock pin pot check box bike refund warn star doc store`) and `tone` (`blue violet amber green teal gray`, an owner or domain, never a meaning).
+Participants: `id` (used in messages), `label`, optional `icon` (`user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`) and `tone` (`blue violet amber green teal gray`, an owner or domain, never a meaning).
 
 ## Writing good content
 
@@ -61,3 +61,7 @@ Participants: `id` (used in messages), `label`, optional `icon` (`user phone car
 ## Known limits
 
 A note sits beside its lifeline at the row where it is written and may cover a message that crosses that spot. Bars of overlapping calls on one participant stack side by side. Text width is estimated. In the `.drawio` file, a message label is plain text with a number, not a rounded chip, and the fonts Inter and JetBrains Mono must be installed or draw.io substitutes another font.
+
+## Icons
+
+Built-in icon names: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`. When none fits, draw one: write `icons.local.json` next to the spec, an object of name to the inner SVG of a 24 x 24 line icon, for example `{"teapot": "<path d=\"M6 9h10v6a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4z\"/>"}`. Allowed elements: `path circle ellipse rect line polyline polygon g`. Allowed attributes: `d cx cy r rx ry x y width height x1 y1 x2 y2 points`, with coordinates between -2 and 26. Names are lowercase letters, digits and `-`, and must not reuse a built-in name. The build refuses anything else with exit code 1 and says why. Keep the icon file with the spec; the scene and overrides files live there too.

@@ -223,6 +223,23 @@ def load_theme() -> Theme:
 
 
 @cache
+def _load_builtin_icons() -> dict[str, str]:
+    """Return the icons that ship with the plugin."""
+    return json.loads((DATA_DIR / "icons.json").read_text(encoding="utf-8"))
+
+
+_LOCAL_ICONS: dict[str, str] = {}
+
+
+def register_icons(icons: dict[str, str]) -> None:
+    """Add checked custom icons to the library for the rest of the run.
+
+    Args:
+        icons: Icon name to inner SVG markup; the caller has validated both.
+    """
+    _LOCAL_ICONS.update(icons)
+
+
 def load_icons() -> dict[str, str]:
     """Return the simple line icons: name to the inner SVG of a 24 x 24 viewBox."""
-    return json.loads((DATA_DIR / "icons.json").read_text(encoding="utf-8"))
+    return {**_load_builtin_icons(), **_LOCAL_ICONS}

@@ -41,6 +41,10 @@ You write a short **spec**: the states and the transitions. A script places the 
 - `direction`: `down` (default) or `right`.
 - Nested states, guards and actions on transitions are not supported: put them in the label or the `detail`.
 
+## Icons
+
+Built-in icon names: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`. When none fits, draw one: write `icons.local.json` next to the spec, an object of name to the inner SVG of a 24 x 24 line icon, for example `{"teapot": "<path d=\"M6 9h10v6a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4z\"/>"}`. Allowed elements: `path circle ellipse rect line polyline polygon g`. Allowed attributes: `d cx cy r rx ry x y width height x1 y1 x2 y2 points`, with coordinates between -2 and 26. Names are lowercase letters, digits and `-`, and must not reuse a built-in name. The build refuses anything else with exit code 1 and says why. Keep the icon file with the spec; the scene and overrides files live there too.
+
 ## Limits to tell the user
 
 - Two transitions that leave the same side of a state can share the first stretch of line, and a label can sit on the neighbouring line. Check the picture.
