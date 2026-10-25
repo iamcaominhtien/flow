@@ -1,245 +1,360 @@
 """Render a scene as one self-contained HTML file: boxes, inline SVG and CSS animation."""
 
-import html
 import math
 
-from .theme import icons, theme
+from .markup import esc, fmt, px, tag
+from .model import ArrowEnd, Edge, EdgeLabel, Frame, Node, Point, Scene, Shape
+from .shapes import outline_svg
+from .theme import ShapeColors, Theme, load_icons, load_theme
 
-FONTS_LINK = (
+FONTS_URL = (
     "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800"
     "&family=JetBrains+Mono:wght@400;500&display=swap"
 )
 
+# Text inside a node
+DECISION_TEXT_WIDTH_FRACTION = 0.64  # a diamond only has room for the middle of its width
+PLAIN_TEXT_INSET_PX = 20  # total horizontal padding of text in an upright shape
+SLANTED_TEXT_INSET_PX = 36  # total horizontal padding in shapes with slanted sides
+LINE_HEIGHT_FACTOR = 1.25
+NODE_TEXT_WEIGHT = 600
+DOCUMENT_LABEL_TRIM_PX = 6  # the wavy bottom of a document leaves less room for text
+DOCUMENT_ICON_LIFT_PX = 3
 
-def _esc(text):
-    return html.escape(str(text))
+# Icon inside a node
+ICON_SIZE_PX = 18
+ICON_STROKE_WIDTH = 2
+ICON_TEXT_RESERVE_PX = 24  # text width given up to make room for an icon
+ICON_TEXT_SHIFT_PX = 12  # text moves right by half of that
+ICON_LEFT_PX: dict[Shape, float] = {
+    Shape.SUBPROCESS: 22,
+    Shape.IO: 26,
+    Shape.PREPARATION: 24,
+}
+DEFAULT_ICON_LEFT_PX = 14
+
+# Number badge on a node corner
+BADGE_OVERHANG_LEFT_PX = 6
+BADGE_OVERHANG_TOP_PX = 10
+BADGE_MIN_WIDTH_PX = 22
+BADGE_HEIGHT_PX = 20
+BADGE_PADDING_X_PX = 6
+BADGE_FONT_SIZE_PX = 11
+
+# Frame
+FRAME_RADIUS_PX = 16
+FRAME_BORDER_PX = 1.5
+FRAME_PILL_INSET_X_PX = 16
+FRAME_PILL_INSET_Y_PX = 12
+PILL_HEIGHT_PX = 22
+PILL_PADDING_X_PX = 12
+PILL_FONT_SIZE_PX = 12
+PILL_RADIUS_PX = 999
+
+# Label chip on a line
+CHIP_PADDING = "2px 8px"
+CHIP_FONT_SIZE_PX = 11
+CHIP_LINE_HEIGHT_PX = 16
+
+# Title block
+TITLE_LEFT_PX = 64
+TITLE_TOP_PX = 48
+TITLE_FONT_SIZE_PX = 24
+TITLE_WEIGHT = 600
+DESCRIPTION_FONT_SIZE_PX = 13
+DESCRIPTION_LINE_HEIGHT_PX = 20
+DESCRIPTION_MAX_WIDTH_PX = 900
+TITLE_GAP_PX = 8
+
+ABSOLUTE = {"position": "absolute"}
+CENTERED_ON_POINT = "translate(-50%,-50%)"
 
 
-def _shape_svg(shape, w, h, fill, stroke):
-    """The outline of one flowchart shape, drawn to fill a w x h box."""
-    common = f'fill="{fill}" stroke="{stroke}" stroke-width="2"'
-    if shape in ("terminator", "fail"):
-        body = (
-            f'<rect x="1" y="1" width="{w - 2:g}" height="{h - 2:g}" '
-            f'rx="{(h - 2) / 2:g}" {common}/>'
-        )
-    elif shape in ("process", "subprocess"):
-        body = f'<rect x="1" y="1" width="{w - 2:g}" height="{h - 2:g}" rx="10" {common}/>'
-        if shape == "subprocess":
-            body += (
-                f'<path d="M14 1V{h - 1:g}M{w - 14:g} 1V{h - 1:g}" stroke="{stroke}" '
-                'stroke-width="2" fill="none"/>'
-            )
-    elif shape == "decision":
-        body = (
-            f'<path d="M{w / 2:g} 1L{w - 1:g} {h / 2:g}L{w / 2:g} {h - 1:g}L1 {h / 2:g}Z" '
-            f'{common} stroke-linejoin="round"/>'
-        )
-    elif shape == "io":
-        s = min(18, w / 6)
-        body = (
-            f'<path d="M{s:g} 1H{w - 1:g}L{w - s:g} {h - 1:g}H1Z" {common} '
-            'stroke-linejoin="round"/>'
-        )
-    elif shape == "document":
-        r = h * 0.2
-        body = (
-            f'<path d="M1 1H{w - 1:g}V{h - r:.1f}Q{w * 0.75:.1f} {h - r * 2.2:.1f} {w / 2:.1f} '
-            f'{h - r:.1f}T1 {h - r:.1f}Z" {common} stroke-linejoin="round"/>'
-        )
-    elif shape == "preparation":
-        s = min(20, w / 5)
-        body = (
-            f'<path d="M{s:g} 1H{w - s:g}L{w - 1:g} {h / 2:g}L{w - s:g} {h - 1:g}H{s:g}'
-            f'L1 {h / 2:g}Z" {common} stroke-linejoin="round"/>'
-        )
-    else:  # connector
-        body = f'<circle cx="{w / 2:g}" cy="{h / 2:g}" r="{min(w, h) / 2 - 1:g}" {common}/>'
+def _text_width(node: Node) -> float:
+    """Return how wide the text of a node may be, before any icon is taken into account."""
+    if node.shape is Shape.DECISION:
+        return node.width * DECISION_TEXT_WIDTH_FRACTION
+    slanted = node.shape in (Shape.IO, Shape.PREPARATION, Shape.SUBPROCESS)
+    return node.width - (SLANTED_TEXT_INSET_PX if slanted else PLAIN_TEXT_INSET_PX)
+
+
+def _icon_html(node: Node, stroke: str) -> str:
+    """Draw the icon of a node at its left side, or return nothing if it has none."""
+    if node.icon is None:
+        return ""
+    left = ICON_LEFT_PX.get(node.shape, DEFAULT_ICON_LEFT_PX)
+    top = (node.height - ICON_SIZE_PX) / 2
+    if node.shape is Shape.DOCUMENT:
+        top -= DOCUMENT_ICON_LIFT_PX
     return (
-        f'<svg width="{w:g}" height="{h:g}" viewBox="0 0 {w:g} {h:g}" preserveAspectRatio="none" '
-        f'style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true">{body}</svg>'
+        f'<svg width="{ICON_SIZE_PX}" height="{ICON_SIZE_PX}" viewBox="0 0 24 24" '
+        f'style="position:absolute;left:{px(left)};top:{px(top)}" fill="none" '
+        f'stroke="{stroke}" stroke-width="{ICON_STROKE_WIDTH}" stroke-linecap="round" '
+        f'stroke-linejoin="round" aria-hidden="true">{load_icons()[node.icon]}</svg>'
     )
 
 
-def _icon_svg(name, x, y, size, color):
-    return (
-        f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" '
-        f'style="position:absolute;left:{x:g}px;top:{y:g}px" fill="none" stroke="{color}" '
-        'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-        f"{icons()[name]}</svg>"
+def _label_html(node: Node, theme: Theme) -> str:
+    """Draw the text of a node, centred in the space the shape leaves for it."""
+    if not node.text:
+        return ""
+    width = _text_width(node)
+    shift = 0.0
+    if node.icon is not None:
+        width -= ICON_TEXT_RESERVE_PX
+        shift = ICON_TEXT_SHIFT_PX
+    height = node.height - (DOCUMENT_LABEL_TRIM_PX if node.shape is Shape.DOCUMENT else 0)
+    style = {
+        **ABSOLUTE,
+        "left": px((node.width - width) / 2 + shift),
+        "top": "0",
+        "width": px(width),
+        "height": px(height),
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "text-align": "center",
+        "font-size": px(node.font_size),
+        "line-height": px(int(node.font_size * LINE_HEIGHT_FACTOR)),
+        "font-weight": str(NODE_TEXT_WEIGHT),
+        "color": theme.ink,
+    }
+    return tag("div", style, "<br>".join(esc(line) for line in node.text))
+
+
+def _badge_html(node: Node, theme: Theme) -> str:
+    """Draw the number badge on the top-left corner of a node, or return nothing."""
+    if node.number is None:
+        return ""
+    style = {
+        **ABSOLUTE,
+        "left": px(node.x - BADGE_OVERHANG_LEFT_PX),
+        "top": px(node.y - BADGE_OVERHANG_TOP_PX),
+        "min-width": px(BADGE_MIN_WIDTH_PX),
+        "height": px(BADGE_HEIGHT_PX),
+        "padding": f"0 {px(BADGE_PADDING_X_PX)}",
+        "box-sizing": "border-box",
+        "border-radius": px(PILL_RADIUS_PX),
+        "background": theme.badge.background,
+        "color": theme.badge.foreground,
+        "font": f"700 {px(BADGE_FONT_SIZE_PX)}/{px(BADGE_HEIGHT_PX)} "
+        f"'{theme.fonts.mono}',monospace",
+        "text-align": "center",
+    }
+    return tag("div", style, esc(node.number))
+
+
+def _node_html(node: Node, theme: Theme) -> str:
+    """Draw one node: its outline, icon and text, and its number badge when it has one."""
+    colors = theme.shapes[node.shape]
+    if node.tone is not None:
+        colors = ShapeColors(fill=theme.tones[node.tone].box, stroke=colors.stroke)
+    inside = (
+        outline_svg(node.shape, node.width, node.height, colors)
+        + _icon_html(node, colors.stroke)
+        + _label_html(node, theme)
     )
+    box = {
+        **ABSOLUTE,
+        "left": px(node.x),
+        "top": px(node.y),
+        "width": px(node.width),
+        "height": px(node.height),
+    }
+    return tag("div", box, inside, data_id=node.id) + _badge_html(node, theme)
 
 
-def _node(node, t):
-    shape, w, h = node["shape"], node["w"], node["h"]
-    colors = dict(t["shapes"][shape])
-    if "tone" in node:
-        colors["fill"] = t["tones"][node["tone"]]["box"]
-    parts = [_shape_svg(shape, w, h, colors["fill"], colors["stroke"])]
+def _frame_html(frame: Frame, theme: Theme) -> str:
+    """Draw one frame and its label pill."""
+    tone = theme.tones[frame.tone]
+    area = {
+        **ABSOLUTE,
+        "left": px(frame.x),
+        "top": px(frame.y),
+        "width": px(frame.width),
+        "height": px(frame.height),
+        "box-sizing": "border-box",
+        "background": tone.box,
+        "border": f"{px(FRAME_BORDER_PX)} dashed {tone.pill}",
+        "border-radius": px(FRAME_RADIUS_PX),
+    }
+    html = tag("div", area, data_id=frame.id)
+    if frame.label:
+        pill = {
+            **ABSOLUTE,
+            "left": px(frame.x + FRAME_PILL_INSET_X_PX),
+            "top": px(frame.y + FRAME_PILL_INSET_Y_PX),
+            "height": px(PILL_HEIGHT_PX),
+            "padding": f"0 {px(PILL_PADDING_X_PX)}",
+            "box-sizing": "border-box",
+            "border-radius": px(PILL_RADIUS_PX),
+            "background": tone.pill,
+            "color": theme.ink,
+            "font-size": px(PILL_FONT_SIZE_PX),
+            "font-weight": "700",
+            "line-height": px(PILL_HEIGHT_PX),
+            "white-space": "nowrap",
+        }
+        html += tag("div", pill, esc(frame.label))
+    return html
 
-    inner = (
-        w * 0.64
-        if shape == "decision"
-        else w - (36 if shape in ("io", "preparation", "subprocess") else 20)
-    )
-    shift = 0
-    if "icon" in node:
-        left = {"subprocess": 22, "io": 26, "preparation": 24}.get(shape, 14)
-        top = (h - 18) / 2 - (3 if shape == "document" else 0)
-        parts.append(_icon_svg(node["icon"], left, top, 18, colors["stroke"]))
-        inner -= 24
-        shift = 12
 
-    text = node.get("text", "")
-    lines = [text] if isinstance(text, str) else text
-    if lines:
-        fs = node.get("font_size", 13)
-        box_h = h - (6 if shape == "document" else 0)
-        label = "<br>".join(_esc(line) for line in lines)
-        parts.append(
-            f'<div style="position:absolute;left:{(w - inner) / 2 + shift:g}px;top:0;'
-            f"width:{inner:g}px;height:{box_h:g}px;display:flex;align-items:center;"
-            f"justify-content:center;text-align:center;font-size:{fs}px;"
-            f'line-height:{int(fs * 1.25)}px;font-weight:600;color:{t["ink"]}">{label}</div>'
+def _pull_back(points: tuple[Point, ...], gap: float) -> list[Point]:
+    """Shorten the last segment so the arrowhead tip touches the box it points at.
+
+    Args:
+        points: The route of a line, at least two points.
+        gap: How far to pull the end back, in pixels.
+
+    Returns:
+        A new list of points. The route is returned as it is when its last segment is not
+        longer than ``gap``.
+    """
+    (start_x, start_y), (end_x, end_y) = points[-2], points[-1]
+    length = math.hypot(end_x - start_x, end_y - start_y)
+    if length <= gap:
+        return list(points)
+    kept = (length - gap) / length
+    pulled_back = (start_x + (end_x - start_x) * kept, start_y + (end_y - start_y) * kept)
+    return [*points[:-1], pulled_back]
+
+
+def _edge_html(edge: Edge, theme: Theme) -> str:
+    """Draw one line as an SVG path, with its dash, animation class and arrowhead."""
+    line = theme.roles[edge.role]
+    has_arrow = edge.arrow is ArrowEnd.END
+    route = _pull_back(edge.points, line.gap) if has_arrow else list(edge.points)
+    attributes = {
+        "d": "M " + " L ".join(f"{fmt(x)} {fmt(y)}" for x, y in route),
+        "stroke": line.color,
+        "stroke-width": fmt(line.width),
+        "fill": "none",
+        "stroke-linejoin": "round",
+    }
+    if line.dash:
+        attributes["stroke-dasharray"] = line.dash
+    if line.animation:
+        attributes["class"] = line.animation.value
+    if has_arrow:
+        attributes["marker-end"] = f"url(#head-{edge.role.value})"
+    text = " ".join(f'{name}="{esc(value)}"' for name, value in attributes.items())
+    return f'<path data-id="{esc(edge.id)}" {text}/>'
+
+
+def _arrowheads(theme: Theme) -> str:
+    """Return the SVG ``defs`` with one arrowhead marker per line role."""
+    markers = []
+    for role, line in theme.roles.items():
+        size, middle = line.head_size, line.head_size / 2
+        markers.append(
+            f'<marker id="head-{role.value}" orient="auto" markerWidth="{fmt(size)}" '
+            f'markerHeight="{fmt(size)}" refX="{fmt(middle)}" refY="{fmt(middle)}" '
+            f'overflow="visible"><path d="M0 0 L{fmt(size)} {fmt(middle)} L0 {fmt(size)} Z" '
+            f'fill="{line.color}" stroke="none"/></marker>'
         )
-    out = (
-        f'<div data-id="{_esc(node["id"])}" style="position:absolute;left:{node["x"]:g}px;'
-        f'top:{node["y"]:g}px;width:{w:g}px;height:{h:g}px">{"".join(parts)}</div>'
-    )
-    if "number" in node:
-        out += (
-            f'<div style="position:absolute;left:{node["x"] - 6:g}px;top:{node["y"] - 10:g}px;'
-            "min-width:22px;height:20px;padding:0 6px;box-sizing:border-box;border-radius:999px;"
-            f"background:{t['ink']};color:#7DD3CB;font:700 11px/20px 'JetBrains Mono',"
-            f'monospace;text-align:center">{_esc(node["number"])}</div>'
-        )
-    return out
+    return "<defs>" + "".join(markers) + "</defs>"
 
 
-def _frame(frame, t):
-    tone = t["tones"][frame.get("tone", "gray")]
-    out = (
-        f'<div data-id="{_esc(frame["id"])}" style="position:absolute;left:{frame["x"]:g}px;'
-        f"top:{frame['y']:g}px;width:{frame['w']:g}px;height:{frame['h']:g}px;box-sizing:border-box;"
-        f'background:{tone["box"]};border:1.5px dashed {tone["pill"]};border-radius:16px"></div>'
-    )
-    if frame.get("label"):
-        out += (
-            f'<div style="position:absolute;left:{frame["x"] + 16:g}px;top:{frame["y"] + 12:g}px;'
-            f"height:22px;padding:0 12px;box-sizing:border-box;border-radius:999px;"
-            f"background:{tone['pill']};color:{t['ink']};font-size:12px;font-weight:700;"
-            f'line-height:22px;white-space:nowrap">{_esc(frame["label"])}</div>'
-        )
-    return out
+def _label_chip_html(label: EdgeLabel, theme: Theme) -> str:
+    """Draw the chip that names a line, centred on the label position."""
+    colors = theme.chips[label.kind]
+    style = {
+        **ABSOLUTE,
+        "left": px(label.at[0]),
+        "top": px(label.at[1]),
+        "transform": CENTERED_ON_POINT,
+        "padding": CHIP_PADDING,
+        "border-radius": px(PILL_RADIUS_PX),
+        "background": colors.background,
+        "color": colors.foreground,
+        "font-size": px(CHIP_FONT_SIZE_PX),
+        "font-weight": "700",
+        "line-height": px(CHIP_LINE_HEIGHT_PX),
+        "white-space": "nowrap",
+    }
+    return tag("div", style, esc(label.text))
 
 
-def _shorten(points, gap):
-    """Pull the last point back along the last segment so the arrowhead tip touches the box."""
-    (x0, y0), (x1, y1) = points[-2], points[-1]
-    length = math.hypot(x1 - x0, y1 - y0)
-    if length <= gap or length == 0:
-        return points
-    k = (length - gap) / length
-    return [*points[:-1], [x0 + (x1 - x0) * k, y0 + (y1 - y0) * k]]
+def _title_html(scene: Scene, theme: Theme) -> str:
+    """Draw the title and the description of a scene, or return nothing without a title."""
+    if not scene.title:
+        return ""
+    title_style = {"font-size": px(TITLE_FONT_SIZE_PX), "font-weight": str(TITLE_WEIGHT)}
+    title = tag("div", title_style, esc(scene.title))
+    description = ""
+    if scene.description:
+        style = {
+            "font-size": px(DESCRIPTION_FONT_SIZE_PX),
+            "line-height": px(DESCRIPTION_LINE_HEIGHT_PX),
+            "color": theme.slate,
+            "max-width": px(min(scene.width - 2 * TITLE_LEFT_PX, DESCRIPTION_MAX_WIDTH_PX)),
+        }
+        description = tag("div", style, esc(scene.description))
+    block = {
+        **ABSOLUTE,
+        "left": px(TITLE_LEFT_PX),
+        "top": px(TITLE_TOP_PX),
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": px(TITLE_GAP_PX),
+    }
+    return tag("div", block, title + description)
 
 
-def _edge(edge, t):
-    role = t["roles"][edge.get("role", "next")]
-    points = [list(p) for p in edge["points"]]
-    arrow = edge.get("arrow", "end") == "end"
-    if arrow:
-        points = _shorten(points, role["gap"])
-    d = "M " + " L ".join(f"{x:g} {y:g}" for x, y in points)
-    attrs = [
-        f'd="{d}"',
-        f'stroke="{role["color"]}"',
-        f'stroke-width="{role["width"]}"',
-        'fill="none"',
-        'stroke-linejoin="round"',
-    ]
-    if role.get("dash"):
-        attrs.append(f'stroke-dasharray="{role["dash"]}"')
-    if role.get("animation"):
-        attrs.append(f'class="{role["animation"]}"')
-    if arrow:
-        attrs.append(f'marker-end="url(#head-{edge.get("role", "next")})"')
-    return f'<path data-id="{_esc(edge["id"])}" {" ".join(attrs)}/>'
-
-
-def _markers(t):
-    out = []
-    for name, role in t["roles"].items():
-        n = role["head"]
-        out.append(
-            f'<marker id="head-{name}" orient="auto" markerWidth="{n}" markerHeight="{n}" '
-            f'refX="{n / 2:g}" refY="{n / 2:g}" overflow="visible">'
-            f'<path d="M0 0 L{n} {n / 2:g} L0 {n} Z" fill="{role["color"]}" '
-            'stroke="none"/></marker>'
-        )
-    return "<defs>" + "".join(out) + "</defs>"
-
-
-def _label(edge, t):
-    label = edge["label"]
-    chip = t["chips"][label.get("kind", "plain")]
-    x, y = label["at"]
-    return (
-        f'<div style="position:absolute;left:{x:g}px;top:{y:g}px;transform:translate(-50%,-50%);'
-        f"padding:2px 8px;border-radius:999px;background:{chip['bg']};color:{chip['fg']};"
-        f'font-size:11px;font-weight:700;line-height:16px;white-space:nowrap">{_esc(label["text"])}</div>'
-    )
-
-
-def _css(t):
-    sans, mono = t["fonts"]["sans"], t["fonts"]["mono"]
+def _stylesheet(theme: Theme) -> str:
+    """Return the page CSS: fonts, and the keyframes of each animated tier."""
     rules = [
-        f"body{{margin:0;background:{t['canvas']};font-family:'{sans}',system-ui,sans-serif;"
-        f"color:{t['ink']}}}",
-        f".mono{{font-family:'{mono}',monospace}}",
+        f"body{{margin:0;background:{theme.canvas};font-family:'{theme.fonts.sans}',"
+        f"system-ui,sans-serif;color:{theme.ink}}}",
     ]
-    for name, a in t["animations"].items():
-        rules.append(f"@keyframes {name}{{to{{stroke-dashoffset:{a['offset']}}}}}")
-        rules.append(f".{name}{{animation:{name} {a['seconds']}s linear infinite}}")
-    rules.append("@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}")
+    for animation, speed in theme.animations.items():
+        name = animation.value
+        rules.append(f"@keyframes {name}{{to{{stroke-dashoffset:{fmt(speed.dash_offset)}}}}}")
+        rules.append(f".{name}{{animation:{name} {fmt(speed.seconds)}s linear infinite}}")
+    still = ",".join(f".{animation.value}" for animation in theme.animations)
+    rules.append(f"@media (prefers-reduced-motion: reduce){{{still}{{animation:none}}}}")
     return "\n".join(rules)
 
 
-def render(scene):
-    """Return the HTML text for a validated scene."""
-    t = theme()
-    w, h = scene["size"]
-    body = [_frame(f, t) for f in scene.get("frames", [])]
-    body += [_node(n, t) for n in scene.get("nodes", [])]
-    edges = scene.get("edges", [])
-    body.append(
-        f'<svg width="{w:g}" height="{h:g}" viewBox="0 0 {w:g} {h:g}" '
+def _lines_html(scene: Scene, theme: Theme) -> str:
+    """Draw all lines in one SVG layer that covers the whole scene."""
+    width, height = fmt(scene.width), fmt(scene.height)
+    paths = "".join(_edge_html(edge, theme) for edge in scene.edges)
+    return (
+        f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
         'style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true">'
-        + _markers(t)
-        + "".join(_edge(e, t) for e in edges)
-        + "</svg>"
+        f"{_arrowheads(theme)}{paths}</svg>"
     )
-    body += [_label(e, t) for e in edges if e.get("label")]
-    if scene.get("title"):
-        desc = scene.get("desc")
-        body.append(
-            '<div style="position:absolute;left:64px;top:48px;display:flex;flex-direction:column;'
-            f'gap:8px"><div style="font-size:24px;font-weight:600">{_esc(scene["title"])}</div>'
-            + (
-                f'<div style="font-size:13px;line-height:20px;color:{t["slate"]};'
-                f'max-width:{min(w - 128, 900):g}px">{_esc(desc)}</div>'
-                if desc
-                else ""
-            )
-            + "</div>"
-        )
-    title = _esc(scene.get("title") or "Diagram")
+
+
+def render(scene: Scene) -> str:
+    """Return the HTML text of a scene.
+
+    Args:
+        scene: A scene from ``scene.parse`` or ``scene.load``.
+
+    Returns:
+        A complete HTML document with no script and no file besides the web fonts.
+    """
+    theme = load_theme()
+    layers = [_frame_html(frame, theme) for frame in scene.frames]
+    layers += [_node_html(node, theme) for node in scene.nodes]
+    layers.append(_lines_html(scene, theme))
+    layers += [_label_chip_html(edge.label, theme) for edge in scene.edges if edge.label]
+    layers.append(_title_html(scene, theme))
+    canvas = {
+        "position": "relative",
+        "width": px(scene.width),
+        "height": px(scene.height),
+        "background": theme.canvas,
+        "overflow": "hidden",
+    }
     return (
         '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        f"<title>{title}</title>\n"
-        f'<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-        f'<link href="{FONTS_LINK}" rel="stylesheet">\n'
-        f"<style>\n{_css(t)}\n</style>\n</head>\n<body>\n"
-        f'<div style="position:relative;width:{w:g}px;height:{h:g}px;background:{t["canvas"]};'
-        f'overflow:hidden">\n' + "\n".join(body) + "\n</div>\n</body>\n</html>\n"
+        f"<title>{esc(scene.title or 'Diagram')}</title>\n"
+        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+        f'<link href="{FONTS_URL}" rel="stylesheet">\n'
+        f"<style>\n{_stylesheet(theme)}\n</style>\n</head>\n<body>\n"
+        f"{tag('div', canvas, chr(10).join(layers))}\n</body>\n</html>\n"
     )

@@ -11,82 +11,82 @@
    "shape": "terminator",
    "x": 255.0,
    "y": 176.0,
-   "w": 150,
-   "h": 48,
-   "text": "Start"
+   "text": "Start",
+   "width": 150,
+   "height": 48
   },
   {
    "id": "enter",
    "shape": "io",
    "x": 235.0,
    "y": 278.0,
-   "w": 190,
-   "h": 56,
-   "text": "Enter email and password"
+   "text": "Enter email and password",
+   "width": 190,
+   "height": 56
   },
   {
    "id": "check",
    "shape": "process",
    "x": 245.0,
    "y": 384.0,
-   "w": 170,
-   "h": 56,
-   "text": "Check credentials"
+   "text": "Check credentials",
+   "width": 170,
+   "height": 56
   },
   {
    "id": "valid",
    "shape": "decision",
    "x": 245.0,
    "y": 490.0,
-   "w": 170,
-   "h": 100,
-   "text": "Valid?"
+   "text": "Valid?",
+   "width": 170,
+   "height": 100
   },
   {
    "id": "session",
    "shape": "process",
    "x": 245.0,
    "y": 658.0,
-   "w": 170,
-   "h": 56,
-   "text": "Create session"
+   "text": "Create session",
+   "width": 170,
+   "height": 56
   },
   {
    "id": "dash",
    "shape": "terminator",
    "x": 255.0,
    "y": 770.0,
-   "w": 150,
-   "h": 48,
-   "text": "Open dashboard"
+   "text": "Open dashboard",
+   "width": 150,
+   "height": 48
   },
   {
    "id": "attempts",
    "shape": "decision",
    "x": 625.0,
    "y": 490.0,
-   "w": 190,
-   "h": 100,
    "text": "Fewer than 3 attempts?",
-   "font_size": 12
+   "font_size": 12,
+   "width": 190,
+   "height": 100
   },
   {
    "id": "lock",
    "shape": "process",
    "x": 635.0,
    "y": 658.0,
-   "w": 170,
-   "h": 56,
-   "text": "Lock account"
+   "text": "Lock account",
+   "width": 170,
+   "height": 56
   },
   {
    "id": "notice",
    "shape": "fail",
    "x": 645.0,
    "y": 770.0,
-   "w": 150,
-   "h": 48,
-   "text": "Show lock notice"
+   "text": "Show lock notice",
+   "width": 150,
+   "height": 48
   }
  ],
  "edges": [

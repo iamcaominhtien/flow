@@ -9,10 +9,10 @@
    "id": "zone",
    "x": 30,
    "y": 90,
-   "w": 1020,
-   "h": 200,
    "label": "Checkout",
-   "tone": "blue"
+   "tone": "blue",
+   "width": 1020,
+   "height": 200
   }
  ],
  "nodes": [
@@ -21,87 +21,87 @@
    "shape": "terminator",
    "x": 60,
    "y": 160,
-   "w": 160,
-   "h": 52,
-   "text": "Start"
+   "text": "Start",
+   "width": 160,
+   "height": 52
   },
   {
    "id": "b",
    "shape": "process",
    "x": 300,
    "y": 158,
-   "w": 180,
-   "h": 56,
    "text": "Pay by card",
    "icon": "card",
    "tone": "amber",
-   "number": "1"
+   "number": "1",
+   "width": 180,
+   "height": 56
   },
   {
    "id": "c",
    "shape": "decision",
    "x": 560,
    "y": 140,
-   "w": 190,
-   "h": 92,
-   "text": "Accepted?"
+   "text": "Accepted?",
+   "width": 190,
+   "height": 92
   },
   {
    "id": "d",
    "shape": "subprocess",
    "x": 820,
    "y": 158,
-   "w": 190,
-   "h": 56,
    "text": "Send receipt",
-   "icon": "bell"
+   "icon": "bell",
+   "width": 190,
+   "height": 56
   },
   {
    "id": "e",
    "shape": "document",
    "x": 60,
    "y": 300,
-   "w": 170,
-   "h": 70,
-   "text": "Invoice"
+   "text": "Invoice",
+   "width": 170,
+   "height": 70
   },
   {
    "id": "f",
    "shape": "preparation",
    "x": 300,
    "y": 308,
-   "w": 190,
-   "h": 56,
    "text": "Prepare order",
-   "icon": "pot"
+   "icon": "pot",
+   "width": 190,
+   "height": 56
   },
   {
    "id": "g",
    "shape": "io",
    "x": 560,
    "y": 308,
-   "w": 200,
-   "h": 56,
    "text": "Read card",
-   "icon": "phone"
+   "icon": "phone",
+   "width": 200,
+   "height": 56
   },
   {
    "id": "h",
    "shape": "connector",
    "x": 880,
    "y": 306,
-   "w": 60,
-   "h": 60,
-   "text": "A"
+   "text": "A",
+   "width": 60,
+   "height": 60
   },
   {
    "id": "i",
    "shape": "fail",
    "x": 60,
    "y": 450,
-   "w": 170,
-   "h": 52,
-   "text": "Declined"
+   "text": "Declined",
+   "width": 170,
+   "height": 52
   }
  ],
  "edges": [

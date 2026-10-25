@@ -12,28 +12,53 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from flowlib import render_html, scene
 
+EXIT_OK = 0
+EXIT_INVALID_SCENE = 1
 
-def cmd_render(args):
+
+def run_render(arguments: argparse.Namespace) -> int:
+    """Draw a scene file as an HTML file.
+
+    Args:
+        arguments: The parsed command line; ``scene`` is the input path and ``output`` the
+            optional output path (default: the input path with an ``.html`` suffix).
+
+    Returns:
+        The exit code: 0 when the file was written, 1 when the scene is not valid.
+    """
     try:
-        data = scene.load(args.scene)
-    except scene.SceneError as err:
-        print(f"{args.scene} is not a valid scene:\n{err}", file=sys.stderr)
-        return 1
-    out = Path(args.output) if args.output else Path(args.scene).with_suffix(".html")
-    out.write_text(render_html.render(data), encoding="utf-8")
-    print(f"wrote {out}")
-    return 0
+        parsed = scene.load(arguments.scene)
+    except scene.SceneError as error:
+        print(f"{arguments.scene} is not a valid scene:\n{error}", file=sys.stderr)
+        return EXIT_INVALID_SCENE
+    output_path = Path(arguments.output or Path(arguments.scene).with_suffix(".html"))
+    output_path.write_text(render_html.render(parsed), encoding="utf-8")
+    print(f"wrote {output_path}")
+    return EXIT_OK
 
 
-def main(argv=None):
+def build_parser() -> argparse.ArgumentParser:
+    """Return the command line parser, with one sub-command per action."""
     parser = argparse.ArgumentParser(prog="flow.py", description=__doc__.splitlines()[0])
-    sub = parser.add_subparsers(dest="command", required=True)
-    r = sub.add_parser("render", help="draw a scene as HTML")
-    r.add_argument("scene")
-    r.add_argument("-o", "--output")
-    r.set_defaults(run=cmd_render)
-    args = parser.parse_args(argv)
-    return args.run(args)
+    commands = parser.add_subparsers(dest="command", required=True)
+    render = commands.add_parser("render", help="draw a scene as HTML")
+    render.add_argument("scene")
+    render.add_argument("-o", "--output")
+    render.set_defaults(run=run_render)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Run the command line.
+
+    Args:
+        argv: The arguments after the program name; ``sys.argv`` is used when None.
+
+    Returns:
+        The exit code of the chosen command.
+    """
+    arguments = build_parser().parse_args(argv)
+    return arguments.run(arguments)
 
 
 if __name__ == "__main__":

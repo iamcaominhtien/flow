@@ -98,8 +98,8 @@ A scene is plain geometry in pixels, independent of HTML and draw.io. `x` and `y
 {
   "size": [1400, 900],
   "title": "Place an order",
-  "frames": [{"id": "lane1", "x": 0, "y": 80, "w": 1400, "h": 220, "label": "Customer", "tone": "blue"}],
-  "nodes":  [{"id": "pay", "shape": "process", "x": 540, "y": 120, "w": 280, "h": 92,
+  "frames": [{"id": "lane1", "x": 0, "y": 80, "width": 1400, "height": 220, "label": "Customer", "tone": "blue"}],
+  "nodes":  [{"id": "pay", "shape": "process", "x": 540, "y": 120, "width": 280, "height": 92,
               "text": ["Pay by card"], "tone": "amber", "icon": "card", "number": "2"}],
   "edges":  [{"id": "e1", "from": "start", "to": "pay", "role": "main",
               "points": [[680, 60], [680, 120]],
