@@ -56,13 +56,13 @@ Flow aims to cover **nearly every common diagram type**, grouped into 8 categori
 
 | Category | Diagram types | Status |
 | --- | --- | --- |
-| Process & business | Flowchart, Swimlane / cross-functional, BPMN, User flow | Flowchart and swimlane built; the rest planned |
-| UML behavior | Sequence, Use case, Activity, State machine | Sequence and state machine built; the rest planned |
-| Structure & data | ER diagram, Class diagram, Data flow diagram (DFD) | ER built; the rest planned |
-| Architecture & infrastructure | Architecture, C4 model, Cloud (AWS / GCP / Azure), Network, Deployment | Architecture built; the rest planned |
-| Planning & management | Gantt, Org chart, Mind map, Roadmap / Kanban | Planned |
-| UI design | Wireframe / mockup | Planned |
-| Explainer / infographic | Layered flow (icon-based tiers/lanes), Tree / hierarchy, Side-by-side comparison, Concept illustration | Planned |
+| Process & business | Flowchart, Swimlane / cross-functional, BPMN, User flow | Built (BPMN as a look, not the full standard) |
+| UML behavior | Sequence, Use case, Activity, State machine | Built; activity is drawn with the flowchart skill |
+| Structure & data | ER diagram, Class diagram, Data flow diagram (DFD) | Built |
+| Architecture & infrastructure | Architecture, C4 model, Cloud (AWS / GCP / Azure), Network, Deployment | Built (network and deployment use the architecture or cloud skill; no provider icons) |
+| Planning & management | Gantt, Org chart, Mind map, Roadmap / Kanban | Built |
+| UI design | Wireframe / mockup | Built (a simple stack of boxes) |
+| Explainer / infographic | Layered flow (icon-based tiers/lanes), Tree / hierarchy, Side-by-side comparison, Concept illustration | Layers, tree and comparison (through Kanban) built; concept illustration not built |
 | Editing | Update or restyle existing `.drawio` files | Import only (best effort) |
 
 ## Getting started
@@ -81,12 +81,15 @@ To export to PNG, SVG or PDF, also run `/plugin marketplace add jgraph/drawio-mc
 | `/flow:flowchart` | Flowcharts, top to bottom or left to right, with swimlanes and an overrides file for fixes |
 | `/flow:sequence` | Sequence diagrams: activation bars, fragments, notes, create and destroy |
 | `/flow:er` | ER diagrams: tables, keys, crow's-foot cardinality |
-| `/flow:architecture` | Architecture diagrams: components in nested zones |
-| `/flow:state` | State diagrams |
+| `/flow:architecture`, `/flow:cloud`, `/flow:c4` | Components in nested zones; cloud resources; C4 elements |
+| `/flow:state`, `/flow:bpmn`, `/flow:usecase`, `/flow:class`, `/flow:dfd`, `/flow:screen-flow` | State, BPMN-style, use case, class, data flow and screen flow diagrams |
+| `/flow:org-chart`, `/flow:mind-map` | Trees with a tidy layout (top down; left to right) |
+| `/flow:gantt`, `/flow:roadmap` | Time axis in named periods; lanes of items |
+| `/flow:kanban`, `/flow:layers`, `/flow:wireframe` | Columns of cards (also a comparison); stacked bands; low-fidelity screens |
 | `/flow:import-drawio` | Reads an existing `.drawio` file into a scene (best effort) |
 | `/flow:doctor` | Checks the install |
 
-You can also add your own icons: Claude writes `icons.local.json` next to the spec, and the build checks it before use. The other diagram types (BPMN, C4, cloud, DFD, UML class and use case, planning types, wireframe, explainer, screen flow) are designed but not built. Nothing has been tested in the draw.io editor, in claude.ai or in Cowork, or on Windows.
+You can also add your own icons: Claude writes `icons.local.json` next to the spec, and the build checks it before use. Not built: the illustrated style, BPMN event types and pools with message flow checks, an explainer "concept" shape, and editing a `.drawio` file in place. The types above are simpler than the design pages describe (for example no device frames, no provider icons, no dates in the Gantt chart). Nothing has been tested in the draw.io editor, in claude.ai or in Cowork, or on Windows.
 
 ## Roadmap
 
@@ -101,7 +104,7 @@ You can also add your own icons: Claude writes `icons.local.json` next to the sp
 - [x] draw.io renderer from the same description (checked in the draw.io viewer; not yet in the editor)
 - [x] Generate valid draw.io XML from a text prompt (flowchart, sequence, ER, architecture, state)
 - [x] First plugins: flowchart, sequence, ER, architecture, state
-- [ ] Expand to the remaining categories above
+- [x] Expand to the remaining categories above (simplified; see the table)
 - [ ] Support editing existing `.drawio` files (import exists; editing in place does not)
 - [ ] Documentation and examples
 

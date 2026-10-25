@@ -224,10 +224,10 @@ Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build 
 | B | Spec, validator, layered layout, `flow.py build`, check; the `flowchart` skill; swimlanes, left to right, overrides, back-edge routing | Done |
 | C | draw.io renderer | Done; checked in the draw.io viewer, not in the editor |
 | D | Second family: sequence diagram | Done; the scene and renderers needed new frame, bar and symbol-head support but no rewrite |
-| E | Remaining types, family by family | ER, architecture and state done. Not built: BPMN, C4, cloud, DFD, UML class and use case, screen flow, explainer, Gantt, org chart, mind map, Kanban, roadmap, wireframe, illustrated style |
+| E | Remaining types, family by family | Done in a simplified form: ER, architecture, cloud, C4, state, BPMN, use case, class, DFD, screen flow (all on the layered engine), org chart and mind map (tidy tree), Gantt and roadmap (timeline), Kanban, layers and wireframe (boards). Not built: the illustrated style and the concept explainer |
 | F | Editing existing files, publishing | Import done (best effort). Editing in place and publishing to a directory: not done |
 
-Types that fit the layered engine (C4, cloud, DFD, BPMN, UML) are adapters like `architecture` and `state`: a parser that turns the spec into nodes, edges and zones. The planning types and the wireframe need layouts of their own (a time axis, a tree, a column board, a free grid).
+Types that fit the layered engine are declared as data in `diagrams/catalog.py` (words, kinds and line styles) and read by `diagrams/graph.py`. Trees use `tidy.py`, because the layered engine merges the buses of different parents. Gantt and roadmap are in `diagrams/timeline.py`, and Kanban, layers and wireframe in `diagrams/boards.py`; both build the scene directly.
 
 ## 12. Decisions taken
 
@@ -239,3 +239,5 @@ Types that fit the layered engine (C4, cloud, DFD, BPMN, UML) are adapters like 
 6. **Custom icons are names, not inline SVG.** `icons.local.json` beside the spec maps a name to the inner markup of a 24 px line icon; the build checks it (allow-listed elements and attributes, numbers inside the grid, size limits) and refuses anything else. The detailed 64 px style is not supported yet. The built-in library has 40 icons.
 7. **One engine for the graph family.** Flowchart, ER, architecture and state share ranking, placement, routing and zones. Each type is a parser in `flowlib/diagrams/` plus a skill.
 8. **Marks keep their own size.** Start, end, connector and actor nodes are not stretched to the width of their column; a stretched circle would be an ellipse in draw.io.
+9. **Graph types are data.** A new type of the graph family is a `GraphType` value (words, kinds, line styles), not a new parser. Unknown kinds and styles are refused with the list of valid ones.
+10. **Dates are not read.** A timeline names its own periods (`W1`, `Q2`) and bars use whole periods.
