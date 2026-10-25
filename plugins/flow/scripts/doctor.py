@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Print the state of the Flow plugin install. Standard library only."""
+
 import json
 import os
 import sys
