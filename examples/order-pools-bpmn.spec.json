@@ -121,5 +121,6 @@
       "style": "message",
       "label": "charge"
     }
-  ]
+  ],
+  "direction": "right"
 }

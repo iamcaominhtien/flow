@@ -230,20 +230,17 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
     rules = rules_for(spec, base_rules)
     fitted = _layout_sizes(spec, base_rules)
     widths = _column_widths(fitted, grid.column)
-    if spec.lanes:
-        pad = rules.lane_padding
-        widths = {
-            index: max(rules.lane_min_size, width + 2 * pad) for index, width in widths.items()
-        }
+    bands: dict[int, tuple[float, float]] = {}
+    if spec.lanes and grid.lane_columns:
+        center_x, bands = _lane_positions(spec, grid, fitted, rules)
+    else:
+        center_x = _column_centers(spec, grid, fitted, rules)
+    if spec.lanes and not bands:
+        bands = {index: (center_x[index] - widths[index] / 2, widths[index]) for index in center_x}
     heights: dict[int, float] = defaultdict(float)
     for node_id, size in fitted.items():
         heights[grid.rank[node_id]] = max(heights[grid.rank[node_id]], size.height)
-    left, top = page_origin(spec, rules)
-    column_gaps = (
-        (0.0, 0.0) if spec.lanes else (rules.gap_horizontal, rules.gap_horizontal_labelled)
-    )
-    labelled_columns = _labelled_boundaries(grid.forward, grid.column)
-    center_x = _centers(widths, labelled_columns, column_gaps, left)
+    top = page_origin(spec, rules)[1]
     row_gaps = (rules.gap_vertical, rules.gap_vertical_labelled)
     labelled_rows = _labelled_boundaries(grid.forward, grid.rank)
     center_y = _centers(dict(heights), labelled_rows, row_gaps, top)
@@ -256,13 +253,66 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
         )
         for node in spec.nodes
     }
-    return _with_frames(spec, nodes, (widths, center_x), rules)
+    return _with_frames(spec, nodes, bands, rules)
+
+
+def _column_centers(
+    spec: Spec, grid: Grid, fitted: dict[str, FittedNode], rules: LayoutRules
+) -> dict[int, float]:
+    """Return the centre x of each column when the columns are not lane-owned."""
+    widths = _column_widths(fitted, grid.column)
+    if spec.lanes:
+        widths = {
+            index: max(rules.lane_min_size, width + 2 * rules.lane_padding)
+            for index, width in widths.items()
+        }
+    column_gaps = (
+        (0.0, 0.0) if spec.lanes else (rules.gap_horizontal, rules.gap_horizontal_labelled)
+    )
+    labelled_columns = _labelled_boundaries(grid.forward, grid.column)
+    return _centers(widths, labelled_columns, column_gaps, page_origin(spec, rules)[0])
+
+
+def _lane_positions(
+    spec: Spec, grid: Grid, fitted: dict[str, FittedNode], rules: LayoutRules
+) -> tuple[dict[int, float], dict[int, tuple[float, float]]]:
+    """Place the columns of each swimlane inside its band, and size the bands.
+
+    A lane with several columns (side-by-side branches) keeps ``gap_horizontal`` between them
+    and ``lane_padding`` at both ends; a lane is never narrower than ``lane_min_size``, and its
+    columns are centred in it.
+
+    Args:
+        spec: The description, with its lanes.
+        grid: The columns, and which columns each lane owns.
+        fitted: The size of each node.
+        rules: The layout rules, in layout space.
+
+    Returns:
+        The centre x of each column, and each lane's left edge and width.
+    """
+    column_width: dict[int, float] = defaultdict(float)
+    for node_id, size in fitted.items():
+        column_width[grid.column[node_id]] = max(column_width[grid.column[node_id]], size.width)
+    left = page_origin(spec, rules)[0]
+    centers: dict[int, float] = {}
+    bands: dict[int, tuple[float, float]] = {}
+    for lane, columns in grid.lane_columns.items():
+        content = sum(column_width[c] for c in columns) + rules.gap_horizontal * (len(columns) - 1)
+        width = max(rules.lane_min_size, content + 2 * rules.lane_padding)
+        edge = left + (width - content) / 2
+        for column in columns:
+            centers[column] = edge + column_width[column] / 2
+            edge += column_width[column] + rules.gap_horizontal
+        bands[lane] = (left, width)
+        left += width
+    return centers, bands
 
 
 def _with_frames(
     spec: Spec,
     nodes: dict[str, Node],
-    columns: tuple[dict[int, float], dict[int, float]],
+    bands: dict[int, tuple[float, float]],
     rules: LayoutRules,
 ) -> Placement:
     """Add the swimlane and zone frames to placed nodes, and measure the area they cover.
@@ -270,18 +320,16 @@ def _with_frames(
     Args:
         spec: The description.
         nodes: The placed nodes.
-        columns: The width and the centre x of each column, which give the lane bands.
+        bands: Each lane's left edge and width; empty when there are no lanes.
         rules: The layout rules.
 
     Returns:
         The finished placement.
     """
-    widths, center_x = columns
     right = max(node.x + node.width for node in nodes.values())
     bottom = max(node.y + node.height for node in nodes.values())
     frames: tuple[Frame, ...] = ()
     if spec.lanes:
-        bands = {index: (center_x[index] - widths[index] / 2, widths[index]) for index in widths}
         row_span = (min(node.y for node in nodes.values()), bottom)
         frames = _lane_frames(spec, bands, row_span, rules.lane_padding)
     if spec.zones:

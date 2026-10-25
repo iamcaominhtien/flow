@@ -19,7 +19,7 @@ from typing import Any
 
 from ..model import Direction, Head, Role, Row, Scene, Shape, Tone
 from ..reader import Reader, SpecError, suggestion
-from ..spec import Spec, SpecEdge, SpecNode
+from ..spec import Spec, SpecEdge, SpecNode, check_explicit_cells
 from ..theme import icon_names
 from . import flowchart
 
@@ -171,6 +171,7 @@ def to_spec(raw: object) -> Spec:
         for index, item in enumerate(raw.get("tables", []))
     ]
     tables = {node.id: node for node in built if node is not None}
+    check_explicit_cells(tables.values(), read)
     if not tables:
         read.report("spec", "'tables' must list at least one table")
     relations = [

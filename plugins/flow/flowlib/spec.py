@@ -12,6 +12,7 @@ The JSON format of a flowchart::
 """
 
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
@@ -93,6 +94,7 @@ class Spec:
     edges: tuple[SpecEdge, ...]
     zones: tuple[SpecZone, ...] = ()
     illustrated: bool = False
+    side_by_side: bool = False  # in a swimlane chart, branches of one lane sit side by side
 
 
 def load(path: str | Path) -> Spec:
@@ -265,3 +267,21 @@ def with_cards(spec: Spec) -> Spec:
         for node in spec.nodes
     )
     return replace(spec, nodes=nodes)
+
+
+def check_explicit_cells(nodes: Iterable[SpecNode], read: Reader) -> None:
+    """Report a spec in which only some nodes name a grid cell with ``at``.
+
+    Explicit cells switch the whole layout to them, so a node without one has no place.
+
+    Args:
+        nodes: Every node of the spec.
+        read: The reader that collects problems.
+    """
+    nodes = list(nodes)
+    placed = [node for node in nodes if node.at is not None]
+    if placed and len(placed) < len(nodes):
+        missing = ", ".join(node.id for node in nodes if node.at is None)
+        read.report(
+            "spec", f"'at' is set on some items but not on: {missing}; set it on all or none"
+        )

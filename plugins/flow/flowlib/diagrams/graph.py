@@ -18,12 +18,17 @@ from typing import Any
 
 from ..model import Direction, Head, Role, Row, Scene, Shape, Tone
 from ..reader import Reader, SpecError, suggestion
-from ..spec import Spec, SpecEdge, SpecLane, SpecNode, SpecZone
+from ..spec import Spec, SpecEdge, SpecLane, SpecNode, SpecZone, check_explicit_cells
 from ..theme import icon_names
 from . import flowchart
 
 AT_LENGTH = 2
-CAPTIONED_SHAPES = {Shape.ACTOR, Shape.INTERMEDIATE}  # a figure or a ring: the label goes under it
+CAPTIONED_SHAPES = {
+    Shape.ACTOR,
+    Shape.INTERMEDIATE,
+    Shape.START,
+    Shape.END,
+}  # a figure or a ring: the label goes under it
 DEFAULT_ZONE_TONE = Tone.GRAY
 NODE_KEYS = {"id", "label", "kind", "detail", "icon", "tone", "zone", "at"}
 LINK_KEYS = {"from", "to", "label", "style", "main", "from_label", "to_label"}
@@ -54,6 +59,7 @@ class GraphType:
     default_role: Role = Role.NEXT
     unlabelled_kinds: frozenset[str] = frozenset()
     has_zones: bool = False
+    side_by_side: bool = False  # branches inside one lane share a rank instead of stacking
     zones_are_lanes: bool = False  # zones become swimlanes: every item sits in exactly one
     extra_node_keys: frozenset[str] = frozenset()
     kind_icons: dict[str, str] = field(default_factory=dict, compare=False)
@@ -242,6 +248,7 @@ def to_spec(graph: GraphType, raw: object) -> Spec:
     direction = read.enum(Direction, raw, "direction", "spec") or Direction.DOWN
     illustrated = read.illustrated(raw, "spec")
     title, description = read.text(raw, "title", "spec"), read.text(raw, "desc", "spec")
+    check_explicit_cells(nodes.values(), read)
     if graph.zones_are_lanes and zones:
         _require_lane(nodes, read)
     if read.problems:
@@ -255,6 +262,7 @@ def to_spec(graph: GraphType, raw: object) -> Spec:
         edges=tuple(link for link in links if link is not None),
         zones=tuple(zones.values()),
         illustrated=illustrated,
+        side_by_side=graph.side_by_side,
     )
     return _as_lanes(spec) if graph.zones_are_lanes else spec
 

@@ -18,7 +18,7 @@ from typing import Any
 
 from ..model import Direction, Head, Role, Scene, Shape, Tone
 from ..reader import Reader, SpecError, suggestion
-from ..spec import Spec, SpecEdge, SpecNode, SpecZone
+from ..spec import Spec, SpecEdge, SpecNode, SpecZone, check_explicit_cells
 from ..theme import icon_names
 from . import flowchart
 
@@ -185,6 +185,7 @@ def to_spec(raw: object) -> Spec:
         for i, item in enumerate(_list(raw, "components"))
     ]
     components = {node.id: node for node in built if node is not None}
+    check_explicit_cells(components.values(), read)
     if not components:
         read.report("spec", "'components' must list at least one component")
     links = [

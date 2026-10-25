@@ -105,6 +105,7 @@ BPMN = GraphType(
     ),
     has_zones=True,
     zones_are_lanes=True,
+    side_by_side=True,
     kind_icons={
         "timer": "clock",
         "message": "mail",

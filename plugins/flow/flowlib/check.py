@@ -4,7 +4,7 @@ Each check returns findings that name the items involved, so that the author can
 spec (a hint, shorter text) and build again.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from itertools import combinations, pairwise
 
@@ -272,7 +272,38 @@ def check_scene(scene: Scene) -> list[Finding]:
         *check_text_fit(scene, rules),
         *check_crossings(scene),
     ]
-    return sorted(findings, key=lambda finding: finding.severity is not Severity.ERROR)
+    named = [_with_names(finding, scene) for finding in findings]
+    return sorted(named, key=lambda finding: finding.severity is not Severity.ERROR)
+
+
+def _title_of(node: Node) -> str:
+    """Return the words a person sees on a node: its text, else its caption."""
+    return " ".join(node.text) or node.caption or ""
+
+
+def _with_names(finding: Finding, scene: Scene) -> Finding:
+    """Add to each quoted id in a message what it is: a node's label, or a line's two ends.
+
+    Args:
+        finding: A finding whose message quotes node and line ids.
+        scene: The scene the ids belong to.
+
+    Returns:
+        The finding with a short description after each id, so that a person can find the item
+        without reading the scene file.
+    """
+    nodes = {node.id: node for node in scene.nodes}
+    message = finding.message
+    for node in nodes.values():
+        if f"'{node.id}'" in message and _title_of(node):
+            message = message.replace(f"'{node.id}'", f"'{node.id}' ({_title_of(node)})")
+    for edge in scene.edges:
+        if f"'{edge.id}'" not in message or edge.source not in nodes or edge.target not in nodes:
+            continue
+        start, end = _title_of(nodes[edge.source]), _title_of(nodes[edge.target])
+        if start and end:
+            message = message.replace(f"'{edge.id}'", f"'{edge.id}' ({start} to {end})")
+    return replace(finding, message=message)
 
 
 def format_report(findings: list[Finding]) -> str:

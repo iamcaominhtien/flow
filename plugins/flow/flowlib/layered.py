@@ -6,7 +6,7 @@ are routed around the flow later.
 """
 
 from collections import Counter, defaultdict, deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .model import Role, Side
 from .spec import Spec, SpecEdge
@@ -25,6 +25,7 @@ class Grid:
     column: dict[str, int]
     forward: tuple[SpecEdge, ...]
     returning: tuple[SpecEdge, ...]
+    lane_columns: dict[int, tuple[int, ...]] = field(default_factory=dict)
 
 
 def split_returning(spec: Spec) -> tuple[list[SpecEdge], list[SpecEdge]]:
@@ -218,6 +219,36 @@ def assign_lane_columns(spec: Spec) -> dict[str, int]:
     return {node.id: position[node.lane] for node in spec.nodes if node.lane is not None}
 
 
+def split_lane_columns(
+    spec: Spec, rank: dict[str, int]
+) -> tuple[dict[str, int], dict[int, tuple[int, ...]]]:
+    """Give each lane as many columns as its busiest row has nodes, and spread the nodes over them.
+
+    Args:
+        spec: A flowchart description whose nodes all name a lane.
+        rank: Node id to row; several nodes of one lane may share a row.
+
+    Returns:
+        Node id to its column, and each lane's position to the columns it owns, in order.
+    """
+    lane_of = assign_lane_columns(spec)
+    in_cell: dict[tuple[int, int], list[str]] = defaultdict(list)
+    for node in spec.nodes:
+        in_cell[(rank[node.id], lane_of[node.id])].append(node.id)
+    width = dict.fromkeys(range(len(spec.lanes)), 1)
+    for (_, lane), members in in_cell.items():
+        width[lane] = max(width[lane], len(members))
+    first, columns = 0, {}
+    lane_columns = {}
+    for lane in range(len(spec.lanes)):
+        lane_columns[lane] = tuple(range(first, first + width[lane]))
+        first += width[lane]
+    for (_, lane), members in in_cell.items():
+        for position, node_id in enumerate(members):
+            columns[node_id] = lane_columns[lane][position]
+    return columns, lane_columns
+
+
 def build_grid(spec: Spec) -> Grid:
     """Place every node of a flowchart on the grid.
 
@@ -236,6 +267,10 @@ def build_grid(spec: Spec) -> Grid:
         rank = {node.id: node.at[0] for node in spec.nodes if node.at is not None}
         column = {node.id: node.at[1] for node in spec.nodes if node.at is not None}
         return Grid(rank=rank, column=column, forward=tuple(forward), returning=tuple(returning))
+    if spec.lanes and spec.side_by_side:
+        rank = assign_ranks(spec, forward, set())
+        column, lane_columns = split_lane_columns(spec, rank)
+        return Grid(rank, column, tuple(forward), tuple(returning), lane_columns)
     if spec.lanes:
         column = assign_lane_columns(spec)
         rank = separate_lane_cells(spec, forward, column)
