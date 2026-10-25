@@ -9,6 +9,7 @@ from typing import Any
 from .model import Animation, LabelKind, Role, Shape, Tone
 
 DATA_DIR = Path(__file__).parent
+ICON_STROKE_WIDTH = 2  # line weight of a flat icon, in its 24 px grid
 
 
 @dataclass(frozen=True)
@@ -236,6 +237,65 @@ def _load_builtin_icons() -> dict[str, str]:
 
 
 _LOCAL_ICONS: dict[str, str] = {}
+
+
+@cache
+def load_detailed_icons() -> dict[str, str]:
+    """Return the detailed icons: name to the inner SVG of a 64 x 64 viewBox, with own colours."""
+    return json.loads((DATA_DIR / "icons_detailed.json").read_text(encoding="utf-8"))
+
+
+def icon_names() -> set[str]:
+    """Return every icon name a spec may use: flat, custom and detailed."""
+    return set(load_icons()) | set(load_detailed_icons())
+
+
+def has_detailed_icon(name: str) -> bool:
+    """Tell whether an icon has a detailed drawing."""
+    return name in load_detailed_icons()
+
+
+def icon_svg(name: str, size: float, stroke: str, attrs: str = "") -> str:
+    """Draw an icon as an ``svg`` element, using the flat drawing when there is one.
+
+    Args:
+        name: An icon name from ``icon_names``.
+        size: The drawn width and height in pixels.
+        stroke: The line colour of a flat icon; a detailed icon has its own colours.
+        attrs: Extra attributes for the element, such as a ``style`` or ``xmlns``.
+
+    Returns:
+        The ``svg`` element.
+    """
+    flat = load_icons().get(name)
+    if flat is None:
+        return detailed_icon_svg(name, size, stroke, attrs)
+    return (
+        f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" {attrs} fill="none" '
+        f'stroke="{stroke}" stroke-width="{ICON_STROKE_WIDTH}" stroke-linecap="round" '
+        f'stroke-linejoin="round" aria-hidden="true">{flat}</svg>'
+    )
+
+
+def detailed_icon_svg(name: str, size: float, stroke: str, attrs: str = "") -> str:
+    """Draw an icon in its detailed form when it has one, else as the flat drawing.
+
+    Args:
+        name: An icon name from ``icon_names``.
+        size: The drawn width and height in pixels.
+        stroke: The line colour used when only a flat drawing exists.
+        attrs: Extra attributes for the element, such as a ``style`` or ``xmlns``.
+
+    Returns:
+        The ``svg`` element.
+    """
+    detailed = load_detailed_icons().get(name)
+    if detailed is None:
+        return icon_svg(name, size, stroke, attrs)
+    return (
+        f'<svg width="{size}" height="{size}" viewBox="0 0 64 64" {attrs} '
+        f'overflow="visible" aria-hidden="true">{detailed}</svg>'
+    )
 
 
 def register_icons(icons: dict[str, str]) -> None:

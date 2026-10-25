@@ -20,7 +20,7 @@ from ..canvas import fit_canvas
 from ..model import DEFAULT_FONT_SIZE_PX, Edge, Frame, Head, Node, Role, Scene, Shape, Tone
 from ..reader import Reader, SpecError
 from ..sizing import FittedNode, NodeContent, fit_card, fit_node
-from ..theme import LayoutRules, load_icons, load_theme
+from ..theme import LayoutRules, icon_names, load_theme
 
 KANBAN = "kanban"
 LAYERS = "layers"
@@ -87,7 +87,7 @@ def _card(raw: object, where: str, read: Reader) -> _Card | None:
         return None
     read.check_keys(raw, CARD_KEYS, where)
     icon = raw.get("icon")
-    if icon is not None and icon not in load_icons():
+    if icon is not None and icon not in icon_names():
         read.report(where, f"unknown icon '{icon}'")
     return _Card(
         read.text(raw, "label", where) or "",

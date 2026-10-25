@@ -18,7 +18,7 @@ from typing import Any
 
 from .model import Direction, Head, Role, Row, Shape, Side, Tone
 from .reader import Reader, SpecError, suggestion
-from .theme import load_icons
+from .theme import icon_names
 
 SPEC_KEYS = {"type", "title", "desc", "direction", "lanes", "nodes", "edges", "style"}
 NODE_KEYS = {"id", "kind", "text", "icon", "tone", "number", "side", "lane", "detail"}
@@ -131,7 +131,7 @@ class _SpecParser:
     def __init__(self) -> None:
         """Start with an empty reader."""
         self._read = Reader()
-        self._icon_names = load_icons().keys()
+        self._icon_names = icon_names()
 
     def spec(self, raw: object) -> Spec:
         """Build the spec, or raise if anything was wrong.

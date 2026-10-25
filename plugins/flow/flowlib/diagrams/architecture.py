@@ -19,7 +19,7 @@ from typing import Any
 from ..model import Direction, Head, Role, Scene, Shape, Tone
 from ..reader import Reader, SpecError, suggestion
 from ..spec import Spec, SpecEdge, SpecNode, SpecZone
-from ..theme import load_icons
+from ..theme import icon_names
 from . import flowchart
 
 SPEC_KEYS = {"type", "title", "desc", "direction", "zones", "components", "links", "style"}
@@ -179,7 +179,7 @@ def to_spec(raw: object) -> Spec:
     built_zones = [_zone(item, f"zones[{i}]", read) for i, item in enumerate(_list(raw, "zones"))]
     zones = {zone.id: zone for zone in built_zones if zone is not None}
     _check_zone_parents(zones, read)
-    known = (set(load_icons()), set(zones))
+    known = (icon_names(), set(zones))
     built = [
         _component(item, f"components[{i}]", read, known)
         for i, item in enumerate(_list(raw, "components"))

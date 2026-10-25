@@ -15,7 +15,7 @@ from typing import Any
 from ..model import Direction, Head, Scene, Shape, Tone
 from ..reader import Reader, SpecError
 from ..spec import Spec
-from ..theme import load_icons
+from ..theme import icon_names
 from ..tidy import layout_tree
 from .graph import GraphType, LineKind, to_spec
 
@@ -68,7 +68,7 @@ class _Flattener:
         self.read.check_keys(raw, ITEM_KEYS, where)
         identifier = f"n{len(self.nodes)}"
         icon = raw.get("icon")
-        if icon is not None and icon not in load_icons():
+        if icon is not None and icon not in icon_names():
             self.read.report(where, f"unknown icon '{icon}'")
         node = {"id": identifier, "label": raw.get("label"), "detail": raw.get("detail")}
         node.update({"icon": icon, "tone": raw.get("tone", tone)})

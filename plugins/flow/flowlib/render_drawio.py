@@ -25,12 +25,12 @@ from .model import Frame, FrameVariant, Node, Scene, Shape, Tone
 from .shapes import BOX_CORNER_RADIUS_PX, STROKE_WIDTH_PX, SUBPROCESS_BAR_INSET_PX
 from .sizing import estimate_text_width
 from .text_area import ICON_TEXT_RESERVE_PX
-from .theme import Theme, load_icons, load_theme
+from .theme import Theme, detailed_icon_svg, has_detailed_icon, icon_svg, load_theme
 
 ICON_SIZE_PX = 18
 ICON_STROKE_WIDTH = 2
 ICON_LEFT_PX = 14
-ICON_VIEW_BOX = "0 0 24 24"
+SVG_NAMESPACE = "http://www.w3.org/2000/svg"
 BADGE_HEIGHT_PX = 20
 BADGE_MIN_WIDTH_PX = 22
 BADGE_OVERHANG_LEFT_PX = 6
@@ -283,16 +283,18 @@ def _node_value(node: Node, theme: Theme) -> str:
     return f'{title}<br><span style="{style}">{_label_value(node.detail)}</span>'
 
 
-def _icon_data_uri(name: str, stroke: str) -> str:
+def _icon_data_uri(name: str, stroke: str, size: float = ICON_SIZE_PX) -> str:
     """Build the ``image`` style value for an icon: a base64 SVG with no ``base64`` keyword.
 
     draw.io splits styles at semicolons, so the usual ``;base64,`` of a data URI cannot be used.
     """
-    svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{ICON_VIEW_BOX}" fill="none" '
-        f'stroke="{stroke}" stroke-width="{ICON_STROKE_WIDTH}" stroke-linecap="round" '
-        f'stroke-linejoin="round">{load_icons()[name]}</svg>'
-    )
+    svg = icon_svg(name, size, stroke, f'xmlns="{SVG_NAMESPACE}"')
+    return "data:image/svg+xml," + base64.b64encode(svg.encode()).decode()
+
+
+def _detailed_data_uri(name: str, stroke: str, size: float) -> str:
+    """Build the ``image`` style value for an icon in its detailed form."""
+    svg = detailed_icon_svg(name, size, stroke, f'xmlns="{SVG_NAMESPACE}"')
     return "data:image/svg+xml," + base64.b64encode(svg.encode()).decode()
 
 
@@ -317,26 +319,44 @@ def _add_node(root: ET.Element, node: Node, theme: Theme) -> None:
         _add_badge(root, node, theme)
 
 
-def _add_card_parts(root: ET.Element, node: Node, theme: Theme) -> None:
-    """Add the icon disc, the icon and the name pill of an illustrated card as child cells."""
+def _add_card_disc(root: ET.Element, node: Node, theme: Theme) -> None:
+    """Add the tinted disc and the enlarged flat icon of an illustrated card."""
     rules = theme.layout
     tone = theme.tones[node.tone or Tone.BLUE]
     parent = f"node-{node.id}"
     disc_left = (node.width - rules.card_disc) / 2
-    disc = add_vertex(
-        root,
-        f"disc-{node.id}",
-        "",
-        style_string({"ellipse": "", "strokeColor": "none", "fillColor": tone.pill}),
-    )
+    disc_style = style_string({"ellipse": "", "strokeColor": "none", "fillColor": tone.pill})
+    disc = add_vertex(root, f"disc-{node.id}", "", disc_style)
     disc.set("parent", parent)
     add_geometry(disc, (disc_left, rules.card_padding, rules.card_disc, rules.card_disc))
     size = rules.card_disc * rules.card_icon_fraction
     inset = (rules.card_disc - size) / 2
-    image = style_string({"shape": "image", "image": _icon_data_uri(node.icon or "", tone.stroke)})
-    icon = add_vertex(root, f"icon-{node.id}", "", image)
+    image = _icon_data_uri(node.icon or "", tone.stroke, size)
+    icon = add_vertex(root, f"icon-{node.id}", "", style_string({"shape": "image", "image": image}))
     icon.set("parent", parent)
     add_geometry(icon, (disc_left + inset, rules.card_padding + inset, size, size))
+
+
+def _add_detailed_icon(root: ET.Element, node: Node, theme: Theme) -> None:
+    """Add the detailed icon of an illustrated card, which needs no disc."""
+    rules = theme.layout
+    tone = theme.tones[node.tone or Tone.BLUE]
+    image = _detailed_data_uri(node.icon or "", tone.stroke, rules.card_disc)
+    icon = add_vertex(root, f"icon-{node.id}", "", style_string({"shape": "image", "image": image}))
+    icon.set("parent", f"node-{node.id}")
+    left = (node.width - rules.card_disc) / 2
+    add_geometry(icon, (left, rules.card_padding, rules.card_disc, rules.card_disc))
+
+
+def _add_card_parts(root: ET.Element, node: Node, theme: Theme) -> None:
+    """Add the icon and the name pill of an illustrated card as child cells."""
+    rules = theme.layout
+    tone = theme.tones[node.tone or Tone.BLUE]
+    parent = f"node-{node.id}"
+    if has_detailed_icon(node.icon or ""):
+        _add_detailed_icon(root, node, theme)
+    else:
+        _add_card_disc(root, node, theme)
     pill_width = (
         estimate_text_width(" ".join(node.text), rules, node.font_size)
         + 2 * rules.card_pill_padding

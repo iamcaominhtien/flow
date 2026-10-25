@@ -15,7 +15,7 @@ from enum import StrEnum
 from ..model import Direction, Head, Role, Scene, Shape, Tone
 from ..reader import Reader, SpecError, suggestion
 from ..spec import Spec, SpecEdge, SpecNode
-from ..theme import load_icons
+from ..theme import icon_names
 from . import flowchart
 
 SPEC_KEYS = {"type", "title", "desc", "direction", "states", "transitions"}
@@ -105,7 +105,7 @@ def to_spec(raw: object) -> Spec:
         raise SpecError(["the spec must be a JSON object"])
     read = Reader()
     read.check_keys(raw, SPEC_KEYS, "spec")
-    icons = set(load_icons())
+    icons = icon_names()
     items = raw.get("states", [])
     built = [
         _state(item, f"states[{i}]", read, icons)

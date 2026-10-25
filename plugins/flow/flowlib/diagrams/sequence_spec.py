@@ -24,7 +24,7 @@ from typing import Any
 
 from ..model import Side, Tone
 from ..reader import Reader, SpecError, suggestion
-from ..theme import load_icons, load_theme
+from ..theme import icon_names, load_theme
 
 SEQUENCE = "sequence"
 SPEC_KEYS = {"type", "title", "desc", "participants", "items"}
@@ -174,7 +174,7 @@ class _Parser:
         """Start with an empty reader and no participants known."""
         self._read = Reader()
         self._ids: list[str] = []
-        self._icon_names = load_icons().keys()
+        self._icon_names = icon_names()
         self._max_depth = load_theme().sequence.max_fragment_depth
 
     def spec(self, raw: object) -> SequenceSpec:

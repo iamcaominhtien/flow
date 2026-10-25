@@ -37,7 +37,7 @@ from .model import (
     Tone,
 )
 from .reader import POINT_LENGTH, Reader, is_number
-from .theme import load_icons
+from .theme import icon_names
 
 Built = TypeVar("Built")
 
@@ -215,7 +215,7 @@ class _SceneParser:
     def __init__(self) -> None:
         """Start with an empty reader."""
         self._read = Reader()
-        self._icon_names = load_icons().keys()
+        self._icon_names = icon_names()
 
     def scene(self, raw: object) -> Scene:
         """Build the scene, or raise if anything was wrong.

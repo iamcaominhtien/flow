@@ -20,7 +20,7 @@ from typing import Any
 from ..model import Direction, Head, Role, Row, Scene, Shape, Tone
 from ..reader import Reader, SpecError, suggestion
 from ..spec import Spec, SpecEdge, SpecNode
-from ..theme import load_icons
+from ..theme import icon_names
 from . import flowchart
 
 ER = "er"
@@ -165,7 +165,7 @@ def to_spec(raw: object) -> Spec:
         raise SpecError(["the spec must be a JSON object"])
     read = Reader()
     read.check_keys(raw, SPEC_KEYS, "spec")
-    icons = set(load_icons())
+    icons = icon_names()
     built = [
         _table(item, f"tables[{index}]", read, icons)
         for index, item in enumerate(raw.get("tables", []))

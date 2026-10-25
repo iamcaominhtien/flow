@@ -4,7 +4,7 @@ from .markup import esc, px, tag
 from .model import Node, Shape, Tone
 from .shapes import outline_svg
 from .text_area import text_area_width
-from .theme import ShapeColors, Theme, load_icons
+from .theme import ShapeColors, Theme, detailed_icon_svg, has_detailed_icon, icon_svg
 
 # Text inside a node
 LINE_HEIGHT_FACTOR = 1.25
@@ -67,12 +67,8 @@ def _icon_html(node: Node, stroke: str, band: float | None = None) -> str:
     top = ((band or node.height) - ICON_SIZE_PX) / 2
     if node.shape is Shape.DOCUMENT:
         top -= DOCUMENT_ICON_LIFT_PX
-    return (
-        f'<svg width="{ICON_SIZE_PX}" height="{ICON_SIZE_PX}" viewBox="0 0 24 24" '
-        f'style="position:absolute;left:{px(left)};top:{px(top)}" fill="none" '
-        f'stroke="{stroke}" stroke-width="{ICON_STROKE_WIDTH}" stroke-linecap="round" '
-        f'stroke-linejoin="round" aria-hidden="true">{load_icons()[node.icon]}</svg>'
-    )
+    place = f'style="position:absolute;left:{px(left)};top:{px(top)}"'
+    return icon_svg(node.icon, ICON_SIZE_PX, stroke, place)
 
 
 def _label_html(node: Node, theme: Theme) -> str:
@@ -237,13 +233,15 @@ def _card_html(node: Node, theme: Theme) -> str:
         "border-radius": "50%",
         "background": tone.pill,
     }
-    icon = (
-        f'<svg width="{icon_size}" height="{icon_size}" viewBox="0 0 24 24" '
-        f'style="position:absolute;left:{px(inset)};top:{px(inset)}" '
-        f'fill="none" stroke="{tone.stroke}" stroke-width="{ICON_STROKE_WIDTH}" '
-        f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-        f"{load_icons()[node.icon or '']}</svg>"
-    )
+    html = ""
+    if has_detailed_icon(node.icon or ""):
+        left = px((node.width - disc) / 2)
+        place = f'style="position:absolute;left:{left};top:{px(rules.card_padding)}"'
+        html = detailed_icon_svg(node.icon or "", disc, tone.stroke, place)
+    else:
+        place = f'style="position:absolute;left:{px(inset)};top:{px(inset)}"'
+        icon = icon_svg(node.icon or "", icon_size, tone.stroke, place)
+        html = tag("div", disc_style, icon)
     pill_top = rules.card_padding + disc + rules.card_gap
     pill_row = {
         **ABSOLUTE,
@@ -264,9 +262,7 @@ def _card_html(node: Node, theme: Theme) -> str:
         "color": theme.ink,
         "white-space": "nowrap",
     }
-    html = tag("div", disc_style, icon) + tag(
-        "div", pill_row, tag("span", pill, esc(" ".join(node.text)))
-    )
+    html += tag("div", pill_row, tag("span", pill, esc(" ".join(node.text))))
     if node.detail:
         detail = {
             **ABSOLUTE,

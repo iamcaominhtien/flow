@@ -19,7 +19,7 @@ from typing import Any
 from ..model import Direction, Head, Role, Row, Scene, Shape, Tone
 from ..reader import Reader, SpecError, suggestion
 from ..spec import Spec, SpecEdge, SpecNode, SpecZone
-from ..theme import load_icons
+from ..theme import icon_names
 from . import flowchart
 
 AT_LENGTH = 2
@@ -114,8 +114,8 @@ def _node(raw: object, where: str, context: _Context) -> SpecNode | None:
         return None
     read.check_keys(raw, NODE_KEYS | graph.extra_node_keys, where)
     icon, zone = raw.get("icon"), raw.get("zone")
-    if icon is not None and icon not in load_icons():
-        known = ", ".join(sorted(load_icons()))
+    if icon is not None and icon not in icon_names():
+        known = ", ".join(sorted(icon_names()))
         read.report(where, f"unknown icon '{icon}'; use one of: {known}")
     if zone is not None and zone not in zones:
         read.report(where, f"'zone' names '{zone}', which is not a zone{suggestion(zone, zones)}")

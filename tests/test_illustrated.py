@@ -65,13 +65,24 @@ def test_card_flag_survives_the_scene_file() -> None:
     assert [node.card for node in again.nodes] == [True] * 4
 
 
-def test_both_renderers_draw_the_pill_and_the_disc() -> None:
-    """HTML has a pill with the name; draw.io has a disc, an icon and a pill cell per card."""
+def test_both_renderers_draw_pills_and_use_the_detailed_icon_when_there_is_one() -> None:
+    """Every card has a pill; a card whose icon has a detailed drawing has no disc."""
     drawn = diagrams.layout(shop_raw())
-    assert "border-radius:50%" in render_html.render(drawn)
+    html = render_html.render(drawn)
+    assert "border-radius:50%" not in html
+    assert 'viewBox="0 0 64 64"' in html
     xml = render_drawio.render(drawn)
     assert xml.count('id="pill-') == 4
-    assert xml.count('id="disc-') == 4
+    assert xml.count('id="disc-') == 0
+
+
+def test_an_icon_without_a_detailed_drawing_gets_a_disc() -> None:
+    """The bike icon has no detailed twin, so its card keeps the tinted disc in both outputs."""
+    raw = shop_raw()
+    raw["components"][0]["icon"] = "bike"
+    drawn = diagrams.layout(raw)
+    assert "border-radius:50%" in render_html.render(drawn)
+    assert render_drawio.render(drawn).count('id="disc-') == 1
 
 
 def test_a_name_too_long_for_the_pill_is_flagged() -> None:
