@@ -336,7 +336,14 @@
     "table_row_gap": 24,
     "table_padding_x": 14,
     "table_bottom_pad": 8,
-    "table_extra_width": 100
+    "table_extra_width": 100,
+    "card_min_width": 180,
+    "card_padding": 16,
+    "card_disc": 64,
+    "card_gap": 10,
+    "card_pill_height": 26,
+    "card_pill_padding": 12,
+    "card_icon_fraction": 0.55
   },
   "sequence": {
     "participant_width": 135,

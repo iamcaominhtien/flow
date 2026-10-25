@@ -60,7 +60,7 @@ class GraphType:
     @property
     def spec_keys(self) -> set[str]:
         """Return the keys the top level of a spec may have."""
-        keys = {"type", "title", "desc", "direction", self.nodes_key, self.links_key}
+        keys = {"type", "title", "desc", "direction", "style", self.nodes_key, self.links_key}
         return keys | ({"zones"} if self.has_zones else set())
 
 
@@ -221,6 +221,7 @@ def to_spec(graph: GraphType, raw: object) -> Spec:
         for i, item in enumerate(_list(raw, graph.links_key))
     ]
     direction = read.enum(Direction, raw, "direction", "spec") or Direction.DOWN
+    illustrated = read.illustrated(raw, "spec")
     title, description = read.text(raw, "title", "spec"), read.text(raw, "desc", "spec")
     if read.problems:
         raise SpecError(read.problems)
@@ -232,6 +233,7 @@ def to_spec(graph: GraphType, raw: object) -> Spec:
         nodes=tuple(nodes.values()),
         edges=tuple(link for link in links if link is not None),
         zones=tuple(zones.values()),
+        illustrated=illustrated,
     )
 
 

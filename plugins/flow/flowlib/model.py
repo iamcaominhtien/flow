@@ -181,6 +181,7 @@ class Node:
     detail: tuple[str, ...] = ()
     caption: str | None = None
     sections: tuple[tuple[Row, ...], ...] = ()
+    card: bool = False  # drawn as an illustrated card: a large icon, a name pill, a detail line
 
 
 @dataclass(frozen=True)

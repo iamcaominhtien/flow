@@ -12,7 +12,7 @@ The JSON format of a flowchart::
 """
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +20,7 @@ from .model import Direction, Head, Role, Row, Shape, Side, Tone
 from .reader import Reader, SpecError, suggestion
 from .theme import load_icons
 
-SPEC_KEYS = {"type", "title", "desc", "direction", "lanes", "nodes", "edges"}
+SPEC_KEYS = {"type", "title", "desc", "direction", "lanes", "nodes", "edges", "style"}
 NODE_KEYS = {"id", "kind", "text", "icon", "tone", "number", "side", "lane"}
 LANE_KEYS = {"id", "label", "tone"}
 EDGE_KEYS = {"from", "to", "role", "label"}
@@ -53,6 +53,7 @@ class SpecNode:
     sections: tuple[tuple[Row, ...], ...] = ()
     at: tuple[int, int] | None = None  # (row, column) on an explicit grid
     zone: str | None = None
+    card: bool = False
 
 
 @dataclass(frozen=True)
@@ -91,6 +92,7 @@ class Spec:
     nodes: tuple[SpecNode, ...]
     edges: tuple[SpecEdge, ...]
     zones: tuple[SpecZone, ...] = ()
+    illustrated: bool = False
 
 
 def load(path: str | Path) -> Spec:
@@ -161,6 +163,7 @@ class _SpecParser:
             self._edge(item, f"edges[{i}]", node_ids) for i, item in enumerate(raw.get("edges", []))
         ]
         direction = read.enum(Direction, raw, "direction", "spec") or Direction.DOWN
+        illustrated = read.illustrated(raw, "spec")
         title, description = read.text(raw, "title", "spec"), read.text(raw, "desc", "spec")
         if read.problems:
             raise SpecError(read.problems)
@@ -171,6 +174,7 @@ class _SpecParser:
             lanes=tuple(lane for lane in lanes if lane is not None),
             nodes=tuple(node for node in nodes if node is not None),
             edges=tuple(edge for edge in edges if edge is not None),
+            illustrated=illustrated,
         )
 
     def _lane(self, raw: object, where: str) -> SpecLane | None:
@@ -241,3 +245,22 @@ class _SpecParser:
         hint = suggestion(name, node_ids)
         self._read.report(where, f"'{end}' names '{name}', which is not a node{hint}")
         return ""
+
+
+CARD_KINDS = (Shape.PROCESS, Shape.SUBPROCESS)  # outlines that become cards when they have an icon
+
+
+def with_cards(spec: Spec) -> Spec:
+    """Mark the nodes that an illustrated spec draws as cards: boxes that have an icon.
+
+    Args:
+        spec: A description that asked for the illustrated style.
+
+    Returns:
+        A copy in which each box with an icon has ``card`` set; the other nodes are unchanged.
+    """
+    nodes = tuple(
+        replace(node, card=True) if node.kind in CARD_KINDS and node.icon else node
+        for node in spec.nodes
+    )
+    return replace(spec, nodes=nodes)

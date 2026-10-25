@@ -19,7 +19,7 @@ from typing import Any
 from ..canvas import fit_canvas
 from ..model import DEFAULT_FONT_SIZE_PX, Edge, Frame, Head, Node, Role, Scene, Shape, Tone
 from ..reader import Reader, SpecError
-from ..sizing import FittedNode, NodeContent, fit_node
+from ..sizing import FittedNode, NodeContent, fit_card, fit_node
 from ..theme import LayoutRules, load_icons, load_theme
 
 KANBAN = "kanban"
@@ -37,7 +37,7 @@ COLUMN_KEYS = {"label", "tone", "cards"}
 LAYER_KEYS = {"label", "tone", "items"}
 SCREEN_KEYS = {"label", "elements"}
 ELEMENT_KEYS = {"kind", "label", "items"}
-SPEC_KEYS = {"type", "title", "desc", "columns", "layers", "screens", "flow"}
+SPEC_KEYS = {"type", "title", "desc", "columns", "layers", "screens", "flow", "style"}
 
 
 @dataclass
@@ -48,6 +48,7 @@ class _Card:
     detail: str
     icon: str | None
     tone: Tone | None
+    is_card: bool = False
 
 
 @dataclass
@@ -122,10 +123,11 @@ def _groups(raw: dict[str, Any], key: str, member_key: str, read: Reader) -> lis
 
 
 def _fit(card: _Card, rules: LayoutRules) -> FittedNode:
-    """Size a card to its text."""
-    return fit_node(
-        Shape.PROCESS, NodeContent(card.label, card.detail, card.icon is not None), rules
-    )
+    """Size a card to its text; an illustrated card has its own size."""
+    content = NodeContent(card.label, card.detail, card.icon is not None)
+    if card.is_card:
+        return fit_card(content, rules)
+    return fit_node(Shape.PROCESS, content, rules)
 
 
 def _node(name: str, shape: Shape, box: tuple[float, float, float, float], card: _Card) -> Node:
@@ -163,6 +165,7 @@ def _wrapped(card: _Card, size: FittedNode, name: str, box: tuple[float, float, 
         None,
         DEFAULT_FONT_SIZE_PX,
         detail=size.detail,
+        card=card.is_card,
     )
 
 
@@ -235,6 +238,14 @@ def _layers(
             )
         y += height + LAYER_GAP_PX
     return frames, nodes, edges
+
+
+def _illustrate(groups: list[_Group], illustrated: bool) -> list[_Group]:
+    """Mark the cards that have an icon as illustrated cards, when the spec asks for it."""
+    for group in groups:
+        for card in group.cards:
+            card.is_card = illustrated and card.icon is not None
+    return groups
 
 
 def _element_nodes(raw: object, where: str, read: Reader) -> list[tuple[str, str, list[str]]]:
@@ -321,15 +332,16 @@ def layout_board(kind: str, raw: object) -> Scene:
     read.check_keys(raw, SPEC_KEYS, "spec")
     rules = load_theme().layout
     title, description = read.text(raw, "title", "spec"), read.text(raw, "desc", "spec")
+    illustrated = read.illustrated(raw, "spec")
     top = rules.margin + (rules.title_block_height if title else 0)
     edges: list[Edge] = []
     if kind == WIREFRAME:
         frames, nodes = _wireframe(raw, rules, top, read)
     elif kind == KANBAN:
-        groups = _groups(raw, "columns", "cards", read)
+        groups = _illustrate(_groups(raw, "columns", "cards", read), illustrated)
         frames, nodes = _kanban(groups, rules, top) if not read.problems else ([], [])
     else:
-        groups = _groups(raw, "layers", "items", read)
+        groups = _illustrate(_groups(raw, "layers", "items", read), illustrated)
         ready = not read.problems and all(group.cards for group in groups)
         if not ready and not read.problems:
             read.report("spec", "every layer needs at least one item")

@@ -5,7 +5,7 @@ from dataclasses import dataclass, replace
 
 from .layered import Grid
 from .model import DEFAULT_FONT_SIZE_PX, Direction, Frame, Node, Point, Shape
-from .sizing import FittedNode, NodeContent, fit_node, fit_table
+from .sizing import FittedNode, NodeContent, fit_card, fit_node, fit_table
 from .spec import Spec, SpecEdge, SpecNode
 from .theme import LayoutRules
 from .zones import zone_frames
@@ -127,6 +127,8 @@ def rules_for(spec: Spec, rules: LayoutRules) -> LayoutRules:
 def fit_content(node: SpecNode, rules: LayoutRules) -> FittedNode:
     """Fit one node to its content: a table to its rows, any other shape to its text."""
     has_icon = node.icon is not None
+    if node.card:
+        return fit_card(NodeContent(node.text, node.detail, has_icon), rules)
     if node.kind is Shape.TABLE:
         return fit_table(node.text, node.sections, has_icon, rules)
     return fit_node(node.kind, NodeContent(node.text, node.detail, has_icon), rules)
@@ -210,6 +212,7 @@ def make_node(node: SpecNode, size: FittedNode, center: Point, width: float) -> 
         detail=size.detail,
         caption=node.caption,
         sections=node.sections,
+        card=node.card,
     )
 
 

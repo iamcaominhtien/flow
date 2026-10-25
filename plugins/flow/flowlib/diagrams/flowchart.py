@@ -22,6 +22,8 @@ def layout(spec: Spec) -> Scene:
         that holds them.
     """
     rules = load_theme().layout
+    if spec.illustrated:
+        spec = spec_io.with_cards(spec)
     grid = build_grid(spec)
     placement = place_nodes(spec, grid, rules)
     nodes = tuple(placement.nodes.values())

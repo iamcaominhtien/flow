@@ -22,7 +22,7 @@ from ..spec import Spec, SpecEdge, SpecNode, SpecZone
 from ..theme import load_icons
 from . import flowchart
 
-SPEC_KEYS = {"type", "title", "desc", "direction", "zones", "components", "links"}
+SPEC_KEYS = {"type", "title", "desc", "direction", "zones", "components", "links", "style"}
 ZONE_KEYS = {"id", "label", "tone", "parent"}
 COMPONENT_KEYS = {"id", "label", "kind", "detail", "icon", "tone", "zone", "at"}
 LINK_KEYS = {"from", "to", "label", "style", "main"}
@@ -191,6 +191,7 @@ def to_spec(raw: object) -> Spec:
         _link(item, f"links[{i}]", read, components) for i, item in enumerate(_list(raw, "links"))
     ]
     direction = read.enum(Direction, raw, "direction", "spec") or Direction.DOWN
+    illustrated = read.illustrated(raw, "spec")
     title, description = read.text(raw, "title", "spec"), read.text(raw, "desc", "spec")
     if read.problems:
         raise SpecError(read.problems)
@@ -202,6 +203,7 @@ def to_spec(raw: object) -> Spec:
         nodes=tuple(components.values()),
         edges=tuple(edge for edge in links if edge is not None),
         zones=tuple(zones.values()),
+        illustrated=illustrated,
     )
 
 

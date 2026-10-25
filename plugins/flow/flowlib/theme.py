@@ -102,6 +102,13 @@ class LayoutRules:
     chip_height: float
     chip_padding_x: float
     chip_char_width_em: float
+    card_min_width: float
+    card_padding: float
+    card_disc: float
+    card_gap: float
+    card_pill_height: float
+    card_pill_padding: float
+    card_icon_fraction: float
 
 
 @dataclass(frozen=True)

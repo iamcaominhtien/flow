@@ -224,7 +224,7 @@ Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build 
 | B | Spec, validator, layered layout, `flow.py build`, check; the `flowchart` skill; swimlanes, left to right, overrides, back-edge routing | Done |
 | C | draw.io renderer | Done; checked in the draw.io viewer, not in the editor |
 | D | Second family: sequence diagram | Done; the scene and renderers needed new frame, bar and symbol-head support but no rewrite |
-| E | Remaining types, family by family | Done in a simplified form: ER, architecture, cloud, C4, state, BPMN, use case, class, DFD, screen flow (all on the layered engine), org chart and mind map (tidy tree), Gantt and roadmap (timeline), Kanban, layers and wireframe (boards). Not built: the illustrated style and the concept explainer |
+| E | Remaining types, family by family | Done in a simplified form: ER, architecture, cloud, C4, state, BPMN, use case, class, DFD, screen flow (all on the layered engine), org chart and mind map (tidy tree), Gantt and roadmap (timeline), Kanban, layers and wireframe (boards). Not built: the detailed 64 px icons, per-type illustrated notation and the concept explainer. A first illustrated style exists: `style: illustrated` turns boxes with an icon into cards (see decision 11) |
 | F | Editing existing files, publishing | Import done (best effort). Editing in place and publishing to a directory: not done |
 
 Types that fit the layered engine are declared as data in `diagrams/catalog.py` (words, kinds and line styles) and read by `diagrams/graph.py`. Trees use `tidy.py`, because the layered engine merges the buses of different parents. Gantt and roadmap are in `diagrams/timeline.py`, and Kanban, layers and wireframe in `diagrams/boards.py`; both build the scene directly.
@@ -241,3 +241,4 @@ Types that fit the layered engine are declared as data in `diagrams/catalog.py` 
 8. **Marks keep their own size.** Start, end, connector and actor nodes are not stretched to the width of their column; a stretched circle would be an ellipse in draw.io.
 9. **Graph types are data.** A new type of the graph family is a `GraphType` value (words, kinds, line styles), not a new parser. Unknown kinds and styles are refused with the list of valid ones.
 10. **Dates are not read.** A timeline names its own periods (`W1`, `Q2`) and bars use whole periods.
+11. **Illustrated style is a spec switch, not a second renderer.** `style: illustrated` marks each box that has an icon as a `card` node; the sizing step gives it a card size and both renderers draw a disc, a pill and a detail line. It uses the 24 px icons enlarged, not the detailed 64 px set.

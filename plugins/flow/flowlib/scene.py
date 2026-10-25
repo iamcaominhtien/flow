@@ -45,7 +45,7 @@ SCENE_KEYS = {"size", "title", "desc", "frames", "nodes", "edges"}
 FRAME_KEYS = {"id", "x", "y", "width", "height", "label", "tone", "variant", "guard", "dividers"}
 DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
-NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections"}
+NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections", "card"}
 ROW_KEYS = {"left", "right"}
 EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label", "extras"}
 LABEL_KEYS = {"text", "at", "kind", "number"}
@@ -170,6 +170,8 @@ def _dump_node(node: Node) -> dict[str, Any]:
         written["detail"] = list(node.detail)
     if node.caption:
         written["caption"] = node.caption
+    if node.card:
+        written["card"] = True
     if node.sections:
         written["sections"] = [
             [{"left": row.left, "right": row.right} for row in section] for section in node.sections
@@ -340,6 +342,7 @@ class _SceneParser:
             detail=self._lines(raw.get("detail", []), where),
             caption=read.text(raw, "caption", where),
             sections=self._sections(raw.get("sections", []), where),
+            card=raw.get("card") is True,
         )
 
     def _sections(self, raw: object, where: str) -> tuple[tuple[Row, ...], ...]:

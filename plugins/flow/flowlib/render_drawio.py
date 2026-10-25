@@ -21,8 +21,9 @@ from .drawio_common import (
 )
 from .drawio_lines import add_divider, add_edge
 from .markup import esc, fmt
-from .model import Frame, FrameVariant, Node, Scene, Shape
+from .model import Frame, FrameVariant, Node, Scene, Shape, Tone
 from .shapes import BOX_CORNER_RADIUS_PX, STROKE_WIDTH_PX, SUBPROCESS_BAR_INSET_PX
+from .sizing import estimate_text_width
 from .text_area import ICON_TEXT_RESERVE_PX
 from .theme import Theme, load_icons, load_theme
 
@@ -246,9 +247,22 @@ def _node_style(node: Node, theme: Theme) -> str:
                 "spacingLeft": TABLE_TEXT_INSET_PX + icon_room,
             }
         )
-    if node.icon and node.shape is not Shape.TABLE:
+    if node.card:
+        style.update(_card_text_style(node, theme))
+    elif node.icon and node.shape is not Shape.TABLE:
         style["spacingLeft"] = ICON_TEXT_RESERVE_PX
     return style_string(style)
+
+
+def _card_text_style(node: Node, theme: Theme) -> dict[str, object]:
+    """Style pairs that put the detail text at the bottom of an illustrated card."""
+    return {
+        "verticalAlign": "bottom",
+        "spacingBottom": theme.layout.card_padding / 2,
+        "fontStyle": 0,
+        "fontSize": theme.layout.detail_font_size,
+        "fontColor": theme.slate,
+    }
 
 
 def _label_value(lines: tuple[str, ...]) -> str:
@@ -260,6 +274,8 @@ def _node_value(node: Node, theme: Theme) -> str:
     """Return the label of a node: its caption, or its title followed by its detail lines."""
     if node.caption:
         return esc(node.caption)
+    if node.card:
+        return _label_value(node.detail)
     title = _label_value(node.text)
     if not node.detail:
         return title
@@ -286,7 +302,9 @@ def _add_node(root: ET.Element, node: Node, theme: Theme) -> None:
     add_geometry(cell, (node.x, node.y, node.width, node.height))
     if node.shape is Shape.TABLE:
         _add_table_rows(root, node, theme)
-    if node.icon:
+    if node.card:
+        _add_card_parts(root, node, theme)
+    elif node.icon:
         icon_style = style_string(
             {"shape": "image", "image": _icon_data_uri(node.icon, theme.shapes[node.shape].stroke)}
         )
@@ -297,6 +315,49 @@ def _add_node(root: ET.Element, node: Node, theme: Theme) -> None:
         add_geometry(icon, (ICON_LEFT_PX, icon_top, ICON_SIZE_PX, ICON_SIZE_PX))
     if node.number:
         _add_badge(root, node, theme)
+
+
+def _add_card_parts(root: ET.Element, node: Node, theme: Theme) -> None:
+    """Add the icon disc, the icon and the name pill of an illustrated card as child cells."""
+    rules = theme.layout
+    tone = theme.tones[node.tone or Tone.BLUE]
+    parent = f"node-{node.id}"
+    disc_left = (node.width - rules.card_disc) / 2
+    disc = add_vertex(
+        root,
+        f"disc-{node.id}",
+        "",
+        style_string({"ellipse": "", "strokeColor": "none", "fillColor": tone.pill}),
+    )
+    disc.set("parent", parent)
+    add_geometry(disc, (disc_left, rules.card_padding, rules.card_disc, rules.card_disc))
+    size = rules.card_disc * rules.card_icon_fraction
+    inset = (rules.card_disc - size) / 2
+    image = style_string({"shape": "image", "image": _icon_data_uri(node.icon or "", tone.stroke)})
+    icon = add_vertex(root, f"icon-{node.id}", "", image)
+    icon.set("parent", parent)
+    add_geometry(icon, (disc_left + inset, rules.card_padding + inset, size, size))
+    pill_width = (
+        estimate_text_width(" ".join(node.text), rules, node.font_size)
+        + 2 * rules.card_pill_padding
+    )
+    pill_style = style_string(
+        {
+            "rounded": 1,
+            "arcSize": PILL_ARC_PERCENT,
+            "html": 1,
+            "strokeColor": "none",
+            "fillColor": tone.pill,
+            "fontColor": theme.ink,
+            "fontSize": fmt(node.font_size),
+            "fontStyle": FONT_BOLD,
+            "fontFamily": theme.fonts.sans,
+        }
+    )
+    pill = add_vertex(root, f"pill-{node.id}", esc(" ".join(node.text)), pill_style)
+    pill.set("parent", parent)
+    top = rules.card_padding + rules.card_disc + rules.card_gap
+    add_geometry(pill, ((node.width - pill_width) / 2, top, pill_width, rules.card_pill_height))
 
 
 def _row_value(left: str, right: str) -> str:

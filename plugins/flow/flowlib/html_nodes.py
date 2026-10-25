@@ -221,6 +221,67 @@ def _caption_html(node: Node, theme: Theme) -> str:
     return tag("div", style, esc(node.caption))
 
 
+def _card_html(node: Node, theme: Theme) -> str:
+    """Draw the inside of an illustrated card: icon disc, name pill and detail text."""
+    rules = theme.layout
+    tone = theme.tones[node.tone or Tone.BLUE]
+    disc = rules.card_disc
+    icon_size = disc * rules.card_icon_fraction
+    inset = (disc - icon_size) / 2
+    disc_style = {
+        **ABSOLUTE,
+        "left": px((node.width - disc) / 2),
+        "top": px(rules.card_padding),
+        "width": px(disc),
+        "height": px(disc),
+        "border-radius": "50%",
+        "background": tone.pill,
+    }
+    icon = (
+        f'<svg width="{icon_size}" height="{icon_size}" viewBox="0 0 24 24" '
+        f'style="position:absolute;left:{px(inset)};top:{px(inset)}" '
+        f'fill="none" stroke="{tone.stroke}" stroke-width="{ICON_STROKE_WIDTH}" '
+        f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+        f"{load_icons()[node.icon or '']}</svg>"
+    )
+    pill_top = rules.card_padding + disc + rules.card_gap
+    pill_row = {
+        **ABSOLUTE,
+        "left": px(rules.card_padding),
+        "top": px(pill_top),
+        "width": px(node.width - 2 * rules.card_padding),
+        "height": px(rules.card_pill_height),
+        "display": "flex",
+        "justify-content": "center",
+    }
+    pill = {
+        "padding": f"0 {px(rules.card_pill_padding)}",
+        "border-radius": px(PILL_RADIUS_PX),
+        "background": tone.pill,
+        "font-size": px(node.font_size),
+        "font-weight": str(NODE_TEXT_WEIGHT),
+        "line-height": px(rules.card_pill_height),
+        "color": theme.ink,
+        "white-space": "nowrap",
+    }
+    html = tag("div", disc_style, icon) + tag(
+        "div", pill_row, tag("span", pill, esc(" ".join(node.text)))
+    )
+    if node.detail:
+        detail = {
+            **ABSOLUTE,
+            "left": px(rules.card_padding),
+            "top": px(pill_top + rules.card_pill_height + rules.card_gap),
+            "width": px(node.width - 2 * rules.card_padding),
+            "text-align": "center",
+            "font-size": px(rules.detail_font_size),
+            "line-height": px(rules.detail_line_height),
+            "color": theme.slate,
+        }
+        html += tag("div", detail, "<br>".join(esc(line) for line in node.detail))
+    return html
+
+
 def node_html(node: Node, theme: Theme) -> str:
     """Draw one node: its outline, icon and text, its badge and its caption.
 
@@ -235,7 +296,9 @@ def node_html(node: Node, theme: Theme) -> str:
     if node.tone is not None and node.shape is not Shape.TABLE:
         colors = ShapeColors(fill=theme.tones[node.tone].box, stroke=colors.stroke)
     inside = outline_svg(node.shape, node.width, node.height, colors)
-    if node.shape is Shape.TABLE:
+    if node.card:
+        inside += _card_html(node, theme)
+    elif node.shape is Shape.TABLE:
         inside += _table_html(node, theme)
         inside += _icon_html(node, colors.stroke, _header_height(theme))
     else:

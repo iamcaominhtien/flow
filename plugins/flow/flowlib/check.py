@@ -201,6 +201,8 @@ def check_text_fit(scene: Scene, rules: LayoutRules) -> list[Finding]:
         if not node.text:
             continue
         room = text_area_width(node.shape, node.width, node.icon is not None)
+        if node.card:
+            room = node.width - 2 * (rules.card_padding + rules.card_pill_padding)
         widest = max(
             (estimate_text_width(line, rules, node.font_size) for line in node.text), default=0
         )

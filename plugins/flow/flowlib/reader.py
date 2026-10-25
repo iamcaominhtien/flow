@@ -11,6 +11,9 @@ Member = TypeVar("Member", bound=StrEnum)
 
 POINT_LENGTH = 2
 
+PLAIN_STYLE = "plain"
+ILLUSTRATED_STYLE = "illustrated"
+
 
 class SpecError(ValueError):
     """A spec is not valid. The message lists every problem found, one per line."""
@@ -134,6 +137,21 @@ class Reader:
             allowed = ", ".join(member.value for member in enum_type)
             self.report(where, f"unknown {key} '{raw[key]}'; use one of: {allowed}")
             return None
+
+    def illustrated(self, raw: dict[str, Any], where: str) -> bool:
+        """Read the ``style`` field of a spec: ``plain`` (the default) or ``illustrated``.
+
+        Args:
+            raw: The object that holds the field.
+            where: Where the object is, for the message.
+
+        Returns:
+            True for ``illustrated``.
+        """
+        value = raw.get("style", PLAIN_STYLE)
+        if value not in (PLAIN_STYLE, ILLUSTRATED_STYLE):
+            self.report(where, f"unknown style '{value}'; use plain or illustrated")
+        return value == ILLUSTRATED_STYLE
 
     def point(self, raw: object, where: str) -> Point | None:
         """Read an ``[x, y]`` pair, or report a problem."""

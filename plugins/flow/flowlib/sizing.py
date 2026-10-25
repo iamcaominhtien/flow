@@ -106,6 +106,32 @@ def fit_node(shape: Shape, content: NodeContent, rules: LayoutRules) -> FittedNo
     return FittedNode(width, max(min_height, needed), tuple(lines), tuple(detail_lines))
 
 
+def fit_card(content: NodeContent, rules: LayoutRules) -> FittedNode:
+    """Size an illustrated card: an icon disc on top, a name pill under it, then a detail text.
+
+    The name stays on one line, inside the pill; the card widens to hold it, up to the maximum
+    node width. A longer name is flagged by the text-fit check.
+
+    Args:
+        content: The name, the optional detail text and whether there is an icon.
+        rules: The layout rules.
+
+    Returns:
+        The width, the height, the name as one line and the wrapped detail lines.
+    """
+    pill = estimate_text_width(content.title, rules, DEFAULT_FONT_SIZE_PX)
+    pill += 2 * rules.card_pill_padding
+    width = min(max(rules.card_min_width, pill + 2 * rules.card_padding), rules.max_node_width)
+    room = width - 2 * rules.card_padding
+    detail = (
+        wrap_text(content.detail, rules, room, rules.detail_font_size) if content.detail else []
+    )
+    height = 2 * rules.card_padding + rules.card_disc + rules.card_gap + rules.card_pill_height
+    if detail:
+        height += rules.card_gap + len(detail) * rules.detail_line_height
+    return FittedNode(width, height, (content.title,), tuple(detail))
+
+
 def fit_table(
     title: str, sections: tuple[tuple[Row, ...], ...], has_icon: bool, rules: LayoutRules
 ) -> FittedNode:
