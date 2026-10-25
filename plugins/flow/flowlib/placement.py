@@ -10,6 +10,9 @@ from .spec import Spec, SpecEdge, SpecNode
 from .theme import LayoutRules
 from .zones import zone_frames
 
+# Marks keep their own size: stretching a circle to the width of its column would make an ellipse.
+FIXED_WIDTH_SHAPES = {Shape.START, Shape.END, Shape.INTERMEDIATE, Shape.CONNECTOR, Shape.ACTOR}
+
 
 @dataclass(frozen=True)
 class Placement:
@@ -183,6 +186,13 @@ def _origin(spec: Spec, rules: LayoutRules) -> tuple[float, float]:
     ) + lane_room
 
 
+def _node_width(node: SpecNode, size: FittedNode, column_width: float, spec: Spec) -> float:
+    """Return the drawn width: the column's, except for a mark or in a swimlane chart."""
+    if spec.lanes or node.kind in FIXED_WIDTH_SHAPES:
+        return size.width
+    return column_width
+
+
 def _make_node(node: SpecNode, size: FittedNode, center: Point, width: float) -> Node:
     """Build a scene node from its spec, its fitted size and the centre it is placed at."""
     return Node(
@@ -239,7 +249,7 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
             node,
             fitted[node.id],
             (center_x[grid.column[node.id]], center_y[grid.rank[node.id]]),
-            fitted[node.id].width if spec.lanes else widths[grid.column[node.id]],
+            _node_width(node, fitted[node.id], widths[grid.column[node.id]], spec),
         )
         for node in spec.nodes
     }

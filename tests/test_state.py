@@ -55,3 +55,10 @@ def test_unknown_state_is_rejected_with_a_suggestion() -> None:
     raw["transitions"][1]["to"] = "pad"
     with pytest.raises(SpecError, match="paid"):
         diagrams.layout(raw)
+
+
+def test_start_and_end_marks_keep_their_own_size() -> None:
+    """A mark is not widened to its column; a stretched circle would be an ellipse in draw.io."""
+    nodes = {node.id: node for node in diagrams.layout(order_raw()).nodes}
+    for name in ("begin", "done"):
+        assert nodes[name].width == nodes[name].height
