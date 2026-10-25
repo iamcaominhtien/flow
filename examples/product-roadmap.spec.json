@@ -1,0 +1,15 @@
+{
+  "type": "roadmap",
+  "title": "Roadmap: 2026",
+  "desc": "What each team plans to ship in each quarter.",
+  "periods": ["Q1", "Q2", "Q3", "Q4"],
+  "lanes": [
+    {"label": "Product", "tone": "blue", "items": [
+      {"label": "Onboarding", "start": 0, "length": 1},
+      {"label": "Search", "start": 1, "length": 2},
+      {"label": "Mobile app", "start": 2, "length": 2}]},
+    {"label": "Platform", "tone": "violet", "items": [
+      {"label": "Move to the new database", "start": 0, "length": 2},
+      {"label": "Faster builds", "start": 2, "length": 1}]}
+  ]
+}
