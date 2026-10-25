@@ -29,10 +29,11 @@ class ShapeColors:
 
 @dataclass(frozen=True)
 class ToneColors:
-    """The box tint and the darker pill tint of a tone."""
+    """The box tint, the darker pill tint, and the outline colour of a tone."""
 
     box: str
     pill: str
+    stroke: str
 
 
 @dataclass(frozen=True)

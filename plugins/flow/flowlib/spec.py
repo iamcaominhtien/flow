@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from .model import Direction, Role, Shape, Side, Tone
-from .reader import Reader
+from .reader import Reader, SpecError
 from .theme import load_icons
 
 SPEC_KEYS = {"type", "title", "desc", "direction", "lanes", "nodes", "edges"}
@@ -27,19 +27,6 @@ LANE_KEYS = {"id", "label", "tone"}
 EDGE_KEYS = {"from", "to", "role", "label"}
 FLOWCHART = "flowchart"
 MAX_SUGGESTIONS = 1
-
-
-class SpecError(ValueError):
-    """The spec is not valid. The message lists every problem found, one per line."""
-
-    def __init__(self, problems: list[str]) -> None:
-        """Keep the problems and join them into the message.
-
-        Args:
-            problems: One sentence per problem, each starting with where it was found.
-        """
-        self.problems = problems
-        super().__init__("\n".join(problems))
 
 
 @dataclass(frozen=True)

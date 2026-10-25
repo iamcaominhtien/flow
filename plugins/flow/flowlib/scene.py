@@ -3,11 +3,12 @@
 The JSON format::
 
     {"size": [width, height], "title": "...", "desc": "...",
-     "frames": [{"id", "x", "y", "width", "height", "label", "tone"}],
+     "frames": [{"id", "x", "y", "width", "height", "label", "tone", "variant", "guard",
+                 "dividers": [{"y", "guard"}]}],
      "nodes":  [{"id", "shape", "x", "y", "width", "height", "text", "icon", "tone",
                  "number", "font_size"}],
-     "edges":  [{"id", "from", "to", "role", "points": [[x, y], ...], "arrow",
-                 "label": {"text", "at": [x, y], "kind"}}]}
+     "edges":  [{"id", "from", "to", "role", "points": [[x, y], ...], "head", "tail", "dashed",
+                 "label": {"text", "at": [x, y], "kind", "number"}}]}
 """
 
 import json
@@ -18,10 +19,12 @@ from typing import Any, TypeVar
 
 from .model import (
     DEFAULT_FONT_SIZE_PX,
-    ArrowEnd,
+    Divider,
     Edge,
     EdgeLabel,
     Frame,
+    FrameVariant,
+    Head,
     LabelKind,
     Node,
     Point,
@@ -36,11 +39,12 @@ from .theme import load_icons
 Built = TypeVar("Built")
 
 SCENE_KEYS = {"size", "title", "desc", "frames", "nodes", "edges"}
-FRAME_KEYS = {"id", "x", "y", "width", "height", "label", "tone"}
+FRAME_KEYS = {"id", "x", "y", "width", "height", "label", "tone", "variant", "guard", "dividers"}
+DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
 NODE_KEYS |= {"number", "font_size"}
-EDGE_KEYS = {"id", "from", "to", "role", "points", "arrow", "label"}
-LABEL_KEYS = {"text", "at", "kind"}
+EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label"}
+LABEL_KEYS = {"text", "at", "kind", "number"}
 MIN_ROUTE_POINTS = 2
 
 
@@ -121,7 +125,7 @@ def dumps(scene: Scene, indent: int | None = None) -> str:
 
 def _dump_frame(frame: Frame) -> dict[str, Any]:
     """Write one frame in the JSON format."""
-    return {
+    written: dict[str, Any] = {
         "id": frame.id,
         "x": frame.x,
         "y": frame.y,
@@ -129,7 +133,15 @@ def _dump_frame(frame: Frame) -> dict[str, Any]:
         "height": frame.height,
         "label": frame.label,
         "tone": frame.tone.value,
+        "variant": frame.variant.value,
     }
+    if frame.guard:
+        written["guard"] = frame.guard
+    if frame.dividers:
+        written["dividers"] = [
+            {"y": divider.y, "guard": divider.guard} for divider in frame.dividers
+        ]
+    return written
 
 
 def _dump_node(node: Node) -> dict[str, Any]:
@@ -159,7 +171,9 @@ def _dump_edge(edge: Edge) -> dict[str, Any]:
         "id": edge.id,
         "role": edge.role.value,
         "points": [list(point) for point in edge.points],
-        "arrow": edge.arrow.value,
+        "head": edge.head.value,
+        "tail": edge.tail.value,
+        "dashed": edge.dashed,
     }
     if edge.source:
         written["from"] = edge.source
@@ -171,6 +185,8 @@ def _dump_edge(edge: Edge) -> dict[str, Any]:
             "at": list(edge.label.at),
             "kind": edge.label.kind.value,
         }
+        if edge.label.number:
+            written["label"]["number"] = edge.label.number
     return written
 
 
@@ -260,7 +276,30 @@ class _SceneParser:
             height=read.extent(raw, "height", where),
             label=read.text(raw, "label", where),
             tone=read.enum(Tone, raw, "tone", where) or Tone.GRAY,
+            variant=read.enum(FrameVariant, raw, "variant", where) or FrameVariant.AREA,
+            guard=read.text(raw, "guard", where),
+            dividers=self._dividers(raw.get("dividers", []), where),
         )
+
+    def _dividers(self, raw: object, where: str) -> tuple[Divider, ...]:
+        """Read the dividers of a fragment frame."""
+        if not isinstance(raw, list):
+            self._read.report(where, "'dividers' must be a list")
+            return ()
+        found = []
+        for index, item in enumerate(raw):
+            place = f"{where}.dividers[{index}]"
+            if not isinstance(item, dict):
+                self._read.report(place, "must be an object")
+                continue
+            self._read.check_keys(item, DIVIDER_KEYS, place)
+            found.append(
+                Divider(
+                    y=self._read.number(item, "y", place),
+                    guard=self._read.text(item, "guard", place) or "",
+                )
+            )
+        return tuple(found)
 
     def _node(self, raw: dict[str, Any], where: str) -> Node:
         """Build one node."""
@@ -319,10 +358,12 @@ class _SceneParser:
             id=read.identifier(raw, where),
             role=read.enum(Role, raw, "role", where) or Role.NEXT,
             points=self._route(raw.get("points"), where),
-            arrow=read.enum(ArrowEnd, raw, "arrow", where) or ArrowEnd.END,
             label=self._label(raw.get("label"), where),
             source=raw.get("from"),
             target=raw.get("to"),
+            head=read.enum(Head, raw, "head", where) or Head.FILLED,
+            tail=read.enum(Head, raw, "tail", where) or Head.NONE,
+            dashed=raw.get("dashed", False) is True,
         )
 
     def _route(self, raw: object, where: str) -> tuple[Point, ...]:
@@ -344,4 +385,5 @@ class _SceneParser:
         self._read.check_keys(raw, LABEL_KEYS, where)
         at = self._read.point(raw.get("at"), f"{where}.at")
         kind = self._read.enum(LabelKind, raw, "kind", where) or LabelKind.PLAIN
-        return EdgeLabel(text=raw["text"], at=at, kind=kind) if at else None
+        number = self._read.text(raw, "number", where)
+        return EdgeLabel(text=raw["text"], at=at, kind=kind, number=number) if at else None

@@ -1,9 +1,8 @@
 """Render a scene as one self-contained HTML file: boxes, inline SVG and CSS animation."""
 
-import math
-
+from .html_lines import lines_layer
 from .markup import esc, fmt, px, tag
-from .model import ArrowEnd, Edge, EdgeLabel, Frame, Node, Point, Scene, Shape
+from .model import Divider, EdgeLabel, Frame, FrameVariant, Node, Role, Scene, Shape
 from .shapes import outline_svg
 from .text_area import text_area_width
 from .theme import ShapeColors, Theme, load_icons, load_theme
@@ -16,6 +15,7 @@ FONTS_URL = (
 # Text inside a node
 LINE_HEIGHT_FACTOR = 1.25
 NODE_TEXT_WEIGHT = 600
+NOTE_TEXT_WEIGHT = 400
 DOCUMENT_LABEL_TRIM_PX = 6  # the wavy bottom of a document leaves less room for text
 DOCUMENT_ICON_LIFT_PX = 3
 
@@ -48,7 +48,19 @@ PILL_PADDING_X_PX = 12
 PILL_FONT_SIZE_PX = 12
 PILL_RADIUS_PX = 999
 
+# Fragment frame
+FRAGMENT_RADIUS_PX = 8
+FRAGMENT_TAG_HEIGHT_PX = 18
+FRAGMENT_TAG_PADDING_X_PX = 10
+FRAGMENT_TAG_RADIUS_PX = 8
+FRAGMENT_FONT_SIZE_PX = 11
+FRAGMENT_GAP_PX = 8
+FRAGMENT_GUARD_INSET_PX = 10
+FRAGMENT_GUARD_DROP_PX = 2
+
 # Label chip on a line
+NUMBER_SIZE_PX = 16
+NUMBER_GAP_PX = 6
 CHIP_PADDING = "2px 8px"
 CHIP_FONT_SIZE_PX = 11
 CHIP_LINE_HEIGHT_PX = 16
@@ -91,6 +103,7 @@ def _label_html(node: Node, theme: Theme) -> str:
     width = text_area_width(node.shape, node.width, has_icon)
     shift = ICON_TEXT_SHIFT_PX if has_icon else 0.0
     height = node.height - (DOCUMENT_LABEL_TRIM_PX if node.shape is Shape.DOCUMENT else 0)
+    is_note = node.shape is Shape.NOTE
     style = {
         **ABSOLUTE,
         "left": px((node.width - width) / 2 + shift),
@@ -99,12 +112,12 @@ def _label_html(node: Node, theme: Theme) -> str:
         "height": px(height),
         "display": "flex",
         "align-items": "center",
-        "justify-content": "center",
-        "text-align": "center",
+        "justify-content": "flex-start" if is_note else "center",
+        "text-align": "left" if is_note else "center",
         "font-size": px(node.font_size),
         "line-height": px(int(node.font_size * LINE_HEIGHT_FACTOR)),
-        "font-weight": str(NODE_TEXT_WEIGHT),
-        "color": theme.ink,
+        "font-weight": str(NOTE_TEXT_WEIGHT if is_note else NODE_TEXT_WEIGHT),
+        "color": theme.slate if is_note else theme.ink,
     }
     return tag("div", style, "<br>".join(esc(line) for line in node.text))
 
@@ -152,7 +165,9 @@ def _node_html(node: Node, theme: Theme) -> str:
 
 
 def _frame_html(frame: Frame, theme: Theme) -> str:
-    """Draw one frame and its label pill."""
+    """Draw one frame: a tinted area with a label pill, or a fragment with a tag and a guard."""
+    if frame.variant is FrameVariant.FRAGMENT:
+        return _fragment_html(frame, theme)
     tone = theme.tones[frame.tone]
     area = {
         **ABSOLUTE,
@@ -186,60 +201,95 @@ def _frame_html(frame: Frame, theme: Theme) -> str:
     return html
 
 
-def _pull_back(points: tuple[Point, ...], gap: float) -> list[Point]:
-    """Shorten the last segment so the arrowhead tip touches the box it points at.
-
-    Args:
-        points: The route of a line, at least two points.
-        gap: How far to pull the end back, in pixels.
-
-    Returns:
-        A new list of points. The route is returned as it is when its last segment is not
-        longer than ``gap``.
-    """
-    (start_x, start_y), (end_x, end_y) = points[-2], points[-1]
-    length = math.hypot(end_x - start_x, end_y - start_y)
-    if length <= gap:
-        return list(points)
-    kept = (length - gap) / length
-    pulled_back = (start_x + (end_x - start_x) * kept, start_y + (end_y - start_y) * kept)
-    return [*points[:-1], pulled_back]
+def _mono_font(theme: Theme) -> str:
+    """Return the CSS ``font`` shorthand for guard text: small monospace on a tag-high line."""
+    return (
+        f"{px(FRAGMENT_FONT_SIZE_PX)}/{px(FRAGMENT_TAG_HEIGHT_PX)} '{theme.fonts.mono}',monospace"
+    )
 
 
-def _edge_html(edge: Edge, theme: Theme) -> str:
-    """Draw one line as an SVG path, with its dash, animation class and arrowhead."""
-    line = theme.roles[edge.role]
-    has_arrow = edge.arrow is ArrowEnd.END
-    route = _pull_back(edge.points, line.gap) if has_arrow else list(edge.points)
-    attributes = {
-        "d": "M " + " L ".join(f"{fmt(x)} {fmt(y)}" for x, y in route),
-        "stroke": line.color,
-        "stroke-width": fmt(line.width),
-        "fill": "none",
-        "stroke-linejoin": "round",
+def _fragment_html(frame: Frame, theme: Theme) -> str:
+    """Draw a fragment frame: a bordered area, a tag tab, the guard, and the dividers."""
+    tone = theme.tones[frame.tone]
+    area = {
+        **ABSOLUTE,
+        "left": px(frame.x),
+        "top": px(frame.y),
+        "width": px(frame.width),
+        "height": px(frame.height),
+        "box-sizing": "border-box",
+        "background": tone.box,
+        "border": f"{px(FRAME_BORDER_PX)} solid {tone.stroke}",
+        "border-radius": px(FRAGMENT_RADIUS_PX),
     }
-    if line.dash:
-        attributes["stroke-dasharray"] = line.dash
-    if line.animation:
-        attributes["class"] = line.animation.value
-    if has_arrow:
-        attributes["marker-end"] = f"url(#head-{edge.role.value})"
-    text = " ".join(f'{name}="{esc(value)}"' for name, value in attributes.items())
-    return f'<path data-id="{esc(edge.id)}" {text}/>'
+    html = tag("div", area, data_id=frame.id)
+    tab = {
+        "padding": f"0 {px(FRAGMENT_TAG_PADDING_X_PX)}",
+        "height": px(FRAGMENT_TAG_HEIGHT_PX),
+        "line-height": px(FRAGMENT_TAG_HEIGHT_PX),
+        "background": "#FFFFFF",
+        "border": f"1px solid {tone.stroke}",
+        "border-top": "none",
+        "border-left": "none",
+        "border-radius": f"0 0 {px(FRAGMENT_TAG_RADIUS_PX)} 0",
+        "font-size": px(FRAGMENT_FONT_SIZE_PX),
+        "font-weight": "700",
+        "color": theme.ink,
+    }
+    guard = {
+        "font": _mono_font(theme),
+        "color": theme.slate,
+    }
+    head = {
+        **ABSOLUTE,
+        "left": px(frame.x),
+        "top": px(frame.y),
+        "display": "flex",
+        "gap": px(FRAGMENT_GAP_PX),
+    }
+    inner = tag("div", tab, esc(frame.label or ""))
+    if frame.guard:
+        inner += tag("div", guard, esc(f"[{frame.guard}]"))
+    html += tag("div", head, inner)
+    for divider in frame.dividers:
+        html += _divider_html(frame, divider, theme)
+    return html
 
 
-def _arrowheads(theme: Theme) -> str:
-    """Return the SVG ``defs`` with one arrowhead marker per line role."""
-    markers = []
-    for role, line in theme.roles.items():
-        size, middle = line.head_size, line.head_size / 2
-        markers.append(
-            f'<marker id="head-{role.value}" orient="auto" markerWidth="{fmt(size)}" '
-            f'markerHeight="{fmt(size)}" refX="{fmt(middle)}" refY="{fmt(middle)}" '
-            f'overflow="visible"><path d="M0 0 L{fmt(size)} {fmt(middle)} L0 {fmt(size)} Z" '
-            f'fill="{line.color}" stroke="none"/></marker>'
-        )
-    return "<defs>" + "".join(markers) + "</defs>"
+def _divider_html(frame: Frame, divider: Divider, theme: Theme) -> str:
+    """Draw a dashed line across a fragment, with the guard of the part below it."""
+    line = {
+        **ABSOLUTE,
+        "left": px(frame.x),
+        "top": px(divider.y),
+        "width": px(frame.width),
+        "border-top": f"1px dashed {theme.tones[frame.tone].stroke}",
+    }
+    text = {
+        **ABSOLUTE,
+        "left": px(frame.x + FRAGMENT_GUARD_INSET_PX),
+        "top": px(divider.y + FRAGMENT_GUARD_DROP_PX),
+        "font": _mono_font(theme),
+        "color": theme.slate,
+    }
+    return tag("div", line) + tag("div", text, esc(f"[{divider.guard}]"))
+
+
+def _number_html(number: str, theme: Theme) -> str:
+    """Draw the small dark circle that holds a step number inside a label."""
+    style = {
+        "display": "inline-block",
+        "min-width": px(NUMBER_SIZE_PX),
+        "height": px(NUMBER_SIZE_PX),
+        "margin-right": px(NUMBER_GAP_PX),
+        "border-radius": px(PILL_RADIUS_PX),
+        "background": theme.badge.background,
+        "color": theme.badge.foreground,
+        "font": f"700 10px/{px(NUMBER_SIZE_PX)} '{theme.fonts.mono}',monospace",
+        "text-align": "center",
+        "vertical-align": "middle",
+    }
+    return tag("span", style, esc(number))
 
 
 def _label_chip_html(label: EdgeLabel, theme: Theme) -> str:
@@ -259,7 +309,8 @@ def _label_chip_html(label: EdgeLabel, theme: Theme) -> str:
         "line-height": px(CHIP_LINE_HEIGHT_PX),
         "white-space": "nowrap",
     }
-    return tag("div", style, esc(label.text))
+    number = _number_html(label.number, theme) if label.number else ""
+    return tag("div", style, number + esc(label.text))
 
 
 def _title_html(scene: Scene, theme: Theme) -> str:
@@ -303,17 +354,6 @@ def _stylesheet(theme: Theme) -> str:
     return "\n".join(rules)
 
 
-def _lines_html(scene: Scene, theme: Theme) -> str:
-    """Draw all lines in one SVG layer that covers the whole scene."""
-    width, height = fmt(scene.width), fmt(scene.height)
-    paths = "".join(_edge_html(edge, theme) for edge in scene.edges)
-    return (
-        f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
-        'style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true">'
-        f"{_arrowheads(theme)}{paths}</svg>"
-    )
-
-
 def render(scene: Scene) -> str:
     """Return the HTML text of a scene.
 
@@ -324,9 +364,13 @@ def render(scene: Scene) -> str:
         A complete HTML document with no script and no file besides the web fonts.
     """
     theme = load_theme()
+    size = (scene.width, scene.height)
+    underlay = tuple(edge for edge in scene.edges if edge.role is Role.LIFELINE)
+    overlay = tuple(edge for edge in scene.edges if edge.role is not Role.LIFELINE)
     layers = [_frame_html(frame, theme) for frame in scene.frames]
+    layers.append(lines_layer(underlay, theme, size))
     layers += [_node_html(node, theme) for node in scene.nodes]
-    layers.append(_lines_html(scene, theme))
+    layers.append(lines_layer(overlay, theme, size))
     layers += [_label_chip_html(edge.label, theme) for edge in scene.edges if edge.label]
     layers.append(_title_html(scene, theme))
     canvas = {

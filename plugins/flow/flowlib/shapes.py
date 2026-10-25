@@ -7,6 +7,11 @@ from .model import Shape
 from .theme import ShapeColors
 
 STROKE_WIDTH_PX = 2
+BAR_STROKE_WIDTH_PX = 1.5
+BAR_RADIUS_PX = 2
+NOTE_FOLD_PX = 16
+CROSS_INSET_PX = 4
+CROSS_STROKE_WIDTH_PX = 2.5
 INSET_PX = 1  # keeps the outline inside the box, so the stroke is not clipped
 BOX_CORNER_RADIUS_PX = 10
 SUBPROCESS_BAR_INSET_PX = 14
@@ -100,6 +105,41 @@ def _hexagon(width: float, height: float, colors: ShapeColors) -> str:
     )
 
 
+def _bar(width: float, height: float, colors: ShapeColors) -> str:
+    """Draw a thin rectangle, such as an activation bar."""
+    return (
+        f'<rect x="{INSET_PX}" y="{INSET_PX}" width="{fmt(width - 2 * INSET_PX)}" '
+        f'height="{fmt(height - 2 * INSET_PX)}" rx="{BAR_RADIUS_PX}" fill="{colors.fill}" '
+        f'stroke="{colors.stroke}" stroke-width="{BAR_STROKE_WIDTH_PX}"/>'
+    )
+
+
+def _note(width: float, height: float, colors: ShapeColors) -> str:
+    """Draw a rectangle with a folded top-right corner."""
+    paint = _paint(colors)
+    fold = NOTE_FOLD_PX
+    outline = (
+        f'<path d="M{INSET_PX} {INSET_PX}H{fmt(width - fold)}L{fmt(width - INSET_PX)} {fold}'
+        f'V{fmt(height - INSET_PX)}H{INSET_PX}Z" {paint} stroke-linejoin="round"/>'
+    )
+    crease = (
+        f'<path d="M{fmt(width - fold)} {INSET_PX}V{fold}H{fmt(width - INSET_PX)}" fill="none" '
+        f'stroke="{colors.stroke}" stroke-width="{STROKE_WIDTH_PX}" stroke-linejoin="round"/>'
+    )
+    return outline + crease
+
+
+def _cross(width: float, height: float, colors: ShapeColors) -> str:
+    """Draw an X, which ends the lifeline of a destroyed participant."""
+    low_x, high_x = CROSS_INSET_PX, width - CROSS_INSET_PX
+    low_y, high_y = CROSS_INSET_PX, height - CROSS_INSET_PX
+    return (
+        f'<path d="M{fmt(low_x)} {fmt(low_y)}L{fmt(high_x)} {fmt(high_y)}'
+        f'M{fmt(high_x)} {fmt(low_y)}L{fmt(low_x)} {fmt(high_y)}" fill="none" '
+        f'stroke="{colors.stroke}" stroke-width="{CROSS_STROKE_WIDTH_PX}" stroke-linecap="round"/>'
+    )
+
+
 def _circle(width: float, height: float, colors: ShapeColors) -> str:
     """Draw a circle that fits the smaller side."""
     paint = _paint(colors)
@@ -117,6 +157,9 @@ DRAWERS: dict[Shape, Drawer] = {
     Shape.DOCUMENT: _document,
     Shape.PREPARATION: _hexagon,
     Shape.CONNECTOR: _circle,
+    Shape.BAR: _bar,
+    Shape.NOTE: _note,
+    Shape.CROSS: _cross,
 }
 
 

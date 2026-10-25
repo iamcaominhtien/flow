@@ -42,32 +42,50 @@
     "connector": {
       "fill": "#FDE4E4",
       "stroke": "#B42318"
+    },
+    "bar": {
+      "fill": "#DCEEFB",
+      "stroke": "#334155"
+    },
+    "note": {
+      "fill": "#FFF1DD",
+      "stroke": "#F59E3A"
+    },
+    "cross": {
+      "fill": "none",
+      "stroke": "#B42318"
     }
   },
   "tones": {
     "blue": {
       "box": "#DCEEFB",
-      "pill": "#BFDBFE"
+      "pill": "#BFDBFE",
+      "stroke": "#60A5FA"
     },
     "violet": {
       "box": "#E6E3FB",
-      "pill": "#CFC8F7"
+      "pill": "#CFC8F7",
+      "stroke": "#8B7FE8"
     },
     "amber": {
       "box": "#FFF1DD",
-      "pill": "#FFD9A3"
+      "pill": "#FFD9A3",
+      "stroke": "#F59E3A"
     },
     "green": {
       "box": "#DCF5E1",
-      "pill": "#B5EBC1"
+      "pill": "#B5EBC1",
+      "stroke": "#4CC38A"
     },
     "teal": {
       "box": "#D3F3EF",
-      "pill": "#A8E6DE"
+      "pill": "#A8E6DE",
+      "stroke": "#2BB3A6"
     },
     "gray": {
       "box": "#F1F5F9",
-      "pill": "#E2E8F0"
+      "pill": "#E2E8F0",
+      "stroke": "#94A3B8"
     }
   },
   "roles": {
@@ -114,6 +132,13 @@
       "gap": 5,
       "animation": "flow2",
       "head_size": 5
+    },
+    "lifeline": {
+      "color": "#94A3B8",
+      "dash": "4 4",
+      "width": 1,
+      "head_size": 5,
+      "gap": 0
     }
   },
   "animations": {
@@ -142,6 +167,14 @@
     "plain": {
       "background": "#F1F5F9",
       "foreground": "#334155"
+    },
+    "text": {
+      "background": "none",
+      "foreground": "#0F172A"
+    },
+    "text_fail": {
+      "background": "none",
+      "foreground": "#B42318"
     }
   },
   "badge": {

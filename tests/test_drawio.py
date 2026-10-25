@@ -14,7 +14,8 @@ SHAPES_SCENE = ROOT / "examples" / "shapes.scene.json"
 
 sys.path.insert(0, str(PLUGIN_DIR))
 
-from flowlib import build, render_drawio, scene, spec  # noqa: E402
+from flowlib import render_drawio, scene, spec  # noqa: E402
+from flowlib.diagrams import flowchart  # noqa: E402
 from flowlib.model import Scene  # noqa: E402
 
 
@@ -67,10 +68,10 @@ def test_every_scene_item_becomes_a_cell(path: Path) -> None:
 
 def test_edges_keep_their_waypoints_and_terminals() -> None:
     """An edge from a built flowchart keeps its interior points and joins its two nodes."""
-    flowchart = build.layout(spec.load(ROOT / "examples" / "login-flow.spec.json"))
-    cells = cells_of(render_drawio.render(flowchart))
+    chart = flowchart.layout(spec.load(ROOT / "examples" / "login-flow.spec.json"))
+    cells = cells_of(render_drawio.render(chart))
     back = next(
-        edge for edge in flowchart.edges if edge.source == "attempts" and edge.target == "enter"
+        edge for edge in chart.edges if edge.source == "attempts" and edge.target == "enter"
     )
     cell = cells[f"edge-{back.id}"]
     points = cell.findall("./mxGeometry/Array[@as='points']/mxPoint")

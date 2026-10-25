@@ -10,7 +10,7 @@ from enum import StrEnum
 from itertools import pairwise
 
 from .layered import Grid
-from .model import ArrowEnd, Edge, EdgeLabel, LabelKind, Node, Point, Role
+from .model import Edge, EdgeLabel, LabelKind, Node, Point, Role
 from .placement import Placement
 from .spec import Spec, SpecEdge
 from .theme import LayoutRules
@@ -291,7 +291,6 @@ def route_edges(spec: Spec, grid: Grid, placement: Placement, rules: LayoutRules
                 id=f"e{index}",
                 role=spec_edge.role,
                 points=tuple(points),
-                arrow=ArrowEnd.END,
                 label=label,
                 source=spec_edge.source,
                 target=spec_edge.target,

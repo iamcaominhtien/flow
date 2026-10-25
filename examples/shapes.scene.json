@@ -1,7 +1,7 @@
 {
  "size": [
   1100,
-  540
+  760
  ],
  "title": "Shapes, icons, frames and line roles",
  "frames": [
@@ -13,6 +13,23 @@
    "tone": "blue",
    "width": 1020,
    "height": 200
+  },
+  {
+   "id": "frag",
+   "x": 30,
+   "y": 560,
+   "width": 1020,
+   "height": 170,
+   "label": "alt",
+   "tone": "amber",
+   "variant": "fragment",
+   "guard": "payment accepted",
+   "dividers": [
+    {
+     "y": 650,
+     "guard": "else"
+    }
+   ]
   }
  ],
  "nodes": [
@@ -102,6 +119,58 @@
    "text": "Declined",
    "width": 170,
    "height": 52
+  },
+  {
+   "id": "life1",
+   "shape": "process",
+   "x": 80,
+   "y": 520,
+   "width": 120,
+   "height": 30,
+   "text": [
+    "Customer"
+   ],
+   "tone": "blue"
+  },
+  {
+   "id": "life2",
+   "shape": "process",
+   "x": 420,
+   "y": 520,
+   "width": 120,
+   "height": 30,
+   "text": [
+    "Service"
+   ],
+   "tone": "violet"
+  },
+  {
+   "id": "act",
+   "shape": "bar",
+   "x": 474,
+   "y": 590,
+   "width": 12,
+   "height": 110,
+   "tone": "violet"
+  },
+  {
+   "id": "note1",
+   "shape": "note",
+   "x": 700,
+   "y": 580,
+   "width": 200,
+   "height": 56,
+   "text": [
+    "Compared as hashes"
+   ]
+  },
+  {
+   "id": "gone",
+   "shape": "cross",
+   "x": 774,
+   "y": 690,
+   "width": 24,
+   "height": 24
   }
  ],
  "edges": [
@@ -227,7 +296,140 @@
      450
     ]
    ],
-   "arrow": "none"
+   "head": "none"
+  },
+  {
+   "id": "life-a",
+   "role": "lifeline",
+   "points": [
+    [
+     140,
+     550
+    ],
+    [
+     140,
+     740
+    ]
+   ],
+   "head": "none"
+  },
+  {
+   "id": "life-b",
+   "role": "lifeline",
+   "points": [
+    [
+     480,
+     550
+    ],
+    [
+     480,
+     740
+    ]
+   ],
+   "head": "none"
+  },
+  {
+   "id": "call",
+   "role": "main",
+   "points": [
+    [
+     140,
+     600
+    ],
+    [
+     474,
+     600
+    ]
+   ],
+   "label": {
+    "text": "POST /login",
+    "at": [
+     307,
+     584
+    ],
+    "kind": "text",
+    "number": "1"
+   }
+  },
+  {
+   "id": "ret",
+   "role": "next",
+   "points": [
+    [
+     474,
+     690
+    ],
+    [
+     140,
+     690
+    ]
+   ],
+   "head": "open",
+   "dashed": true,
+   "label": {
+    "text": "Token",
+    "at": [
+     307,
+     674
+    ],
+    "kind": "text",
+    "number": "2"
+   }
+  },
+  {
+   "id": "bad",
+   "role": "no",
+   "points": [
+    [
+     474,
+     670
+    ],
+    [
+     140,
+     670
+    ]
+   ],
+   "head": "open",
+   "dashed": true,
+   "label": {
+    "text": "401",
+    "at": [
+     307,
+     654
+    ],
+    "kind": "text_fail"
+   }
+  },
+  {
+   "id": "lost",
+   "role": "next",
+   "points": [
+    [
+     480,
+     720
+    ],
+    [
+     640,
+     720
+    ]
+   ],
+   "head": "dot"
+  },
+  {
+   "id": "found",
+   "role": "next",
+   "points": [
+    [
+     640,
+     745
+    ],
+    [
+     480,
+     745
+    ]
+   ],
+   "head": "filled",
+   "tail": "dot"
   }
  ]
 }

@@ -67,7 +67,7 @@ def test_main_line_is_animated_and_has_an_arrowhead() -> None:
     """The main role gets the animation class and an arrowhead marker."""
     page = render_html.render(scene.load(SHAPES_SCENE))
     assert f'class="{Animation.FLOW.value}"' in page
-    assert 'marker-end="url(#head-main)"' in page
+    assert 'marker-end="url(#head-main-filled)"' in page
 
 
 def test_theme_styles_every_member_of_every_enum() -> None:

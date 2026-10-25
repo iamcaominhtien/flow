@@ -24,6 +24,9 @@ class Shape(StrEnum):
     DOCUMENT = "document"
     PREPARATION = "preparation"
     CONNECTOR = "connector"
+    BAR = "bar"
+    NOTE = "note"
+    CROSS = "cross"
 
 
 class Role(StrEnum):
@@ -35,6 +38,7 @@ class Role(StrEnum):
     BACK = "back"
     MAIN = "main"
     DATA = "data"
+    LIFELINE = "lifeline"
 
 
 class LabelKind(StrEnum):
@@ -44,6 +48,8 @@ class LabelKind(StrEnum):
     YES = "yes"
     NO = "no"
     BACK = "back"
+    TEXT = "text"
+    TEXT_FAIL = "text_fail"
 
 
 class Tone(StrEnum):
@@ -57,11 +63,20 @@ class Tone(StrEnum):
     GRAY = "gray"
 
 
-class ArrowEnd(StrEnum):
-    """Whether a line ends in an arrowhead."""
+class Head(StrEnum):
+    """What a line has at one end."""
 
-    END = "end"
     NONE = "none"
+    FILLED = "filled"
+    OPEN = "open"
+    DOT = "dot"
+
+
+class FrameVariant(StrEnum):
+    """How a frame is drawn: a tinted area (lane, zone) or a bordered fragment with a tag."""
+
+    AREA = "area"
+    FRAGMENT = "fragment"
 
 
 class Side(StrEnum):
@@ -86,8 +101,16 @@ class Animation(StrEnum):
 
 
 @dataclass(frozen=True)
+class Divider:
+    """A dashed line across a fragment frame, with the guard of the part below it."""
+
+    y: float
+    guard: str
+
+
+@dataclass(frozen=True)
 class Frame:
-    """A tinted, dashed area that groups nodes (a lane, a zone)."""
+    """An area that groups nodes: a lane or zone, or a labelled fragment around some rows."""
 
     id: str
     x: float
@@ -96,6 +119,9 @@ class Frame:
     height: float
     label: str | None
     tone: Tone
+    variant: FrameVariant = FrameVariant.AREA
+    guard: str | None = None
+    dividers: tuple[Divider, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -122,6 +148,7 @@ class EdgeLabel:
     text: str
     at: Point
     kind: LabelKind
+    number: str | None = None
 
 
 @dataclass(frozen=True)
@@ -131,10 +158,12 @@ class Edge:
     id: str
     role: Role
     points: tuple[Point, ...]
-    arrow: ArrowEnd
     label: EdgeLabel | None
     source: str | None
     target: str | None
+    head: Head = Head.FILLED
+    tail: Head = Head.NONE
+    dashed: bool = False
 
 
 @dataclass(frozen=True)

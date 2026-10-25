@@ -10,6 +10,19 @@ Member = TypeVar("Member", bound=StrEnum)
 POINT_LENGTH = 2
 
 
+class SpecError(ValueError):
+    """A spec is not valid. The message lists every problem found, one per line."""
+
+    def __init__(self, problems: list[str]) -> None:
+        """Keep the problems and join them into the message.
+
+        Args:
+            problems: One sentence per problem, each starting with where it was found.
+        """
+        self.problems = problems
+        super().__init__("\n".join(problems))
+
+
 def is_number(value: object) -> bool:
     """Tell whether a JSON value is a number; ``True`` and ``False`` are not."""
     return isinstance(value, int | float) and not isinstance(value, bool)

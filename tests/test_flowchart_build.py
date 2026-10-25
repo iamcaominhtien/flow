@@ -20,6 +20,7 @@ sys.path.insert(0, str(PLUGIN_DIR))
 
 from flowlib import build, overrides, scene, spec  # noqa: E402
 from flowlib.check import Severity, check_scene  # noqa: E402
+from flowlib.diagrams import flowchart  # noqa: E402
 from flowlib.model import Role, Scene  # noqa: E402
 
 
@@ -32,7 +33,7 @@ def laid_out(path: Path) -> Scene:
     Returns:
         The scene.
     """
-    return build.layout(spec.load(path))
+    return flowchart.layout(spec.load(path))
 
 
 def centers_x(scene_to_read: Scene, node_ids: list[str]) -> set[float]:
