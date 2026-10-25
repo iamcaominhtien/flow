@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Standalone copy of the design-canvas board "Wireframe_Rules". Generated from source/canvas/Wireframe_Rules.dc.html; opens in any browser. -->
+<meta charset="utf-8">
+<title>Wireframe: Rules</title>
+
+</head>
+<body>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@keyframes dc-flow2{to{stroke-dashoffset:-12}}
+.flow2{stroke-dasharray:6 6;animation:dc-flow2 1.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}
+</style>
+
+<div style="position: relative; width: 1280px; height: 1540px; background: #F8FAFC; overflow: hidden">
+<style>.rc{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}.rc h2{font-size:16px;font-weight:800}.rc li{font-size:13px;line-height:20px;color:#334155;margin-bottom:6px}.rc ul{padding-left:18px;margin:0}.mono{font-family:'JetBrains Mono',monospace;font-size:12px}</style><div style="position:absolute;left:0;top:0;width:1280px;box-sizing:border-box;padding:64px;display:flex;flex-direction:column;gap:28px"><div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:24px;font-weight:600">Wireframe · Rules</div><div style="font-size:13px;line-height:20px;color:#475569;max-width:900px">The conventions for wireframes and what a plugin can rely on. The examples show an annotated phone flow, an annotated desktop screen, a responsive set and a state set.</div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px"><div class="rc"><h2>What it is for</h2><ul><li>A wireframe shows what is on a screen and where, before any visual design. It answers: what does the person see, and what can they do?</li><li>It is the detailed twin of a screen flow: a flow shows how screens connect, a wireframe shows what is inside one.</li></ul></div><div class="rc"><h2>Grey with one colour</h2><ul><li>Grey-blue for everything: lines <span class="mono">#CBD5E1</span>, fills <span class="mono">#F1F5F9</span>, text <span class="mono">#334155</span>.</li><li><b>Blue</b> marks the primary action and the selected choice. <b>Rose</b> marks a risky or failed thing. <b>Green</b> and <b>amber</b> appear only in status chips.</li><li>No brand colours, no photos, no decoration. The page is judged on structure.</li></ul></div><div class="rc"><h2>Blocks</h2><ul><li>Made of the blocks on the Components page: navbar, sidebar, card, list item, form field, buttons, image placeholder, tab bar, bottom nav, search bar, table, chart, modal, sheet, toast, loading, empty and error.</li><li>Labels and buttons carry real words. Body text is grey bars. An image is a crossed box.</li><li>One primary button per screen. Secondary buttons are outlined.</li></ul></div><div class="rc"><h2>Devices and size</h2><ul><li>Phone: frame 330 × 680 (screen 298 wide), 3 px ink border, 38 px corners. Tablet and desktop use the device frames from Components.</li><li>Desktop frame 1320 × 760 with a browser bar. Content margins 28 px, gap between cards 16 px.</li><li>Drawn at about 0.8 of real size for phones and 1 for desktop; labels stay readable.</li></ul></div><div class="rc"><h2>Annotations</h2><ul><li>A numbered badge: dark circle 26 px, teal digits. Place it on the <b>corner</b> of what it explains, never over text.</li><li>The notes sit below the screens in three columns: a bold title, one line of text. Number in the same order as the screen, left to right and top to bottom.</li><li>A note says what the detail does or why, not what it looks like.</li></ul></div><div class="rc"><h2>Tap targets</h2><ul><li>A red dot with a halo marks where a tap or click starts, for example the primary button.</li><li>One per transition at most. It sits on the target, off the label.</li><li>The same dot is used in screen flows, so the two diagram types agree.</li></ul></div><div class="rc"><h2>States</h2><ul><li>Every screen that loads data is drawn four times: normal, loading, empty, error.</li><li>Loading: skeleton bars in the shape of the rows, then a spinner after about a second. Empty: dashed icon, one line, one action. Error: rose icon, plain words, retry first.</li></ul></div><div class="rc"><h2>Responsive</h2><ul><li>Show the same content at three widths: desktop 1024 and up, tablet 640 to 1023, phone under 640.</li><li>Say what changes: columns, where the filters go, how the links fold. A short note per change.</li><li>Keep the three frames the same height so the difference is visible.</li></ul></div><div class="rc"><h2>With screen flows</h2><ul><li>A screen in a flow at fidelity L3 is a wireframe from this page. It keeps the screen ID and the name (S12 · Cart).</li><li>Use the same blocks, so a screen can move between the two types without redrawing.</li></ul></div><div class="rc"><h2>Style and animation</h2><ul><li>One style only: grey wireframe. An illustrated style would defeat the purpose.</li><li>Nothing animates. A wireframe is a still; motion belongs to a prototype.</li></ul></div><div class="rc"><h2>What a plugin can rely on</h2><ul><li>A screen is: ID, name, device, state, a list of blocks (type, text, position in a grid) and a list of annotations (number, target, title, text).</li><li>A block is one of the types in Components. A position is a row, a column and a span, not free coordinates.</li><li>A responsive set is the same screen with three widths. A state set is the same screen with four states.</li><li>Anything not covered is left to the diagram author.</li></ul></div></div></div>
+</div>
+
+
+</body>
+</html>

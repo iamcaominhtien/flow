@@ -1,0 +1,26 @@
+from c4lib import *
+b = Board('C4_Component', 'Level 3, components: the Order service', 1800, 1800,
+  'Zoom into one container. A component is a part inside it: a controller, a handler, a client. Neighbours are shown as containers, because that is what they are from here.')
+A, B, C = 330, 850, 1500
+r1, r2, r3, r4 = 560, 830, 1100, 1370
+boundary(b, 170, 440, 1010, 1480, 'Order service [Container]', 'violet', pill_x=770)
+gw = c4(b, A, 250, 'container', 'API gateway', 'Kong', 'Routing, auth checks.', 'Gateway', 'violet')
+ct = c4(b, A, r1, 'component', 'Order controller', 'Spring REST', 'Receives the calls from the gateway.', 'Code / API', 'violet')
+ch = c4(b, A, r2, 'component', 'Checkout handler', 'Kotlin', 'Validates the basket and drives checkout.', 'Workflow', 'violet')
+pc = c4(b, B, r2, 'component', 'Payment client', 'gRPC', 'Asks the payment service to charge.', 'Plugin', 'amber')
+sm = c4(b, A, r3, 'component', 'Order state machine', 'Kotlin', 'Placed, paid, cooking, on the way, delivered.', 'Flag', 'violet')
+ep = c4(b, B, r3, 'component', 'Event publisher', 'Kafka client', 'Emits an event for every state change.', 'Pub / Sub', 'amber')
+rp = c4(b, A, r4, 'component', 'Order repository', 'Spring Data', 'Reads and writes orders.', 'Table', 'violet')
+db = c4(b, A, 1640, 'container', 'Orders database', 'PostgreSQL', 'Orders, customers, menus.', 'Database', 'violet')
+ps = c4(b, C, r2, 'container', 'Payment service', 'Kotlin, Spring', 'Charges and refunds.', 'Card', 'amber')
+bu = c4(b, C, r3, 'container', 'Event bus', 'Kafka', 'Order and delivery events.', 'Event stream', 'amber')
+b.arrow([gw.b(), ct.t()], 'main', 'REST', (A, 400))
+b.arrow([ct.b(), ch.t()], 'main', 'calls', (A, 695))
+b.arrow([ch.r(), pc.l()], 'main', 'charge', ((ch.r()[0] + pc.l()[0]) / 2, r2))
+b.arrow([pc.r(), ps.l()], 'main', 'gRPC', (1190, r2))
+b.arrow([ch.b(), sm.t()], 'next', 'marks paid', (A, 965))
+b.arrow([sm.b(), rp.t()], 'next', 'save', (A, 1235))
+b.arrow([sm.r(), ep.l()], 'data', 'publishes', ((sm.r()[0] + ep.l()[0]) / 2, r3))
+b.arrow([ep.r(), bu.l()], 'data', 'order.placed', (1190, r3))
+b.arrow([rp.b(), db.t()], 'next', 'SQL', (A, 1525))
+print(save8(b))

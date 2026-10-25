@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flow Icons</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h1,h2,h3,p{margin:0}
+</style>
+</helmet>
+<div style="max-width: 1200px; margin: 0 auto; box-sizing: border-box; padding: 56px 32px 80px; display: flex; flex-direction: column; gap: 44px">
+
+<header style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="background: #1D4ED8; color: #FFFFFF; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 999px">Flow</span>
+<span style="font-size: 13px; font-weight: 600; color: #475569">Icons · flat color style</span>
+</div>
+<h1 style="font-size: 40px; line-height: 1.1; font-weight: 800; letter-spacing: -0.02em">Icon library, {{total}} icons in 9 groups</h1>
+<p style="font-size: 16px; line-height: 1.55; color: #334155; max-width: 800px">Flat color style: 48 px grid, 2 px ink outline, pastel fills, one accent per icon. Every icon is a set of plain paths, so it converts directly to an SVG image shape for draw.io. All shapes are original and simple; the full set grows by group as new diagram types need them.</p>
+</header>
+
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="8">
+<section style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap">
+<h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.01em">{{g.name}}</h2>
+<span style="font-size: 13px; color: #475569">{{g.note}}</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 12px">
+<sc-for list="{{g.icons}}" as="i" hint-placeholder-count="8">
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 16px 6px 12px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+<svg width="52" height="52" viewBox="0 0 48 48" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round">
+<sc-for list="{{i.shapes}}" as="p" hint-placeholder-count="3">
+<path d="{{p.d}}" fill="{{p.fill}}" stroke="{{p.stroke}}" stroke-width="{{p.sw}}"/>
+</sc-for>
+</svg>
+<span style="font-size: 12px; font-weight: 600; text-align: center">{{i.name}}</span>
+<sc-if value="{{i.eq}}" hint-placeholder-val="{{ true }}"><span style="font-size: 10px; line-height: 1.4; color: #475569; text-align: center; padding: 0 4px">{{i.eq}}</span></sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-for>
+
+<section style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 20px 24px; display: flex; flex-direction: column; gap: 8px">
+<h3 style="font-size: 15px; font-weight: 700">Usage rules</h3>
+<p style="font-size: 13px; line-height: 1.65; color: #334155">Show at 32–48 px in diagrams, never below 24. Place on white or a light tint, not on dark backgrounds. One icon style per diagram. The label always carries the meaning; the icon only names the kind of thing. Accent colors follow the foundation: blue for compute and process, green for success and data, amber for storage and warmth, violet for services, red only for warning or stop.</p>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2000}}'>
+class Component extends DCLogic {
+renderVals() {
+const K = '#0F172A', W = '#FFFFFF';
+const B = '#1D4ED8', B1 = '#DCEEFB', G = '#15803D', G1 = '#DCF5E1';
+const A = '#F59E3A', A1 = '#FFF1DD', AM = '#FFE2B0', V = '#5B4BD6', V1 = '#E6E3FB';
+const T = '#7DD3CB', T1 = '#D3F3EF', R = '#D92D20', R1 = '#FDE4E4', S = '#94A3B8';
+const rect = (x, y, w, h, r = 0) => r
+? `M${x + r} ${y}h${w - 2 * r}a${r} ${r} 0 0 1 ${r} ${r}v${h - 2 * r}a${r} ${r} 0 0 1 ${-r} ${r}h${-(w - 2 * r)}a${r} ${r} 0 0 1 ${-r} ${-r}v${-(h - 2 * r)}a${r} ${r} 0 0 1 ${r} ${-r}z`
+: `M${x} ${y}h${w}v${h}h${-w}z`;
+const circ = (cx, cy, r) => `M${cx - r} ${cy}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0z`;
+const ell = (cx, cy, rx, ry) => `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0z`;
+const F = (d, fill) => ({ d: d, fill: fill, stroke: K, sw: 2 });
+const L = (d, stroke = K, sw = 2) => ({ d: d, fill: 'none', stroke: stroke, sw: sw });
+const cloud = 'M14 38a9 9 0 0 1-1-17.9A12 12 0 0 1 36 22a8 8 0 0 1-1 16z';
+const file = 'M12 5h18l8 8v30H12z';
+const groups = [
+{ name: 'People and access', note: 'Users, roles, identity, secrets', icons: [
+{ name: 'User', shapes: [F(circ(24, 15, 8), A1), F('M7 43c0-9 7-15 17-15s17 6 17 15z', B)] },
+{ name: 'Team', shapes: [F('M24 30c3-1 6-1 10-1 8 0 12 4 12 11H28z', V), F('M2 41c0-8 5-12 13-12s13 4 13 12z', G), F(circ(34, 17, 6), A1), F(circ(15, 17, 6), A1)] },
+{ name: 'Admin', shapes: [F('M8 44c0-8 7-12 16-12s16 4 16 12z', B), F(circ(24, 23, 7), A1), F('M15 15l3 4 6-8 6 8 3-4v7H15z', A)] },
+{ name: 'Bot', shapes: [L('M24 14V8'), F(circ(24, 6, 2.5), A), F(rect(3, 22, 5, 9, 2), A), F(rect(40, 22, 5, 9, 2), A), F(rect(8, 14, 32, 26, 8), V1), F(circ(17, 25, 3.5), W), F(circ(31, 25, 3.5), W), L('M18 33h12')] },
+{ name: 'Key', shapes: [F(rect(22, 21, 22, 6, 2), A), L('M36 27v5M41 27v4'), F(circ(15, 24, 10), A), F(circ(15, 24, 3.5), W)] },
+{ name: 'Lock', shapes: [L('M15 21v-6a9 9 0 0 1 18 0v6'), F(rect(9, 21, 30, 21, 5), A), F(circ(24, 30, 3), K), L('M24 32v4')] },
+{ name: 'Security', shapes: [F('M24 5l16 6v12c0 10-7 16-16 20C15 39 8 33 8 23V11z', G1), L('M17 24l5 5 9-10', G, 3)] },
+{ name: 'ID card', shapes: [F(rect(4, 10, 40, 28, 5), W), F(circ(16, 22, 4), A1), F('M9 33c0-4 3-6 7-6s7 2 7 6z', B), L('M29 20h9M29 27h9')] }
+] },
+{ name: 'Compute and infrastructure', note: 'Servers, containers, runtimes, scaling', icons: [
+{ name: 'Server', shapes: [F(rect(6, 8, 36, 14, 4), B1), F(rect(6, 26, 36, 14, 4), B1), F(circ(14, 15, 2), G), F(circ(14, 33, 2), A), L('M22 15h14M22 33h14')] },
+{ name: 'Container', shapes: [F(rect(5, 13, 38, 26, 3), B1), F(rect(5, 13, 38, 6, 3), B), L('M13 19v20M21 19v20M29 19v20M37 19v20')] },
+{ name: 'Virtual machine', shapes: [F('M24 5l16 8v18l-16 10L8 31V13z', V1), F('M24 5l16 8-16 8-16-8z', V), L('M24 21v20')] },
+{ name: 'CPU', shapes: [L('M18 5v7M24 5v7M30 5v7M18 36v7M24 36v7M30 36v7M5 18h7M5 24h7M5 30h7M36 18h7M36 24h7M36 30h7'), F(rect(12, 12, 24, 24, 4), A1), F(rect(19, 19, 10, 10, 2), A)] },
+{ name: 'Function', shapes: [F(rect(6, 6, 36, 36, 9), V1), L('M16 14h5l10 20', V, 3.5), L('M24 24l-8 10', V, 3.5)] },
+{ name: 'Cluster', shapes: [L('M24 17v7M12 31v-7h24v7'), F(rect(17, 5, 14, 12, 3), B1), F(rect(5, 31, 14, 12, 3), B1), F(rect(29, 31, 14, 12, 3), B1), F(circ(24, 11, 1.8), G), F(circ(12, 37, 1.8), G), F(circ(36, 37, 1.8), G)] },
+{ name: 'Load balancer', shapes: [L('M24 15v8M10 23h28M10 23v7M24 23v7M38 23v7'), F(rect(14, 5, 20, 10, 3), A), F(rect(5, 30, 10, 12, 3), B1), F(rect(19, 30, 10, 12, 3), B1), F(rect(33, 30, 10, 12, 3), B1)] },
+{ name: 'Gateway', shapes: [L('M14 26L9 12M34 26l5-14'), F(circ(9, 11, 3), T), F(circ(39, 11, 3), T), F(rect(5, 26, 38, 14, 5), T1), F(circ(14, 33, 2), G), F(circ(22, 33, 2), A), L('M30 33h8')] }
+] },
+{ name: 'Data and storage', note: 'Databases, files, tables, caches', icons: [
+{ name: 'Database', shapes: [F('M8 12v24c0 4 7 7 16 7s16-3 16-7V12z', V1), L('M8 24c0 4 7 7 16 7s16-3 16-7'), F(ell(24, 12, 16, 6), V)] },
+{ name: 'Cache', shapes: [F(rect(6, 6, 36, 36, 9), A1), F('M27 8L14 27h9l-3 13 14-20h-9z', A)] },
+{ name: 'File', shapes: [F(file, W), F('M30 5v8h8', G1), L('M18 24h14M18 31h14')] },
+{ name: 'Folder', shapes: [F('M5 14a3 3 0 0 1 3-3h10l4 5h18a3 3 0 0 1 3 3v17a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z', AM), L('M5 22h38')] },
+{ name: 'Bucket', shapes: [F('M8 14l4 28h24l4-28z', B1), F(ell(24, 14, 16, 5), B)] },
+{ name: 'Table', shapes: [F(rect(5, 8, 38, 32, 4), W), F('M5 12a4 4 0 0 1 4-4h30a4 4 0 0 1 4 4v5H5z', G1), L('M5 17h38M5 26h38M5 34h38M20 17v23')] },
+{ name: 'JSON', shapes: [F(rect(7, 6, 34, 36, 5), W), L('M20 15c-3 0-3 3-3 5s-2 4-4 4c2 0 4 2 4 4s0 5 3 5'), L('M28 15c3 0 3 3 3 5s2 4 4 4c-2 0-4 2-4 4s0 5-3 5')] },
+{ name: 'Data lake', shapes: [F('M5 16c6 6 10-6 19 0s13-6 19 0v26H5z', B1), L('M5 28c6 6 10-6 19 0s13-6 19 0', B)] }
+] },
+{ name: 'Network and cloud', note: 'Internet, edge, boundaries, regions', icons: [
+{ name: 'Cloud', shapes: [F(cloud, B1), L('M24 33V24M20 28l4-4 4 4', B, 2.5)] },
+{ name: 'Globe', shapes: [F(circ(24, 24, 18), T1), L('M6 24h36M24 6c8 8 8 28 0 36M24 6c-8 8-8 28 0 36')] },
+{ name: 'Wi-Fi', shapes: [L('M5 19a27 27 0 0 1 38 0', B, 3.5), L('M11 26a18 18 0 0 1 26 0', B, 3.5), L('M17 33a9 9 0 0 1 14 0', B, 3.5), F(circ(24, 39, 3), A)] },
+{ name: 'Firewall', shapes: [F(rect(5, 10, 38, 30, 3), R1), L('M5 20h38M5 30h38M18 10v10M32 10v10M11 20v10M25 20v10M38 20v10M18 30v10M32 30v10')] },
+{ name: 'CDN', shapes: [L('M11 11l6 6M37 11l-6 6M11 37l6-6M37 37l-6-6'), F(circ(24, 24, 13), T1), L('M11 24h26M24 11c5 6 5 20 0 26M24 11c-5 6-5 20 0 26'), F(circ(8, 8, 4), A), F(circ(40, 8, 4), A), F(circ(8, 40, 4), A), F(circ(40, 40, 4), A)] },
+{ name: 'DNS', shapes: [F(rect(22, 6, 4, 36, 1), S), F('M10 10h22l5 5-5 5H10z', B1), F('M38 24H16l-5 5 5 5h22z', A1)] },
+{ name: 'Region', shapes: [F('M24 5c8 0 13 6 13 13 0 9-13 25-13 25S11 27 11 18C11 11 16 5 24 5z', R), F(circ(24, 18, 5), W)] },
+{ name: 'Private network', shapes: [F(cloud, B1), L('M20 28v-3a4 4 0 0 1 8 0v3'), F(rect(17, 28, 14, 10, 3), A)] }
+] },
+{ name: 'Apps and devices', note: 'Clients, interfaces, tooling', icons: [
+{ name: 'Browser', shapes: [F(rect(4, 8, 40, 32, 5), W), F('M4 13a5 5 0 0 1 5-5h30a5 5 0 0 1 5 5v5H4z', B1), F(circ(10, 13, 1.6), R), F(circ(15, 13, 1.6), A), F(circ(20, 13, 1.6), G)] },
+{ name: 'Mobile', shapes: [F(rect(13, 4, 22, 40, 5), B1), F(rect(17, 10, 14, 24, 2), W), F(circ(24, 39, 1.6), K)] },
+{ name: 'Laptop', shapes: [F(rect(9, 10, 30, 24, 3), B1), F(rect(12, 13, 24, 18, 1), W), F('M4 36h40l-3 6H7z', S)] },
+{ name: 'Code / API', shapes: [F(rect(5, 9, 38, 30, 6), K), L('M19 19l-6 5 6 5M29 19l6 5-6 5', T, 2.5)] },
+{ name: 'Terminal', shapes: [F(rect(4, 8, 40, 32, 5), K), L('M13 18l6 5-6 5', T, 3), L('M24 31h10', W, 3)] },
+{ name: 'Package', shapes: [F('M24 5l17 8v22L24 43 7 35V13z', AM), L('M7 13l17 8 17-8M24 21v22')] },
+{ name: 'Plugin', shapes: [F(circ(21, 14, 5), V1), F(circ(38, 31, 5), V1), F(rect(8, 18, 30, 26, 4), V1)] },
+{ name: 'Dashboard', shapes: [F(rect(4, 6, 40, 36, 5), W), F(rect(10, 26, 6, 10, 1), B), F(rect(21, 18, 6, 18, 1), G), F(rect(32, 12, 6, 24, 1), A)] }
+] },
+{ name: 'Messaging and flow', note: 'Events, queues, notifications, schedules', icons: [
+{ name: 'Queue', shapes: [F(rect(5, 12, 11, 24, 3), B1), F(rect(18.5, 12, 11, 24, 3), G1), F(rect(32, 12, 11, 24, 3), A1)] },
+{ name: 'Email', shapes: [F(rect(4, 10, 40, 28, 5), W), L('M5 13l19 14 19-14'), F(circ(40, 10, 5), R)] },
+{ name: 'Bell', shapes: [F('M24 6c-8 0-12 6-12 14v8l-4 5h32l-4-5v-8c0-8-4-14-12-14z', A), F('M19 38a5 5 0 0 0 10 0z', AM)] },
+{ name: 'Chat', shapes: [F('M6 10h36a3 3 0 0 1 3 3v18a3 3 0 0 1-3 3H22l-9 8v-8H6a3 3 0 0 1-3-3V13a3 3 0 0 1 3-3z', B1), L('M12 19h24M12 26h15')] },
+{ name: 'Event', shapes: [F(circ(24, 24, 18), A1), F('M27 9L13 27h9l-2 12 15-20h-10z', A)] },
+{ name: 'Pipeline', shapes: [L('M14 24h5M29 24h5'), L('M16 21l3 3-3 3M31 21l3 3-3 3'), F(circ(9, 24, 5), B1), F(circ(24, 24, 5), G1), F(circ(39, 24, 5), A1)] },
+{ name: 'Schedule', shapes: [F(circ(24, 24, 18), W), L('M24 13v11l8 5'), F(circ(24, 24, 2), K)] },
+{ name: 'Pub / Sub', shapes: [L('M13 13a16 16 0 0 0 0 22M35 13a16 16 0 0 1 0 22M18 18a8 8 0 0 0 0 12M30 18a8 8 0 0 1 0 12', V, 3), F(circ(24, 24, 5), A)] }
+] },
+{ name: 'Status and actions', note: 'State markers and common controls', icons: [
+{ name: 'Success', shapes: [F(circ(24, 24, 18), G1), L('M15 25l6 6 12-13', G, 4)] },
+{ name: 'Error', shapes: [F(circ(24, 24, 18), R1), L('M17 17l14 14M31 17L17 31', R, 4)] },
+{ name: 'Warning', shapes: [F('M24 6l19 33H5z', AM), L('M24 17v10', K, 3), F(circ(24, 33, 1.8), K)] },
+{ name: 'Info', shapes: [F(circ(24, 24, 18), B1), L('M24 22v10', B, 4), F(circ(24, 15, 2.2), B)] },
+{ name: 'Search', shapes: [L('M30 30l12 12', K, 4.5), F(circ(21, 21, 12), B1)] },
+{ name: 'Settings', shapes: [L('M24 4v7M24 37v7M4 24h7M37 24h7M10 10l5 5M33 33l5 5M38 10l-5 5M15 33l-5 5'), F(circ(24, 24, 13), A1), F(circ(24, 24, 5), A)] },
+{ name: 'Flag', shapes: [L('M10 6v38'), F('M10 8h28l-6 8 6 8H10z', R)] },
+{ name: 'Target', shapes: [F(circ(24, 24, 18), R1), F(circ(24, 24, 11), W), F(circ(24, 24, 5), R)] },
+{ name: 'Start', shapes: [F(circ(24, 24, 18), G1), F('M20 16l14 8-14 8z', G)] },
+{ name: 'Stop', shapes: [F(rect(6, 6, 36, 36, 9), R1), F(rect(17, 17, 14, 14, 2), R)] }
+] },
+{ name: 'Business and planning', note: 'Time, money, metrics, ideas', icons: [
+{ name: 'Calendar', shapes: [L('M15 5v8M33 5v8'), F(rect(6, 9, 36, 33, 5), W), F('M6 14a5 5 0 0 1 5-5h26a5 5 0 0 1 5 5v5H6z', R), F(rect(12, 25, 6, 5, 1), B1), F(rect(21, 25, 6, 5, 1), B1), F(rect(30, 25, 6, 5, 1), B1), F(rect(12, 33, 6, 5, 1), B1), F(rect(21, 33, 6, 5, 1), G1)] },
+{ name: 'Bar chart', shapes: [L('M7 6v36h36'), F(rect(13, 26, 7, 16, 1), B), F(rect(24, 16, 7, 26, 1), G), F(rect(35, 22, 7, 20, 1), A)] },
+{ name: 'Pie chart', shapes: [F(circ(24, 24, 18), B1), F('M24 24V6a18 18 0 0 1 17.1 12.4z', A), F('M24 24L41.1 18.4A18 18 0 0 1 34.6 38.6z', G)] },
+{ name: 'Money', shapes: [F(circ(24, 24, 18), AM), F(circ(24, 24, 12), A1), L('M28 19c-1-2-3-3-5-3-3 0-5 1.5-5 3.5 0 5 10 2.5 10 7.5 0 2-2 3.5-5 3.5-2.5 0-4.5-1-5.5-3M23 13v22', K, 2.5)] },
+{ name: 'Cart', shapes: [F('M12 15h29l-4 17H15z', A1), L('M4 8h6l5 24h22'), F(circ(19, 39, 3), K), F(circ(34, 39, 3), K)] },
+{ name: 'Idea', shapes: [F('M24 5c-8 0-13 6-13 12 0 5 3 8 5 11v4h16v-4c2-3 5-6 5-11 0-6-5-12-13-12z', AM), F(rect(18, 32, 12, 4, 1), S), F(rect(19, 37, 10, 4, 2), S), L('M20 20l4 5 4-5')] },
+{ name: 'Approved doc', shapes: [F('M8 5h18l8 8v30H8z', W), F('M26 5v8h8', G1), F(circ(32, 34, 9), G), L('M28 34l3 3 6-6', W, 3)] },
+{ name: 'Launch', shapes: [F('M16 28l-7 7 4 2 5-3z', R), F('M32 28l7 7-4 2-5-3z', R), F('M20 32h8l-4 10z', A), F('M24 4c7 5 10 13 8 24H16C14 17 17 9 24 4z', W), F(circ(24, 17, 4), B)] }
+] }
+];
+const SL = '#E2E8F0';
+const svc = (name, eq, tile, shapes) => ({ name: name, eq: eq, shapes: [F(rect(4, 4, 40, 40, 10), tile)].concat(shapes) });
+groups.push({ name: 'Cloud services', note: 'Provider-neutral service icons on a tinted tile. Caption lists the AWS, GCP and Azure equivalents (approximate).', icons: [
+svc('Virtual machine', 'EC2 · Compute Engine · Virtual Machines', B1, [F(rect(13, 13, 22, 9, 3), W), F(rect(13, 26, 22, 9, 3), W), F(circ(18, 17.5, 1.4), G), F(circ(18, 30.5, 1.4), G)]),
+svc('Containers', 'ECS / Fargate · Cloud Run · Container Apps', B1, [F(rect(12, 15, 24, 18, 2), W), L('M18 15v18M24 15v18M30 15v18')]),
+svc('Kubernetes', 'EKS · GKE · AKS', B1, [F('M24 11l11 6v14l-11 6-11-6V17z', W), F(circ(24, 24, 4), B)]),
+svc('Serverless function', 'Lambda · Cloud Functions · Azure Functions', B1, [L('M17 15h4l9 18', B, 3), L('M25 25l-8 8', B, 3)]),
+svc('Batch / scheduler', 'Batch · Cloud Scheduler · Azure Batch', B1, [F(circ(24, 24, 11), W), L('M24 17v7l5 3')]),
+svc('Object storage', 'S3 · Cloud Storage · Blob Storage', G1, [F('M14 17l3 17h14l3-17z', W), F(ell(24, 17, 10, 3.5), G)]),
+svc('Block storage', 'EBS · Persistent Disk · Managed Disks', G1, [F(rect(13, 14, 22, 6, 2), W), F(rect(13, 22, 22, 6, 2), W), F(rect(13, 30, 22, 6, 2), W)]),
+svc('File storage', 'EFS · Filestore · Azure Files', G1, [F('M12 18a2 2 0 0 1 2-2h6l3 3h11a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2z', AM)]),
+svc('Backup / archive', 'AWS Backup · Backup and DR · Azure Backup', G1, [F(rect(12, 14, 24, 8, 2), W), F(rect(14, 22, 20, 13, 2), W), L('M21 28h6')]),
+svc('SQL database', 'RDS · Cloud SQL · SQL Database', V1, [F('M14 16v16c0 3 4 5 10 5s10-2 10-5V16z', W), F(ell(24, 16, 10, 4), V)]),
+svc('NoSQL database', 'DynamoDB · Firestore · Cosmos DB', V1, [F(rect(14, 12, 18, 22, 3), W), F(rect(18, 16, 18, 22, 3), V)]),
+svc('Data warehouse', 'Redshift · BigQuery · Synapse', V1, [F('M12 20l12-7 12 7z', V), L('M15 22v12M21 22v12M27 22v12M33 22v12'), F(rect(12, 34, 24, 3, 1), W)]),
+svc('In-memory cache', 'ElastiCache · Memorystore · Cache for Redis', V1, [F(circ(24, 24, 11), W), F('M26 14l-8 11h6l-2 9 9-12h-6z', A)]),
+svc('Virtual network', 'VPC · VPC · Virtual Network', T1, [L('M24 21v4M16 31v-6h16v6'), F(rect(19, 13, 10, 8, 2), W), F(rect(11, 31, 10, 8, 2), W), F(rect(27, 31, 10, 8, 2), W)]),
+svc('Load balancer', 'ELB · Cloud Load Balancing · Load Balancer', T1, [L('M24 19v5M14 24h20M14 24v6M24 24v6M34 24v6'), F(rect(18, 12, 12, 7, 2), A), F(rect(10, 30, 8, 7, 2), W), F(rect(20, 30, 8, 7, 2), W), F(rect(30, 30, 8, 7, 2), W)]),
+svc('CDN', 'CloudFront · Cloud CDN · Front Door', T1, [F(circ(24, 24, 11), W), L('M13 24h22M24 13c4 4 4 18 0 22M24 13c-4 4-4 18 0 22')]),
+svc('DNS', 'Route 53 · Cloud DNS · Azure DNS', T1, [L('M24 12v24'), F('M15 15h14l3 3-3 3H15z', W), F('M33 25H19l-3 3 3 3h14z', W)]),
+svc('API gateway', 'API Gateway · API Gateway · API Management', T1, [F(rect(12, 14, 24, 20, 3), W), L('M17 24h14M27 20l4 4-4 4')]),
+svc('Message queue', 'SQS · Cloud Tasks · Queue Storage', A1, [F(rect(11, 16, 7, 16, 2), W), F(rect(20.5, 16, 7, 16, 2), W), F(rect(30, 16, 7, 16, 2), W)]),
+svc('Pub / Sub topic', 'SNS · Pub/Sub · Service Bus', A1, [L('M16 16a11 11 0 0 0 0 16M32 16a11 11 0 0 1 0 16'), F(circ(24, 24, 4), A)]),
+svc('Event stream', 'Kinesis · Dataflow · Event Hubs', A1, [L('M11 17c4-3 6 3 10 0s6 3 10 0 4 1 6 0'), L('M11 24c4-3 6 3 10 0s6 3 10 0 4 1 6 0'), L('M11 31c4-3 6 3 10 0s6 3 10 0 4 1 6 0')]),
+svc('Workflow', 'Step Functions · Workflows · Logic Apps', A1, [L('M18 24h4l6-8h2M22 24l6 8h2'), F(circ(14, 24, 4), W), F(circ(34, 14, 4), W), F(circ(34, 34, 4), W)]),
+svc('Email service', 'SES · none native · Communication Services', A1, [F(rect(11, 15, 26, 18, 3), W), L('M12 17l12 9 12-9')]),
+svc('Identity (IAM)', 'IAM · Cloud IAM · Entra ID', R1, [F(circ(24, 19, 5), A1), F('M14 36c0-6 4-9 10-9s10 3 10 9z', B)]),
+svc('Secrets', 'Secrets Manager · Secret Manager · Key Vault', R1, [L('M24 24h12M32 24v5M36 24v4'), F(circ(19, 24, 5), A)]),
+svc('Firewall / WAF', 'WAF · Cloud Armor · WAF', R1, [F(rect(11, 14, 26, 20, 2), W), L('M11 21h26M11 28h26M20 14v7M28 14v7M15 21v7M24 21v7M33 21v7M20 28v6M28 28v6')]),
+svc('Key management', 'KMS · Cloud KMS · Key Vault', R1, [L('M18 22v-4a6 6 0 0 1 12 0v4'), F(rect(14, 22, 20, 14, 3), A), F(circ(24, 29, 2), K)]),
+svc('Monitoring', 'CloudWatch · Cloud Monitoring · Monitor', SL, [L('M12 34h24'), L('M13 30l7-8 5 4 9-12', B, 3)]),
+svc('Logging', 'CloudWatch Logs · Cloud Logging · Log Analytics', SL, [F(rect(14, 12, 20, 24, 3), W), L('M18 19h12M18 24h12M18 29h7')]),
+svc('CI / CD', 'CodePipeline · Cloud Build · Azure Pipelines', SL, [L('M18 24h2M28 24h2'), F(circ(14, 24, 4), W), F(circ(24, 24, 4), W), F(circ(34, 24, 4), W)]),
+svc('Container registry', 'ECR · Artifact Registry · Container Registry', SL, [F(rect(13, 24, 10, 9, 1), W), F(rect(25, 24, 10, 9, 1), W), F(rect(19, 14, 10, 9, 1), W)]),
+svc('ML model', 'SageMaker · Vertex AI · Azure ML', SL, [L('M16 17l16 7M16 31l16-7M16 17v14'), F(circ(16, 17, 3.5), W), F(circ(16, 31, 3.5), W), F(circ(32, 24, 3.5), A)])
+] });
+groups.forEach((g) => g.icons.forEach((i) => { if (!i.eq) i.eq = ''; }));
+const total = groups.reduce((n, g) => n + g.icons.length, 0);
+return { groups: groups, total: total };
+}
+}
+</script>
+</body>
+</html>

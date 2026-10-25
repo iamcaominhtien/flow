@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BPMN: Basic BPMN: approving an expense</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@keyframes dc-flow2{to{stroke-dashoffset:-12}}
+.flow2{stroke-dasharray:6 6;animation:dc-flow2 1.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 1500px; height: 930px; background: #F8FAFC; overflow: hidden">
+<div style="position:absolute;left:64px;top:48px;display:flex;flex-direction:column;gap:8px"><div style="font-size:24px;font-weight:600">Basic BPMN: approving an expense</div><div style="font-size:13px;line-height:20px;color:#475569;max-width:900px">One pool with three lanes, one per role. The flow starts top left, crosses lanes where a hand-over happens, and splits at a decision. A dashed arrow returns work for a fix.</div></div>
+<div data-lint="box" style="position:absolute;left:64px;top:190px;width:1372px;height:630px;box-sizing:border-box;border:2px solid #0F172A;border-radius:6px;background:rgba(255,255,255,.75)"></div>
+<div style="position:absolute;left:64px;top:190px;width:36px;height:210px;box-sizing:border-box;border:2px solid #0F172A;background:#BFDBFE;display:flex;align-items:center;justify-content:center"><div style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:13px;font-weight:800">Employee</div></div>
+<div style="position:absolute;left:64px;top:400px;width:36px;height:210px;box-sizing:border-box;border:2px solid #0F172A;background:#CFC8F7;display:flex;align-items:center;justify-content:center"><div style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:13px;font-weight:800">Manager</div></div>
+<div data-lint="edge" style="position:absolute;left:64px;top:400px;width:1372px;border-top:2px solid #0F172A"></div>
+<div style="position:absolute;left:64px;top:610px;width:36px;height:210px;box-sizing:border-box;border:2px solid #0F172A;background:#B5EBC1;display:flex;align-items:center;justify-content:center"><div style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:13px;font-weight:800">Finance</div></div>
+<div data-lint="edge" style="position:absolute;left:64px;top:610px;width:1372px;border-top:2px solid #0F172A"></div>
+<svg width="44" height="44" style="position:absolute;left:168px;top:273px;overflow:visible"><circle cx="22" cy="22" r="20" fill="#DCF5E1" stroke="#15803D" stroke-width="2"/></svg>
+<div style="position:absolute;left:130px;top:321px;font-size:11.5px;line-height:15px;color:#334155;font-weight:600;width:120px;text-align:center;">Expense incurred</div>
+<div style="position:absolute;left:290px;top:263px;width:140px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#DCEEFB;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;font-weight:700;line-height:15px;padding:0 10px 0 26px">Submit expense</div>
+<svg width="18" height="18" viewBox="0 0 24 24" style="position:absolute;left:297px;top:269px;fill:none;stroke:#0F172A;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+<div style="position:absolute;left:290px;top:473px;width:140px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#E6E3FB;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;font-weight:700;line-height:15px;padding:0 10px 0 26px">Review expense</div>
+<svg width="18" height="18" viewBox="0 0 24 24" style="position:absolute;left:297px;top:479px;fill:none;stroke:#0F172A;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+<svg width="56" height="56" style="position:absolute;left:532px;top:477px;overflow:visible"><path d="M28 2L54 28L28 54L2 28Z" fill="#FFF1DD" stroke="#B45309" stroke-width="2" stroke-linejoin="round"/></svg>
+<svg width="28" height="28" viewBox="0 0 24 24" style="position:absolute;left:546px;top:491px;fill:none;stroke:#B45309;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><path d="M8 8l8 8M16 8l-8 8"/></svg>
+<div style="position:absolute;left:500px;top:535px;font-size:11.5px;line-height:15px;color:#334155;font-weight:700;width:120px;text-align:center;">Approved?</div>
+<div style="position:absolute;left:665px;top:263px;width:150px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#DCEEFB;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;font-weight:700;line-height:15px;padding:0 10px 0 26px">Fix and resubmit</div>
+<svg width="18" height="18" viewBox="0 0 24 24" style="position:absolute;left:672px;top:269px;fill:none;stroke:#0F172A;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+<div style="position:absolute;left:710px;top:683px;width:140px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#DCF5E1;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;font-weight:700;line-height:15px;padding:0 10px 0 26px">Pay employee</div>
+<svg width="18" height="18" viewBox="0 0 24 24" style="position:absolute;left:717px;top:689px;fill:none;stroke:#0F172A;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
+<svg width="44" height="44" style="position:absolute;left:938px;top:693px;overflow:visible"><circle cx="22" cy="22" r="20" fill="#FDE4E4" stroke="#B42318" stroke-width="4"/></svg>
+<div style="position:absolute;left:900px;top:741px;font-size:11.5px;line-height:15px;color:#334155;font-weight:600;width:120px;text-align:center;">Paid</div>
+<svg class="flow" width="80" height="12" viewBox="0 0 80 12" preserveAspectRatio="none" style="position:absolute;left:210px;top:289px;width:80px;height:12px;overflow:visible;fill:none;stroke:#1D4ED8;stroke-width:4;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-1" orient="auto" markerWidth="4" markerHeight="4" refX="2.0" refY="2.0" overflow="visible"><path d="M0 0 L4 2.0 L0 4 Z" fill="#1D4ED8" stroke="none" style="stroke:none;fill:#1D4ED8"/></marker></defs><path d="M 0 6 L 72 6" marker-end="url(#dc-arrow-head-filled-1)"></path></svg>
+<svg class="flow" width="12" height="146" viewBox="0 0 12 146" preserveAspectRatio="none" style="position:absolute;left:354px;top:327px;width:12px;height:146px;overflow:visible;fill:none;stroke:#1D4ED8;stroke-width:4;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-2" orient="auto" markerWidth="4" markerHeight="4" refX="2.0" refY="2.0" overflow="visible"><path d="M0 0 L4 2.0 L0 4 Z" fill="#1D4ED8" stroke="none" style="stroke:none;fill:#1D4ED8"/></marker></defs><path d="M 6 0 L 6 138" marker-end="url(#dc-arrow-head-filled-2)"></path></svg>
+<svg class="flow" width="104" height="12" viewBox="0 0 104 12" preserveAspectRatio="none" style="position:absolute;left:430px;top:499px;width:104px;height:12px;overflow:visible;fill:none;stroke:#1D4ED8;stroke-width:4;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-3" orient="auto" markerWidth="4" markerHeight="4" refX="2.0" refY="2.0" overflow="visible"><path d="M0 0 L4 2.0 L0 4 Z" fill="#1D4ED8" stroke="none" style="stroke:none;fill:#1D4ED8"/></marker></defs><path d="M 0 6 L 96 6" marker-end="url(#dc-arrow-head-filled-3)"></path></svg>
+<svg class="flow" width="194" height="12" viewBox="0 0 194 12" preserveAspectRatio="none" style="position:absolute;left:586px;top:499px;width:194px;height:12px;overflow:visible;fill:none;stroke:#1D4ED8;stroke-width:4;stroke-linejoin:round"><path d="M 0 6 L 194 6"></path></svg>
+<svg class="flow" width="12" height="178" viewBox="0 0 12 178" preserveAspectRatio="none" style="position:absolute;left:774px;top:505px;width:12px;height:178px;overflow:visible;fill:none;stroke:#1D4ED8;stroke-width:4;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-5" orient="auto" markerWidth="4" markerHeight="4" refX="2.0" refY="2.0" overflow="visible"><path d="M0 0 L4 2.0 L0 4 Z" fill="#1D4ED8" stroke="none" style="stroke:none;fill:#1D4ED8"/></marker></defs><path d="M 6 0 L 6 170" marker-end="url(#dc-arrow-head-filled-5)"></path></svg>
+<div style="position:absolute;left:800px;top:539px;transform:translate(-50%,-50%);padding:2px 8px;border-radius:999px;background:#F1F5F9;color:#334155;font-size:11px;font-weight:700;line-height:16px;white-space:nowrap;">yes</div>
+<svg class="flow" width="90" height="12" viewBox="0 0 90 12" preserveAspectRatio="none" style="position:absolute;left:850px;top:709px;width:90px;height:12px;overflow:visible;fill:none;stroke:#1D4ED8;stroke-width:4;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-6" orient="auto" markerWidth="4" markerHeight="4" refX="2.0" refY="2.0" overflow="visible"><path d="M0 0 L4 2.0 L0 4 Z" fill="#1D4ED8" stroke="none" style="stroke:none;fill:#1D4ED8"/></marker></defs><path d="M 0 6 L 82 6" marker-end="url(#dc-arrow-head-filled-6)"></path></svg>
+<svg width="12" height="184" viewBox="0 0 12 184" preserveAspectRatio="none" style="position:absolute;left:554px;top:295px;width:12px;height:184px;overflow:visible;fill:none;stroke:#B42318;stroke-width:2;stroke-linejoin:round"><path d="M 6 184 L 6 0"></path></svg>
+<svg width="105" height="12" viewBox="0 0 105 12" preserveAspectRatio="none" style="position:absolute;left:560px;top:289px;width:105px;height:12px;overflow:visible;fill:none;stroke:#B42318;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-8" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#B42318" stroke="none" style="stroke:none;fill:#B42318"/></marker></defs><path d="M 0 6 L 100 6" marker-end="url(#dc-arrow-head-filled-8)"></path></svg>
+<div style="position:absolute;left:582px;top:329px;transform:translate(-50%,-50%);padding:2px 8px;border-radius:999px;background:#FDE4E4;color:#B42318;font-size:11px;font-weight:700;line-height:16px;white-space:nowrap;">no</div>
+<svg width="12" height="38" viewBox="0 0 12 38" preserveAspectRatio="none" style="position:absolute;left:734px;top:225px;width:12px;height:38px;overflow:visible;fill:none;stroke:#475569;stroke-width:2;stroke-linejoin:round" stroke-dasharray="6 5"><path d="M 6 38 L 6 0"></path></svg>
+<svg width="380" height="12" viewBox="0 0 380 12" preserveAspectRatio="none" style="position:absolute;left:360px;top:219px;width:380px;height:12px;overflow:visible;fill:none;stroke:#475569;stroke-width:2;stroke-linejoin:round" stroke-dasharray="6 5"><path d="M 380 6 L 0 6"></path></svg>
+<svg width="12" height="38" viewBox="0 0 12 38" preserveAspectRatio="none" style="position:absolute;left:354px;top:225px;width:12px;height:38px;overflow:visible;fill:none;stroke:#475569;stroke-width:2;stroke-linejoin:round" stroke-dasharray="6 5"><defs><marker id="dc-arrow-head-filled-11" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#475569" stroke="none" style="stroke:none;fill:#475569"/></marker></defs><path d="M 6 0 L 6 33" marker-end="url(#dc-arrow-head-filled-11)"></path></svg>
+<div style="position:absolute;left:550px;top:225px;transform:translate(-50%,-50%);padding:2px 8px;border-radius:999px;background:#E2E8F0;color:#334155;font-size:11px;font-weight:700;line-height:16px;white-space:nowrap;">fix and resubmit</div>
+<div style="position:absolute;left:64px;top:850px;width:1300px;font-size:12.5px;line-height:19px;color:#475569"><b style="color:#0F172A">Reading it.</b> Each lane is a role, not a person. A task is a unit of work, written as verb and noun. The diamond with a cross is an exclusive choice: exactly one exit is taken.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1500,"height":930}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

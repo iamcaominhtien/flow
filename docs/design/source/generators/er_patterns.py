@@ -1,0 +1,45 @@
+from erlib import *
+CW, CH, GX, GY = 640, 340, 32, 28
+b = Board('ER_Patterns', 'Patterns: relationships', 1400, 150 + 3 * (CH + GY) + 40,
+  'The relationship shapes you meet again and again. Read each one from the marks at the ends of the line.')
+def cell(i, title, desc):
+    col, row = i % 2, i // 2
+    x0, y0 = 64 + col * (CW + GX), 130 + row * (CH + GY)
+    b.raw(f'<div style="position:absolute;left:{x0}px;top:{y0}px;width:{CW}px;height:{CH}px;box-sizing:border-box;background:#fff;border:1px solid #E2E8F0;border-radius:14px"></div>')
+    b.text(x0 + 22, y0 + 16, title, size=16, color='#0F172A', weight=800)
+    b.text(x0 + 22, y0 + 40, desc, size=12, color='#475569')
+    return x0, y0
+W = 200
+x0, y0 = cell(0, 'One to many', 'The usual case. The foreign key lives on the many side.')
+a = entity(b, x0 + 40, y0 + 90, 'Customer', [('id', 'uuid', 'pk'), ('name', 'text', '')], 'blue', 'user', w=W)
+c = entity(b, x0 + 400, y0 + 90, 'Order', [('id', 'uuid', 'pk'), ('customer_id', 'uuid', 'fk'), ('total', 'decimal', '')], 'violet', 'cart', w=W)
+rel(b, hv((a.r, a.row('id')), (c.l, c.row('customer_id')), x0 + 320), 'one', 'zero_many', 'places', (x0 + 320, a.row('id') - 16))
+b.text(x0 + 22, y0 + 270, 'A customer has zero or more orders; an order has exactly one customer.', size=12, color='#334155')
+x0, y0 = cell(1, 'One to one', 'A unique foreign key. The marks on the far side are one or zero-or-one.')
+a = entity(b, x0 + 40, y0 + 90, 'User', [('id', 'uuid', 'pk'), ('email', 'text', 'uq')], 'blue', 'user', w=W)
+c = entity(b, x0 + 400, y0 + 90, 'Profile', [('id', 'uuid', 'pk'), ('user_id', 'uuid', 'fk,uq'), ('bio', 'text', 'null')], 'violet', 'doc', w=W)
+rel(b, hv((a.r, a.row('id')), (c.l, c.row('user_id')), x0 + 320), 'one', 'zero_one', 'has', (x0 + 320, a.row('id') - 16))
+b.text(x0 + 22, y0 + 270, 'A user has at most one profile. The unique key on user_id enforces it.', size=12, color='#334155')
+x0, y0 = cell(2, 'Many to many', 'Never drawn directly. A junction table holds two foreign keys as one primary key.')
+a = entity(b, x0 + 16, y0 + 90, 'Student', [('id', 'uuid', 'pk'), ('name', 'text', '')], 'blue', 'user', w=150)
+j = entity(b, x0 + 232, y0 + 90, 'Enrollment', [('student_id', 'uuid', 'pk,fk'), ('course_id', 'uuid', 'pk,fk'), ('grade', 'text', 'null')], 'gray', 'box', w=190)
+c = entity(b, x0 + 484, y0 + 90, 'Course', [('id', 'uuid', 'pk'), ('title', 'text', '')], 'green', 'star', w=140)
+rel(b, hv((a.r, a.row('id')), (j.l, j.row('student_id')), (a.r + j.l) / 2), 'one', 'zero_many')
+rel(b, hv((c.l, c.row('id')), (j.r, j.row('course_id')), (c.l + j.r) / 2), 'one', 'zero_many')
+b.text(x0 + 22, y0 + 270, 'A student takes many courses; a course has many students.', size=12, color='#334155')
+x0, y0 = cell(3, 'Self reference', 'A table points at itself: trees, hierarchies, replies.')
+e = entity(b, x0 + 200, y0 + 80, 'Employee', [('id', 'uuid', 'pk'), ('name', 'text', ''), ('manager_id', 'uuid', 'fk,null')], 'blue', 'user', w=W)
+rel(b, [(e.r, e.row('id')), (e.r + 60, e.row('id')), (e.r + 60, e.row('manager_id')), (e.r, e.row('manager_id'))], 'one', 'zero_many', 'manages', (e.r + 100, (e.row('id') + e.row('manager_id')) / 2))
+b.text(x0 + 22, y0 + 270, 'An employee has zero or one manager and manages zero or more employees.', size=12, color='#334155')
+x0, y0 = cell(4, 'Subtype', 'Subtypes share the parent key. A hollow triangle marks the parent. A person can be both.')
+p = entity(b, x0 + 220, y0 + 64, 'Person', [('id', 'uuid', 'pk'), ('name', 'text', '')], 'gray', 'user', w=200)
+cu = entity(b, x0 + 60, y0 + 222, 'Customer', [('person_id', 'uuid', 'pk,fk'), ('phone', 'text', '')], 'blue', 'user', w=190)
+cr = entity(b, x0 + 390, y0 + 222, 'Courier', [('person_id', 'uuid', 'pk,fk'), ('vehicle', 'text', '')], 'teal', 'bike', w=190)
+ty = p.bot + 28
+b.raw(f'<svg width="400" height="80" style="position:absolute;left:{x0}px;top:{p.bot}px;overflow:visible;fill:none;stroke:{INK};stroke-width:2;stroke-linejoin:round"><path d="M{p.cx-x0} 0V4"/><path d="M{p.cx-x0-9} 4H{p.cx-x0+9}L{p.cx-x0} 18Z" fill="#fff" transform="translate(0 0) rotate(180 {p.cx-x0} 11)"/><path d="M{p.cx-x0} 18V28M{cu.cx-x0} 28H{cr.cx-x0}M{cu.cx-x0} 28V{cu.y-p.bot}M{cr.cx-x0} 28V{cr.y-p.bot}"/></svg>')
+x0, y0 = cell(5, 'Logical link', 'Dashed slate: a reference with no database constraint, for example to another service.')
+a = entity(b, x0 + 40, y0 + 90, 'Order', [('id', 'uuid', 'pk'), ('payment_ref', 'text', '')], 'violet', 'cart', w=W)
+c = entity(b, x0 + 400, y0 + 90, 'Payment (external)', [('id', 'text', 'pk'), ('amount', 'decimal', '')], 'amber', 'card', w=W)
+rel(b, hv((a.r, a.row('payment_ref')), (c.l, c.row('id')), x0 + 320), 'zero_many', 'one', 'refers to', (x0 + 300, a.row('payment_ref') + 20), dashed=True)
+b.text(x0 + 22, y0 + 270, 'Nothing enforces it, so say it with a dashed line and a verb.', size=12, color='#334155')
+print(save(b))

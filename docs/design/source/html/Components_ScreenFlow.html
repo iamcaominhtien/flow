@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Standalone copy of the design-canvas board "Components_ScreenFlow". Generated from source/canvas/Components_ScreenFlow.dc.html; opens in any browser. -->
+<meta charset="utf-8">
+<title>Flow Components: Screen flow parts</title>
+
+</head>
+<body>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h1,h2,h3,p{margin:0}
+.cd{background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pv{background:#F8FAFC;border-radius:10px;min-height:96px;display:flex;align-items:center;justify-content:center;gap:12px;padding:10px;box-sizing:border-box;flex-wrap:wrap}
+.nm{font-size:14px;font-weight:700}
+.cp{font-size:12px;line-height:1.5;color:#475569}
+.sec{display:flex;flex-direction:column;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.gh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.gh h2{font-size:22px;font-weight:800;letter-spacing:-0.01em}
+.gh span{font-size:13px;color:#475569}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow{animation:none}}
+</style>
+
+<div style="max-width: 1200px; margin: 0 auto; box-sizing: border-box; padding: 56px 32px 80px; display: flex; flex-direction: column; gap: 48px">
+
+<header style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="background: #1D4ED8; color: #FFFFFF; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 999px">Flow</span>
+<span style="font-size: 13px; font-weight: 600; color: #475569">Components · Screen flow parts</span>
+</div>
+<h1 style="font-size: 40px; line-height: 1.1; font-weight: 800; letter-spacing: -0.02em">Screen flow parts</h1>
+<p style="font-size: 16px; line-height: 1.55; color: #334155; max-width: 800px">Everything a screen-flow diagram is built from: device frames, wireframe blocks, overlays and states, and the transitions between screens.</p>
+</header>
+
+<section class="sec">
+<div class="gh"><h2>Screen flow: device frames</h2><span>Hold one screen. Choose device, orientation and name; the screen content comes from the blocks below</span></div>
+<div class="grid4">
+
+<div class="cd"><div class="pv" style="min-height: 160px">
+<div style="width: 190px; border: 2px solid #0F172A; border-radius: 8px; overflow: hidden; background: #FFFFFF">
+<div style="display: flex; align-items: center; gap: 5px; background: #E2E8F0; border-bottom: 2px solid #0F172A; padding: 5px 8px"><span style="width: 7px; height: 7px; border-radius: 999px; background: #D92D20"></span><span style="width: 7px; height: 7px; border-radius: 999px; background: #F59E3A"></span><span style="width: 7px; height: 7px; border-radius: 999px; background: #15803D"></span><span style="flex: 1; height: 10px; border-radius: 999px; background: #FFFFFF; margin-left: 6px"></span></div>
+<div style="height: 92px; padding: 8px; display: flex; flex-direction: column; gap: 6px"><span style="height: 9px; width: 55%; background: #CBD5E1; border-radius: 3px"></span><div style="display: flex; gap: 6px; flex: 1"><span style="flex: 1; background: #DCEEFB; border-radius: 4px"></span><span style="flex: 1; background: #DCEEFB; border-radius: 4px"></span><span style="flex: 1; background: #DCEEFB; border-radius: 4px"></span></div></div>
+</div>
+</div><span class="nm">PC browser</span><span class="cp">Window with traffic lights and address bar. Default 1280 × 800.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 160px; flex-direction: column; gap: 0">
+<div style="width: 150px; height: 92px; border: 3px solid #0F172A; border-radius: 8px 8px 0 0; background: #FFFFFF; padding: 8px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px"><span style="height: 9px; width: 50%; background: #CBD5E1; border-radius: 3px"></span><span style="flex: 1; background: #DCEEFB; border-radius: 4px"></span></div>
+<div style="width: 190px; height: 9px; background: #CBD5E1; border: 2px solid #0F172A; border-radius: 0 0 10px 10px; box-sizing: border-box"></div>
+</div><span class="nm">Laptop</span><span class="cp">Screen plus base. Use when the base helps tell it from a desktop.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 160px">
+<div style="width: 104px; height: 140px; border: 3px solid #0F172A; border-radius: 14px; background: #FFFFFF; padding: 10px 8px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px"><span style="height: 9px; width: 60%; background: #CBD5E1; border-radius: 3px"></span><span style="flex: 1; background: #DCEEFB; border-radius: 4px"></span><span style="height: 14px; background: #E2E8F0; border-radius: 4px"></span></div>
+</div><span class="nm">Tablet</span><span class="cp">Portrait or landscape, 4:3 or 3:2.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 160px">
+<div style="position: relative; width: 78px; height: 144px; border: 3px solid #0F172A; border-radius: 18px; background: #FFFFFF; padding: 16px 7px 8px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px"><span style="position: absolute; top: 5px; left: 50%; width: 22px; height: 4px; border-radius: 999px; background: #0F172A; transform: translateX(-50%)"></span><span style="height: 8px; width: 60%; background: #CBD5E1; border-radius: 3px"></span><span style="flex: 1; background: #DCEEFB; border-radius: 4px"></span><span style="height: 12px; background: #1D4ED8; border-radius: 4px"></span></div>
+</div><span class="nm">Phone, portrait</span><span class="cp">Default for SP screens. 390 × 844.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 160px">
+<div style="position: relative; width: 148px; height: 76px; border: 3px solid #0F172A; border-radius: 16px; background: #FFFFFF; padding: 7px 16px 7px 7px; box-sizing: border-box; display: flex; gap: 6px"><span style="position: absolute; right: 5px; top: 50%; width: 4px; height: 22px; border-radius: 999px; background: #0F172A; transform: translateY(-50%)"></span><span style="flex: 1; background: #DCEEFB; border-radius: 4px"></span><span style="width: 36px; background: #E2E8F0; border-radius: 4px"></span></div>
+</div><span class="nm">Phone, landscape</span><span class="cp">For games, video and wide layouts.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 160px; flex-direction: column; gap: 0">
+<span style="width: 34px; height: 14px; background: #475569; border: 2px solid #0F172A; border-bottom: 0; border-radius: 6px 6px 0 0; box-sizing: border-box"></span>
+<div style="width: 66px; height: 76px; border: 3px solid #0F172A; border-radius: 20px; background: #0F172A; padding: 8px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px"><span style="font-size: 16px; font-weight: 800; color: #FFFFFF">10:24</span><span style="width: 34px; height: 6px; border-radius: 999px; background: #7DD3CB"></span></div>
+<span style="width: 34px; height: 14px; background: #475569; border: 2px solid #0F172A; border-top: 0; border-radius: 0 0 6px 6px; box-sizing: border-box"></span>
+</div><span class="nm">Smartwatch</span><span class="cp">Dark face, strap above and below.</span></div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>Screen flow: wireframe blocks</h2><span>Neutral gray-blue so the flow reads first; blue marks the primary action</span></div>
+<div class="grid4">
+
+<div class="cd"><div class="pv"><div style="width: 220px; height: 34px; background: #FFFFFF; border: 1.5px solid #94A3B8; border-radius: 8px; display: flex; align-items: center; gap: 10px; padding: 0 10px; box-sizing: border-box"><span style="width: 18px; height: 18px; border-radius: 5px; background: #1D4ED8"></span><span style="flex: 1"></span><span style="width: 26px; height: 7px; border-radius: 3px; background: #CBD5E1"></span><span style="width: 26px; height: 7px; border-radius: 3px; background: #CBD5E1"></span><span style="width: 20px; height: 20px; border-radius: 999px; background: #E2E8F0; border: 1.5px solid #94A3B8"></span></div></div><span class="nm">Navbar</span><span class="cp">Logo, links, avatar.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><div style="width: 80px; background: #FFFFFF; border: 1.5px solid #94A3B8; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px"><span style="height: 8px; width: 60%; background: #0F172A; border-radius: 3px"></span><span style="height: 12px; background: #DCEEFB; border-radius: 4px"></span><span style="height: 8px; background: #E2E8F0; border-radius: 3px"></span><span style="height: 8px; background: #E2E8F0; border-radius: 3px"></span><span style="height: 8px; background: #E2E8F0; border-radius: 3px"></span></div></div><span class="nm">Sidebar menu</span><span class="cp">Active item tinted.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 140px"><div style="width: 130px; background: #FFFFFF; border: 1.5px solid #94A3B8; border-radius: 10px; overflow: hidden"><svg width="130" height="52" viewBox="0 0 130 52" aria-hidden="true"><rect width="130" height="52" fill="#E2E8F0"/><path d="M0 0L130 52M130 0L0 52" stroke="#94A3B8" stroke-width="1.5"/></svg><div style="padding: 8px; display: flex; flex-direction: column; gap: 5px"><span style="height: 8px; width: 70%; background: #0F172A; border-radius: 3px"></span><span style="height: 6px; background: #CBD5E1; border-radius: 3px"></span><span style="height: 16px; width: 50%; background: #1D4ED8; border-radius: 5px; margin-top: 3px"></span></div></div></div><span class="nm">Card</span><span class="cp">Image, title, text, action.</span></div>
+
+<div class="cd"><div class="pv"><div style="width: 210px; background: #FFFFFF; border: 1.5px solid #94A3B8; border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; box-sizing: border-box"><span style="width: 28px; height: 28px; border-radius: 999px; background: #E2E8F0; border: 1.5px solid #94A3B8"></span><span style="flex: 1; display: flex; flex-direction: column; gap: 5px"><span style="height: 8px; width: 70%; background: #0F172A; border-radius: 3px"></span><span style="height: 6px; width: 45%; background: #CBD5E1; border-radius: 3px"></span></span><svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="M2 2l5 5-5 5" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/></svg></div></div><span class="nm">List item</span><span class="cp">Avatar, two lines, chevron.</span></div>
+
+<div class="cd"><div class="pv"><div style="width: 200px; display: flex; flex-direction: column; gap: 5px"><span style="font-size: 11px; font-weight: 600">Email</span><span style="height: 32px; background: #FFFFFF; border: 2px solid #1D4ED8; border-radius: 8px; display: flex; align-items: center; padding: 0 10px; font-size: 12px; color: #475569; box-sizing: border-box">name@example.com</span><span style="font-size: 10px; color: #475569">We will never share it.</span></div></div><span class="nm">Form field</span><span class="cp">Label, input (focus ring shown), helper text.</span></div>
+
+<div class="cd"><div class="pv" style="gap: 8px"><span style="background: #1D4ED8; color: #FFFFFF; font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 8px">Primary</span><span style="background: #FFFFFF; color: #1D4ED8; border: 2px solid #1D4ED8; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 8px">Secondary</span><span style="background: #D92D20; color: #FFFFFF; font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 8px">Danger</span><span style="background: #E2E8F0; color: #475569; font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 8px">Disabled</span></div><span class="nm">Buttons</span><span class="cp">Primary, secondary, danger, disabled.</span></div>
+
+<div class="cd"><div class="pv"><svg width="140" height="90" viewBox="0 0 140 90" aria-hidden="true"><rect x="1" y="1" width="138" height="88" rx="8" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1.5"/><path d="M1 1L139 89M139 1L1 89" stroke="#94A3B8" stroke-width="1.5"/></svg></div><span class="nm">Image placeholder</span><span class="cp">Crossed box, any aspect ratio.</span></div>
+
+<div class="cd"><div class="pv"><div style="width: 220px; display: flex; border-bottom: 1.5px solid #CBD5E1"><span style="flex: 1; text-align: center; font-size: 12px; font-weight: 700; color: #1D4ED8; padding: 8px 0; border-bottom: 3px solid #1D4ED8; margin-bottom: -1.5px">Home</span><span style="flex: 1; text-align: center; font-size: 12px; font-weight: 600; color: #475569; padding: 8px 0">Orders</span><span style="flex: 1; text-align: center; font-size: 12px; font-weight: 600; color: #475569; padding: 8px 0">Profile</span></div></div><span class="nm">Tab bar</span><span class="cp">Active tab underlined in blue.</span></div>
+
+<div class="cd"><div class="pv"><div style="width: 220px; background: #FFFFFF; border: 1.5px solid #94A3B8; border-radius: 12px; display: flex; justify-content: space-around; padding: 8px 4px"><span style="display: flex; flex-direction: column; align-items: center; gap: 3px"><span style="width: 18px; height: 18px; border-radius: 6px; background: #1D4ED8"></span><span style="font-size: 10px; font-weight: 700; color: #1D4ED8">Home</span></span><span style="display: flex; flex-direction: column; align-items: center; gap: 3px"><span style="width: 18px; height: 18px; border-radius: 6px; background: #CBD5E1"></span><span style="font-size: 10px; font-weight: 600; color: #475569">Search</span></span><span style="display: flex; flex-direction: column; align-items: center; gap: 3px"><span style="width: 18px; height: 18px; border-radius: 6px; background: #CBD5E1"></span><span style="font-size: 10px; font-weight: 600; color: #475569">Cart</span></span><span style="display: flex; flex-direction: column; align-items: center; gap: 3px"><span style="width: 18px; height: 18px; border-radius: 6px; background: #CBD5E1"></span><span style="font-size: 10px; font-weight: 600; color: #475569">Me</span></span></div></div><span class="nm">Bottom nav</span><span class="cp">Mobile primary navigation.</span></div>
+
+<div class="cd"><div class="pv"><div style="width: 210px; height: 34px; background: #FFFFFF; border: 1.5px solid #94A3B8; border-radius: 999px; display: flex; align-items: center; gap: 8px; padding: 0 12px; box-sizing: border-box"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="6"/><path d="M15 15l6 6"/></svg><span style="font-size: 12px; color: #475569">Search</span></div></div><span class="nm">Search bar</span><span class="cp">Pill input with magnifier.</span></div>
+
+<div class="cd"><div class="pv"><div style="width: 220px; background: #FFFFFF; border: 1.5px solid #94A3B8; border-radius: 8px; overflow: hidden"><div style="display: grid; grid-template-columns: 1.4fr 1fr 0.8fr; gap: 8px; padding: 7px 10px; background: #E2E8F0"><span style="height: 7px; background: #0F172A; border-radius: 3px"></span><span style="height: 7px; background: #0F172A; border-radius: 3px"></span><span style="height: 7px; background: #0F172A; border-radius: 3px"></span></div><div style="display: grid; grid-template-columns: 1.4fr 1fr 0.8fr; gap: 8px; padding: 7px 10px; border-top: 1px solid #E2E8F0"><span style="height: 6px; background: #CBD5E1; border-radius: 3px"></span><span style="height: 6px; background: #CBD5E1; border-radius: 3px"></span><span style="height: 6px; background: #CBD5E1; border-radius: 3px"></span></div><div style="display: grid; grid-template-columns: 1.4fr 1fr 0.8fr; gap: 8px; padding: 7px 10px; border-top: 1px solid #E2E8F0"><span style="height: 6px; background: #CBD5E1; border-radius: 3px"></span><span style="height: 6px; background: #CBD5E1; border-radius: 3px"></span><span style="height: 6px; background: #CBD5E1; border-radius: 3px"></span></div></div></div><span class="nm">Data table</span><span class="cp">Header row and body rows.</span></div>
+
+<div class="cd"><div class="pv"><div style="width: 150px; height: 90px; background: #FFFFFF; border: 1.5px solid #94A3B8; border-radius: 10px; padding: 10px; box-sizing: border-box; display: flex; align-items: flex-end; gap: 8px"><span style="flex: 1; height: 40%; background: #DCEEFB; border: 1.5px solid #1E5AA8; border-radius: 3px 3px 0 0"></span><span style="flex: 1; height: 75%; background: #DCEEFB; border: 1.5px solid #1E5AA8; border-radius: 3px 3px 0 0"></span><span style="flex: 1; height: 55%; background: #DCEEFB; border: 1.5px solid #1E5AA8; border-radius: 3px 3px 0 0"></span><span style="flex: 1; height: 90%; background: #1D4ED8; border-radius: 3px 3px 0 0"></span></div></div><span class="nm">Chart placeholder</span><span class="cp">Bars with the key value highlighted.</span></div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>Screen flow: overlays and states</h2><span>Layers that sit on a screen, and the three states every screen needs</span></div>
+<div class="grid4">
+
+<div class="cd"><div class="pv" style="min-height: 140px"><div style="position: relative; width: 190px; height: 120px; background: #E2E8F0; border-radius: 8px; overflow: hidden"><span style="position: absolute; inset: 0; background: rgba(15,23,42,0.5)"></span><div style="position: absolute; left: 24px; right: 24px; top: 22px; background: #FFFFFF; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 6px"><span style="height: 8px; width: 55%; background: #0F172A; border-radius: 3px"></span><span style="height: 6px; background: #CBD5E1; border-radius: 3px"></span><div style="display: flex; gap: 6px; justify-content: flex-end; margin-top: 4px"><span style="width: 32px; height: 14px; border: 1.5px solid #1D4ED8; border-radius: 5px"></span><span style="width: 32px; height: 14px; background: #1D4ED8; border-radius: 5px"></span></div></div></div></div><span class="nm">Modal dialog</span><span class="cp">Dimmed backdrop, centered card, two actions.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 140px"><div style="position: relative; width: 90px; height: 128px; background: #E2E8F0; border-radius: 12px; overflow: hidden"><span style="position: absolute; inset: 0; background: rgba(15,23,42,0.4)"></span><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 62px; background: #FFFFFF; border-radius: 12px 12px 0 0; padding: 7px 9px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="width: 26px; height: 4px; border-radius: 999px; background: #94A3B8"></span><span style="height: 7px; width: 100%; background: #CBD5E1; border-radius: 3px"></span><span style="height: 7px; width: 100%; background: #CBD5E1; border-radius: 3px"></span></div></div></div><span class="nm">Bottom sheet</span><span class="cp">Slides up from the bottom, grab handle on top.</span></div>
+
+<div class="cd"><div class="pv"><span style="display: flex; align-items: center; gap: 8px; background: #0F172A; color: #FFFFFF; font-size: 12px; font-weight: 600; padding: 9px 14px; border-radius: 999px"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#7DD3CB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>Order saved</span></div><span class="nm">Toast</span><span class="cp">Short confirmation that fades out.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 140px"><div style="width: 170px; display: flex; flex-direction: column; gap: 8px; align-items: center"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="11" fill="none" stroke="#E2E8F0" stroke-width="4"/><path d="M15 4a11 11 0 0 1 11 11" fill="none" stroke="#1D4ED8" stroke-width="4" stroke-linecap="round"/></svg><span style="height: 8px; width: 100%; background: #E2E8F0; border-radius: 3px"></span><span style="height: 8px; width: 80%; background: #E2E8F0; border-radius: 3px"></span><span style="height: 8px; width: 60%; background: #E2E8F0; border-radius: 3px"></span></div></div><span class="nm">Loading</span><span class="cp">Spinner over skeleton bars.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 140px"><div style="display: flex; flex-direction: column; align-items: center; gap: 8px"><span style="width: 44px; height: 44px; border-radius: 12px; background: #E2E8F0; border: 1.5px dashed #94A3B8"></span><span style="font-size: 12px; font-weight: 700">No orders yet</span><span style="background: #1D4ED8; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 7px">Create one</span></div></div><span class="nm">Empty state</span><span class="cp">Dashed icon, message, one action.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 140px"><div style="display: flex; flex-direction: column; align-items: center; gap: 8px"><span style="width: 44px; height: 44px; border-radius: 999px; background: #FDE4E4; border: 2px solid #B42318; color: #B42318; font-size: 24px; font-weight: 800; display: flex; align-items: center; justify-content: center">!</span><span style="font-size: 12px; font-weight: 700">Something went wrong</span><span style="background: #FFFFFF; color: #1D4ED8; border: 2px solid #1D4ED8; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 7px">Retry</span></div></div><span class="nm">Error state</span><span class="cp">Rose icon, message, retry.</span></div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>Screen flow: transitions</h2><span>What links one screen to the next, and what triggers it</span></div>
+<div class="grid3">
+
+<div class="cd"><div class="pv" style="min-height: 120px; gap: 0">
+<span style="width: 46px; height: 76px; border: 2.5px solid #0F172A; border-radius: 9px; background: #FFFFFF; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; box-sizing: border-box"><span style="width: 26px; height: 9px; border-radius: 3px; background: #1D4ED8"></span></span>
+<span style="display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 0 4px"><span style="font-size: 10px; font-weight: 700; background: #0F172A; color: #FFFFFF; padding: 3px 8px; border-radius: 999px; white-space: nowrap">tap Login</span><span style="display: flex; align-items: center; width: 90px"><span style="flex: 1; border-top: 2px solid #0F172A"></span><span style="width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 9px solid #0F172A"></span></span></span>
+<span style="width: 46px; height: 76px; border: 2.5px solid #0F172A; border-radius: 9px; background: #FFFFFF; padding: 8px 6px; box-sizing: border-box; display: flex; flex-direction: column; gap: 5px"><span style="height: 6px; background: #CBD5E1; border-radius: 3px"></span><span style="flex: 1; background: #DCEEFB; border-radius: 3px"></span></span>
+</div><span class="nm">Screen link</span><span class="cp">Arrow from the element that was tapped to the next screen, with a dark action chip on the line.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><div style="position: relative; width: 60px; height: 40px; background: #1D4ED8; border-radius: 8px; display: flex; align-items: center; justify-content: center"><span style="font-size: 11px; font-weight: 700; color: #FFFFFF">Buy</span><span style="position: absolute; right: -12px; bottom: -12px; width: 28px; height: 28px; border-radius: 999px; background: rgba(217,45,32,0.25); display: flex; align-items: center; justify-content: center"><span style="width: 12px; height: 12px; border-radius: 999px; background: #D92D20; border: 2px solid #FFFFFF"></span></span></div></div><span class="nm">Hotspot</span><span class="cp">Red dot with a halo marks the exact tap target the arrow starts from.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="260" height="96" viewBox="0 0 260 96" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="22" width="44" height="52" rx="8" fill="#FFFFFF"/><path d="M50 40C80 40 80 20 120 20" fill="none"/><path d="M50 56C80 56 80 76 120 76" fill="none" stroke-dasharray="5 4"/><path d="M114 14l8 6-8 6" fill="none"/><path d="M114 70l8 6-8 6" fill="none"/><rect x="126" y="6" width="44" height="30" rx="7" fill="#DCF5E1" stroke="#1E7A3C"/><rect x="126" y="62" width="44" height="30" rx="7" fill="#FDE4E4" stroke="#B42318"/><text x="76" y="14" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#15803D" stroke="none">success</text><text x="76" y="92" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#B42318" stroke="none">error</text><text x="148" y="25" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#14532D" stroke="none">Home</text><text x="148" y="81" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#7F1D1D" stroke="none">Retry</text></svg></div><span class="nm">Branching transition</span><span class="cp">One screen, two outcomes: solid green for success, dashed rose for failure.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 100px; gap: 8px"><span style="display: flex; align-items: center; gap: 6px; background: #0F172A; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 4px 11px 4px 4px; border-radius: 999px"><span style="background: #7DD3CB; color: #0F172A; border-radius: 999px; padding: 2px 7px">S01</span>Login</span><span style="display: flex; align-items: center; gap: 6px; background: #0F172A; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 4px 11px 4px 4px; border-radius: 999px"><span style="background: #7DD3CB; color: #0F172A; border-radius: 999px; padding: 2px 7px">S02</span>Home</span></div><span class="nm">Screen label</span><span class="cp">ID plus name, placed above each frame. IDs stay stable so specs can refer to them.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 100px"><svg width="240" height="64" viewBox="0 0 240 64" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="8" width="40" height="48" rx="7" fill="#FFFFFF"/><rect x="194" y="8" width="40" height="48" rx="7" fill="#FFFFFF"/><path d="M194 32C170 32 70 32 52 32" fill="none" stroke-dasharray="5 4"/><path d="M58 26l-8 6 8 6" fill="none"/><text x="120" y="24" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#475569" stroke="none">back</text></svg></div><span class="nm">Back / close</span><span class="cp">Dashed return arrow pointing to the earlier screen.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 100px; gap: 6px"><span style="font-size: 11px; font-weight: 700; color: #475569; font-family: 'JetBrains Mono', monospace">[logged in]</span><span style="font-size: 11px; font-weight: 700; color: #475569; font-family: 'JetBrains Mono', monospace">[cart empty]</span><span style="display: flex; align-items: center; gap: 6px"><svg width="64" height="28" viewBox="0 0 64 28" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="8" fill="rgba(29,78,216,0.2)" stroke="#1D4ED8"/><path d="M22 14h34M50 8l7 6-7 6" fill="none" stroke-dasharray="4 3"/></svg><span style="font-size: 11px; font-weight: 700">swipe</span></span></div><span class="nm">Guards and gestures</span><span class="cp">Mono guard text for conditions, circle with dashed arrow for gestures like swipe.</span></div>
+
+</div>
+</section>
+
+</div>
+
+
+</body>
+</html>

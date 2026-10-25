@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Screen flow: rules</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+ul{padding-left:18px}
+li{font-size:13px;line-height:20px;color:#334155;margin-bottom:6px}
+.rc{background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}
+.rc h2{font-size:16px;font-weight:800}
+.mono{font-family:'JetBrains Mono',monospace;font-size:12px}
+.tbl{display:grid;gap:6px 12px;font-size:13px;line-height:20px;color:#334155}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1900px; box-sizing: border-box; padding: 64px; background: #F8FAFC; display: flex; flex-direction: column; gap: 28px">
+
+<div style="display: flex; flex-direction: column; gap: 8px"><div style="font-size: 24px; font-weight: 600">Screen flow &middot; Rules</div><div style="font-size: 13px; line-height: 20px; color: #475569; max-width: 900px">The conventions every screen-flow diagram follows, and that a plugin can rely on. Each rule points to the artboard that shows it.</div></div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+
+<div class="rc">
+<h2>IDs and names</h2>
+<ul>
+<li><b>Screens:</b> S plus two digits. The first digit is the group (0 onboarding, 1 browse, 2 checkout, 3 account), the second is the order in the group. Codes need not be consecutive.</li>
+<li><b>Desktop web:</b> the same scheme with W (W01, W02). A web flow is drawn as its own zone with its own screens, not as badges on phone screens.</li>
+<li><b>States of one screen:</b> same ID plus a state name, written S31 &middot; loading. A state never gets a new number.</li>
+<li><b>Overlays:</b> base ID plus the kind, S12 + modal. Give an overlay its own number only if it has onward transitions of its own.</li>
+<li><b>Orientation:</b> the same ID. A different structure per orientation gets a different ID.</li>
+<li><b>Decisions</b> (diamonds) and flags have no ID. Entry points are named by their source: App icon, Push, Deep link.</li>
+</ul>
+</div>
+
+<div class="rc">
+<h2>Conditions on transitions</h2>
+<div style="font-size: 13px; line-height: 20px; color: #334155">One arrow carries up to three parts: <span class="mono">trigger [guard] / effect</span></div>
+<ul>
+<li><b>Trigger</b> is a chip: dark for something the user does (verb plus target: tap Login, click product, swipe left), slate with an icon for the system (clock for time, bolt for an event, shield for permission, cloud for an API result, phone for a device action).</li>
+<li><b>Guard</b> is mono in square brackets, lower case. Green on the success path, rose on failure.</li>
+<li><b>Effect</b> follows a slash, in gray: <span class="mono">/ save token</span>.</li>
+<li><b>Length:</b> inline while a label stays under about 20 characters. Longer, or shared by several arrows: put a code (C1, C2) on the arrow and the full text in a table.</li>
+<li>Labels never wrap: set nowrap and a width that fits.</li>
+</ul>
+</div>
+
+<div class="rc">
+<h2>Fidelity levels</h2>
+<div class="tbl" style="grid-template-columns: 42px 1fr">
+<b>L0</b><span>Names only: a rounded card with ID and name. Nothing on the screen is decided.</span>
+<b>L1</b><span>Skeleton: a real device frame with identical generic content and "content TBD".</span>
+<b>L2</b><span>Key elements: only the elements that cause a transition are drawn and named, the rest is hatched.</span>
+<b>L3</b><span>Full wireframe from the wireframe blocks.</span>
+</div>
+<ul>
+<li>Levels can be mixed in one diagram. Every level has the same width and centre line, so raising a screen never moves an arrow.</li>
+<li>Undecided: dashed card with a TBD tag, and a dashed arrow into it.</li>
+<li>No default level is chosen yet.</li>
+</ul>
+</div>
+
+<div class="rc">
+<h2>Frame sizes</h2>
+<div class="tbl" style="grid-template-columns: 1.3fr 1fr 1fr">
+<b>Device</b><b>Real size</b><b>Drawn at</b>
+<span>Phone, portrait</span><span class="mono">390 &times; 844</span><span class="mono">156 &times; 324</span>
+<span>Phone, landscape</span><span class="mono">844 &times; 390</span><span class="mono">324 &times; 156</span>
+<span>Tablet, portrait</span><span class="mono">820 &times; 1180</span><span class="mono">164 &times; 236</span>
+<span>Tablet, landscape</span><span class="mono">1180 &times; 820</span><span class="mono">236 &times; 164</span>
+<span>Desktop browser</span><span class="mono">1280 &times; 800</span><span class="mono">240 &times; 170</span>
+<span>Smartwatch face</span><span class="mono">about 200 &times; 240</span><span class="mono">80 &times; 96</span>
+</div>
+<div style="font-size: 12px; line-height: 18px; color: #475569">Scales are approximate: phone 0.4, tablet 0.2, desktop 0.19 including the browser bar. Border 3 px ink. A mini phone at 120 &times; 240 is used where a diagram has many screens.</div>
+</div>
+
+<div class="rc">
+<h2>Layout</h2>
+<ul>
+<li>Flow runs left to right. Branches drop down. Back arrows run in a strip above the main row.</li>
+<li>Gap between frames: 130 px or more when the arrow carries a chip, 96 px otherwise. Frames in a row share a centre line.</li>
+<li>An arrow leaves the middle of the facing edge. Forward and back arrows between the same frames use the upper and lower third.</li>
+<li>Never route an arrow across a frame. Put the ID chip where no arrow passes.</li>
+<li><b>Zones:</b> each group of screens sits in a dashed, tinted frame with a pill label, one colour per zone.</li>
+<li><b>Tab bar:</b> draw the bar once as a bus into every tab, never a pair of arrows per tab. Screens that hide the bar go in their own zone (Tab navigation).</li>
+<li><b>Overlays</b> are drawn on the screen they cover, and closing one returns to it (Overlays).</li>
+<li><b>Entry points</b> are green pills in a left column. <b>Flags</b> point to another diagram by name and number (Entry points).</li>
+</ul>
+</div>
+
+<div class="rc">
+<h2>Colour and line roles</h2>
+<div style="display: grid; grid-template-columns: auto 1fr; gap: 10px 14px; align-items: center; font-size: 13px; line-height: 20px; color: #334155">
+<span style="width: 34px; border-top: 2px solid #0F172A"></span><span>Next screen: ink, solid</span>
+<span style="width: 34px; border-top: 2px solid #15803D"></span><span>Success path: green</span>
+<span style="width: 34px; border-top: 2px solid #B42318"></span><span>Failure path: rose</span>
+<span style="width: 34px; border-top: 2px dashed #475569"></span><span>Back, retry or dismiss: slate, dashed</span>
+<svg width="34" height="8" viewBox="0 0 34 8" aria-hidden="true" style="fill: none; stroke: #1D4ED8; stroke-width: 4; stroke-dasharray: 8 5"><path d="M 0 4 L 34 4"></path></svg><span>Main path: blue, thick, animated. One per diagram.</span>
+<span style="width: 12px; height: 12px; margin: 0 11px; box-sizing: border-box; border-radius: 999px; background: #D92D20; border: 2px solid #FFFFFF; box-shadow: 0 0 0 7px rgba(217,45,32,0.25)"></span><span>Hotspot: the element that was tapped</span>
+<span style="width: 34px; text-align: center; font-size: 11px; font-weight: 700; background: #0F172A; color: #7DD3CB; border-radius: 999px; padding: 2px 0">S01</span><span>ID chip: ink, teal text. In a coloured zone it takes the zone colour.</span>
+</div>
+</div>
+
+<div class="rc">
+<h2>Highlighting the main path</h2>
+<ul>
+<li>Use the animated blue line for the one route that matters: the happy path or the primary request. A second animated line cancels the effect.</li>
+<li>Everything else stays thin and static: failures rose, optional links dotted, returns dashed slate.</li>
+<li>Animation is off when the viewer prefers reduced motion.</li>
+<li>In draw.io each line has its own flow animation (flowAnimation=1) and its own duration: main route 500, event stream 1500. Checked in the draw.io viewer; SVG export not yet tested.</li>
+</ul>
+</div>
+
+<div class="rc">
+<h2>Platforms</h2>
+<ul>
+<li>Show where a screen exists by <b>drawing it</b> in the right device frame. No SP or PC badges.</li>
+<li>A web flow is its own zone below the app flow. It shows its own path, so differences (a one-page checkout, a header menu instead of a tab) are visible as structure.</li>
+<li>The same action uses the matching verb: tap on touch, click on desktop.</li>
+</ul>
+</div>
+
+<div class="rc">
+<h2>What a plugin can rely on</h2>
+<ul>
+<li>A node is: ID, name, device, orientation, fidelity level, optional state or overlay.</li>
+<li>A transition is: from, to, trigger, optional guard, optional effect, kind (forward, back, retry, failure, main).</li>
+<li>Layout comes from rows, columns and zones, not from free coordinates. The plugin picks the column and row, then the arrow routes follow the gap rules above.</li>
+<li>Anything not covered here is left to the diagram author.</li>
+</ul>
+</div>
+
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1900}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

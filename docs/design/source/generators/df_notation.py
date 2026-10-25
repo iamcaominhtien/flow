@@ -1,0 +1,31 @@
+from dfdlib import *
+b = Board('DFD_Notation', 'Notation: four symbols and three mistakes', 2100, 1050,
+  'A data flow diagram has exactly four things. Flows carry data, not actions: the label is a noun. Below, the three connections that are never drawn.')
+def cap(x, y, title, text, w=420):
+    b.raw(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{w}px"><div style="font-size:13px;font-weight:800">{title}</div><div style="font-size:12px;line-height:18px;color:#475569;margin-top:4px">{text}</div></div>')
+ext(b, 300, 260, 'E1', 'Customer', 'User', 'blue')
+cap(150, 340, 'External entity', 'Someone or something outside the system that sends or receives data. Square corners, numbered E1, E2.')
+proc(b, 860, 260, '1.0', 'Take order', 'what it does, in a few words', 'blue')
+cap(710, 340, 'Process', 'Turns data in into data out. Number in the header strip (1.0, 2.0; 4.1 when opened). Name is a verb phrase.')
+store(b, 1420, 260, 'D1', 'Orders', 'violet', w=280)
+cap(1280, 340, 'Data store', 'Data at rest. Open on the right. Numbered D1, D2. Only processes read and write it.')
+b.arrow([(1760, 260), (2000, 260)], 'main', 'Order ticket', (1880, 260))
+cap(1740, 340, 'Data flow', 'An arrow with a noun label: <i>Order ticket</i>, not <i>Send ticket</i>. One direction per arrow; a reply is its own arrow.', w=330)
+b.raw('<div style="position:absolute;left:64px;top:520px;font-size:18px;font-weight:700">Never drawn</div>')
+def bad(x, y, a, c, t, txt):
+    b.arrow([a, c], 'no', 'Data', ((a[0] + c[0]) / 2, y + 0))
+    mx = (a[0] + c[0]) / 2
+    b.raw(f'<div style="position:absolute;left:{mx-14}px;top:{y-62}px;width:28px;height:28px;border-radius:999px;background:#B42318;color:#fff;font:800 16px/28px Inter,sans-serif;text-align:center">×</div>')
+    cap(x - 200, y + 100, t, txt, w=520)
+e1 = ext(b, 200, 700, 'E1', 'Customer', 'User', 'blue', w=170, h=64)
+e2 = ext(b, 640, 700, 'E4', 'Payment provider', 'Card', 'gray', w=170, h=64)
+bad(0 + 330, 700, e1.r(), e2.l(), 'Entity to entity', 'Two outside parties never exchange data on the diagram: it is not part of the system. Put the system between them.')
+s1 = store(b, 960, 700, 'D1', 'Orders', 'violet', w=170, h=64)
+s2 = store(b, 1360, 700, 'D2', 'Menu', 'amber', w=170, h=64)
+bad(1000, 700, s1.r(), s2.l(), 'Store to store', 'A store cannot move data by itself. Show the process that copies it from one to the other.')
+e3 = ext(b, 1560, 700, 'E1', 'Customer', 'User', 'blue', w=170, h=64)
+p3 = proc(b, 1960, 700, '5.0', 'Log visit', 'keeps nothing, sends nothing', 'gray', w=200, h=100)
+b.arrow([e3.r(), p3.l()], 'no', 'Visit', (1760, 700))
+b.raw('<div style="position:absolute;left:1746px;top:638px;width:28px;height:28px;border-radius:999px;background:#B42318;color:#fff;font:800 16px/28px Inter,sans-serif;text-align:center">×</div>')
+cap(1560, 800, 'Black hole', 'A process with an input and no output. Every process produces something, or it does not belong.', w=420)
+print(save10(b))

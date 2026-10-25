@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Standalone copy of the design-canvas board "Components_Annotations". Generated from source/canvas/Components_Annotations.dc.html; opens in any browser. -->
+<meta charset="utf-8">
+<title>Flow Components: Annotations and layout</title>
+
+</head>
+<body>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h1,h2,h3,p{margin:0}
+.cd{background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pv{background:#F8FAFC;border-radius:10px;min-height:96px;display:flex;align-items:center;justify-content:center;gap:12px;padding:10px;box-sizing:border-box;flex-wrap:wrap}
+.nm{font-size:14px;font-weight:700}
+.cp{font-size:12px;line-height:1.5;color:#475569}
+.sec{display:flex;flex-direction:column;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.gh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.gh h2{font-size:22px;font-weight:800;letter-spacing:-0.01em}
+.gh span{font-size:13px;color:#475569}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow{animation:none}}
+</style>
+
+<div style="max-width: 1200px; margin: 0 auto; box-sizing: border-box; padding: 56px 32px 80px; display: flex; flex-direction: column; gap: 48px">
+
+<header style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="background: #1D4ED8; color: #FFFFFF; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 999px">Flow</span>
+<span style="font-size: 13px; font-weight: 600; color: #475569">Components · Annotations and layout</span>
+</div>
+<h1 style="font-size: 40px; line-height: 1.1; font-weight: 800; letter-spacing: -0.02em">Annotations and layout</h1>
+<p style="font-size: 16px; line-height: 1.55; color: #334155; max-width: 800px">Labels, frames, special edges and page chrome that sit on top of any diagram type.</p>
+</header>
+
+<section class="sec">
+<div class="gh"><h2>Labels and annotations</h2><span>Numbering, status, notes and legends</span></div>
+<div class="grid4">
+
+<div class="cd"><div class="pv" style="gap: 18px">
+<span style="display: flex; align-items: center; gap: 8px"><span style="width: 26px; height: 26px; border-radius: 999px; background: #0F172A; color: #FFFFFF; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center">1</span><span style="font-size: 13px; font-weight: 600">Score</span></span>
+<span style="display: flex; align-items: center; gap: 8px"><span style="width: 26px; height: 26px; border-radius: 999px; background: #0F172A; color: #FFFFFF; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center">2</span><span style="font-size: 13px; font-weight: 600">Append</span></span>
+</div><span class="nm">Step badge</span><span class="cp">Numbers the order of reading.</span></div>
+
+<div class="cd"><div class="pv" style="gap: 8px">
+<span style="font-size: 11px; font-weight: 700; background: #F1F5F9; color: #334155; border-radius: 999px; padding: 4px 11px">Planned</span>
+<span style="font-size: 11px; font-weight: 700; background: #DCEEFB; color: #1E3A8A; border-radius: 999px; padding: 4px 11px">In progress</span>
+<span style="font-size: 11px; font-weight: 700; background: #DCF5E1; color: #14532D; border-radius: 999px; padding: 4px 11px">Done</span>
+<span style="font-size: 11px; font-weight: 700; background: #FDE4E4; color: #7F1D1D; border-radius: 999px; padding: 4px 11px">Blocked</span>
+</div><span class="nm">Status pills</span><span class="cp">Four states, text color picked for contrast.</span></div>
+
+<div class="cd"><div class="pv">
+<span style="background: #FFF1DD; border: 1.5px solid #B45309; border-radius: 8px; padding: 9px 12px; font-size: 12px; line-height: 1.45; max-width: 190px">Hot methods are compiled by the JIT and cached.</span>
+</div><span class="nm">Note</span><span class="cp">Amber, for explanations next to a node.</span></div>
+
+<div class="cd"><div class="pv">
+<span style="background: #FDE4E4; border: 1.5px solid #B42318; border-radius: 8px; padding: 9px 12px; font-size: 12px; line-height: 1.45; max-width: 190px">Shared across threads. Needs locking.</span>
+</div><span class="nm">Warning note</span><span class="cp">Rose, for risks and constraints.</span></div>
+
+<div class="cd"><div class="pv" style="gap: 8px">
+<svg width="40" height="84" viewBox="0 0 24 84" aria-hidden="true" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4c8 0 8 4 8 12v10c0 6 3 8 8 8-5 0-8 2-8 8v10c0 8 0 12-8 12" transform="translate(0 0) scale(1 0.95)"/></svg>
+<span style="font-size: 12px; font-weight: 600; max-width: 110px; line-height: 1.4">Shared across threads</span>
+</div><span class="nm">Brace</span><span class="cp">Groups several nodes under one label.</span></div>
+
+<div class="cd"><div class="pv">
+<span style="position: relative; background: #0F172A; color: #FFFFFF; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600">Click to expand<span style="position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: #0F172A; transform: translateX(-50%) rotate(45deg)"></span></span>
+</div><span class="nm">Tooltip callout</span><span class="cp">Dark bubble with a tail.</span></div>
+
+<div class="cd"><div class="pv">
+<span style="position: relative; width: 44px; height: 44px; background: #DCEEFB; border: 2px solid #1E5AA8; border-radius: 12px; display: block"><span style="position: absolute; top: -9px; right: -9px; width: 22px; height: 22px; border-radius: 999px; background: #D92D20; color: #FFFFFF; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">3</span></span>
+</div><span class="nm">Counter badge</span><span class="cp">Count of items or alerts on a node.</span></div>
+
+<div class="cd"><div class="pv" style="padding: 8px">
+<div style="background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 9px 14px; display: grid; grid-template-columns: auto auto; column-gap: 22px; row-gap: 5px; align-items: center">
+<span style="display: flex; align-items: center; gap: 7px"><span style="width: 24px; border-top: 2px dashed #0F172A"></span><span style="font-size: 11px">Flow</span></span>
+<span style="display: flex; align-items: center; gap: 7px"><span style="width: 11px; height: 11px; border-radius: 3px; background: #DCEEFB; border: 1.5px solid #1E5AA8"></span><span style="font-size: 11px">Process</span></span>
+<span style="display: flex; align-items: center; gap: 7px"><span style="width: 24px; border-top: 2px solid #334155"></span><span style="font-size: 11px">Depends</span></span>
+<span style="display: flex; align-items: center; gap: 7px"><span style="width: 11px; height: 11px; border-radius: 3px; background: #DCF5E1; border: 1.5px solid #1E7A3C"></span><span style="font-size: 11px">Data</span></span>
+</div>
+</div><span class="nm">Legend</span><span class="cp">Maps line styles and colors to meaning.</span></div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>Containers and frames</h2><span>Grouping, lanes, tiers and boundaries</span></div>
+<div class="grid3">
+
+<div class="cd"><div class="pv" style="min-height: 140px">
+<div style="position: relative; background: #EFF8FF; border: 1.5px dashed #60A5FA; border-radius: 14px; padding: 30px 16px 14px; display: flex; gap: 8px">
+<span style="position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: #1D4ED8; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 999px; white-space: nowrap">Linking</span>
+<span style="background: #DCEEFB; border: 2px solid #1E5AA8; border-radius: 10px; padding: 7px 11px; font-size: 11px; font-weight: 600">Verify</span>
+<span style="background: #DCEEFB; border: 2px solid #1E5AA8; border-radius: 10px; padding: 7px 11px; font-size: 11px; font-weight: 600">Prepare</span>
+</div>
+</div><span class="nm">Dashed group frame</span><span class="cp">Pill label on the top edge. Available in blue, green, amber, violet, teal, rose.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 140px">
+<div style="width: 220px; background: #FFFFFF; border: 2px solid #0F172A; border-radius: 12px; overflow: hidden">
+<div style="background: #DCF5E1; border-bottom: 2px solid #0F172A; padding: 7px 12px; font-size: 12px; font-weight: 700">Payment service</div>
+<div style="padding: 12px; display: flex; gap: 8px"><span style="background: #F1F5F9; border-radius: 8px; padding: 6px 10px; font-size: 11px; font-weight: 600">API</span><span style="background: #F1F5F9; border-radius: 8px; padding: 6px 10px; font-size: 11px; font-weight: 600">Worker</span></div>
+</div>
+</div><span class="nm">Panel with header</span><span class="cp">Solid frame for a service or component boundary (C4 container).</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 140px; align-items: stretch">
+<div style="display: flex; width: 100%; max-width: 300px; border: 2px solid #0F172A; border-radius: 10px; overflow: hidden; background: #FFFFFF">
+<div style="width: 32px; background: #DCEEFB; border-right: 2px solid #0F172A; display: flex; align-items: center; justify-content: center"><span style="writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; font-weight: 700">Customer</span></div>
+<div style="flex: 1; display: flex; align-items: center; justify-content: space-around; padding: 12px 8px"><span style="background: #DCEEFB; border: 2px solid #1E5AA8; border-radius: 10px; padding: 6px 10px; font-size: 11px; font-weight: 600">Order</span><span style="background: #DCEEFB; border: 2px solid #1E5AA8; border-radius: 10px; padding: 6px 10px; font-size: 11px; font-weight: 600">Pay</span></div>
+</div>
+</div><span class="nm">Swimlane</span><span class="cp">Vertical role label, steps flow left to right inside.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 140px; justify-content: flex-start; padding-left: 14px">
+<span style="width: 70px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 12px; padding: 8px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; flex-shrink: 0"><svg width="28" height="28" viewBox="0 0 48 48" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M8 12v24c0 4 7 7 16 7s16-3 16-7V12z" fill="#E6E3FB"/><ellipse cx="24" cy="12" rx="16" ry="6" fill="#5B4BD6"/></svg><span style="font-size: 11px; font-weight: 700">Store</span></span>
+<div style="flex: 1; min-width: 0; background: #F3F1FD; border: 1.5px dashed #8B7FF0; border-radius: 14px; padding: 12px; display: flex; gap: 8px"><span style="background: #E6E3FB; border: 2px solid #4F46A5; border-radius: 10px; padding: 6px 10px; font-size: 11px; font-weight: 600">Heap</span><span style="background: #E6E3FB; border: 2px solid #4F46A5; border-radius: 10px; padding: 6px 10px; font-size: 11px; font-weight: 600">Stack</span></div>
+</div><span class="nm">Tier band</span><span class="cp">Icon tile on the left, dashed band for the stage. Used for layered explainers.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 140px">
+<div style="position: relative; border: 2px dashed #475569; border-radius: 6px; padding: 30px 18px 16px; display: flex; gap: 8px">
+<span style="position: absolute; top: -12px; left: 14px; background: #F8FAFC; color: #334155; font-size: 11px; font-weight: 700; padding: 3px 8px; border: 1.5px solid #475569; border-radius: 6px; white-space: nowrap">VPC · private</span>
+<span style="background: #FFFFFF; border: 1.5px solid #334155; border-radius: 4px; padding: 7px 11px; font-size: 11px; font-weight: 600">App</span>
+<span style="background: #FFFFFF; border: 1.5px solid #334155; border-radius: 4px; padding: 7px 11px; font-size: 11px; font-weight: 600">DB</span>
+</div>
+</div><span class="nm">Boundary</span><span class="cp">Square slate dashes for trust, network or account boundaries.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 140px">
+<div style="width: 118px; height: 84px; background: #FFF1DD; border: 1.5px solid #B45309; border-radius: 12px; padding: 10px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 5px"><span style="font-size: 13px; font-weight: 800; color: #7C3A06">Option A</span><span style="font-size: 11px; color: #334155">step by step</span></div>
+<span style="font-size: 11px; font-weight: 700; background: #0F172A; color: #FFFFFF; padding: 4px 8px; border-radius: 6px">VS</span>
+<div style="width: 118px; height: 84px; background: #D3F3EF; border: 1.5px solid #0F766E; border-radius: 12px; padding: 10px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 5px"><span style="font-size: 13px; font-weight: 800; color: #0B4F49">Option B</span><span style="font-size: 11px; color: #334155">all at once</span></div>
+</div><span class="nm">Versus frame</span><span class="cp">Two warm and cool panels for comparisons.</span></div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>Special edges</h2><span>Animated and emphasised lines. Use animation on one main path per diagram; a second animated line cancels the effect</span></div>
+<div class="grid4">
+
+<div class="cd"><div class="pv" style="min-height: 100px"><svg class="flow" width="200" height="12" viewBox="0 0 200 12" aria-hidden="true" style="overflow: visible; fill: none; stroke: #1D4ED8; stroke-width: 4; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-101" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#1D4ED8" stroke="none" style="stroke: none; fill: #1D4ED8; fill: context-stroke"/></marker></defs><path d="M 0 6 L 192 6" marker-end="url(#dc-arrow-head-filled-101)"></path></svg></div><span class="nm">Animated main path</span><span class="cp">Thick blue line with moving dashes. Marks the happy path or the primary request route.</span><code style="font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.6; background: #F1F5F9; border-radius: 8px; padding: 8px 10px; word-break: break-all">dashed=1;flowAnimation=1;strokeWidth=4;strokeColor=#1D4ED8;endArrow=block;endFill=1;</code></div>
+
+
+<div class="cd"><div class="pv" style="min-height: 100px; flex-direction: column; gap: 10px"><svg class="flow" width="200" height="12" viewBox="0 0 200 12" aria-hidden="true" style="overflow: visible; fill: none; stroke: #15803D; stroke-width: 4; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-103" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#15803D" stroke="none" style="stroke: none; fill: #15803D; fill: context-stroke"/></marker></defs><path d="M 0 6 L 192 6" marker-end="url(#dc-arrow-head-filled-103)"></path></svg><svg class="flow" width="200" height="12" viewBox="0 0 200 12" aria-hidden="true" style="overflow: visible; fill: none; stroke: #B42318; stroke-width: 4; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-104" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#B42318" stroke="none" style="stroke: none; fill: #B42318; fill: context-stroke"/></marker></defs><path d="M 0 6 L 192 6" marker-end="url(#dc-arrow-head-filled-104)"></path></svg></div><span class="nm">Animated by outcome</span><span class="cp">Green for the success route, rose for the failure route. Use only when the diagram compares the two.</span><code style="font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.6; background: #F1F5F9; border-radius: 8px; padding: 8px 10px; word-break: break-all">dashed=1;flowAnimation=1;strokeWidth=4;strokeColor=#15803D;  /  #B42318</code></div>
+
+<div class="cd"><div class="pv" style="min-height: 100px"><svg width="200" height="16" viewBox="0 0 200 16" aria-hidden="true" style="overflow: visible; fill: none; stroke: #475569; stroke-width: 6"><defs><marker id="dc-arrow-head-filled-105" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#475569" stroke="none" style="stroke: none; fill: #475569; fill: context-stroke"/></marker></defs><path d="M 0 8 L 188 8" marker-end="url(#dc-arrow-head-filled-105)"></path></svg></div><span class="nm">Data stream</span><span class="cp">Heavy solid line for a high-volume flow. No motion, so it reads as capacity rather than direction.</span><code style="font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.6; background: #F1F5F9; border-radius: 8px; padding: 8px 10px; word-break: break-all">strokeWidth=6;strokeColor=#475569;endArrow=block;endFill=1;</code></div>
+
+<div class="cd"><div class="pv" style="min-height: 100px"><svg width="200" height="12" viewBox="0 0 200 12" aria-hidden="true" style="overflow: visible; fill: none; stroke: #0F172A; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-106" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#0F172A" stroke="none" style="stroke: none; fill: #0F172A; fill: context-stroke"/></marker></defs><path d="M 12 6 L 188 6" marker-start="url(#dc-arrow-head-filled-106)" marker-end="url(#dc-arrow-head-filled-106)"></path></svg></div><span class="nm">Two-way</span><span class="cp">Heads at both ends for a request that also returns data (read and write, sync).</span><code style="font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.6; background: #F1F5F9; border-radius: 8px; padding: 8px 10px; word-break: break-all">startArrow=block;startFill=1;endArrow=block;endFill=1;strokeWidth=2;</code></div>
+
+<div class="cd"><div class="pv" style="min-height: 100px"><svg width="200" height="12" viewBox="0 0 200 12" aria-hidden="true" style="overflow: visible; fill: none; stroke: #475569; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M 0 6 L 192 6" stroke-dasharray="1 5"></path><path d="M 186 1 L 194 6 L 186 11"></path></svg></div><span class="nm">Optional link</span><span class="cp">Dotted line with an open head: a loose or optional dependency.</span><code style="font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.6; background: #F1F5F9; border-radius: 8px; padding: 8px 10px; word-break: break-all">dashed=1;dashPattern=1 5;endArrow=open;strokeColor=#475569;strokeWidth=2;</code></div>
+
+<div class="cd"><div class="pv" style="min-height: 100px"><svg width="200" height="12" viewBox="0 0 200 12" aria-hidden="true" style="overflow: visible; fill: none; stroke: #B42318; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-107" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#B42318" stroke="none" style="stroke: none; fill: #B42318; fill: context-stroke"/></marker></defs><path d="M 0 6 L 192 6" stroke-dasharray="6 6" marker-end="url(#dc-arrow-head-filled-107)"></path></svg></div><span class="nm">Failure path</span><span class="cp">Dashed rose for errors, rejections and dead letters. Static, so the main path stays the loudest line.</span><code style="font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.6; background: #F1F5F9; border-radius: 8px; padding: 8px 10px; word-break: break-all">dashed=1;strokeColor=#B42318;endArrow=block;endFill=1;strokeWidth=2;</code></div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>Headers and chrome</h2><span>Titles, subtitles and brand marks for finished pieces</span></div>
+<div class="grid3">
+
+<div class="cd"><div class="pv" style="min-height: 110px">
+<div style="width: 300px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid #15803D; padding: 4px 0 4px 12px">
+<span style="font-size: 20px; font-weight: 800; letter-spacing: -0.01em">How the JVM Works</span>
+<span style="font-size: 12px; font-weight: 700; color: #475569">Flow</span>
+</div>
+</div><span class="nm">Title bar</span><span class="cp">Accent stripe, bold title, brand mark right.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 110px; align-items: flex-start; justify-content: flex-start; padding: 16px 18px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em">Energy-Based Models</span>
+<span style="font-size: 13px; color: #475569">A different way to build AI</span>
+<span style="font-size: 11px; font-weight: 600; color: #1D4ED8">Step 1 of 3</span>
+</div>
+</div><span class="nm">Title with subtitle</span><span class="cp">Adds a one-line subtitle and an optional step counter.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 110px; align-items: flex-end; padding: 0">
+<div style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-top: 1.5px solid #E2E8F0; box-sizing: border-box; background: #FFFFFF; border-radius: 0 0 10px 10px"><span style="font-size: 11px; color: #475569">Source: internal docs</span><span style="display: flex; align-items: center; gap: 6px"><span style="background: #1D4ED8; color: #FFFFFF; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px">Flow</span></span></div>
+</div><span class="nm">Footer mark</span><span class="cp">Source line left, brand pill right.</span></div>
+
+</div>
+</section>
+
+</div>
+
+
+</body>
+</html>

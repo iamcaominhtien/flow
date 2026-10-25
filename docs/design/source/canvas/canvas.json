@@ -1,0 +1,1416 @@
+{
+  "attachments": {},
+  "boards": {
+    "Architecture_Basic.dc.html": {
+      "h": 620,
+      "page": "architecture",
+      "title": "Basic: a web app",
+      "w": 1620,
+      "x": 0,
+      "y": 2400
+    },
+    "Architecture_Delivery.dc.html": {
+      "h": 1184,
+      "page": "architecture",
+      "title": "Complete system: food delivery, plain",
+      "w": 1840,
+      "x": 0,
+      "y": 3420
+    },
+    "Architecture_Delivery_Illustrated.dc.html": {
+      "h": 1200,
+      "page": "architecture",
+      "title": "Complete system: food delivery, illustrated",
+      "w": 1840,
+      "x": 1960,
+      "y": 3420
+    },
+    "Architecture_Notation.dc.html": {
+      "h": 1020,
+      "page": "architecture",
+      "title": "Notation",
+      "w": 1280,
+      "x": 1400,
+      "y": 300
+    },
+    "Architecture_Patterns.dc.html": {
+      "h": 1334,
+      "page": "architecture",
+      "title": "Patterns",
+      "w": 1400,
+      "x": 2800,
+      "y": 300
+    },
+    "Architecture_Rules.dc.html": {
+      "h": 1760,
+      "page": "architecture",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "Architecture_Streaming.dc.html": {
+      "h": 1980,
+      "page": "architecture",
+      "title": "Complete system: video streaming platform, plain",
+      "w": 2860,
+      "x": 0,
+      "y": 4960
+    },
+    "Architecture_Streaming_Illustrated.dc.html": {
+      "h": 2324,
+      "page": "architecture",
+      "title": "Complete system: video streaming platform, illustrated",
+      "w": 3468,
+      "x": 3040,
+      "y": 4960
+    },
+    "BPMN_Advanced.dc.html": {
+      "h": 1450,
+      "page": "bpmn",
+      "title": "Advanced: beyond a flowchart",
+      "w": 1760,
+      "x": 1620,
+      "y": 2300
+    },
+    "BPMN_Basic.dc.html": {
+      "h": 930,
+      "page": "bpmn",
+      "title": "Basic: approving an expense",
+      "w": 1500,
+      "x": 0,
+      "y": 2300
+    },
+    "BPMN_Delivery.dc.html": {
+      "h": 1260,
+      "page": "bpmn",
+      "title": "Complete: ordering and delivering a meal",
+      "w": 1960,
+      "x": 0,
+      "y": 4300
+    },
+    "BPMN_Notation.dc.html": {
+      "h": 1220,
+      "page": "bpmn",
+      "title": "Notation",
+      "w": 1500,
+      "x": 1400,
+      "y": 300
+    },
+    "BPMN_Order.dc.html": {
+      "h": 1760,
+      "page": "bpmn",
+      "title": "Complex: from order to delivered parcel",
+      "w": 2560,
+      "x": 0,
+      "y": 6100
+    },
+    "BPMN_Rules.dc.html": {
+      "h": 1660,
+      "page": "bpmn",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "C4_Component.dc.html": {
+      "h": 1800,
+      "page": "c4",
+      "title": "Level 3, components",
+      "w": 1800,
+      "x": 0,
+      "y": 3400
+    },
+    "C4_Container.dc.html": {
+      "h": 1700,
+      "page": "c4",
+      "title": "Level 2, containers",
+      "w": 2600,
+      "x": 1820,
+      "y": 2000
+    },
+    "C4_Context.dc.html": {
+      "h": 1080,
+      "page": "c4",
+      "title": "Level 1, system context",
+      "w": 1700,
+      "x": 0,
+      "y": 2000
+    },
+    "C4_Rules.dc.html": {
+      "h": 1220,
+      "page": "c4",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "Canvas.dc.html": {
+      "h": 800,
+      "page": "foundation",
+      "title": "Blank canvas",
+      "w": 1280,
+      "x": 1360,
+      "y": 0
+    },
+    "Cloud_Basic.dc.html": {
+      "h": 1500,
+      "page": "cloud",
+      "title": "Basic: a web app in one VPC",
+      "w": 1900,
+      "x": 0,
+      "y": 2100
+    },
+    "Cloud_Delivery.dc.html": {
+      "h": 1800,
+      "page": "cloud",
+      "title": "Delivery on two zones",
+      "w": 2500,
+      "x": 2020,
+      "y": 2100
+    },
+    "Cloud_Network.dc.html": {
+      "h": 1450,
+      "page": "cloud",
+      "title": "Network: offices and cloud",
+      "w": 2500,
+      "x": 0,
+      "y": 4000
+    },
+    "Cloud_Rules.dc.html": {
+      "h": 1320,
+      "page": "cloud",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "Components_Annotations.dc.html": {
+      "expand": "fill",
+      "h": 2750,
+      "page": "components",
+      "title": "Annotations and layout",
+      "w": 1280,
+      "x": 0,
+      "y": 3840
+    },
+    "Components_Planning.dc.html": {
+      "expand": "fill",
+      "h": 2650,
+      "page": "components",
+      "title": "Planning and explainer",
+      "w": 1280,
+      "x": 1360,
+      "y": 3840
+    },
+    "Components_Process.dc.html": {
+      "expand": "fill",
+      "h": 2950,
+      "page": "components",
+      "title": "Process and behavior",
+      "w": 1280,
+      "x": 0,
+      "y": 0
+    },
+    "Components_ScreenFlow.dc.html": {
+      "expand": "fill",
+      "h": 3350,
+      "page": "components",
+      "title": "Screen flow parts",
+      "w": 1280,
+      "x": 2720,
+      "y": 0
+    },
+    "Components_Structure.dc.html": {
+      "expand": "fill",
+      "h": 3700,
+      "page": "components",
+      "title": "Structure and architecture",
+      "w": 1280,
+      "x": 1360,
+      "y": 0
+    },
+    "DFD_Context.dc.html": {
+      "h": 1150,
+      "page": "dfd",
+      "title": "Level 0, context",
+      "w": 1900,
+      "x": 0,
+      "y": 2000
+    },
+    "DFD_Context_Illustrated.dc.html": {
+      "h": 1250,
+      "page": "dfd",
+      "title": "Level 0, illustrated",
+      "w": 1900,
+      "x": 0,
+      "y": 5300
+    },
+    "DFD_Level1.dc.html": {
+      "h": 1350,
+      "page": "dfd",
+      "title": "Level 1",
+      "w": 2500,
+      "x": 2020,
+      "y": 2000
+    },
+    "DFD_Level1_Illustrated.dc.html": {
+      "h": 1450,
+      "page": "dfd",
+      "title": "Level 1, illustrated",
+      "w": 2600,
+      "x": 2020,
+      "y": 5300
+    },
+    "DFD_Level2.dc.html": {
+      "h": 1250,
+      "page": "dfd",
+      "title": "Level 2",
+      "w": 2200,
+      "x": 0,
+      "y": 3450
+    },
+    "DFD_Level2_Illustrated.dc.html": {
+      "h": 1350,
+      "page": "dfd",
+      "title": "Level 2, illustrated",
+      "w": 2500,
+      "x": 0,
+      "y": 6850
+    },
+    "DFD_Notation.dc.html": {
+      "h": 1050,
+      "page": "dfd",
+      "title": "Notation",
+      "w": 2100,
+      "x": 1400,
+      "y": 300
+    },
+    "DFD_Rules.dc.html": {
+      "h": 1230,
+      "page": "dfd",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "ER_Basic.dc.html": {
+      "h": 720,
+      "page": "er",
+      "title": "Basic: a blog",
+      "w": 1400,
+      "x": 0,
+      "y": 2580
+    },
+    "ER_Delivery.dc.html": {
+      "h": 814,
+      "page": "er",
+      "title": "Complete schema: food delivery, plain",
+      "w": 1600,
+      "x": 0,
+      "y": 3720
+    },
+    "ER_Delivery_Illustrated.dc.html": {
+      "h": 862,
+      "page": "er",
+      "title": "Complete schema: food delivery, illustrated",
+      "w": 1600,
+      "x": 1720,
+      "y": 3720
+    },
+    "ER_Notation.dc.html": {
+      "h": 960,
+      "page": "er",
+      "title": "Notation",
+      "w": 1280,
+      "x": 1400,
+      "y": 300
+    },
+    "ER_Patterns.dc.html": {
+      "h": 1294,
+      "page": "er",
+      "title": "Patterns",
+      "w": 1400,
+      "x": 2800,
+      "y": 300
+    },
+    "ER_Rules.dc.html": {
+      "h": 1900,
+      "page": "er",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "ER_Split.dc.html": {
+      "h": 1120,
+      "page": "er",
+      "title": "Splitting by domain",
+      "w": 1600,
+      "x": 0,
+      "y": 4960
+    },
+    "Explainer_Compare.dc.html": {
+      "h": 1340,
+      "page": "explainer",
+      "title": "Comparison: SQL or NoSQL",
+      "w": 1400,
+      "x": 3140,
+      "y": 2400
+    },
+    "Explainer_Concept.dc.html": {
+      "h": 1360,
+      "page": "explainer",
+      "title": "Concept: what a cache does",
+      "w": 1400,
+      "x": 4660,
+      "y": 2400
+    },
+    "Explainer_Layers.dc.html": {
+      "h": 1650,
+      "page": "explainer",
+      "title": "Layers: how a web page reaches you",
+      "w": 1500,
+      "x": 0,
+      "y": 2400
+    },
+    "Explainer_Payment.dc.html": {
+      "h": 1980,
+      "page": "explainer",
+      "title": "Complete explainer: paying by card online",
+      "w": 1900,
+      "x": 0,
+      "y": 4500
+    },
+    "Explainer_Rules.dc.html": {
+      "h": 1700,
+      "page": "explainer",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "Explainer_Tree.dc.html": {
+      "h": 1200,
+      "page": "explainer",
+      "title": "Tree: what is inside a web project",
+      "w": 1400,
+      "x": 1620,
+      "y": 2400
+    },
+    "Flowchart_Basic.dc.html": {
+      "h": 900,
+      "page": "flowchart",
+      "title": "Basic: top to bottom",
+      "w": 1160,
+      "x": 0,
+      "y": 2920
+    },
+    "Flowchart_Complex.dc.html": {
+      "h": 880,
+      "page": "flowchart",
+      "title": "Complete flow: online payment",
+      "w": 1780,
+      "x": 0,
+      "y": 4360
+    },
+    "Flowchart_Delivery.dc.html": {
+      "h": 1460,
+      "page": "flowchart",
+      "title": "Complete flow: food delivery, plain",
+      "w": 2880,
+      "x": 0,
+      "y": 5360
+    },
+    "Flowchart_Delivery_Illustrated.dc.html": {
+      "h": 1540,
+      "page": "flowchart",
+      "title": "Complete flow: food delivery, illustrated",
+      "w": 3724,
+      "x": 3000,
+      "y": 5360
+    },
+    "Flowchart_Horizontal.dc.html": {
+      "h": 620,
+      "page": "flowchart",
+      "title": "Horizontal: left to right",
+      "w": 1560,
+      "x": 1280,
+      "y": 2920
+    },
+    "Flowchart_Illustrated.dc.html": {
+      "h": 1700,
+      "page": "flowchart",
+      "title": "Illustrated nodes",
+      "w": 1280,
+      "x": 2848,
+      "y": 300
+    },
+    "Flowchart_Patterns.dc.html": {
+      "h": 1252,
+      "page": "flowchart",
+      "title": "Patterns",
+      "w": 1328,
+      "x": 1400,
+      "y": 300
+    },
+    "Flowchart_Rules.dc.html": {
+      "h": 2100,
+      "page": "flowchart",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "Flowchart_Swimlane.dc.html": {
+      "h": 800,
+      "page": "flowchart",
+      "title": "Swimlane",
+      "w": 1160,
+      "x": 2960,
+      "y": 2920
+    },
+    "Icons.dc.html": {
+      "expand": "fill",
+      "h": 2800,
+      "page": "icons",
+      "title": "Icons",
+      "w": 1280,
+      "x": 0,
+      "y": 0
+    },
+    "Icons_Detailed.dc.html": {
+      "expand": "fill",
+      "h": 3198,
+      "page": "icons",
+      "title": "Icons: detailed",
+      "w": 1280,
+      "x": 1360,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "expand": "fill",
+      "h": 3468,
+      "page": "foundation",
+      "title": "Foundation",
+      "w": 1277,
+      "x": 0,
+      "y": 0
+    },
+    "Planning_Gantt.dc.html": {
+      "h": 1056,
+      "page": "planning",
+      "title": "Gantt: launching the delivery app",
+      "w": 1700,
+      "x": 0,
+      "y": 2500
+    },
+    "Planning_Kanban.dc.html": {
+      "h": 980,
+      "page": "planning",
+      "title": "Kanban: the delivery app sprint",
+      "w": 1640,
+      "x": 2120,
+      "y": 4000
+    },
+    "Planning_Mind.dc.html": {
+      "h": 1100,
+      "page": "planning",
+      "title": "Mind map: launching the delivery app",
+      "w": 2000,
+      "x": 0,
+      "y": 4000
+    },
+    "Planning_Mind_Large.dc.html": {
+      "h": 1906,
+      "page": "planning",
+      "title": "Mind map: large, four levels",
+      "w": 2840,
+      "x": 1800,
+      "y": 5300
+    },
+    "Planning_Mind_Plain.dc.html": {
+      "h": 1060,
+      "page": "planning",
+      "title": "Mind map: plain",
+      "w": 1700,
+      "x": 0,
+      "y": 5300
+    },
+    "Planning_Org.dc.html": {
+      "h": 949,
+      "page": "planning",
+      "title": "Org chart: plain",
+      "w": 1980,
+      "x": 1820,
+      "y": 2500
+    },
+    "Planning_Org_Illustrated.dc.html": {
+      "h": 1035,
+      "page": "planning",
+      "title": "Org chart: illustrated",
+      "w": 1980,
+      "x": 3920,
+      "y": 2500
+    },
+    "Planning_Roadmap.dc.html": {
+      "h": 1040,
+      "page": "planning",
+      "title": "Roadmap: now, next, later",
+      "w": 1760,
+      "x": 3880,
+      "y": 4000
+    },
+    "Planning_Rules.dc.html": {
+      "h": 1820,
+      "page": "planning",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "ScreenFlow_Anatomy.dc.html": {
+      "h": 720,
+      "page": "screenflow",
+      "title": "Anatomy",
+      "w": 1280,
+      "x": 1400,
+      "y": 300
+    },
+    "ScreenFlow_Cond_Coded.dc.html": {
+      "h": 1100,
+      "page": "screenflow",
+      "title": "Conditions: codes and table",
+      "w": 1300,
+      "x": 2800,
+      "y": 1200
+    },
+    "ScreenFlow_Cond_Inline.dc.html": {
+      "h": 780,
+      "page": "screenflow",
+      "title": "Conditions: on the arrows",
+      "w": 1300,
+      "x": 2800,
+      "y": 300
+    },
+    "ScreenFlow_Devices.dc.html": {
+      "h": 1100,
+      "page": "screenflow",
+      "title": "Orientation and tablet",
+      "w": 1280,
+      "x": 1680,
+      "y": 5260
+    },
+    "ScreenFlow_Entry.dc.html": {
+      "h": 1180,
+      "page": "screenflow",
+      "title": "Entry points and links",
+      "w": 1560,
+      "x": 1720,
+      "y": 8280
+    },
+    "ScreenFlow_Highlight.dc.html": {
+      "h": 1450,
+      "page": "screenflow",
+      "title": "Shop app: main path highlighted",
+      "w": 1520,
+      "x": 1640,
+      "y": 10000
+    },
+    "ScreenFlow_L0_Names.dc.html": {
+      "h": 520,
+      "page": "screenflow",
+      "title": "Fidelity L0: names only",
+      "w": 1560,
+      "x": 0,
+      "y": 2840
+    },
+    "ScreenFlow_L1_Skeleton.dc.html": {
+      "h": 560,
+      "page": "screenflow",
+      "title": "Fidelity L1: skeleton frames",
+      "w": 1560,
+      "x": 1680,
+      "y": 2840
+    },
+    "ScreenFlow_L2_KeyElements.dc.html": {
+      "h": 560,
+      "page": "screenflow",
+      "title": "Fidelity L2: key elements",
+      "w": 1560,
+      "x": 0,
+      "y": 3520
+    },
+    "ScreenFlow_Mixed.dc.html": {
+      "h": 600,
+      "page": "screenflow",
+      "title": "Mixed fidelity",
+      "w": 1560,
+      "x": 1680,
+      "y": 3520
+    },
+    "ScreenFlow_Overlays.dc.html": {
+      "h": 840,
+      "page": "screenflow",
+      "title": "Overlays",
+      "w": 1400,
+      "x": 1720,
+      "y": 7320
+    },
+    "ScreenFlow_Real_ShopApp.dc.html": {
+      "h": 2950,
+      "page": "screenflow",
+      "title": "Shop app: full flow",
+      "w": 1520,
+      "x": 0,
+      "y": 10000
+    },
+    "ScreenFlow_Rules.dc.html": {
+      "h": 1900,
+      "page": "screenflow",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "ScreenFlow_Shop_PC.dc.html": {
+      "h": 480,
+      "page": "screenflow",
+      "title": "Shop checkout, desktop",
+      "w": 1160,
+      "x": 1680,
+      "y": 4660
+    },
+    "ScreenFlow_Shop_SP.dc.html": {
+      "h": 1000,
+      "page": "screenflow",
+      "title": "Shop checkout, phone",
+      "w": 1560,
+      "x": 0,
+      "y": 4660
+    },
+    "ScreenFlow_States.dc.html": {
+      "h": 1000,
+      "page": "screenflow",
+      "title": "States of one screen",
+      "w": 1560,
+      "x": 0,
+      "y": 5780
+    },
+    "ScreenFlow_Tabs.dc.html": {
+      "h": 1200,
+      "page": "screenflow",
+      "title": "Tab navigation",
+      "w": 1600,
+      "x": 0,
+      "y": 7320
+    },
+    "ScreenFlow_Triggers.dc.html": {
+      "h": 800,
+      "page": "screenflow",
+      "title": "Trigger types and syntax",
+      "w": 1160,
+      "x": 1400,
+      "y": 1140
+    },
+    "Sequence_Basic.dc.html": {
+      "h": 900,
+      "page": "sequence",
+      "title": "Basic: sign in",
+      "w": 1460,
+      "x": 0,
+      "y": 2720
+    },
+    "Sequence_Delivery.dc.html": {
+      "h": 1758,
+      "page": "sequence",
+      "title": "Complete flow: food delivery, plain",
+      "w": 1500,
+      "x": 0,
+      "y": 4060
+    },
+    "Sequence_Delivery_Illustrated.dc.html": {
+      "h": 1830,
+      "page": "sequence",
+      "title": "Complete flow: food delivery, illustrated",
+      "w": 1500,
+      "x": 1620,
+      "y": 4060
+    },
+    "Sequence_Fragments.dc.html": {
+      "h": 1896,
+      "page": "sequence",
+      "title": "Fragments",
+      "w": 1400,
+      "x": 3000,
+      "y": 300
+    },
+    "Sequence_Messages.dc.html": {
+      "h": 1190,
+      "page": "sequence",
+      "title": "Message kinds",
+      "w": 1480,
+      "x": 1400,
+      "y": 300
+    },
+    "Sequence_Rules.dc.html": {
+      "h": 2000,
+      "page": "sequence",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "UML_Class.dc.html": {
+      "h": 1260,
+      "page": "uml",
+      "title": "Class diagram: the delivery domain",
+      "w": 1840,
+      "x": 0,
+      "y": 5630
+    },
+    "UML_Rules.dc.html": {
+      "h": 1720,
+      "page": "uml",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "UML_State.dc.html": {
+      "h": 1120,
+      "page": "uml",
+      "title": "State machine: the life of an order",
+      "w": 3120,
+      "x": 0,
+      "y": 2500
+    },
+    "UML_UseCase.dc.html": {
+      "h": 1130,
+      "page": "uml",
+      "title": "Use case: plain",
+      "w": 1960,
+      "x": 0,
+      "y": 4060
+    },
+    "UML_UseCase_Illustrated.dc.html": {
+      "h": 1130,
+      "page": "uml",
+      "title": "Use case: illustrated",
+      "w": 1960,
+      "x": 2080,
+      "y": 4060
+    },
+    "Wireframe_Desktop.dc.html": {
+      "h": 1260,
+      "page": "wireframe",
+      "title": "Annotated: restaurant dashboard",
+      "w": 1520,
+      "x": 1640,
+      "y": 2200
+    },
+    "Wireframe_Mobile.dc.html": {
+      "h": 1180,
+      "page": "wireframe",
+      "title": "Annotated: checkout on a phone",
+      "w": 1520,
+      "x": 0,
+      "y": 2200
+    },
+    "Wireframe_Responsive.dc.html": {
+      "h": 1110,
+      "page": "wireframe",
+      "title": "Responsive: three widths",
+      "w": 1700,
+      "x": 0,
+      "y": 4000
+    },
+    "Wireframe_Rules.dc.html": {
+      "h": 1540,
+      "page": "wireframe",
+      "title": "Rules",
+      "w": 1280,
+      "x": 0,
+      "y": 300
+    },
+    "Wireframe_States.dc.html": {
+      "h": 1090,
+      "page": "wireframe",
+      "title": "States: four situations",
+      "w": 1560,
+      "x": 1820,
+      "y": 4000
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-24T02:10:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "ar-section-1": {
+      "kind": "title1",
+      "maxW": 4400,
+      "page": "architecture",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "ar-section-2": {
+      "kind": "title1",
+      "maxW": 1620,
+      "page": "architecture",
+      "text": "Examples",
+      "w": 240,
+      "x": 0,
+      "y": 2100
+    },
+    "ar-section-3": {
+      "kind": "title1",
+      "maxW": 3800,
+      "page": "architecture",
+      "text": "Complete systems",
+      "w": 240,
+      "x": 0,
+      "y": 3120
+    },
+    "ar-section-4": {
+      "kind": "title1",
+      "maxW": 6500,
+      "page": "architecture",
+      "text": "A larger system",
+      "w": 240,
+      "x": 0,
+      "y": 4660
+    },
+    "bp-section-1": {
+      "kind": "title1",
+      "maxW": 3000,
+      "page": "bpmn",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "bp-section-2": {
+      "kind": "title1",
+      "maxW": 3400,
+      "page": "bpmn",
+      "text": "Examples",
+      "w": 240,
+      "x": 0,
+      "y": 2000
+    },
+    "bp-section-3": {
+      "kind": "title1",
+      "maxW": 1960,
+      "page": "bpmn",
+      "text": "A complete collaboration",
+      "w": 240,
+      "x": 0,
+      "y": 4000
+    },
+    "bp-section-4": {
+      "kind": "title1",
+      "maxW": 2560,
+      "page": "bpmn",
+      "text": "A complex case",
+      "w": 240,
+      "x": 0,
+      "y": 5800
+    },
+    "c4-section-1": {
+      "kind": "title1",
+      "maxW": 1280,
+      "page": "c4",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "c4-section-2": {
+      "kind": "title1",
+      "maxW": 4420,
+      "page": "c4",
+      "text": "One system, three zooms",
+      "w": 240,
+      "x": 0,
+      "y": 1700
+    },
+    "cl-section-1": {
+      "kind": "title1",
+      "maxW": 4500,
+      "page": "cloud",
+      "text": "Reference",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "cl-section-2": {
+      "kind": "title1",
+      "maxW": 4600,
+      "page": "cloud",
+      "text": "Examples",
+      "w": 240,
+      "x": 0,
+      "y": 1800
+    },
+    "df-section-1": {
+      "kind": "title1",
+      "maxW": 3600,
+      "page": "dfd",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "df-section-2": {
+      "kind": "title1",
+      "maxW": 4500,
+      "page": "dfd",
+      "text": "The delivery system at three levels",
+      "w": 240,
+      "x": 0,
+      "y": 1700
+    },
+    "df-section-3": {
+      "kind": "title1",
+      "maxW": 4620,
+      "page": "dfd",
+      "text": "The same three levels, illustrated",
+      "w": 240,
+      "x": 0,
+      "y": 5000
+    },
+    "er-section-1": {
+      "kind": "title1",
+      "maxW": 4400,
+      "page": "er",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "er-section-2": {
+      "kind": "title1",
+      "maxW": 1400,
+      "page": "er",
+      "text": "Examples",
+      "w": 240,
+      "x": 0,
+      "y": 2280
+    },
+    "er-section-3": {
+      "kind": "title1",
+      "maxW": 3320,
+      "page": "er",
+      "text": "Complete schemas",
+      "w": 240,
+      "x": 0,
+      "y": 3420
+    },
+    "er-section-4": {
+      "kind": "title1",
+      "maxW": 1600,
+      "page": "er",
+      "text": "Large schemas",
+      "w": 240,
+      "x": 0,
+      "y": 4660
+    },
+    "ex-section-1": {
+      "kind": "title1",
+      "maxW": 1280,
+      "page": "explainer",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "ex-section-2": {
+      "kind": "title1",
+      "maxW": 6060,
+      "page": "explainer",
+      "text": "Examples: four shapes",
+      "w": 240,
+      "x": 0,
+      "y": 2100
+    },
+    "ex-section-3": {
+      "kind": "title1",
+      "maxW": 1900,
+      "page": "explainer",
+      "text": "A complete explainer",
+      "w": 240,
+      "x": 0,
+      "y": 4200
+    },
+    "fc-section-1": {
+      "kind": "title1",
+      "maxW": 4128,
+      "page": "flowchart",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "fc-section-2": {
+      "kind": "title1",
+      "maxW": 4120,
+      "page": "flowchart",
+      "text": "Examples",
+      "w": 240,
+      "x": 0,
+      "y": 2620
+    },
+    "fc-section-3": {
+      "kind": "title1",
+      "maxW": 6724,
+      "page": "flowchart",
+      "text": "Complete flows",
+      "w": 240,
+      "x": 0,
+      "y": 4060
+    },
+    "pl-section-1": {
+      "kind": "title1",
+      "maxW": 1280,
+      "page": "planning",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "pl-section-2": {
+      "kind": "title1",
+      "maxW": 5900,
+      "page": "planning",
+      "text": "Time and people",
+      "w": 240,
+      "x": 0,
+      "y": 2200
+    },
+    "pl-section-3": {
+      "kind": "title1",
+      "maxW": 5600,
+      "page": "planning",
+      "text": "Maps and boards",
+      "w": 240,
+      "x": 0,
+      "y": 3700
+    },
+    "sf-section-1": {
+      "kind": "title1",
+      "maxW": 4100,
+      "page": "screenflow",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "sf-section-2": {
+      "kind": "title1",
+      "maxW": 3240,
+      "page": "screenflow",
+      "text": "Fidelity levels",
+      "w": 240,
+      "x": 0,
+      "y": 2540
+    },
+    "sf-section-3": {
+      "kind": "title1",
+      "maxW": 2960,
+      "page": "screenflow",
+      "text": "Examples and variants",
+      "w": 240,
+      "x": 0,
+      "y": 4360
+    },
+    "sf-section-4": {
+      "kind": "title1",
+      "maxW": 3280,
+      "page": "screenflow",
+      "text": "Navigation and structure patterns",
+      "w": 240,
+      "x": 0,
+      "y": 7020
+    },
+    "sf-section-5": {
+      "kind": "title1",
+      "maxW": 3160,
+      "page": "screenflow",
+      "text": "Complete flows",
+      "w": 240,
+      "x": 0,
+      "y": 9700
+    },
+    "sq-section-1": {
+      "kind": "title1",
+      "maxW": 4400,
+      "page": "sequence",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "sq-section-2": {
+      "kind": "title1",
+      "maxW": 1460,
+      "page": "sequence",
+      "text": "Examples",
+      "w": 240,
+      "x": 0,
+      "y": 2420
+    },
+    "sq-section-3": {
+      "kind": "title1",
+      "maxW": 3120,
+      "page": "sequence",
+      "text": "Complete flows",
+      "w": 240,
+      "x": 0,
+      "y": 3760
+    },
+    "um-section-1": {
+      "kind": "title1",
+      "maxW": 1280,
+      "page": "uml",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "um-section-2": {
+      "kind": "title1",
+      "maxW": 3120,
+      "page": "uml",
+      "text": "State machines",
+      "w": 240,
+      "x": 0,
+      "y": 2200
+    },
+    "um-section-3": {
+      "kind": "title1",
+      "maxW": 4040,
+      "page": "uml",
+      "text": "Use cases",
+      "w": 240,
+      "x": 0,
+      "y": 3760
+    },
+    "um-section-4": {
+      "kind": "title1",
+      "maxW": 1840,
+      "page": "uml",
+      "text": "Class diagrams",
+      "w": 240,
+      "x": 0,
+      "y": 5330
+    },
+    "wf-section-1": {
+      "kind": "title1",
+      "maxW": 1280,
+      "page": "wireframe",
+      "text": "Reference and notation",
+      "w": 240,
+      "x": 0,
+      "y": 0
+    },
+    "wf-section-2": {
+      "kind": "title1",
+      "maxW": 3160,
+      "page": "wireframe",
+      "text": "Annotated screens",
+      "w": 240,
+      "x": 0,
+      "y": 1900
+    },
+    "wf-section-3": {
+      "kind": "title1",
+      "maxW": 3380,
+      "page": "wireframe",
+      "text": "Responsive and states",
+      "w": 240,
+      "x": 0,
+      "y": 3700
+    }
+  },
+  "order": [
+    "Icons.dc.html",
+    "ScreenFlow_Anatomy.dc.html",
+    "ScreenFlow_Rules.dc.html",
+    "ScreenFlow_Shop_SP.dc.html",
+    "ScreenFlow_Shop_PC.dc.html",
+    "ScreenFlow_Cond_Inline.dc.html",
+    "ScreenFlow_Cond_Coded.dc.html",
+    "ScreenFlow_Triggers.dc.html",
+    "ScreenFlow_L0_Names.dc.html",
+    "ScreenFlow_L1_Skeleton.dc.html",
+    "ScreenFlow_L2_KeyElements.dc.html",
+    "ScreenFlow_Mixed.dc.html",
+    "ScreenFlow_Real_ShopApp.dc.html",
+    "Main.dc.html",
+    "Canvas.dc.html",
+    "ScreenFlow_Highlight.dc.html",
+    "Components_Process.dc.html",
+    "Components_Structure.dc.html",
+    "Components_ScreenFlow.dc.html",
+    "Components_Annotations.dc.html",
+    "Components_Planning.dc.html",
+    "ScreenFlow_Tabs.dc.html",
+    "ScreenFlow_Overlays.dc.html",
+    "ScreenFlow_Entry.dc.html",
+    "ScreenFlow_States.dc.html",
+    "ScreenFlow_Devices.dc.html",
+    "Flowchart_Rules.dc.html",
+    "Flowchart_Patterns.dc.html",
+    "Flowchart_Basic.dc.html",
+    "Flowchart_Horizontal.dc.html",
+    "Flowchart_Swimlane.dc.html",
+    "Flowchart_Complex.dc.html",
+    "Flowchart_Delivery.dc.html",
+    "Flowchart_Illustrated.dc.html",
+    "Flowchart_Delivery_Illustrated.dc.html",
+    "Icons_Detailed.dc.html",
+    "Sequence_Rules.dc.html",
+    "Sequence_Messages.dc.html",
+    "Sequence_Fragments.dc.html",
+    "Sequence_Basic.dc.html",
+    "Sequence_Delivery.dc.html",
+    "Sequence_Delivery_Illustrated.dc.html",
+    "ER_Rules.dc.html",
+    "ER_Notation.dc.html",
+    "ER_Patterns.dc.html",
+    "ER_Basic.dc.html",
+    "ER_Delivery.dc.html",
+    "ER_Delivery_Illustrated.dc.html",
+    "ER_Split.dc.html",
+    "Architecture_Rules.dc.html",
+    "Architecture_Notation.dc.html",
+    "Architecture_Patterns.dc.html",
+    "Architecture_Basic.dc.html",
+    "Architecture_Delivery.dc.html",
+    "Architecture_Delivery_Illustrated.dc.html",
+    "Architecture_Streaming.dc.html",
+    "Architecture_Streaming_Illustrated.dc.html",
+    "Explainer_Rules.dc.html",
+    "Explainer_Layers.dc.html",
+    "Explainer_Tree.dc.html",
+    "Explainer_Compare.dc.html",
+    "Explainer_Concept.dc.html",
+    "Explainer_Payment.dc.html",
+    "Planning_Rules.dc.html",
+    "Planning_Gantt.dc.html",
+    "Planning_Org.dc.html",
+    "Planning_Org_Illustrated.dc.html",
+    "Planning_Mind.dc.html",
+    "Planning_Kanban.dc.html",
+    "Planning_Roadmap.dc.html",
+    "Planning_Mind_Plain.dc.html",
+    "Planning_Mind_Large.dc.html",
+    "UML_Rules.dc.html",
+    "UML_State.dc.html",
+    "UML_UseCase.dc.html",
+    "UML_UseCase_Illustrated.dc.html",
+    "UML_Class.dc.html",
+    "Wireframe_Rules.dc.html",
+    "Wireframe_Mobile.dc.html",
+    "Wireframe_Desktop.dc.html",
+    "Wireframe_Responsive.dc.html",
+    "Wireframe_States.dc.html",
+    "BPMN_Rules.dc.html",
+    "BPMN_Notation.dc.html",
+    "BPMN_Basic.dc.html",
+    "BPMN_Delivery.dc.html",
+    "BPMN_Advanced.dc.html",
+    "BPMN_Order.dc.html",
+    "C4_Rules.dc.html",
+    "C4_Context.dc.html",
+    "C4_Container.dc.html",
+    "C4_Component.dc.html",
+    "Cloud_Rules.dc.html",
+    "Cloud_Basic.dc.html",
+    "Cloud_Delivery.dc.html",
+    "Cloud_Network.dc.html",
+    "DFD_Rules.dc.html",
+    "DFD_Notation.dc.html",
+    "DFD_Context.dc.html",
+    "DFD_Level1.dc.html",
+    "DFD_Level2.dc.html",
+    "DFD_Context_Illustrated.dc.html",
+    "DFD_Level1_Illustrated.dc.html",
+    "DFD_Level2_Illustrated.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "foundation",
+      "name": "Foundation"
+    },
+    {
+      "id": "components",
+      "name": "Components"
+    },
+    {
+      "id": "icons",
+      "name": "Icons"
+    },
+    {
+      "id": "screenflow",
+      "name": "Screen flow"
+    },
+    {
+      "id": "flowchart",
+      "name": "Flowchart"
+    },
+    {
+      "id": "sequence",
+      "name": "Sequence"
+    },
+    {
+      "id": "er",
+      "name": "ER"
+    },
+    {
+      "id": "architecture",
+      "name": "Architecture"
+    },
+    {
+      "id": "explainer",
+      "name": "Explainer"
+    },
+    {
+      "id": "planning",
+      "name": "Planning"
+    },
+    {
+      "id": "uml",
+      "name": "UML"
+    },
+    {
+      "id": "wireframe",
+      "name": "Wireframe"
+    },
+    {
+      "id": "bpmn",
+      "name": "BPMN"
+    },
+    {
+      "id": "c4",
+      "name": "C4"
+    },
+    {
+      "id": "cloud",
+      "name": "Cloud"
+    },
+    {
+      "id": "dfd",
+      "name": "DFD"
+    }
+  ],
+  "title": "Flow Foundation",
+  "v": 3
+}

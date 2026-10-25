@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DFD: Rules</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@keyframes dc-flow2{to{stroke-dashoffset:-12}}
+.flow2{stroke-dasharray:6 6;animation:dc-flow2 1.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 1280px; height: 1230px; background: #F8FAFC; overflow: hidden">
+<style>.rc{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}.rc h2{font-size:16px;font-weight:800}.rc li{font-size:13px;line-height:20px;color:#334155;margin-bottom:6px}.rc ul{padding-left:18px;margin:0}</style><div style="position:absolute;left:0;top:0;width:1280px;box-sizing:border-box;padding:64px;display:flex;flex-direction:column;gap:28px"><div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:24px;font-weight:600">DFD · Rules</div><div style="font-size:13px;line-height:20px;color:#475569;max-width:900px">A data flow diagram follows data through a system. These are the conventions every DFD follows, and that a plugin can rely on. Notation shows the four symbols and the three forbidden connections; the examples show the delivery system at levels 0, 1 and 2.</div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px"><div class="rc"><h2>What it shows</h2><ul><li>How data moves: where it comes from, what changes it, where it rests and where it goes. Not the order of steps (Flowchart, BPMN) and not the order in time (Sequence).</li><li>Good for explaining a system to someone who does not write code, and for finding data that is stored but never used, or used but never stored.</li></ul></div><div class="rc"><h2>Four symbols</h2><ul><li><b>External entity:</b> square corners, E1, E2. Outside the system.</li><li><b>Process:</b> rounded, number in a header strip. Verb phrase name.</li><li><b>Data store:</b> open on the right, D1, D2. Noun name.</li><li><b>Data flow:</b> arrow with a noun label. Never a verb.</li><li>Gane-Sarson style. The shapes are the only thing that differs from other DFD styles.</li></ul></div><div class="rc"><h2>Levels</h2><ul><li><b>Level 0, context:</b> one process, only the outside parties. Shows the border.</li><li><b>Level 1:</b> that process opened into 4 to 7. Stores appear here.</li><li><b>Level 2:</b> one level-1 process opened into 3 to 6. Number its children 4.1, 4.2...</li><li>Opening a process keeps every flow that crossed it, from the same neighbours (balancing). A flow may be split into its parts, but never appear or vanish between levels.</li><li>Do not go past level 2 on one page.</li></ul></div><div class="rc"><h2>Connections</h2><ul><li>Allowed: entity ↔ process, process ↔ process (only on level 2), process ↔ store.</li><li>Never: entity to entity, store to store, entity to store. The Notation page shows each.</li><li>A process needs at least one flow in and one flow out.</li><li>A store needs at least one flow in and one out somewhere in the diagram set.</li><li>Two parties that exchange data both ways get two arrows, side by side, 90 px apart.</li></ul></div><div class="rc"><h2>Lines and labels</h2><ul><li>Straight or orthogonal, at most two bends. Arrow at the receiver.</li><li>Roles as in other diagrams: main route blue, thick, animated; a flow that only reports status violet, thin, slow; the rest ink.</li><li>Label every flow with a noun phrase (<i>Order ticket</i>, <i>Payment result</i>). Leave 90 px for it.</li><li>Parallel pair: 60 px apart, labels centred on their own line.</li></ul></div><div class="rc"><h2>Layout</h2><ul><li>Outside parties on the outside edge, processes in the middle, stores between the processes that share them.</li><li>Process 260 × 124, entity 240 × 80, store 260 × 64 (an open store is wider when many lines meet it).</li><li>Columns 640 px apart, rows 400 px apart. At least 240 px of line between boxes with a label.</li><li>Name, tint and icon of an entity or process are the same as in every other diagram.</li></ul></div><div class="rc"><h2>Animation</h2><ul><li>One blue route: the main journey of the data (basket, amount, charge). Violet for status flows. Everything else static.</li><li>In draw.io each line has its own flow animation (flowAnimation=1) and its own duration: main route 500, event stream 1500. Checked in the draw.io viewer; SVG export not yet tested.</li></ul></div><div class="rc"><h2>What a plugin can rely on</h2><ul><li>A node is: id (E1, 1.0, D1), kind (entity, process, store), name, description, icon, tone. A flow is: from, to, label, kind.</li><li>Checks: no forbidden connection, every process has input and output, ids unique and numbered by level, flows balance across levels.</li><li>The level-2 diagram takes its neighbours from level 1.</li></ul></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1230}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

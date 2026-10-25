@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UML: Use case diagram: the delivery app, illustrated</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@keyframes dc-flow2{to{stroke-dashoffset:-12}}
+.flow2{stroke-dasharray:6 6;animation:dc-flow2 1.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 1960px; height: 1130px; background: #F8FAFC; overflow: hidden">
+<div style="position:absolute;left:64px;top:48px;display:flex;flex-direction:column;gap:8px"><div style="font-size:24px;font-weight:600">Use case diagram: the delivery app, illustrated</div><div style="font-size:13px;line-height:20px;color:#475569;max-width:900px">Who uses the system and what for. Actors stand outside the frame, use cases inside it. A solid line means the actor takes part. A dashed arrow says one use case includes or extends another.</div></div>
+<div style="position:absolute;left:600px;top:190px;width:920px;height:810px;box-sizing:border-box;background:#fff;border:1.5px solid #0F172A;border-radius:14px;"></div>
+<div style="position:absolute;left:620px;top:204px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Delivery app</div>
+<div style="position:absolute;left:680px;top:268px;width:240px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:50%;background:#DCEEFB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;text-align:center;padding:0 24px">Browse menus</div>
+<div style="position:absolute;left:1200px;top:268px;width:240px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:50%;background:#DCEEFB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;text-align:center;padding:0 24px">Track the order</div>
+<div style="position:absolute;left:680px;top:408px;width:240px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:50%;background:#DCEEFB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;text-align:center;padding:0 24px">Place an order</div>
+<div style="position:absolute;left:1200px;top:408px;width:240px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:50%;background:#DCEEFB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;text-align:center;padding:0 24px">Apply a promo code</div>
+<div style="position:absolute;left:680px;top:548px;width:240px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:50%;background:#DCEEFB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;text-align:center;padding:0 24px">Rate the meal</div>
+<div style="position:absolute;left:1200px;top:548px;width:240px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:50%;background:#FFF1DD;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;text-align:center;padding:0 24px">Pay for the order</div>
+<div style="position:absolute;left:680px;top:688px;width:240px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:50%;background:#DCF5E1;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;text-align:center;padding:0 24px">Accept an order</div>
+<div style="position:absolute;left:1200px;top:688px;width:240px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:50%;background:#DCF5E1;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;text-align:center;padding:0 24px">Prepare the food</div>
+<div style="position:absolute;left:680px;top:828px;width:240px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:50%;background:#D3F3EF;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;text-align:center;padding:0 24px">Deliver the order</div>
+<div style="position:absolute;left:1200px;top:828px;width:240px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:50%;background:#D3F3EF;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;text-align:center;padding:0 24px">Share live location</div>
+<div style="position:absolute;left:160px;top:370px;width:180px;height:140px;box-sizing:border-box;border:2px solid #0F172A;border-radius:16px;background:#DCEEFB"><svg width="72" height="72" viewBox="0 0 64 64" style="position:absolute;left:54px;top:10px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="60" rx="20" ry="3" fill="rgba(15,23,42,0.13)"/>
+<path d="M9 59c0-14 10-22 23-22s23 8 23 22z" fill="#1D4ED8" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M32 37c13 0 23 8 23 22H40c0-9-3-16-8-22z" fill="#173FB0" opacity=".7"/>
+<path d="M9 59c0-14 10-22 23-22s23 8 23 22z" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M24 38l8 9 8-9" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/>
+<circle cx="32" cy="22" r="12.5" fill="#FFE2B0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M32 9.5a12.5 12.5 0 0 1 0 25z" fill="#F7C77E" opacity=".6"/>
+<path d="M19.6 20c1-9 8-13 14-12 6 1 10 6 9 12-4-2-9-6-12-8-3 4-7 7-11 8z" fill="#334155" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/>
+<circle cx="27" cy="24" r="1.7" fill="#0F172A"/><circle cx="37" cy="24" r="1.7" fill="#0F172A"/><path d="M28 29c2 2 6 2 8 0" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/></svg><div style="position:absolute;left:0;right:0;top:92px;display:flex;justify-content:center"><div style="padding:2px 12px;border:2px solid #0F172A;border-radius:999px;background:#BFDBFE;box-shadow:0 3px 0 #0F172A;font-size:13px;font-weight:800;white-space:nowrap">Customer</div></div></div>
+<div style="position:absolute;left:160px;top:650px;width:180px;height:140px;box-sizing:border-box;border:2px solid #0F172A;border-radius:16px;background:#DCF5E1"><svg width="72" height="72" viewBox="0 0 64 64" style="position:absolute;left:54px;top:10px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="58" rx="26" ry="3.5" fill="rgba(15,23,42,0.13)"/>
+<path d="M10 28h44v28H10z" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M44 28h10v28H44z" fill="#E2E8F0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M10 28h44v28H10z" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<rect x="13" y="35" width="11" height="11" rx="1.5" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/><path d="M15 38l5-1" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+<rect x="40" y="35" width="11" height="11" rx="1.5" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/>
+<path d="M26 56V38a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v18z" fill="#F59E3A" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="35" cy="47" r="1.4" fill="#0F172A"/>
+<path d="M6 10h52l5 15H1z" fill="#D92D20" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M19 10l-3 15M32 10v15M45 10l3 15M26 10l-1 15M39 10l1 15" stroke="none"/>
+<path d="M14 10l-4 15h8l2-15zM30 10l-2 15h8l-2-15zM46 10l2 15h8L52 10z" fill="#FFFFFF" stroke="none"/>
+<path d="M1 25a6.3 6.3 0 0 0 12.6 0 6.3 6.3 0 0 0 12.6 0 6.3 6.3 0 0 0 12.6 0 6.3 6.3 0 0 0 12.6 0 6.3 6.3 0 0 0 12.6 0" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M6 10h52l5 15H1z" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /></svg><div style="position:absolute;left:0;right:0;top:92px;display:flex;justify-content:center"><div style="padding:2px 12px;border:2px solid #0F172A;border-radius:999px;background:#B5EBC1;box-shadow:0 3px 0 #0F172A;font-size:13px;font-weight:800;white-space:nowrap">Restaurant</div></div></div>
+<div style="position:absolute;left:160px;top:830px;width:180px;height:140px;box-sizing:border-box;border:2px solid #0F172A;border-radius:16px;background:#D3F3EF"><svg width="72" height="72" viewBox="0 0 64 64" style="position:absolute;left:54px;top:10px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="58" rx="28" ry="3" fill="rgba(15,23,42,0.13)"/>
+<path d="M2 28h8M0 34h10M3 40h7" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+<rect x="12" y="14" width="24" height="22" rx="3.5" fill="#F59E3A" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M12 22h24" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/><path d="M26 14h10v8H26z" fill="#E07B12" stroke="none"/><rect x="12" y="14" width="24" height="22" rx="3.5" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="24" cy="29" r="3.4" fill="#FFFFFF" stroke="#0F172A" stroke-width="2"/>
+<path d="M18 46h22c5 0 8-3 8-7v-4h-9l-3 7H18z" fill="#7DD3CB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M48 49L43 20M38 20h10" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="3"/>
+<circle cx="15" cy="49" r="8" fill="#334155" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="15" cy="49" r="3.4" fill="#E2E8F0" stroke="#0F172A" stroke-width="2"/>
+<circle cx="49" cy="49" r="8" fill="#334155" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="49" cy="49" r="3.4" fill="#E2E8F0" stroke="#0F172A" stroke-width="2"/>
+<path d="M14 39h8" stroke="#0F172A" stroke-width="2" fill="none"/></svg><div style="position:absolute;left:0;right:0;top:92px;display:flex;justify-content:center"><div style="padding:2px 12px;border:2px solid #0F172A;border-radius:999px;background:#A8E6DE;box-shadow:0 3px 0 #0F172A;font-size:13px;font-weight:800;white-space:nowrap">Courier</div></div></div>
+<div style="position:absolute;left:1690px;top:510px;width:180px;height:140px;box-sizing:border-box;border:2px solid #0F172A;border-radius:16px;background:#FFF1DD"><svg width="72" height="72" viewBox="0 0 64 64" style="position:absolute;left:54px;top:10px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="57" rx="22" ry="3.5" fill="rgba(15,23,42,0.13)"/>
+<g transform="rotate(8 32 32)"><rect x="9" y="10" width="46" height="32" rx="6" fill="#FFE2B0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /></g>
+<g transform="rotate(-8 32 32)">
+<rect x="6" y="16" width="52" height="34" rx="6" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M6 40h52v4a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6z" fill="#B8D6F2"/>
+<rect x="6" y="24" width="52" height="9" fill="#1D4ED8" stroke="#0F172A" stroke-width="2.5"/>
+<path d="M10 21c12-3 26-3 44 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+<rect x="12" y="37" width="11" height="8" rx="2" fill="#FFE2B0" stroke="#0F172A" stroke-width="2"/><path d="M12 41h11M17.5 37v8" stroke="#0F172A" stroke-width="1.4" fill="none"/>
+<circle cx="32" cy="41" r="1.7" fill="#0F172A"/><circle cx="38" cy="41" r="1.7" fill="#0F172A"/><circle cx="44" cy="41" r="1.7" fill="#0F172A"/><circle cx="50" cy="41" r="1.7" fill="#0F172A"/>
+<rect x="6" y="16" width="52" height="34" rx="6" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /></g></svg><div style="position:absolute;left:0;right:0;top:92px;display:flex;justify-content:center"><div style="padding:2px 12px;border:2px solid #0F172A;border-radius:999px;background:#FFD9A3;box-shadow:0 3px 0 #0F172A;font-size:13px;font-weight:800;white-space:nowrap">Payment provider</div></div></div>
+<svg width="356" height="156" style="position:absolute;left:332px;top:292px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 8 148 L 348 8"/></svg>
+<svg width="356" height="16" style="position:absolute;left:332px;top:432px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 8 8 L 348 8"/></svg>
+<svg width="356" height="156" style="position:absolute;left:332px;top:432px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 8 8 L 348 148"/></svg>
+<svg width="876" height="156" style="position:absolute;left:332px;top:292px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 8 148 L 868 8"/></svg>
+<svg width="356" height="16" style="position:absolute;left:332px;top:712px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 8 8 L 348 8"/></svg>
+<svg width="356" height="56" style="position:absolute;left:332px;top:852px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 8 48 L 348 8"/></svg>
+<svg width="266" height="16" style="position:absolute;left:1432px;top:572px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 258 8 L 8 8"/></svg>
+<svg width="296" height="16" style="position:absolute;left:912px;top:432px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 288 8 L 8 8" stroke-dasharray="7 6"/></svg>
+<svg width="48" height="48" viewBox="0 0 48 48" style="position:absolute;left:896px;top:416px;overflow:visible;stroke:#0F172A;stroke-width:2;stroke-linejoin:round;stroke-linecap:round"><g transform="rotate(0 24 24)"><path d="M36 18 L24 24 L36 30" fill="none"/></g></svg>
+<div style="position:absolute;left:1060px;top:440px;transform:translate(-50%,-50%);padding:2px 8px;border-radius:999px;background:#F1F5F9;color:#334155;font-size:11px;font-weight:700;line-height:16px;white-space:nowrap;">«extend»</div>
+<svg width="316" height="116" style="position:absolute;left:902px;top:452px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 8 8 L 308 108" stroke-dasharray="7 6"/></svg>
+<svg width="48" height="48" viewBox="0 0 48 48" style="position:absolute;left:1186px;top:536px;overflow:visible;stroke:#0F172A;stroke-width:2;stroke-linejoin:round;stroke-linecap:round"><g transform="rotate(-161.565 24 24)"><path d="M36 18 L24 24 L36 30" fill="none"/></g></svg>
+<div style="position:absolute;left:1060px;top:510px;transform:translate(-50%,-50%);padding:2px 8px;border-radius:999px;background:#F1F5F9;color:#334155;font-size:11px;font-weight:700;line-height:16px;white-space:nowrap;">«include»</div>
+<svg width="296" height="16" style="position:absolute;left:912px;top:712px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 8 8 L 288 8" stroke-dasharray="7 6"/></svg>
+<svg width="48" height="48" viewBox="0 0 48 48" style="position:absolute;left:1176px;top:696px;overflow:visible;stroke:#0F172A;stroke-width:2;stroke-linejoin:round;stroke-linecap:round"><g transform="rotate(180 24 24)"><path d="M36 18 L24 24 L36 30" fill="none"/></g></svg>
+<div style="position:absolute;left:1060px;top:720px;transform:translate(-50%,-50%);padding:2px 8px;border-radius:999px;background:#F1F5F9;color:#334155;font-size:11px;font-weight:700;line-height:16px;white-space:nowrap;">«include»</div>
+<svg width="296" height="16" style="position:absolute;left:912px;top:852px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 8 8 L 288 8" stroke-dasharray="7 6"/></svg>
+<svg width="48" height="48" viewBox="0 0 48 48" style="position:absolute;left:1176px;top:836px;overflow:visible;stroke:#0F172A;stroke-width:2;stroke-linejoin:round;stroke-linecap:round"><g transform="rotate(180 24 24)"><path d="M36 18 L24 24 L36 30" fill="none"/></g></svg>
+<div style="position:absolute;left:1060px;top:860px;transform:translate(-50%,-50%);padding:2px 8px;border-radius:999px;background:#F1F5F9;color:#334155;font-size:11px;font-weight:700;line-height:16px;white-space:nowrap;">«include»</div>
+<div style="position:absolute;left:64px;top:1040px;width:1500px;font-size:12.5px;line-height:19px;color:#475569"><b style="color:#0F172A">include:</b> the base use case always uses the other one. <b style="color:#0F172A">extend:</b> the extension may add to the base in some cases. The arrow points at the use case being included or extended.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1960,"height":1130}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

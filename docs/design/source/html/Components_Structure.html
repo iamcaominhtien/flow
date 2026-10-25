@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en"><head>
+<!-- Standalone copy of the design-canvas board "Components_Structure". Generated from source/canvas/Components_Structure.dc.html; opens in any browser. -->
+<meta charset="utf-8">
+<title>Flow Components: Structure and architecture</title>
+
+</head>
+<body>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h1,h2,h3,p{margin:0}
+.cd{background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pv{background:#F8FAFC;border-radius:10px;min-height:96px;display:flex;align-items:center;justify-content:center;gap:12px;padding:10px;box-sizing:border-box;flex-wrap:wrap}
+.nm{font-size:14px;font-weight:700}
+.cp{font-size:12px;line-height:1.5;color:#475569}
+.sec{display:flex;flex-direction:column;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.gh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.gh h2{font-size:22px;font-weight:800;letter-spacing:-0.01em}
+.gh span{font-size:13px;color:#475569}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow{animation:none}}
+</style>
+
+<div style="max-width: 1200px; margin: 0 auto; box-sizing: border-box; padding: 56px 32px 80px; display: flex; flex-direction: column; gap: 48px">
+
+<header style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="background: #1D4ED8; color: #FFFFFF; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 999px">Flow</span>
+<span style="font-size: 13px; font-weight: 600; color: #475569">Components · Structure and architecture</span>
+</div>
+<h1 style="font-size: 40px; line-height: 1.1; font-weight: 800; letter-spacing: -0.02em">Structure and architecture</h1>
+<p style="font-size: 16px; line-height: 1.55; color: #334155; max-width: 800px">Notation for data, class, sequence and system diagrams: ER entities and cardinality, UML relationships, sequence parts, C4 elements and cloud boundaries.</p>
+</header>
+
+<section class="sec">
+<div class="gh"><h2>Data modeling</h2><span>Entity tables and crow's foot cardinality for ER diagrams</span></div>
+<div class="grid4">
+<div class="cd">
+<div class="pv" style="min-height: 150px">
+<div style="width: 190px; background: #FFFFFF; border: 2px solid #0F172A; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(15,23,42,0.18)">
+<div style="background: #5B4BD6; color: #FFFFFF; font-size: 12px; font-weight: 700; padding: 7px 12px">orders</div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-bottom: 1px solid #E2E8F0"><span style="font-size: 10px; font-weight: 700; background: #FFE2B0; border-radius: 4px; padding: 1px 5px">PK</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px">id</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #475569; margin-left: auto">bigint</span></div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-bottom: 1px solid #E2E8F0"><span style="font-size: 10px; font-weight: 700; background: #DCEEFB; border-radius: 4px; padding: 1px 5px">FK</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px">user_id</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #475569; margin-left: auto">bigint</span></div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px"><span style="font-size: 10px; font-weight: 700; background: #F1F5F9; border-radius: 4px; padding: 1px 5px">&nbsp;&nbsp;</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px">total</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #475569; margin-left: auto">decimal</span></div>
+</div>
+</div>
+<span class="nm">Entity table</span>
+<span class="cp">Header in a role color, rows in mono, PK / FK badges.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="140" height="64" viewBox="0 0 90 40" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M0 20H72M58 10V30M66 10V30" fill="none" stroke="#0F172A" stroke-width="2"></path><rect x="74" y="6" width="9" height="28" rx="2" fill="#DCEEFB" stroke="#0F172A" stroke-width="2"></rect></svg>
+</div>
+<span class="nm">Exactly one</span>
+<span class="cp">1</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="140" height="64" viewBox="0 0 90 40" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M0 20H46M46 20a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M54 20H72M62 10V30" fill="none" stroke="#0F172A" stroke-width="2"></path><rect x="74" y="6" width="9" height="28" rx="2" fill="#DCEEFB" stroke="#0F172A" stroke-width="2"></rect></svg>
+</div>
+<span class="nm">Zero or one</span>
+<span class="cp">0..1</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="140" height="64" viewBox="0 0 90 40" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M0 20H72M46 10V30M54 20L72 8M54 20L72 32" fill="none" stroke="#0F172A" stroke-width="2"></path><rect x="74" y="6" width="9" height="28" rx="2" fill="#DCEEFB" stroke="#0F172A" stroke-width="2"></rect></svg>
+</div>
+<span class="nm">One or many</span>
+<span class="cp">1..*</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="140" height="64" viewBox="0 0 90 40" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M0 20H34M34 20a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M42 20H72M54 20L72 8M54 20L72 32" fill="none" stroke="#0F172A" stroke-width="2"></path><rect x="74" y="6" width="9" height="28" rx="2" fill="#DCEEFB" stroke="#0F172A" stroke-width="2"></rect></svg>
+</div>
+<span class="nm">Zero or many</span>
+<span class="cp">0..*</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="140" height="64" viewBox="0 0 90 40" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M0 20H72M54 20L72 8M54 20L72 32" fill="none" stroke="#0F172A" stroke-width="2"></path><rect x="74" y="6" width="9" height="28" rx="2" fill="#DCEEFB" stroke="#0F172A" stroke-width="2"></rect></svg>
+</div>
+<span class="nm">Many</span>
+<span class="cp">*</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="140" height="64" viewBox="0 0 90 40" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M0 20H72M62 10V30" fill="none" stroke="#0F172A" stroke-width="2"></path><rect x="74" y="6" width="9" height="28" rx="2" fill="#DCEEFB" stroke="#0F172A" stroke-width="2"></rect></svg>
+</div>
+<span class="nm">One</span>
+<span class="cp">1 (loose)</span>
+</div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>UML relationships</h2><span>Edge ends for class and component diagrams</span></div>
+<div class="grid4">
+
+<div class="cd">
+<div class="pv">
+<svg width="150" height="40" viewBox="0 0 120 28" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 14H108" fill="none" stroke-dasharray="none"></path><path d="M98 7l10 7-10 7" fill="none"></path></svg>
+</div>
+<span class="nm">Association</span>
+<span class="cp">A uses B. Open arrow, solid.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="150" height="40" viewBox="0 0 120 28" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 14H108" fill="none" stroke-dasharray="5 4"></path><path d="M98 7l10 7-10 7" fill="none"></path></svg>
+</div>
+<span class="nm">Dependency</span>
+<span class="cp">Weak, temporary use. Dashed.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="150" height="40" viewBox="0 0 120 28" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 14H100" fill="none" stroke-dasharray="none"></path><path d="M100 6l14 8-14 8z" fill="#FFFFFF"></path></svg>
+</div>
+<span class="nm">Inheritance</span>
+<span class="cp">A extends B. Hollow triangle.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="150" height="40" viewBox="0 0 120 28" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 14H100" fill="none" stroke-dasharray="5 4"></path><path d="M100 6l14 8-14 8z" fill="#FFFFFF"></path></svg>
+</div>
+<span class="nm">Realization</span>
+<span class="cp">A implements B. Dashed, hollow triangle.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="150" height="40" viewBox="0 0 120 28" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 14H92" fill="none" stroke-dasharray="none"></path><path d="M92 14l11-7 11 7-11 7z" fill="#FFFFFF"></path></svg>
+</div>
+<span class="nm">Aggregation</span>
+<span class="cp">Has-a, parts can live alone. Hollow diamond.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="150" height="40" viewBox="0 0 120 28" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 14H92" fill="none" stroke-dasharray="none"></path><path d="M92 14l11-7 11 7-11 7z" fill="#0F172A"></path></svg>
+</div>
+<span class="nm">Composition</span>
+<span class="cp">Owns-a, parts die with whole. Filled diamond.</span>
+</div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>Sequence diagrams</h2><span>Participants, lifelines, messages and combined fragments</span></div>
+<div class="grid4">
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="64" height="96" viewBox="0 0 64 96" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="16" r="10" fill="#FFF1DD"></circle><path d="M32 26v34M12 40h40M32 60L16 84M32 60l16 24" fill="none"></path></svg></div><span class="nm">Actor</span><span class="cp">Person or external trigger.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><span style="background: #DCEEFB; border: 2px solid #1E5AA8; border-radius: 8px; padding: 9px 16px; font-size: 12px; font-weight: 700; box-shadow: 0 2px 6px rgba(15,23,42,0.18)">Order API</span></div><span class="nm">Participant</span><span class="cp">Service, object or system. Role color follows the foundation.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="110" height="120" viewBox="0 0 110 120" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linecap="round"><rect x="20" y="4" width="70" height="26" rx="7" fill="#DCEEFB" stroke="#1E5AA8"></rect><path d="M55 30V116" fill="none" stroke-dasharray="5 4"></path><rect x="49" y="50" width="12" height="44" rx="2" fill="#FFFFFF"></rect></svg></div><span class="nm">Lifeline and activation</span><span class="cp">Dashed vertical line, white bar while the participant is busy.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="170" height="64" viewBox="0 0 170 64" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 40H156" fill="none"></path><path d="M148 33l10 7-10 7z" fill="#0F172A"></path><text x="82" y="30" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" fill="#0F172A" stroke="none">createOrder()</text></svg></div><span class="nm">Synchronous message</span><span class="cp">Solid line, filled head. Caller waits.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="170" height="64" viewBox="0 0 170 64" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M156 40H12" fill="none" stroke-dasharray="5 4"></path><path d="M20 33l-9 7 9 7" fill="none"></path><text x="82" y="30" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" fill="#0F172A" stroke="none">201 Created</text></svg></div><span class="nm">Return message</span><span class="cp">Dashed, open head, flows back to the caller.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="170" height="64" viewBox="0 0 170 64" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 40H156" fill="none"></path><path d="M146 33l10 7-10 7" fill="none"></path><text x="82" y="30" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" fill="#0F172A" stroke="none">publish(event)</text></svg></div><span class="nm">Asynchronous message</span><span class="cp">Solid line, open head. Fire and forget.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="150" height="70" viewBox="0 0 150 70" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="6" width="12" height="58" rx="2" fill="#FFFFFF"></rect><path d="M24 16H70V46H26" fill="none"></path><path d="M34 40l-9 6 9 6" fill="none"></path><text x="78" y="34" font-family="'JetBrains Mono', monospace" font-size="11" fill="#0F172A" stroke="none">validate()</text></svg></div><span class="nm">Self call</span><span class="cp">Loop back to the same lifeline.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><div style="position: relative; width: 190px; height: 100px; border: 2px solid #0F172A; border-radius: 4px"><span style="position: absolute; left: -2px; top: -2px; background: #F1F5F9; border: 2px solid #0F172A; border-radius: 4px 0 8px 0; font-size: 11px; font-weight: 800; padding: 2px 10px">alt</span><span style="position: absolute; left: 70px; top: 6px; font-size: 11px; font-family: 'JetBrains Mono', monospace">[stock ok]</span><span style="position: absolute; left: 0; right: 0; top: 52px; border-top: 2px dashed #0F172A"></span><span style="position: absolute; left: 10px; top: 58px; font-size: 11px; font-family: 'JetBrains Mono', monospace">[else]</span></div></div><span class="nm">Combined fragment</span><span class="cp">alt, opt, loop, par: tab on the corner, dashed divider between branches.</span></div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>Architecture and C4</h2><span>People, systems, containers and the relationships between them</span></div>
+<div class="grid4">
+
+<div class="cd"><div class="pv" style="min-height: 130px"><span style="width: 160px; background: #DCEEFB; border: 2px solid #0F172A; border-radius: 28px; padding: 12px 10px; box-sizing: border-box; text-align: center"><span style="display: block; font-size: 13px; font-weight: 700">Customer</span><span style="display: block; font-size: 10px; color: #475569; margin-top: 2px; font-family: 'JetBrains Mono', monospace">[Person]</span><span style="display: block; font-size: 11px; margin-top: 6px; color: #334155">Orders food.</span></span></div><span class="nm">Person</span><span class="cp">Round corners. Tinted by who it is, with its icon.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 130px"><span style="width: 160px; background: #E6E3FB; border: 2px solid #0F172A; border-radius: 14px; padding: 12px 10px; box-sizing: border-box; text-align: center"><span style="display: block; font-size: 13px; font-weight: 700">Delivery platform</span><span style="display: block; font-size: 10px; color: #475569; margin-top: 2px; font-family: 'JetBrains Mono', monospace">[Software system]</span><span style="display: block; font-size: 11px; margin-top: 6px; color: #334155">The system in scope.</span></span></div><span class="nm">Software system</span><span class="cp">The system in scope. Violet tint, solid border.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 130px"><span style="width: 160px; background: #F1F5F9; border: 2px dashed #0F172A; border-radius: 14px; padding: 12px 10px; box-sizing: border-box; text-align: center"><span style="display: block; font-size: 13px; font-weight: 700">Payment provider</span><span style="display: block; font-size: 10px; color: #475569; margin-top: 2px; font-family: 'JetBrains Mono', monospace">[External system]</span><span style="display: block; font-size: 11px; margin-top: 6px; color: #334155">Charges cards.</span></span></div><span class="nm">External system</span><span class="cp">Outside your control. Grey, dashed border.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 130px"><span style="width: 160px; background: #DCEEFB; border: 2px solid #0F172A; border-radius: 14px; padding: 12px 10px; box-sizing: border-box; text-align: center"><span style="display: block; font-size: 13px; font-weight: 700">Customer app</span><span style="display: block; font-size: 10px; color: #475569; margin-top: 2px; font-family: 'JetBrains Mono', monospace">[Container: iOS, Android]</span><span style="display: block; font-size: 11px; margin-top: 6px; color: #334155">Browse and order.</span></span></div><span class="nm">Container</span><span class="cp">Name, technology in brackets, one sentence. Tint by domain.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 130px"><span style="width: 160px; background: #DCF5E1; border: 2px solid #0F172A; border-radius: 14px; padding: 12px 10px; box-sizing: border-box; text-align: center"><span style="display: block; font-size: 13px; font-weight: 700">Order controller</span><span style="display: block; font-size: 10px; color: #475569; margin-top: 2px; font-family: 'JetBrains Mono', monospace">[Component: Spring REST]</span></span></div><span class="nm">Component</span><span class="cp">Inside a container. Same box, tinted by domain.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 130px"><span style="width: 160px; background: #E6E3FB; border: 2px solid #0F172A; border-radius: 14px; padding: 12px 10px; box-sizing: border-box; text-align: center"><span style="display: block; font-size: 13px; font-weight: 700">Orders database</span><span style="display: block; font-size: 10px; color: #475569; margin-top: 2px; font-family: 'JetBrains Mono', monospace">[Container: PostgreSQL]</span><span style="display: block; font-size: 11px; margin-top: 6px; color: #334155">Orders, customers.</span></span></div><span class="nm">Database</span><span class="cp">A database is a container: same box, with the Database icon.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 130px"><svg width="190" height="76" viewBox="0 0 190 76" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 44H170" fill="none" stroke-dasharray="6 4"></path><path d="M160 37l10 7-10 7z" fill="#0F172A"></path><text x="94" y="28" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#0F172A" stroke="none">Places orders</text><text x="94" y="64" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10" fill="#475569" stroke="none">[HTTPS / JSON]</text></svg></div><span class="nm">Relationship</span><span class="cp">Verb above the line, protocol below in brackets.</span></div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>Cloud boundaries</h2><span>Frames that nest from region down to subnet, plus on-premises sites and the DMZ</span></div>
+<div class="grid4">
+
+<div class="cd"><div class="pv" style="min-height: 130px"><div style="position: relative; border: 1.5px solid #1D4ED8; border-radius: 14px; padding: 26px 18px 14px; background: rgba(29,78,216,0.05)"><span style="position: absolute; left: 12px; top: -11px; background: #1D4ED8; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap">Region eu-west</span><span style="display: block; width: 110px; height: 34px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px"></span></div></div><span class="nm">Region</span><span class="cp">Solid blue frame. Blue pill label on the top edge.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 130px"><div style="position: relative; border: 1.5px dashed #64748B; border-radius: 14px; padding: 26px 18px 14px; background: rgba(100,116,139,0.06)"><span style="position: absolute; left: 12px; top: -11px; background: #64748B; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap">Zone a</span><span style="display: block; width: 110px; height: 34px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px"></span></div></div><span class="nm">Availability zone</span><span class="cp">Dashed grey frame, sits inside a VPC.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 130px"><div style="position: relative; border: 1.5px dashed #5B4BD6; border-radius: 14px; padding: 26px 18px 14px; background: rgba(91,75,214,0.06)"><span style="position: absolute; left: 12px; top: -11px; background: #5B4BD6; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap">VPC 10.0.0.0/16</span><span style="display: block; width: 110px; height: 34px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px"></span></div></div><span class="nm">VPC / virtual network</span><span class="cp">Dashed violet frame. The address range goes in the label.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 130px"><div style="display: flex; flex-direction: column; gap: 14px"><div style="position: relative; border: 1.5px dashed #15803D; border-radius: 14px; padding: 20px 12px 8px; background: rgba(21,128,61,0.08)"><span style="position: absolute; left: 12px; top: -11px; background: #15803D; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap">Public subnet</span><span style="display: block; width: 90px; height: 22px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 6px"></span></div><div style="position: relative; border: 1.5px dashed #B45309; border-radius: 14px; padding: 20px 12px 8px; background: rgba(245,158,58,0.10)"><span style="position: absolute; left: 12px; top: -11px; background: #B45309; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap">Private subnet</span><span style="display: block; width: 90px; height: 22px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 6px"></span></div><div style="position: relative; border: 1.5px dashed #0F766E; border-radius: 14px; padding: 20px 12px 8px; background: rgba(15,118,110,0.08)"><span style="position: absolute; left: 12px; top: -11px; background: #0F766E; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap">Data subnet</span><span style="display: block; width: 90px; height: 22px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 6px"></span></div></div></div><span class="nm">Subnet</span><span class="cp">Green public, amber private, teal data.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 130px"><div style="position: relative; border: 1.5px solid #334155; border-radius: 14px; padding: 26px 18px 14px; background: rgba(100,116,139,0.08)"><span style="position: absolute; left: 12px; top: -11px; background: #334155; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap">Head office</span><span style="display: block; width: 110px; height: 34px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px"></span></div></div><span class="nm">On-premises site</span><span class="cp">Solid slate frame for an office or data centre.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 130px"><div style="position: relative; border: 1.5px dashed #B42318; border-radius: 14px; padding: 26px 18px 14px; background: rgba(180,35,24,0.06)"><span style="position: absolute; left: 12px; top: -11px; background: #B42318; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap">DMZ subnet</span><span style="display: block; width: 110px; height: 34px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px"></span></div></div><span class="nm">DMZ</span><span class="cp">Red dashed frame: the only place outsiders may touch.</span></div>
+
+</div>
+</section>
+
+</div>
+
+
+
+
+</body></html>
