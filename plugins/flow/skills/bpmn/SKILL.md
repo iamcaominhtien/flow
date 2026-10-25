@@ -81,9 +81,9 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 }
 ```
 
-- **Element**: `id`, `label`, `kind`: `task` (default), `subprocess`, `gateway` (diamond), `event` (intermediate), `start`, `end`, `document`. Start, end, event and gateway need no label.
-- **Zone**: a pool or lane, drawn as a frame: `id`, `label`, `tone`, `parent`. Put elements in it with `zone`.
-- **Flow**: `from`, `to`, `label`, `style` (`sequence` solid, default; `message` dashed with an open arrow, for messages between pools), `main: true`.
+- **Element**: `id`, `label`, `kind`: `task` (default), `subprocess`, `gateway` (an empty diamond), `exclusive` (diamond with an X), `parallel` (diamond with a +), `start`, `end`, `event` (plain intermediate event), `timer`, `message`, `error` (intermediate events with a clock, an envelope or a warning mark), `document`. Start, end, event and gateway kinds need no label; a label on an event sits under it.
+- **Zone**: a pool or lane, drawn as a swimlane: `id`, `label`, `tone`. When there are zones, every element needs one (`zone`), and the build refuses an element without one. Zones are laid out side by side; nesting (`parent`) is not used.
+- **Flow**: `from`, `to`, `label`, `style`: `sequence` (solid, default) or `message` (dashed, a dot at the start and an open arrow, for messages between pools), `main: true`.
 - Top level: `type` (`bpmn`), `title`, `desc`, optional `direction` (`down` default, or `right`).
 - Optional `at: [row, column]` on an item places it on an explicit grid cell. Use it only when the automatic placement is wrong.
 - Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
@@ -94,6 +94,7 @@ Add `"style": "illustrated"` at the top level to draw each box that has an `icon
 
 ## Limits to tell the user
 
-- This is the BPMN look, not the full standard: no event types (timer, message, error), no gateway markers (X, +), no data objects. Say so if the user needs strict BPMN.
+- This is the BPMN look, not the full standard: only the timer, message and error events and the exclusive and parallel gateways are marked; there is no start or end event type, no boundary event, no data object, and no check that message flows cross pools. Say so if the user needs strict BPMN.
+- With pools, a line that leaves a gateway on the side can go around the outside of its pool. Check the picture.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
 - Fixes beyond the spec: see the flowchart skill (overrides file).

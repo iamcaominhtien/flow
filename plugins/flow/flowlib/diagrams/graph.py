@@ -13,12 +13,12 @@ The JSON format, with the words of the type in place of ``nodes`` and ``links``:
 """
 
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from ..model import Direction, Head, Role, Row, Scene, Shape, Tone
 from ..reader import Reader, SpecError, suggestion
-from ..spec import Spec, SpecEdge, SpecNode, SpecZone
+from ..spec import Spec, SpecEdge, SpecLane, SpecNode, SpecZone
 from ..theme import icon_names
 from . import flowchart
 
@@ -54,7 +54,9 @@ class GraphType:
     default_role: Role = Role.NEXT
     unlabelled_kinds: frozenset[str] = frozenset()
     has_zones: bool = False
+    zones_are_lanes: bool = False  # zones become swimlanes: every item sits in exactly one
     extra_node_keys: frozenset[str] = frozenset()
+    kind_icons: dict[str, str] = field(default_factory=dict, compare=False)
     extra: Extra | None = field(default=None, compare=False)
 
     @property
@@ -114,6 +116,7 @@ def _node(raw: object, where: str, context: _Context) -> SpecNode | None:
         return None
     read.check_keys(raw, NODE_KEYS | graph.extra_node_keys, where)
     icon, zone = raw.get("icon"), raw.get("zone")
+    icon = icon if icon is not None else graph.kind_icons.get(raw.get("kind", ""))
     if icon is not None and icon not in icon_names():
         known = ", ".join(sorted(icon_names()))
         read.report(where, f"unknown icon '{icon}'; use one of: {known}")
@@ -182,6 +185,22 @@ def _link(raw: object, where: str, context: _Context) -> SpecEdge | None:
     )
 
 
+def _require_lane(nodes: dict[str, SpecNode], read: Reader) -> None:
+    """Report an item with no zone, for a type whose zones are swimlanes."""
+    for node in nodes.values():
+        if node.zone is None:
+            read.report(
+                f"item '{node.id}'", "needs a 'zone': when there are zones, each item sits in one"
+            )
+
+
+def _as_lanes(spec: Spec) -> Spec:
+    """Turn the zones of a spec into swimlanes, and each item's zone into its lane."""
+    lanes = tuple(SpecLane(zone.id, zone.label, zone.tone) for zone in spec.zones)
+    nodes = tuple(replace(node, lane=node.zone, zone=None) for node in spec.nodes)
+    return replace(spec, lanes=lanes, nodes=nodes, zones=())
+
+
 def _list(raw: dict[str, Any], key: str) -> list[object]:
     """Return a field that should be a list, or an empty list when it is not one."""
     value = raw.get(key, [])
@@ -223,9 +242,11 @@ def to_spec(graph: GraphType, raw: object) -> Spec:
     direction = read.enum(Direction, raw, "direction", "spec") or Direction.DOWN
     illustrated = read.illustrated(raw, "spec")
     title, description = read.text(raw, "title", "spec"), read.text(raw, "desc", "spec")
+    if graph.zones_are_lanes and zones:
+        _require_lane(nodes, read)
     if read.problems:
         raise SpecError(read.problems)
-    return Spec(
+    spec = Spec(
         title=title,
         description=description,
         direction=direction,
@@ -235,6 +256,7 @@ def to_spec(graph: GraphType, raw: object) -> Spec:
         zones=tuple(zones.values()),
         illustrated=illustrated,
     )
+    return _as_lanes(spec) if graph.zones_are_lanes else spec
 
 
 def layout_with(graph: GraphType) -> Callable[[object], Scene]:

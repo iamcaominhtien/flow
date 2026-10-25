@@ -30,6 +30,7 @@ from .theme import Theme, detailed_icon_svg, has_detailed_icon, icon_svg, load_t
 ICON_SIZE_PX = 18
 ICON_STROKE_WIDTH = 2
 ICON_LEFT_PX = 14
+CENTERED_ICON_SHAPES = (Shape.INTERMEDIATE, Shape.DECISION)  # the icon is a marker in the middle
 SVG_NAMESPACE = "http://www.w3.org/2000/svg"
 BADGE_HEIGHT_PX = 20
 BADGE_MIN_WIDTH_PX = 22
@@ -314,7 +315,9 @@ def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
         icon.set("parent", f"node-{node.id}")  # a child cell moves with its node
         band = theme.layout.table_header_height if node.shape is Shape.TABLE else node.height
         icon_top = (band - ICON_SIZE_PX) / 2
-        add_geometry(icon, (ICON_LEFT_PX, icon_top, ICON_SIZE_PX, ICON_SIZE_PX))
+        is_marker = node.shape in CENTERED_ICON_SHAPES and not node.text
+        icon_left = (node.width - ICON_SIZE_PX) / 2 if is_marker else ICON_LEFT_PX
+        add_geometry(icon, (icon_left, icon_top, ICON_SIZE_PX, ICON_SIZE_PX))
     if node.number:
         _add_badge(root, node, theme)
 

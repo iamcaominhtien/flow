@@ -87,16 +87,31 @@ BPMN = GraphType(
         "start": Shape.START,
         "end": Shape.END,
         "event": Shape.INTERMEDIATE,
+        "timer": Shape.INTERMEDIATE,
+        "message": Shape.INTERMEDIATE,
+        "error": Shape.INTERMEDIATE,
         "task": Shape.PROCESS,
         "subprocess": Shape.SUBPROCESS,
         "gateway": Shape.DECISION,
+        "exclusive": Shape.DECISION,
+        "parallel": Shape.DECISION,
         "document": Shape.DOCUMENT,
     },
     default_kind="task",
-    line_kinds={"sequence": FLOW, "message": DASHED},
+    line_kinds={"sequence": FLOW, "message": LineKind(dashed=True, head=Head.OPEN, tail=Head.DOT)},
     default_line="sequence",
-    unlabelled_kinds=frozenset({"start", "end", "event", "gateway"}),
+    unlabelled_kinds=frozenset(
+        {"start", "end", "event", "timer", "message", "error", "gateway", "exclusive", "parallel"}
+    ),
     has_zones=True,
+    zones_are_lanes=True,
+    kind_icons={
+        "timer": "clock",
+        "message": "mail",
+        "error": "warn",
+        "exclusive": "x",
+        "parallel": "plus",
+    },
 )
 CLASS = GraphType(
     name="class",

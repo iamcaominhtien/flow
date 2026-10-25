@@ -18,6 +18,7 @@ CASES = {
     "refund-bpmn.spec.json": "bpmn",
     "shapes-class.spec.json": "class",
     "signup-screen.spec.json": "screen",
+    "order-pools-bpmn.spec.json": "bpmn",
 }
 
 sys.path.insert(0, str(PLUGIN_DIR))
@@ -114,3 +115,26 @@ def test_a_line_leaves_an_actor_below_its_name() -> None:
     shopper = next(node for node in scene.nodes if node.id == "shopper")
     line = next(edge for edge in scene.edges if edge.source == "shopper")
     assert line.points[0][1] > shopper.y + shopper.height
+
+
+def test_bpmn_event_and_gateway_markers_and_pools() -> None:
+    """Timer, message and parallel kinds get a marker icon; zones become swimlanes."""
+    scene = diagrams.layout(raw_example("order-pools-bpmn.spec.json"))
+    nodes = {node.id: node for node in scene.nodes}
+    assert nodes["wait"].icon == "clock"
+    assert nodes["split"].icon == "plus"
+    assert nodes["ok"].icon == "x"
+    assert nodes["wait"].shape is Shape.INTERMEDIATE
+    assert [frame.label for frame in scene.frames] == ["Shop", "Bank"]
+    assert nodes["charge"].x > nodes["pay"].x
+    message = next(edge for edge in scene.edges if edge.source == "pay" and edge.target == "charge")
+    assert message.dashed
+    assert message.tail is Head.DOT
+
+
+def test_an_item_without_a_zone_is_refused_when_zones_are_pools() -> None:
+    """In a BPMN diagram with pools, an element outside every pool fails."""
+    raw = raw_example("order-pools-bpmn.spec.json")
+    del raw["elements"][0]["zone"]
+    with pytest.raises(SpecError, match="needs a 'zone'"):
+        diagrams.layout(raw)

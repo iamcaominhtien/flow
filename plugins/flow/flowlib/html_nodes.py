@@ -26,6 +26,7 @@ ICON_LEFT_PX: dict[Shape, float] = {
     Shape.PREPARATION: 24,
 }
 DEFAULT_ICON_LEFT_PX = 14
+CENTERED_ICON_SHAPES = (Shape.INTERMEDIATE, Shape.DECISION)  # the icon is a marker in the middle
 
 # Number badge on a node corner
 BADGE_OVERHANG_LEFT_PX = 6
@@ -64,6 +65,8 @@ def _icon_html(node: Node, stroke: str, band: float | None = None) -> str:
     if node.icon is None:
         return ""
     left = ICON_LEFT_PX.get(node.shape, DEFAULT_ICON_LEFT_PX)
+    if node.shape in CENTERED_ICON_SHAPES and not node.text:
+        left = (node.width - ICON_SIZE_PX) / 2
     top = ((band or node.height) - ICON_SIZE_PX) / 2
     if node.shape is Shape.DOCUMENT:
         top -= DOCUMENT_ICON_LIFT_PX

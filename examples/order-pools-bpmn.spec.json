@@ -1,0 +1,125 @@
+{
+  "type": "bpmn",
+  "title": "BPMN: order with a timeout",
+  "desc": "A customer's order is paid within a day, or it is cancelled; payment and packing run together.",
+  "zones": [
+    {
+      "id": "shop",
+      "label": "Shop",
+      "tone": "blue"
+    },
+    {
+      "id": "bank",
+      "label": "Bank",
+      "tone": "green"
+    }
+  ],
+  "elements": [
+    {
+      "id": "s",
+      "kind": "start",
+      "zone": "shop"
+    },
+    {
+      "id": "order",
+      "label": "Take the order",
+      "zone": "shop"
+    },
+    {
+      "id": "split",
+      "kind": "parallel",
+      "zone": "shop"
+    },
+    {
+      "id": "pay",
+      "label": "Ask for payment",
+      "zone": "shop"
+    },
+    {
+      "id": "pack",
+      "label": "Pack the goods",
+      "zone": "shop"
+    },
+    {
+      "id": "join",
+      "kind": "parallel",
+      "zone": "shop"
+    },
+    {
+      "id": "ok",
+      "kind": "exclusive",
+      "zone": "shop"
+    },
+    {
+      "id": "wait",
+      "kind": "timer",
+      "label": "1 day",
+      "zone": "shop"
+    },
+    {
+      "id": "ship",
+      "label": "Ship it",
+      "zone": "shop"
+    },
+    {
+      "id": "e",
+      "kind": "end",
+      "zone": "shop"
+    },
+    {
+      "id": "charge",
+      "label": "Charge the card",
+      "zone": "bank"
+    }
+  ],
+  "flows": [
+    {
+      "from": "s",
+      "to": "order"
+    },
+    {
+      "from": "order",
+      "to": "split"
+    },
+    {
+      "from": "split",
+      "to": "pay"
+    },
+    {
+      "from": "split",
+      "to": "pack"
+    },
+    {
+      "from": "pay",
+      "to": "join"
+    },
+    {
+      "from": "pack",
+      "to": "join"
+    },
+    {
+      "from": "join",
+      "to": "ok"
+    },
+    {
+      "from": "ok",
+      "to": "ship",
+      "label": "Paid"
+    },
+    {
+      "from": "ok",
+      "to": "wait",
+      "label": "Not paid"
+    },
+    {
+      "from": "ship",
+      "to": "e"
+    },
+    {
+      "from": "pay",
+      "to": "charge",
+      "style": "message",
+      "label": "charge"
+    }
+  ]
+}
