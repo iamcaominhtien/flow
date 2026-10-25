@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Flow command line. Standard library only.
 
-flow.py build spec.json [-o dir]           place, check and draw a flowchart spec
+flow.py build spec.json [-o dir]           place, check and draw a flowchart spec (HTML and draw.io)
 flow.py check scene.json                   check a scene
 flow.py render scene.json [-o out.html]    draw a scene as HTML
 """
@@ -57,7 +57,7 @@ def run_build(arguments: argparse.Namespace) -> int:
     except spec.SpecError as error:
         print(f"{spec_path} is not a valid spec:\n{error}", file=sys.stderr)
         return EXIT_INVALID_INPUT
-    print(f"wrote {result.scene_path}\nwrote {result.html_path}")
+    print(f"wrote {result.scene_path}\nwrote {result.html_path}\nwrote {result.drawio_path}")
     print(check.format_report(result.findings))
     has_errors = any(finding.severity is check.Severity.ERROR for finding in result.findings)
     return EXIT_ERRORS_FOUND if has_errors else EXIT_OK
@@ -87,7 +87,9 @@ def build_parser() -> argparse.ArgumentParser:
     """Return the command line parser, with one sub-command per action."""
     parser = argparse.ArgumentParser(prog="flow.py", description=__doc__.splitlines()[0])
     commands = parser.add_subparsers(dest="command", required=True)
-    build_command = commands.add_parser("build", help="place, check and draw a flowchart spec")
+    build_command = commands.add_parser(
+        "build", help="place, check and draw a flowchart spec (HTML and draw.io)"
+    )
     build_command.add_argument("spec")
     build_command.add_argument("-o", "--output")
     build_command.set_defaults(run=run_build)

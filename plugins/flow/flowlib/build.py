@@ -9,7 +9,8 @@ from .check import Finding, check_scene
 from .layered import build_grid
 from .model import Scene
 from .placement import place_nodes
-from .render_html import render
+from .render_drawio import render as render_drawio
+from .render_html import render as render_html
 from .routing import route_edges
 from .spec import Spec
 from .theme import load_theme
@@ -17,6 +18,7 @@ from .theme import load_theme
 SPEC_SUFFIX = ".spec.json"
 SCENE_SUFFIX = ".scene.json"
 HTML_SUFFIX = ".html"
+DRAWIO_SUFFIX = ".drawio"
 JSON_INDENT = 1
 
 
@@ -26,6 +28,7 @@ class BuildResult:
 
     scene_path: Path
     html_path: Path
+    drawio_path: Path
     findings: list[Finding]
 
 
@@ -70,11 +73,11 @@ def output_stem(spec_path: Path) -> str:
 
 
 def build(spec_path: Path, out_dir: Path) -> BuildResult:
-    """Build the scene and the HTML of a spec file and check the result.
+    """Build the scene, the HTML page and the draw.io file of a spec, and check the result.
 
     Args:
         spec_path: A spec file.
-        out_dir: Where to write ``<name>.scene.json`` and ``<name>.html``.
+        out_dir: Where to write ``<name>.scene.json``, ``<name>.html`` and ``<name>.drawio``.
 
     Returns:
         The paths written and the findings of the checks.
@@ -87,6 +90,8 @@ def build(spec_path: Path, out_dir: Path) -> BuildResult:
     stem = output_stem(spec_path)
     scene_path = out_dir / f"{stem}{SCENE_SUFFIX}"
     html_path = out_dir / f"{stem}{HTML_SUFFIX}"
+    drawio_path = out_dir / f"{stem}{DRAWIO_SUFFIX}"
     scene_path.write_text(scene_io.dumps(scene, JSON_INDENT) + "\n", encoding="utf-8")
-    html_path.write_text(render(scene), encoding="utf-8")
-    return BuildResult(scene_path, html_path, check_scene(scene))
+    html_path.write_text(render_html(scene), encoding="utf-8")
+    drawio_path.write_text(render_drawio(scene), encoding="utf-8")
+    return BuildResult(scene_path, html_path, drawio_path, check_scene(scene))

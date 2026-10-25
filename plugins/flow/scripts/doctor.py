@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 DRAWIO_HINT = (
-    "INFO draw.io export needs the optional `drawio@drawio` plugin;\n"
+    "INFO exporting .drawio files to PNG, SVG or PDF needs the optional `drawio@drawio` plugin;\n"
     "     check with `claude plugin list`"
 )
 PLUGIN_ROOT = Path(os.environ.get("CLAUDE_PLUGIN_ROOT") or Path(__file__).resolve().parent.parent)

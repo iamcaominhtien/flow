@@ -133,7 +133,7 @@ def test_spec_rejects_a_direction_that_is_not_built_yet() -> None:
 
 
 def test_build_command_writes_the_files(tmp_path: Path) -> None:
-    """The build command writes the scene and the page next to the requested folder."""
+    """The build command writes the scene, the page and the draw.io file to the folder."""
     run = subprocess.run(
         [sys.executable, str(FLOW_CLI), "build", str(LOGIN_SPEC), "-o", str(tmp_path)],
         capture_output=True,
@@ -143,6 +143,7 @@ def test_build_command_writes_the_files(tmp_path: Path) -> None:
     assert run.returncode == EXIT_OK, run.stderr
     assert (tmp_path / "login-flow.scene.json").is_file()
     assert (tmp_path / "login-flow.html").is_file()
+    assert (tmp_path / "login-flow.drawio").is_file()
     assert "no problems found" in run.stdout
 
 

@@ -122,11 +122,16 @@ The scene is also the thing the **check** reads and the thing tests compare agai
 
 ### draw.io
 
-- Each node becomes an `mxCell` with a style string from the foundation page (the "Building blocks" table already lists them); each edge becomes an `mxCell` with `edgeStyle=orthogonalEdgeStyle` and the scene's waypoints as `<Array as="points">`. Frames become containers.
-- Animation uses the per-edge style from the first test: main `strokeWidth=3;flowAnimation=1;flowAnimationDuration=500`, events `strokeWidth=1;flowAnimation=1;flowAnimationDuration=1500`.
-- Icons are written as `shape=image` with an inline SVG data URI built from the same icon paths. **Not tested yet**: how that looks in the editor and in PNG/PDF export.
-- The output is plain XML written by a script, never by Claude, so the `.drawio` is valid by construction. If the optional draw.io plugin is installed, Claude can offer to export PNG/SVG/PDF with it.
-- Line weights: the same numbers as the HTML (2 px ordinary, 4 px main path, 2 px event stream). The earlier draw.io recipe (3 and 1) is dropped unless the draw.io test shows a problem.
+Built in `flowlib/render_drawio.py`. The file is an uncompressed `mxfile`, written by a script and never by Claude.
+
+- **Nodes** are vertices with the draw.io shape closest to the HTML one (`rounded` with `arcSize`, `rhombus`, `parallelogram`, `hexagon`, `process`, `document`, `ellipse`), with the same fill, stroke (2 px) and font as the page. Text keeps the line breaks the layout chose.
+- **Edges** keep the routed points of the scene as waypoints, with no `edgeStyle`, so the line is drawn exactly as routed. Each edge names its source and target nodes and fixes the exit and entry points (`exitX`, `entryX`...), so it stays attached when a node is moved (the waypoints do not follow). An edge also carries its end points, so a hand-written scene without node names still draws.
+- **Labels** are edge labels placed at their position along the line, with an offset for labels beside a vertical line. They are plain text on a coloured background: draw.io has no rounded chip for an edge label.
+- **Icons** are small image cells inside their node, as SVG data URIs, so they move with it. The URI has no `;base64`, because draw.io splits styles at semicolons.
+- **Line weights** are the same as the page: 2 px for ordinary lines, 4 px for the main path. Dash patterns are converted to multiples of the line width, which is how draw.io reads them.
+- **Animation** uses `flowAnimation=1`. draw.io spends `flowAnimationDuration` ms per 16 px of dash cycle, so the duration is computed from the page's speed (one cycle in 0.7 s for the main path, 1.8 s for events) and the two outputs move at the same speed.
+
+Checked by loading the files in draw.io's own viewer script (`viewer-static.min.js`, the same rendering code as the editor) in Chromium: shapes, waypoints, labels, icons, arrowheads and the dash patterns match the page, and the animated edges carry the computed animation style. Not checked: opening the file in the draw.io editor or desktop app, PNG/PDF export (which cannot animate), and what happens when the fonts Inter and JetBrains Mono are missing.
 
 ### 6a. Icons: library first, drawn on demand
 
@@ -206,8 +211,8 @@ Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build 
 1. **Layout quality is the project.** A home-made layered layout will not match a good hand layout on large graphs. Mitigation: start with small and medium graphs, expose hints, report honestly when the result is poor. Not planned: calling Graphviz, because it is not guaranteed to be installed.
 2. **Python is a requirement.** Claude Code does not ship it. `doctor` checks and says what to install if it is missing. (Not verified: on Windows the command may be `python` or `py`.)
 3. **Text measurement** is an approximation; wide scripts and long labels will sometimes overflow.
-4. **Line weights:** the same numbers in both outputs (§6); to be confirmed when the draw.io renderer is tried.
-5. **Icons in draw.io** (inline SVG images) are untested for editing and export.
+4. **Line weights:** the same numbers in both outputs (§6); confirmed by eye in the draw.io viewer.
+5. **Icons in draw.io** (inline SVG images) draw in the viewer; editing them in the editor and exporting to PNG/PDF are untested.
 6. **Claude.ai and Cowork:** skills run there, but whether the scripts can run is not verified. If they cannot, the plugin is for Claude Code only until that changes.
 7. **Icons for any subject.** The plugin ships the sets drawn for the design (simple line icons and 73 detailed ones). For anything else Claude draws the icon itself; see §6a.
 8. **Editing existing `.drawio` files** is not designed (deferred). The scene is the likely route: parse a file back into a scene, change it, render again.

@@ -1,5 +1,5 @@
 ---
-description: Draw a top-to-bottom flowchart (steps, decisions, loops) as an animated HTML page from a short description. Use when the user asks for a flowchart, a process flow, or the steps and decisions of a procedure.
+description: Draw a top-to-bottom flowchart (steps, decisions, loops) as an animated HTML page and a draw.io file from a short description. Use when the user asks for a flowchart, a process flow, or the steps and decisions of a procedure.
 allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py *)
 ---
 
@@ -13,10 +13,10 @@ Scope today: top-to-bottom flowcharts without swimlanes, in the plain style. For
 
 1. Work out the steps, the decisions and the places where the flow loops back. Ask only if the process is unclear.
 2. Write `<name>.spec.json` in a `diagrams/` folder of the current project (create it if needed).
-3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json` and `<name>.html` next to the spec and prints a check report.
+3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` (view and share) and `<name>.drawio` (open and edit in draw.io) next to the spec, and prints a check report.
 4. Read the report. Exit code 0 means no error; 2 means errors were found (the files are still written); 1 means the spec is invalid and the message lists every problem.
 5. Fix errors by changing the spec (see below) and build again, at most three rounds. Warnings may stay; mention them.
-6. Tell the user where the HTML is and what, if anything, the check still reports. Do not say a diagram "looks good": you have not seen it.
+6. Tell the user where the HTML and the `.drawio` file are and what, if anything, the check still reports. Do not say a diagram "looks good": you have not seen it.
 
 ## The spec
 
@@ -63,4 +63,4 @@ You cannot move a box by hand yet; if the three steps above do not clear an erro
 
 ## Known limits
 
-Back edges between two nodes on the same row arc over the top and meet the incoming line of their target. Several back edges that start from the same node share a side. Text width is estimated, not measured. Nothing here has been run in claude.ai or Cowork.
+Back edges between two nodes on the same row arc over the top and meet the incoming line of their target. Several back edges that start from the same node share a side. Text width is estimated, not measured. In the `.drawio` file, edge labels are plain text with a background (no rounded chip), and the fonts Inter and JetBrains Mono must be installed or draw.io substitutes another font. Nothing here has been run in claude.ai or Cowork.
