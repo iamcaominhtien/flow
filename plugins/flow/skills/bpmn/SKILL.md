@@ -162,7 +162,7 @@ Add `"style": "illustrated"` at the top level to draw each box that has an `icon
 ## Limits to tell the user
 
 - This is the BPMN look, not the full standard: only the timer, message and error events and the exclusive and parallel gateways are marked; there is no start or end event type, no boundary event, no data object, and no check that message flows cross pools. Say so if the user needs strict BPMN.
-- With pools, a line that leaves a gateway on the side can go around the outside of its pool. Check the picture.
+- A line that cannot go straight is searched for a right-angled route around the boxes and the lines already drawn. It can still cross another line (the report warns) or leave its pool for a stretch; with many branches the labels of neighbouring flows can end up close together. Check the picture.
 - The report names each flow by its two ends, for example `line 'e10' (Scoring failed to Send rejection) passes through ...`; the ids `e1`, `e2`, ... count the flows in the order written, from 1. To fix a line through a box, change the order of the elements or the pool of one of its ends, or move the element with `at`.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
 - Fixes beyond the spec: see the flowchart skill (overrides file).

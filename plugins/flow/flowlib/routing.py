@@ -12,6 +12,7 @@ from itertools import pairwise
 
 from .layered import Grid
 from .model import SYMBOL_HEADS, Edge, EdgeLabel, LabelKind, Node, Point, Role, Shape
+from .pathfind import SearchSpace, find_route
 from .placement import Placement
 from .spec import Spec, SpecEdge
 from .theme import LayoutRules, load_theme
@@ -22,6 +23,9 @@ BUS_ABOVE_TARGET_PX = 28.0  # a line between columns turns this far above its ta
 BUS_BELOW_SOURCE_PX = 12.0  # but never closer than this to the bottom of its source
 SAME_LINE_TOLERANCE_PX = 1.0  # two centres closer than this count as on one line
 CLEARANCE_PX = 4.0  # how far a line must stay from a node it passes
+SEARCH_MARGIN_PX = 12.0  # how far a searched route keeps from every box
+STUB_PX = 16.0  # a searched route leaves a box straight for this far before it may turn
+PORT_REUSE_COST_PX = 60.0  # a searched route prefers a side of a box that is still free
 
 
 class Port(StrEnum):
@@ -55,6 +59,7 @@ class _Context:
     used_ports: set[tuple[str, Port]]
     channels_used: dict[Port, int]
     slots: dict[SpecEdge, tuple[float, float]] = field(default_factory=dict)
+    lines: list[tuple[Point, Point]] = field(default_factory=list)
 
 
 def _bottom(node: Node) -> float:
@@ -338,6 +343,67 @@ def _end_labels(spec_edge: SpecEdge, points: list[Point]) -> tuple[EdgeLabel, ..
     return tuple(found)
 
 
+OUTWARD = {
+    Port.TOP: (0.0, -1.0),
+    Port.BOTTOM: (0.0, 1.0),
+    Port.LEFT: (-1.0, 0.0),
+    Port.RIGHT: (1.0, 0.0),
+}
+
+
+def _obstacles(context: _Context) -> tuple[tuple[float, float, float, float], ...]:
+    """Return every node as a box grown by the search margin, with room for its caption."""
+    caption = context.rules.caption_height
+    return tuple(
+        (
+            node.x - SEARCH_MARGIN_PX,
+            node.y - SEARCH_MARGIN_PX,
+            node.x + node.width + SEARCH_MARGIN_PX,
+            node.y + node.height + SEARCH_MARGIN_PX + (caption if node.caption else 0.0),
+        )
+        for node in context.nodes.values()
+    )
+
+
+def _stub(node: Node, port: Port) -> Point:
+    """Return the point just outside a node, straight out from one of its sides."""
+    x, y = _attach(node, port)
+    out_x, out_y = OUTWARD[port]
+    return (x + out_x * STUB_PX, y + out_y * STUB_PX)
+
+
+def _search_route(source: Node, target: Node, context: _Context) -> _Route | None:
+    """Search for a route around the boxes and the lines already drawn, over all side pairs.
+
+    Args:
+        source: Where the line starts.
+        target: Where the line ends.
+        context: The router state; it is not changed.
+
+    Returns:
+        The cheapest route found, or None when no pair of sides can be joined.
+    """
+    space = SearchSpace(_obstacles(context), tuple(context.lines))
+    best: tuple[float, _Route] | None = None
+    for leave in Port:
+        for arrive in Port:
+            found = find_route(space, _stub(source, leave), _stub(target, arrive))
+            if found is None:
+                continue
+            cost = found.cost + _reuse_cost(source, target, (leave, arrive), context)
+            points = [_attach(source, leave), *found.points, _attach(target, arrive)]
+            if best is None or cost < best[0]:
+                best = (cost, _Route(points, leaves=leave, arrives=arrive, channel=None))
+    return None if best is None else best[1]
+
+
+def _reuse_cost(source: Node, target: Node, ports: tuple[Port, Port], context: _Context) -> float:
+    """Return the extra cost of attaching to a side of a box that another line already uses."""
+    leave, arrive = ports
+    used = (source.id, leave) in context.used_ports, (target.id, arrive) in context.used_ports
+    return PORT_REUSE_COST_PX * sum(used)
+
+
 def _route_one(spec_edge: SpecEdge, returning: bool, context: _Context) -> list[Point]:
     """Route one edge, registering the ports it uses.
 
@@ -352,9 +418,13 @@ def _route_one(spec_edge: SpecEdge, returning: bool, context: _Context) -> list[
     source, target = context.nodes[spec_edge.source], context.nodes[spec_edge.target]
     points, port = _forward_points(source, target, context.slots.get(spec_edge))
     route = _Route(points, leaves=port, arrives=Port.TOP, channel=None)
-    if returning or not _is_clear(points, context, (source.id, target.id)):
+    if returning:
         route = _returning_route(source, target, context)
+    elif not _is_clear(points, context, (source.id, target.id)):
+        route = _search_route(source, target, context) or _returning_route(source, target, context)
     context.used_ports.add((source.id, route.leaves))
+    context.used_ports.add((target.id, route.arrives))
+    context.lines.extend(pairwise(route.points))
     return route.points
 
 

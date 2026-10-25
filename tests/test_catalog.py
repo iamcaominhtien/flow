@@ -19,6 +19,7 @@ CASES = {
     "shapes-class.spec.json": "class",
     "signup-screen.spec.json": "screen",
     "order-pools-bpmn.spec.json": "bpmn",
+    "order-fulfilment-bpmn.spec.json": "bpmn",
 }
 
 sys.path.insert(0, str(PLUGIN_DIR))
