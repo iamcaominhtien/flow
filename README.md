@@ -42,7 +42,7 @@ The visual language is designed first, on a canvas of sample artboards, before a
 | BPMN | Done: rules, notation, basic example, advanced features, three-pool delivery, complex order-to-delivery case |
 | C4 | Done: rules, level 1 context, level 2 containers, level 3 components (one delivery platform at three zooms) |
 | Cloud | Done: rules, basic one-VPC app, delivery platform on two zones, network joining offices to the cloud |
-| DFD | Done: rules, notation with forbidden connections, levels 0, 1 and 2 of the delivery system |
+| DFD | Done: rules, notation with forbidden connections, levels 0, 1 and 2 of the delivery system, plain and illustrated |
 | Editing existing .drawio files | Not started |
 
 Not yet verified: whether draw.io's `flowAnimation` edge style survives export well enough to reproduce the animated lines.
