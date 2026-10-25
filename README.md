@@ -20,7 +20,7 @@ Drawing diagrams by hand is slow, and AI-generated diagrams are often hard to ed
 
 ## Design system
 
-The visual language is designed first, on a canvas of sample artboards, before any plugin code is written. The canvas currently lives outside this repository; the decisions it holds are summarised here.
+The visual language is designed first, on a canvas of sample artboards, before any plugin code is written. The canvas currently lives outside this repository; the decisions it holds are written up in full, with pictures, in the **[design document](docs/design/README.md)**, and summarised here.
 
 - **Foundation**: a flat pastel palette with ink outlines, Inter and JetBrains Mono, 12 px node radius, 2 px strokes.
 - **Icons**: a flat set of 98 icons and a detailed set that has a twin for every one of them (shaded, with highlights and accents).
@@ -72,6 +72,7 @@ Installation and usage instructions will be added once the first plugin is avail
 
 - [x] Design foundation, icon sets, Screen flow, Flowchart, Sequence, ER, Architecture, Explainer, Planning, UML, Wireframe, BPMN, C4, Cloud and DFD notation
 - [x] Cross-type review and a first test of draw.io animated edges
+- [x] Write the [design document](docs/design/README.md) (18 pages, 104 pictures)
 - [ ] Design how plugins edit existing `.drawio` files
 - [ ] Test an exported SVG with animated edges on its own
 - [ ] Define the plugin interface and project structure
