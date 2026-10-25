@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Standalone copy of the design-canvas board "BPMN_Notation". Generated from source/canvas/BPMN_Notation.dc.html; opens in any browser. -->
+<meta charset="utf-8">
+<title>BPMN: Notation: the parts of a BPMN diagram</title>
+
+</head>
+<body>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@keyframes dc-flow2{to{stroke-dashoffset:-12}}
+.flow2{stroke-dasharray:6 6;animation:dc-flow2 1.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}
+</style>
+
+<div style="position: relative; width: 1500px; height: 1220px; background: #F8FAFC; overflow: hidden">
+<div style="position:absolute;left:64px;top:48px;display:flex;flex-direction:column;gap:8px"><div style="font-size:24px;font-weight:600">Notation: the parts of a BPMN diagram</div><div style="font-size:13px;line-height:20px;color:#475569;max-width:900px">A small set of shapes covers most processes: events, activities, gateways, flows and containers. Shape tells the kind, tint tells the role.</div></div>
+<div style="position:absolute;left:64px;top:130px;width:1372px;height:250px;box-sizing:border-box;background:#fff;border:1px solid #E2E8F0;border-radius:14px"></div>
+<div style="position:absolute;left:86px;top:146px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Events: something happens</div>
+<svg width="44" height="44" style="position:absolute;left:168px;top:198px;overflow:visible"><circle cx="22" cy="22" r="20" fill="#DCF5E1" stroke="#15803D" stroke-width="2"/></svg>
+<div style="position:absolute;left:95px;top:262px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">Start</div>
+<div style="position:absolute;left:95px;top:282px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">Where the process begins. Thin green ring.</div>
+<svg width="44" height="44" style="position:absolute;left:388px;top:198px;overflow:visible"><circle cx="22" cy="22" r="20" fill="#DCF5E1" stroke="#15803D" stroke-width="2"/></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" style="position:absolute;left:399px;top:209px;fill:none;stroke:#15803D;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
+<div style="position:absolute;left:315px;top:262px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">Message start</div>
+<div style="position:absolute;left:315px;top:282px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">Starts when a message arrives.</div>
+<svg width="44" height="44" style="position:absolute;left:608px;top:198px;overflow:visible"><circle cx="22" cy="22" r="20" fill="#FFF1DD" stroke="#B45309" stroke-width="2"/><circle cx="22" cy="22" r="15" fill="none" stroke="#B45309" stroke-width="2"/></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" style="position:absolute;left:619px;top:209px;fill:none;stroke:#B45309;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+<div style="position:absolute;left:535px;top:262px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">Timer</div>
+<div style="position:absolute;left:535px;top:282px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">Wait, or a deadline. Double amber ring.</div>
+<svg width="44" height="44" style="position:absolute;left:828px;top:198px;overflow:visible"><circle cx="22" cy="22" r="20" fill="#FFF1DD" stroke="#B45309" stroke-width="2"/><circle cx="22" cy="22" r="15" fill="none" stroke="#B45309" stroke-width="2"/></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" style="position:absolute;left:839px;top:209px;fill:none;stroke:#B45309;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
+<div style="position:absolute;left:755px;top:262px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">Message</div>
+<div style="position:absolute;left:755px;top:282px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">Waits for or sends a message.</div>
+<svg width="44" height="44" style="position:absolute;left:1048px;top:198px;overflow:visible"><circle cx="22" cy="22" r="20" fill="#FDE4E4" stroke="#B42318" stroke-width="4"/></svg>
+<div style="position:absolute;left:975px;top:262px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">End</div>
+<div style="position:absolute;left:975px;top:282px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">Where a path stops. Thick rose ring.</div>
+<svg width="44" height="44" style="position:absolute;left:1268px;top:198px;overflow:visible"><circle cx="22" cy="22" r="20" fill="#FDE4E4" stroke="#B42318" stroke-width="4"/></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" style="position:absolute;left:1279px;top:209px;fill:#B42318;stroke:#B42318;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><path d="M13 3L6 13h5l-2 8 8-11h-5z"/></svg>
+<div style="position:absolute;left:1195px;top:262px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">Error end</div>
+<div style="position:absolute;left:1195px;top:282px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">The path ends in failure.</div>
+<div style="position:absolute;left:64px;top:410px;width:1372px;height:250px;box-sizing:border-box;background:#fff;border:1px solid #E2E8F0;border-radius:14px"></div>
+<div style="position:absolute;left:86px;top:426px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Activities: work is done</div>
+<div style="position:absolute;left:115px;top:468px;width:150px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#DCEEFB;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;font-weight:700;line-height:15px;padding:0 10px 0 10px">Task</div>
+<div style="position:absolute;left:95px;top:548px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">Task</div>
+<div style="position:absolute;left:95px;top:568px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">A single unit of work.</div>
+<div style="position:absolute;left:335px;top:468px;width:150px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#DCEEFB;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;font-weight:700;line-height:15px;padding:0 10px 0 26px">User task</div>
+<svg width="18" height="18" viewBox="0 0 24 24" style="position:absolute;left:342px;top:474px;fill:none;stroke:#0F172A;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+<div style="position:absolute;left:315px;top:548px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">User task</div>
+<div style="position:absolute;left:315px;top:568px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">A person does it.</div>
+<div style="position:absolute;left:555px;top:468px;width:150px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#DCEEFB;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;font-weight:700;line-height:15px;padding:0 10px 0 26px">Service task</div>
+<svg width="18" height="18" viewBox="0 0 24 24" style="position:absolute;left:562px;top:474px;fill:none;stroke:#0F172A;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
+<div style="position:absolute;left:535px;top:548px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">Service task</div>
+<div style="position:absolute;left:535px;top:568px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">A system does it.</div>
+<div style="position:absolute;left:775px;top:468px;width:150px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#DCEEFB;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;font-weight:700;line-height:15px;padding:0 10px 0 26px">Send task</div>
+<svg width="18" height="18" viewBox="0 0 24 24" style="position:absolute;left:782px;top:474px;fill:#0F172A;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
+<div style="position:absolute;left:755px;top:548px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">Send task</div>
+<div style="position:absolute;left:755px;top:568px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">Sends a message.</div>
+<div style="position:absolute;left:995px;top:468px;width:150px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#DCEEFB;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;font-weight:700;line-height:15px;padding:0 10px 0 26px">Receive task</div>
+<svg width="18" height="18" viewBox="0 0 24 24" style="position:absolute;left:1002px;top:474px;fill:none;stroke:#0F172A;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 7l9 7 9-7"/></svg>
+<div style="position:absolute;left:975px;top:548px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">Receive task</div>
+<div style="position:absolute;left:975px;top:568px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">Waits for a message.</div>
+<div style="position:absolute;left:1215px;top:468px;width:150px;height:64px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#DCEEFB;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;font-weight:700;line-height:15px;padding:0 10px 0 10px">Sub-process</div>
+<div style="position:absolute;left:1282px;top:515.0px;width:16px;height:16px;box-sizing:border-box;border:1.5px solid #0F172A;background:#fff;border-radius:3px;font:800 13px/12px Inter,sans-serif;text-align:center">+</div>
+<div style="position:absolute;left:1195px;top:548px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:190px;text-align:center;">Sub-process</div>
+<div style="position:absolute;left:1195px;top:568px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;text-align:center;">A task defined elsewhere (+).</div>
+<div style="position:absolute;left:64px;top:690px;width:680px;height:250px;box-sizing:border-box;background:#fff;border:1px solid #E2E8F0;border-radius:14px"></div>
+<div style="position:absolute;left:86px;top:706px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Gateways: the path splits or joins</div>
+<svg width="56" height="56" style="position:absolute;left:112px;top:762px;overflow:visible"><path d="M28 2L54 28L28 54L2 28Z" fill="#FFF1DD" stroke="#B45309" stroke-width="2" stroke-linejoin="round"/></svg>
+<svg width="28" height="28" viewBox="0 0 24 24" style="position:absolute;left:126px;top:776px;fill:none;stroke:#B45309;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><path d="M8 8l8 8M16 8l-8 8"/></svg>
+<div style="position:absolute;left:70px;top:828px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:140px;text-align:center;">Exclusive</div>
+<div style="position:absolute;left:70px;top:848px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:140px;text-align:center;">One exit is taken.</div>
+<svg width="56" height="56" style="position:absolute;left:272px;top:762px;overflow:visible"><path d="M28 2L54 28L28 54L2 28Z" fill="#FFF1DD" stroke="#B45309" stroke-width="2" stroke-linejoin="round"/></svg>
+<svg width="28" height="28" viewBox="0 0 24 24" style="position:absolute;left:286px;top:776px;fill:none;stroke:#B45309;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg>
+<div style="position:absolute;left:230px;top:828px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:140px;text-align:center;">Parallel</div>
+<div style="position:absolute;left:230px;top:848px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:140px;text-align:center;">All exits are taken.</div>
+<svg width="56" height="56" style="position:absolute;left:432px;top:762px;overflow:visible"><path d="M28 2L54 28L28 54L2 28Z" fill="#FFF1DD" stroke="#B45309" stroke-width="2" stroke-linejoin="round"/></svg>
+<svg width="28" height="28" viewBox="0 0 24 24" style="position:absolute;left:446px;top:776px;fill:none;stroke:#B45309;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="12" r="6"/></svg>
+<div style="position:absolute;left:390px;top:828px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:140px;text-align:center;">Inclusive</div>
+<div style="position:absolute;left:390px;top:848px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:140px;text-align:center;">One or more exits.</div>
+<svg width="56" height="56" style="position:absolute;left:592px;top:762px;overflow:visible"><path d="M28 2L54 28L28 54L2 28Z" fill="#FFF1DD" stroke="#B45309" stroke-width="2" stroke-linejoin="round"/></svg>
+<svg width="28" height="28" viewBox="0 0 24 24" style="position:absolute;left:606px;top:776px;fill:none;stroke:#B45309;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 7.5l3.8 2.8-1.5 4.5H9.7l-1.5-4.5z"/></svg>
+<div style="position:absolute;left:550px;top:828px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;width:140px;text-align:center;">Event-based</div>
+<div style="position:absolute;left:550px;top:848px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:140px;text-align:center;">First message wins.</div>
+<div style="position:absolute;left:770px;top:690px;width:666px;height:250px;box-sizing:border-box;background:#fff;border:1px solid #E2E8F0;border-radius:14px"></div>
+<div style="position:absolute;left:792px;top:706px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Flows: what connects</div>
+<svg width="130" height="12" viewBox="0 0 130 12" preserveAspectRatio="none" style="position:absolute;left:810px;top:754px;width:130px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-1" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 0 6 L 125 6" marker-end="url(#dc-arrow-head-filled-1)"></path></svg>
+<div style="position:absolute;left:960px;top:748px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Sequence flow</div>
+<div style="position:absolute;left:960px;top:768px;font-size:11.5px;line-height:17px;color:#475569;font-weight:400;white-space:nowrap;">Order of work inside a pool.</div>
+<svg width="146" height="16" style="position:absolute;left:802px;top:812px;overflow:visible;fill:none;stroke:#334155;stroke-width:1.8;stroke-linejoin:round"><path d="M 8 8 L 138 8" stroke-dasharray="7 6"/></svg>
+<div style="position:absolute;left:805px;top:815px;width:10px;height:10px;box-sizing:border-box;border:1.8px solid #334155;border-radius:999px;background:#fff"></div>
+<svg width="48" height="48" viewBox="0 0 48 48" style="position:absolute;left:916px;top:796px;overflow:visible;stroke:#334155;stroke-width:2;stroke-linejoin:round;stroke-linecap:round"><g transform="rotate(180 24 24)"><path d="M24 24 L40 16 L40 32 Z" fill="#fff"/></g></svg>
+<div style="position:absolute;left:960px;top:808px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Message flow</div>
+<div style="position:absolute;left:960px;top:828px;font-size:11.5px;line-height:17px;color:#475569;font-weight:400;white-space:nowrap;">Between pools. Open circle, open head.</div>
+<svg width="130" height="12" viewBox="0 0 130 12" preserveAspectRatio="none" style="position:absolute;left:810px;top:874px;width:130px;height:12px;overflow:visible;fill:none;stroke:#475569;stroke-width:2;stroke-linejoin:round" stroke-dasharray="6 5"><defs><marker id="dc-arrow-head-filled-2" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#475569" stroke="none" style="stroke:none;fill:#475569"/></marker></defs><path d="M 0 6 L 125 6" marker-end="url(#dc-arrow-head-filled-2)"></path></svg>
+<div style="position:absolute;left:960px;top:868px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Return</div>
+<div style="position:absolute;left:960px;top:888px;font-size:11.5px;line-height:17px;color:#475569;font-weight:400;white-space:nowrap;">Dashed slate: loop back or retry.</div>
+<svg class="flow" width="150" height="12" viewBox="0 0 150 12" preserveAspectRatio="none" style="position:absolute;left:1230px;top:754px;width:150px;height:12px;overflow:visible;fill:none;stroke:#1D4ED8;stroke-width:4;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-3" orient="auto" markerWidth="4" markerHeight="4" refX="2.0" refY="2.0" overflow="visible"><path d="M0 0 L4 2.0 L0 4 Z" fill="#1D4ED8" stroke="none" style="stroke:none;fill:#1D4ED8"/></marker></defs><path d="M 0 6 L 142 6" marker-end="url(#dc-arrow-head-filled-3)"></path></svg>
+<div style="position:absolute;left:1230px;top:780px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Main path</div>
+<div style="position:absolute;left:1230px;top:800px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:190px;">Blue, animated. One per diagram.</div>
+<div style="position:absolute;left:64px;top:970px;width:1372px;height:220px;box-sizing:border-box;background:#fff;border:1px solid #E2E8F0;border-radius:14px"></div>
+<div style="position:absolute;left:86px;top:986px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Containers: who does it</div>
+<div style="position:absolute;left:120px;top:1020px;width:360px;height:120px;box-sizing:border-box;border:2px solid #0F172A;border-radius:6px;background:rgba(255,255,255,.75)"></div><div style="position:absolute;left:120px;top:1020px;width:36px;height:120px;box-sizing:border-box;border:2px solid #0F172A;border-radius:6px 0 0 6px;background:#BFDBFE;display:flex;align-items:center;justify-content:center"><div style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;font-weight:800">Pool</div></div>
+<div style="position:absolute;left:500px;top:1040px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Pool</div>
+<div style="position:absolute;left:500px;top:1060px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:260px;">One participant: a company, a system or a role that takes part. Messages cross between pools.</div>
+<div style="position:absolute;left:800px;top:1020px;width:360px;height:120px;box-sizing:border-box;border:2px solid #0F172A;border-radius:6px;background:rgba(255,255,255,.75)"></div><div style="position:absolute;left:800px;top:1020px;width:36px;height:60px;box-sizing:border-box;border:2px solid #0F172A;background:#BFDBFE;display:flex;align-items:center;justify-content:center"><div style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;font-weight:800">Lane</div></div><div style="position:absolute;left:800px;top:1080px;width:36px;height:60px;box-sizing:border-box;border:2px solid #0F172A;background:#B5EBC1;display:flex;align-items:center;justify-content:center"><div style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;font-weight:800">Lane</div></div><div style="position:absolute;left:800px;top:1080px;width:360px;border-top:2px solid #0F172A"></div>
+<div style="position:absolute;left:1180px;top:1040px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Lane</div>
+<div style="position:absolute;left:1180px;top:1060px;font-size:11.5px;line-height:16px;color:#475569;font-weight:400;width:230px;">A role or team inside one pool. Work crosses lanes with sequence flows.</div>
+</div>
+
+
+</body>
+</html>

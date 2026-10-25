@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wireframe: Wireframe states: one screen, four situations</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@keyframes dc-flow2{to{stroke-dashoffset:-12}}
+.flow2{stroke-dasharray:6 6;animation:dc-flow2 1.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 1560px; height: 1090px; background: #F8FAFC; overflow: hidden">
+<div style="position:absolute;left:64px;top:48px;display:flex;flex-direction:column;gap:8px"><div style="font-size:24px;font-weight:600">Wireframe states: one screen, four situations</div><div style="font-size:13px;line-height:20px;color:#475569;max-width:900px">Every screen that loads data has four faces: the list itself, loading, nothing yet, and an error. Design all four, not just the first.</div></div>
+<div style="position:absolute;left:80px;top:200px;width:300px;height:620px;box-sizing:border-box;border:3px solid #0F172A;border-radius:38px;background:#F8FAFC;overflow:hidden"></div>
+<div style="position:absolute;left:110px;top:214px;white-space:nowrap;font-size:12px;line-height:16px;font-weight:700;color:#0F172A;">10:24</div>
+<div style="position:absolute;left:182.0px;top:802px;width:96px;height:5px;border-radius:3px;background:#0F172A"></div>
+<div style="position:absolute;left:80px;top:162px;width:300px;text-align:center;font-size:14px;font-weight:800">Normal</div>
+<div style="position:absolute;left:460px;top:200px;width:300px;height:620px;box-sizing:border-box;border:3px solid #0F172A;border-radius:38px;background:#F8FAFC;overflow:hidden"></div>
+<div style="position:absolute;left:490px;top:214px;white-space:nowrap;font-size:12px;line-height:16px;font-weight:700;color:#0F172A;">10:24</div>
+<div style="position:absolute;left:562.0px;top:802px;width:96px;height:5px;border-radius:3px;background:#0F172A"></div>
+<div style="position:absolute;left:460px;top:162px;width:300px;text-align:center;font-size:14px;font-weight:800">Loading</div>
+<div style="position:absolute;left:840px;top:200px;width:300px;height:620px;box-sizing:border-box;border:3px solid #0F172A;border-radius:38px;background:#F8FAFC;overflow:hidden"></div>
+<div style="position:absolute;left:870px;top:214px;white-space:nowrap;font-size:12px;line-height:16px;font-weight:700;color:#0F172A;">10:24</div>
+<div style="position:absolute;left:942.0px;top:802px;width:96px;height:5px;border-radius:3px;background:#0F172A"></div>
+<div style="position:absolute;left:840px;top:162px;width:300px;text-align:center;font-size:14px;font-weight:800">Empty</div>
+<div style="position:absolute;left:1200px;top:200px;width:300px;height:620px;box-sizing:border-box;border:3px solid #0F172A;border-radius:38px;background:#F8FAFC;overflow:hidden"></div>
+<div style="position:absolute;left:1230px;top:214px;white-space:nowrap;font-size:12px;line-height:16px;font-weight:700;color:#0F172A;">10:24</div>
+<div style="position:absolute;left:1302.0px;top:802px;width:96px;height:5px;border-radius:3px;background:#0F172A"></div>
+<div style="position:absolute;left:1200px;top:162px;width:300px;text-align:center;font-size:14px;font-weight:800">Error</div>
+<div style="position:absolute;left:112px;top:250px;white-space:nowrap;font-size:16px;line-height:21px;font-weight:800;color:#0F172A;">My orders</div>
+<div style="position:absolute;left:96px;top:284px;width:268px;border-top:1.5px solid #E2E8F0"></div>
+<div style="position:absolute;left:83px;top:742px;width:294px;height:60px;box-sizing:border-box;background:#fff;border:1.5px solid #CBD5E1;border-radius:0px;"></div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:109.75px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9M9 20v-6h6v6"/></svg>
+<div style="position:absolute;left:79.75px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Home</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:183.25px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+<div style="position:absolute;left:153.25px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Search</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:256.75px;top:750px" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h3l2.5 11h10L21 7H7"/><circle cx="10" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></svg>
+<div style="position:absolute;left:226.75px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#1D4ED8;text-align:center;">Orders</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:330.25px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+<div style="position:absolute;left:300.25px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Me</div>
+<div style="position:absolute;left:492px;top:250px;white-space:nowrap;font-size:16px;line-height:21px;font-weight:800;color:#0F172A;">My orders</div>
+<div style="position:absolute;left:476px;top:284px;width:268px;border-top:1.5px solid #E2E8F0"></div>
+<div style="position:absolute;left:463px;top:742px;width:294px;height:60px;box-sizing:border-box;background:#fff;border:1.5px solid #CBD5E1;border-radius:0px;"></div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:489.75px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9M9 20v-6h6v6"/></svg>
+<div style="position:absolute;left:459.75px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Home</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:563.25px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+<div style="position:absolute;left:533.25px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Search</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:636.75px;top:750px" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h3l2.5 11h10L21 7H7"/><circle cx="10" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></svg>
+<div style="position:absolute;left:606.75px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#1D4ED8;text-align:center;">Orders</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:710.25px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+<div style="position:absolute;left:680.25px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Me</div>
+<div style="position:absolute;left:872px;top:250px;white-space:nowrap;font-size:16px;line-height:21px;font-weight:800;color:#0F172A;">My orders</div>
+<div style="position:absolute;left:856px;top:284px;width:268px;border-top:1.5px solid #E2E8F0"></div>
+<div style="position:absolute;left:843px;top:742px;width:294px;height:60px;box-sizing:border-box;background:#fff;border:1.5px solid #CBD5E1;border-radius:0px;"></div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:869.75px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9M9 20v-6h6v6"/></svg>
+<div style="position:absolute;left:839.75px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Home</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:943.25px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+<div style="position:absolute;left:913.25px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Search</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:1016.75px;top:750px" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h3l2.5 11h10L21 7H7"/><circle cx="10" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></svg>
+<div style="position:absolute;left:986.75px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#1D4ED8;text-align:center;">Orders</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:1090.25px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+<div style="position:absolute;left:1060.25px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Me</div>
+<div style="position:absolute;left:1232px;top:250px;white-space:nowrap;font-size:16px;line-height:21px;font-weight:800;color:#0F172A;">My orders</div>
+<div style="position:absolute;left:1216px;top:284px;width:268px;border-top:1.5px solid #E2E8F0"></div>
+<div style="position:absolute;left:1203px;top:742px;width:294px;height:60px;box-sizing:border-box;background:#fff;border:1.5px solid #CBD5E1;border-radius:0px;"></div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:1229.75px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9M9 20v-6h6v6"/></svg>
+<div style="position:absolute;left:1199.75px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Home</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:1303.25px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+<div style="position:absolute;left:1273.25px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Search</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:1376.75px;top:750px" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h3l2.5 11h10L21 7H7"/><circle cx="10" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></svg>
+<div style="position:absolute;left:1346.75px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#1D4ED8;text-align:center;">Orders</div>
+<svg width="20" height="20" viewBox="0 0 24 24" style="position:absolute;left:1450.25px;top:750px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+<div style="position:absolute;left:1420.25px;top:776px;width:80px;font-size:10.5px;line-height:14px;font-weight:700;color:#94A3B8;text-align:center;">Me</div>
+<div style="position:absolute;left:96px;top:300px;width:268px;height:72px;box-sizing:border-box;background:#fff;border:1.5px solid #CBD5E1;border-radius:10px;"></div>
+<div style="position:absolute;left:108px;top:317px;width:38px;height:38px;border-radius:999px;background:#E2E8F0;border:1.5px solid #CBD5E1"></div>
+<div style="position:absolute;left:158px;top:320px;white-space:nowrap;font-size:13px;line-height:17px;font-weight:700;color:#0F172A;">Pad Thai House</div>
+<div style="position:absolute;left:158px;top:338px;white-space:nowrap;font-size:11px;line-height:14px;font-weight:500;color:#64748B;">2 items · $21.50</div>
+<div style="position:absolute;left:266px;top:325px;width:84px;height:22px;border-radius:999px;background:#DCEEFB;color:#1E5AA8;font:700 11px/22px Inter,sans-serif;text-align:center;white-space:nowrap">On the way</div>
+<div style="position:absolute;left:96px;top:382px;width:268px;height:72px;box-sizing:border-box;background:#fff;border:1.5px solid #CBD5E1;border-radius:10px;"></div>
+<div style="position:absolute;left:108px;top:399px;width:38px;height:38px;border-radius:999px;background:#E2E8F0;border:1.5px solid #CBD5E1"></div>
+<div style="position:absolute;left:158px;top:402px;white-space:nowrap;font-size:13px;line-height:17px;font-weight:700;color:#0F172A;">Green Bowl</div>
+<div style="position:absolute;left:158px;top:420px;white-space:nowrap;font-size:11px;line-height:14px;font-weight:500;color:#64748B;">1 item · $12.00</div>
+<div style="position:absolute;left:273px;top:407px;width:77px;height:22px;border-radius:999px;background:#DCF5E1;color:#15803D;font:700 11px/22px Inter,sans-serif;text-align:center;white-space:nowrap">Delivered</div>
+<div style="position:absolute;left:96px;top:464px;width:268px;height:72px;box-sizing:border-box;background:#fff;border:1.5px solid #CBD5E1;border-radius:10px;"></div>
+<div style="position:absolute;left:108px;top:481px;width:38px;height:38px;border-radius:999px;background:#E2E8F0;border:1.5px solid #CBD5E1"></div>
+<div style="position:absolute;left:158px;top:484px;white-space:nowrap;font-size:13px;line-height:17px;font-weight:700;color:#0F172A;">Noodle Bar</div>
+<div style="position:absolute;left:158px;top:502px;white-space:nowrap;font-size:11px;line-height:14px;font-weight:500;color:#64748B;">3 items · $30.20</div>
+<div style="position:absolute;left:273px;top:489px;width:77px;height:22px;border-radius:999px;background:#FDE4E4;color:#B42318;font:700 11px/22px Inter,sans-serif;text-align:center;white-space:nowrap">Cancelled</div>
+<div style="position:absolute;left:476px;top:300px;width:268px;height:72px;box-sizing:border-box;background:#fff;border:1.5px solid #CBD5E1;border-radius:10px;"></div>
+<div style="position:absolute;left:488px;top:317px;width:38px;height:38px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:19px;"></div>
+<div style="position:absolute;left:538px;top:322px;width:120.6px;height:9px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:4.5px;"></div>
+<div style="position:absolute;left:538px;top:342px;width:75.04px;height:7px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:3.5px;"></div>
+<div style="position:absolute;left:476px;top:382px;width:268px;height:72px;box-sizing:border-box;background:#fff;border:1.5px solid #CBD5E1;border-radius:10px;"></div>
+<div style="position:absolute;left:488px;top:399px;width:38px;height:38px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:19px;"></div>
+<div style="position:absolute;left:538px;top:404px;width:120.6px;height:9px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:4.5px;"></div>
+<div style="position:absolute;left:538px;top:424px;width:75.04px;height:7px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:3.5px;"></div>
+<div style="position:absolute;left:476px;top:464px;width:268px;height:72px;box-sizing:border-box;background:#fff;border:1.5px solid #CBD5E1;border-radius:10px;"></div>
+<div style="position:absolute;left:488px;top:481px;width:38px;height:38px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:19px;"></div>
+<div style="position:absolute;left:538px;top:486px;width:120.6px;height:9px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:4.5px;"></div>
+<div style="position:absolute;left:538px;top:506px;width:75.04px;height:7px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:3.5px;"></div>
+<div style="position:absolute;left:476px;top:546px;width:268px;height:72px;box-sizing:border-box;background:#fff;border:1.5px solid #CBD5E1;border-radius:10px;"></div>
+<div style="position:absolute;left:488px;top:563px;width:38px;height:38px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:19px;"></div>
+<div style="position:absolute;left:538px;top:568px;width:120.6px;height:9px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:4.5px;"></div>
+<div style="position:absolute;left:538px;top:588px;width:75.04px;height:7px;box-sizing:border-box;background:#E2E8F0;border:0px solid #E2E8F0;border-radius:3.5px;"></div>
+<svg width="44" height="44" viewBox="0 0 44 44" style="position:absolute;left:588.0px;top:652px;fill:none;stroke-linecap:round;stroke-width:4"><circle cx="22" cy="22" r="17" stroke="#E2E8F0"/><path d="M22 5A17 17 0 0 1 39 22" stroke="#1D4ED8"/></svg>
+<div style="position:absolute;left:476px;top:704px;width:268px;font-size:12px;line-height:16px;font-weight:600;color:#64748B;text-align:center;">Loading your orders…</div>
+<div style="position:absolute;left:946.0px;top:330px;width:88px;height:88px;border-radius:999px;border:3px dashed #94A3B8"></div>
+<svg width="40" height="40" viewBox="0 0 24 24" style="position:absolute;left:970.0px;top:354px" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h3l2.5 11h10L21 7H7"/><circle cx="10" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></svg>
+<div style="position:absolute;left:856px;top:444px;width:268px;font-size:18px;line-height:24px;font-weight:800;color:#0F172A;text-align:center;">No orders yet</div>
+<div style="position:absolute;left:856px;top:476px;width:268px;font-size:12.5px;line-height:18px;font-weight:500;color:#64748B;text-align:center;">When you order, it shows up here so you can track it.</div>
+<div style="position:absolute;left:886px;top:540px;width:208px;height:46px;box-sizing:border-box;border:2px solid #1D4ED8;border-radius:16.4286px;background:#1D4ED8;color:#fff;font:700 13px/42px Inter,sans-serif;text-align:center">Browse restaurants</div>
+<div style="position:absolute;left:1306.0px;top:330px;width:88px;height:88px;border-radius:999px;background:#FDE4E4;border:3px solid #B42318;color:#B42318;font:800 44px/82px Inter,sans-serif;text-align:center">!</div>
+<div style="position:absolute;left:1216px;top:444px;width:268px;font-size:18px;line-height:24px;font-weight:800;color:#0F172A;text-align:center;">Something went wrong</div>
+<div style="position:absolute;left:1216px;top:476px;width:268px;font-size:12.5px;line-height:18px;font-weight:500;color:#64748B;text-align:center;">We could not load your orders. Check your connection and try again.</div>
+<div style="position:absolute;left:1246px;top:540px;width:208px;height:46px;box-sizing:border-box;border:2px solid #1D4ED8;border-radius:16.4286px;background:#1D4ED8;color:#fff;font:700 13px/42px Inter,sans-serif;text-align:center">Try again</div>
+<div style="position:absolute;left:1246px;top:598px;width:208px;height:46px;box-sizing:border-box;border:2px solid #1D4ED8;border-radius:16.4286px;background:#fff;color:#1D4ED8;font:700 13px/42px Inter,sans-serif;text-align:center">Contact support</div>
+<div style="position:absolute;left:1408px;top:557px;width:12px;height:12px;border-radius:999px;background:#D92D20;border:2px solid #fff;box-shadow:0 0 0 7px rgba(217,45,32,.25);z-index:4"></div>
+<div style="position:absolute;left:347px;top:312px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">1</div>
+<div style="position:absolute;left:469px;top:287px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">2</div>
+<div style="position:absolute;left:597.0px;top:639px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">3</div>
+<div style="position:absolute;left:933.0px;top:317px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">4</div>
+<div style="position:absolute;left:873px;top:527px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">5</div>
+<div style="position:absolute;left:1381.0px;top:317px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">6</div>
+<div style="position:absolute;left:1233px;top:527px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">7</div>
+<div style="position:absolute;left:80.0px;top:880px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">1</div>
+<div style="position:absolute;left:116px;top:880px;width:292px;font-size:13px;line-height:17px;font-weight:800;color:#0F172A;">Status chip</div>
+<div style="position:absolute;left:116px;top:900px;width:292px;font-size:11.5px;line-height:17px;font-weight:500;color:#475569;">Colour and word, never colour alone.</div>
+<div style="position:absolute;left:80.0px;top:950px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">2</div>
+<div style="position:absolute;left:116px;top:950px;width:292px;font-size:13px;line-height:17px;font-weight:800;color:#0F172A;">Skeleton</div>
+<div style="position:absolute;left:116px;top:970px;width:292px;font-size:11.5px;line-height:17px;font-weight:500;color:#475569;">Grey bars in the shape of the real rows, so nothing jumps when data arrives.</div>
+<div style="position:absolute;left:436.0px;top:880px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">3</div>
+<div style="position:absolute;left:472px;top:880px;width:292px;font-size:13px;line-height:17px;font-weight:800;color:#0F172A;">Spinner and text</div>
+<div style="position:absolute;left:472px;top:900px;width:292px;font-size:11.5px;line-height:17px;font-weight:500;color:#475569;">Shown after about a second. The skeleton alone is enough before that.</div>
+<div style="position:absolute;left:436.0px;top:950px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">4</div>
+<div style="position:absolute;left:472px;top:950px;width:292px;font-size:13px;line-height:17px;font-weight:800;color:#0F172A;">Empty icon</div>
+<div style="position:absolute;left:472px;top:970px;width:292px;font-size:11.5px;line-height:17px;font-weight:500;color:#475569;">Dashed, quiet. Nothing is wrong; there is just nothing yet.</div>
+<div style="position:absolute;left:792.0px;top:880px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">5</div>
+<div style="position:absolute;left:828px;top:880px;width:292px;font-size:13px;line-height:17px;font-weight:800;color:#0F172A;">One action</div>
+<div style="position:absolute;left:828px;top:900px;width:292px;font-size:11.5px;line-height:17px;font-weight:500;color:#475569;">Empty states offer the next useful step, not a dead end.</div>
+<div style="position:absolute;left:792.0px;top:950px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">6</div>
+<div style="position:absolute;left:828px;top:950px;width:292px;font-size:13px;line-height:17px;font-weight:800;color:#0F172A;">Error icon</div>
+<div style="position:absolute;left:828px;top:970px;width:292px;font-size:11.5px;line-height:17px;font-weight:500;color:#475569;">Rose, solid, with an exclamation mark. Plain words, no codes.</div>
+<div style="position:absolute;left:1148.0px;top:880px;width:26px;height:26px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:800 12px/26px 'JetBrains Mono',monospace;text-align:center;box-shadow:0 0 0 3px rgba(248,250,252,.9);z-index:5">7</div>
+<div style="position:absolute;left:1184px;top:880px;width:292px;font-size:13px;line-height:17px;font-weight:800;color:#0F172A;">Retry first</div>
+<div style="position:absolute;left:1184px;top:900px;width:292px;font-size:11.5px;line-height:17px;font-weight:500;color:#475569;">Retry is primary. A second route, such as support, is secondary.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1560,"height":1090}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

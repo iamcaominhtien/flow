@@ -27,7 +27,7 @@ Rule of thumb: if you find yourself writing "and meanwhile..." or "if no answer 
 
 ![The parts of a BPMN diagram](images/BPMN_Notation.png)
 
-*The parts of a BPMN diagram. [Full size](images/BPMN_Notation.png)*
+*The parts of a BPMN diagram. [Full size](images/BPMN_Notation.png) · [HTML source](source/html/BPMN_Notation.html)*
 
 **Shape tells the kind; tint tells the role.**
 
@@ -45,7 +45,7 @@ Sizes: an event has radius 20 px; a task is a rounded box 130 × 64; a gateway d
 
 ![Basic BPMN: approving an expense](images/BPMN_Basic.png)
 
-*Basic BPMN: approving an expense. [Full size](images/BPMN_Basic.png)*
+*Basic BPMN: approving an expense. [Full size](images/BPMN_Basic.png) · [HTML source](source/html/BPMN_Basic.html)*
 
 One **pool** with three **lanes**: Employee, Manager and Finance. Each lane is a role, not a person.
 
@@ -57,7 +57,7 @@ One **pool** with three **lanes**: Employee, Manager and Finance. Each lane is a
 
 ![BPMN beyond a flowchart: handling a refund request](images/BPMN_Advanced.png)
 
-*BPMN beyond a flowchart: handling a refund request. [Full size](images/BPMN_Advanced.png)*
+*BPMN beyond a flowchart: handling a refund request. [Full size](images/BPMN_Advanced.png) · [HTML source](source/html/BPMN_Advanced.html)*
 
 One process, *handling a refund request*, uses every extra feature, each pointed at by a number:
 
@@ -78,7 +78,7 @@ Lanes: System, Agent and Manager (and the Customer as the black box above them).
 
 ![BPMN: ordering and delivering a meal](images/BPMN_Delivery.png)
 
-*BPMN: ordering and delivering a meal. [Full size](images/BPMN_Delivery.png)*
+*BPMN: ordering and delivering a meal. [Full size](images/BPMN_Delivery.png) · [HTML source](source/html/BPMN_Delivery.html)*
 
 **Three participants, each in its own pool**: Customer, Restaurant, Courier. Solid arrows are the order of work inside a pool; dashed arrows are messages between pools. Circles are events, diamonds are decisions. **Blue is the customer's happy path.**
 
@@ -91,7 +91,7 @@ Lanes: System, Agent and Manager (and the Customer as the black box above them).
 
 ![BPMN, complex: from order to delivered parcel](images/BPMN_Order.png)
 
-*BPMN, complex: from order to delivered parcel. [Full size](images/BPMN_Order.png)*
+*BPMN, complex: from order to delivered parcel. [Full size](images/BPMN_Order.png) · [HTML source](source/html/BPMN_Order.html)*
 
 Four participants and a customer: **the shop** (three lanes: Orders, Warehouse, Finance), **the payment provider**, **the courier company**, and **the customer as a black box**. It combines splits and joins, a task per item, a loop, a payment deadline, a delivery deadline, a retry loop and **six message flows**. Blue is the shop's happy path.
 
@@ -129,7 +129,7 @@ The six message flows are *order*, *rejection*, *payment request*, *payment resu
 
 ![BPMN: rules board](images/BPMN_Rules.png)
 
-*BPMN: rules board. [Full size](images/BPMN_Rules.png)*
+*BPMN: rules board. [Full size](images/BPMN_Rules.png) · [HTML source](source/html/BPMN_Rules.html)*
 
 #### What it is for
 

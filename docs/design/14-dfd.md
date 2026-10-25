@@ -16,7 +16,7 @@ A data flow diagram has **exactly four kinds of thing**. The style used here is 
 
 ![Notation: four symbols and three mistakes](images/DFD_Notation.png)
 
-*Notation: four symbols and three mistakes. [Full size](images/DFD_Notation.png)*
+*Notation: four symbols and three mistakes. [Full size](images/DFD_Notation.png) · [HTML source](source/html/DFD_Notation.html)*
 
 | Symbol | Look | Meaning | Name |
 | --- | --- | --- | --- |
@@ -55,7 +55,7 @@ A DFD is drawn in levels, each opening one process of the level above.
 
 ![Level 0, context: food delivery](images/DFD_Context.png)
 
-*Level 0, context: food delivery. [Full size](images/DFD_Context.png)*
+*Level 0, context: food delivery. [Full size](images/DFD_Context.png) · [HTML source](source/html/DFD_Context.html)*
 
 The **Delivery system** is one process (`0`) in the middle. Four outside parties surround it: **Customer** (E1), **Restaurant** (E2), **Courier** (E3) and **Payment provider** (E4). Between the system and each party run **two arrows**, one each way:
 
@@ -70,13 +70,13 @@ Blue marks the customer's journey and the card charge; the rest are ink. There a
 
 ![Level 0, context, illustrated](images/DFD_Context_Illustrated.png)
 
-*Level 0, context, illustrated. [Full size](images/DFD_Context_Illustrated.png)*
+*Level 0, context, illustrated. [Full size](images/DFD_Context_Illustrated.png) · [HTML source](source/html/DFD_Context_Illustrated.html)*
 
 ### 3.2 Level 1: inside the system
 
 ![Level 1: inside the delivery system](images/DFD_Level1.png)
 
-*Level 1: inside the delivery system. [Full size](images/DFD_Level1.png)*
+*Level 1: inside the delivery system. [Full size](images/DFD_Level1.png) · [HTML source](source/html/DFD_Level1.html)*
 
 The single process becomes **four**: **1.0 Take order**, **2.0 Take payment**, **3.0 Prepare food** and **4.0 Deliver order**. One store, **D1 Orders**, sits between them, and the four outside parties are the same as on level 0.
 
@@ -91,13 +91,13 @@ Blue is the main journey (basket, amount to pay, charge request); violet is the 
 
 ![Level 1, illustrated](images/DFD_Level1_Illustrated.png)
 
-*Level 1, illustrated. [Full size](images/DFD_Level1_Illustrated.png)*
+*Level 1, illustrated. [Full size](images/DFD_Level1_Illustrated.png) · [HTML source](source/html/DFD_Level1_Illustrated.html)*
 
 ### 3.3 Level 2: inside process 4.0
 
 ![Level 2: inside process 4.0, Deliver order](images/DFD_Level2.png)
 
-*Level 2: inside process 4.0, Deliver order. [Full size](images/DFD_Level2.png)*
+*Level 2: inside process 4.0, Deliver order. [Full size](images/DFD_Level2.png) · [HTML source](source/html/DFD_Level2.html)*
 
 Process **4.0 Deliver order** opens into three: **4.1 Match courier**, **4.2 Offer job** and **4.3 Confirm drop-off**. A dashed frame labelled *4.0 Deliver order* marks what was opened. The **dashed store** D1 Orders belongs to level 1 and is shown for reference.
 
@@ -114,7 +114,7 @@ New at this level: a store **D3 Courier positions**, written by 4.2 (*Latest pos
 
 ![Level 2, illustrated](images/DFD_Level2_Illustrated.png)
 
-*Level 2, illustrated. [Full size](images/DFD_Level2_Illustrated.png)*
+*Level 2, illustrated. [Full size](images/DFD_Level2_Illustrated.png) · [HTML source](source/html/DFD_Level2_Illustrated.html)*
 
 ## 4. The illustrated style
 
@@ -148,7 +148,7 @@ Entities, processes and stores become **cards with a name pill and a large detai
 
 ![DFD: rules board](images/DFD_Rules.png)
 
-*DFD: rules board. [Full size](images/DFD_Rules.png)*
+*DFD: rules board. [Full size](images/DFD_Rules.png) · [HTML source](source/html/DFD_Rules.html)*
 
 #### What it shows
 

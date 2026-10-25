@@ -16,7 +16,7 @@ All three use the delivery domain, so the same order that is a table in the [ER 
 
 ![State machine: the life of an order](images/UML_State.png)
 
-*State machine: the life of an order. [Full size](images/UML_State.png)*
+*State machine: the life of an order. [Full size](images/UML_State.png) · [HTML source](source/html/UML_State.html)*
 
 A **state machine** shows every state a thing can be in and what moves it from one to the next. Boxes are **states**, arrows are **transitions**, the filled dot is the **start** and the ringed dot an **end**.
 
@@ -46,7 +46,7 @@ The **blue path** is the happy path, drawn thick and animated; it is the only an
 
 ![Use case diagram: the delivery app, plain](images/UML_UseCase.png)
 
-*Use case diagram: the delivery app, plain. [Full size](images/UML_UseCase.png)*
+*Use case diagram: the delivery app, plain. [Full size](images/UML_UseCase.png) · [HTML source](source/html/UML_UseCase.html)*
 
 A **use case diagram** says who uses the system and what for, without saying how.
 
@@ -61,7 +61,7 @@ The Payment provider appears as an actor because it is outside the system but ta
 
 ![Use case diagram: the delivery app, illustrated](images/UML_UseCase_Illustrated.png)
 
-*Use case diagram: the delivery app, illustrated. [Full size](images/UML_UseCase_Illustrated.png)*
+*Use case diagram: the delivery app, illustrated. [Full size](images/UML_UseCase_Illustrated.png) · [HTML source](source/html/UML_UseCase_Illustrated.html)*
 
 The actors become **cards** with a name pill and a large detailed icon (a person for the Customer, a shop front for the Restaurant, a scooter for the Courier, a card for the Payment provider), tinted by who they are. The use cases stay as ovals, tinted by the actor they belong to (blue for the customer's, green for the restaurant's, teal for the courier's, amber for payment). The notation (solid line, `«include»`, `«extend»`) is unchanged. In the plain version actors are the standard stick figure.
 
@@ -69,7 +69,7 @@ The actors become **cards** with a name pill and a large detailed icon (a person
 
 ![Class diagram: the delivery domain](images/UML_Class.png)
 
-*Class diagram: the delivery domain. [Full size](images/UML_Class.png)*
+*Class diagram: the delivery domain. [Full size](images/UML_Class.png) · [HTML source](source/html/UML_Class.html)*
 
 A **class diagram** describes the classes of a domain and how they relate. Each box has three parts: the **name**, the **attributes** and the **operations**; a compartment with nothing in it is left out. Visibility marks: `+` public, `-` private, `#` protected.
 
@@ -110,7 +110,7 @@ Other details in the example: **Payment is abstract** (its name is in italics) w
 
 ![UML: rules board](images/UML_Rules.png)
 
-*UML: rules board. [Full size](images/UML_Rules.png)*
+*UML: rules board. [Full size](images/UML_Rules.png) · [HTML source](source/html/UML_Rules.html)*
 
 #### What it covers
 

@@ -6,7 +6,7 @@ The visual foundation was drawn first, before any type: the palette, the type sc
 
 ![The foundation board: colour families, neutrals, type scale, shapes, edges, themes and layout rules](images/Main.png)
 
-*The foundation board: colour families, neutrals, type scale, shapes, edges, themes and layout rules. [Full size](images/Main.png)*
+*The foundation board: colour families, neutrals, type scale, shapes, edges, themes and layout rules. [Full size](images/Main.png) · [HTML source](source/html/Main.html)*
 
 ## 1. Colour
 
@@ -106,7 +106,7 @@ A 48 px grid, a 2 px ink outline, pastel fills and one accent per icon. Every ic
 
 ![The flat icon library, nine groups](images/Icons.png)
 
-*The flat icon library, nine groups. [Full size](images/Icons.png)*
+*The flat icon library, nine groups. [Full size](images/Icons.png) · [HTML source](source/html/Icons.html)*
 
 The nine groups: people and access, compute and infrastructure, data and storage, network and cloud, apps and devices, messaging and flow, status and actions, business and planning, and cloud services (32 icons that mirror the managed services of the big clouds: Kubernetes, SQL database, Message queue, Firewall / WAF, Identity (IAM) and so on).
 
@@ -116,7 +116,7 @@ A second style for the illustrated mode. The same subjects as the flat set, with
 
 ![The detailed icon library](images/Icons_Detailed.png)
 
-*The detailed icon library. [Full size](images/Icons_Detailed.png)*
+*The detailed icon library. [Full size](images/Icons_Detailed.png) · [HTML source](source/html/Icons_Detailed.html)*
 
 Style rules for the detailed set: a 64 px grid, a 2.5 px ink outline with round joins, three tones per object (base, a darker shade on the side away from the light, a white highlight stroke), one or two small accents in palette colours, and a ground shadow under each object. Readable at 56 px.
 
@@ -130,23 +130,23 @@ The **Components** pages are the building-block kit the type pages were assemble
 
 ![Components: process and behavior](images/Components_Process.png)
 
-*Components: process and behavior. [Full size](images/Components_Process.png)*
+*Components: process and behavior. [Full size](images/Components_Process.png) · [HTML source](source/html/Components_Process.html)*
 
 ![Components: structure and architecture](images/Components_Structure.png)
 
-*Components: structure and architecture. [Full size](images/Components_Structure.png)*
+*Components: structure and architecture. [Full size](images/Components_Structure.png) · [HTML source](source/html/Components_Structure.html)*
 
 ![Components: screen flow parts](images/Components_ScreenFlow.png)
 
-*Components: screen flow parts. [Full size](images/Components_ScreenFlow.png)*
+*Components: screen flow parts. [Full size](images/Components_ScreenFlow.png) · [HTML source](source/html/Components_ScreenFlow.html)*
 
 ![Components: annotations and layout](images/Components_Annotations.png)
 
-*Components: annotations and layout. [Full size](images/Components_Annotations.png)*
+*Components: annotations and layout. [Full size](images/Components_Annotations.png) · [HTML source](source/html/Components_Annotations.html)*
 
 ![Components: planning and explainer](images/Components_Planning.png)
 
-*Components: planning and explainer. [Full size](images/Components_Planning.png)*
+*Components: planning and explainer. [Full size](images/Components_Planning.png) · [HTML source](source/html/Components_Planning.html)*
 
 The Components pages were drawn first, as a general kit. Where a later type page made a decision that differs, **the type page is the authority**. The DFD, C4 and cloud-frame entries on the Components pages were realigned with their type pages during the final review; the remaining pages may still differ in small details (see [Open items](15-open-items.md)).
 
@@ -248,6 +248,6 @@ The design canvas has 16 pages (foundation, components, icons and the thirteen t
 
 ![The blank canvas: 1280 × 800, 20 px dot grid, white page, pastel infographic theme](images/Canvas.png)
 
-*The blank canvas: 1280 × 800, 20 px dot grid, white page, pastel infographic theme. [Full size](images/Canvas.png)*
+*The blank canvas: 1280 × 800, 20 px dot grid, white page, pastel infographic theme. [Full size](images/Canvas.png) · [HTML source](source/html/Canvas.html)*
 
 A blank canvas is 1280 × 800 on a 20 px dot grid with a white page in the Pastel infographic theme. Themes swap the palette, corner radius and edge style while keeping the same shapes and spacing: *Pastel infographic* (the default: radius 12, stroke 2, shadow on, dashed flow edges), *Technical clean* (for UML, ER and C4: radius 4, stroke 1.5, no shadow, solid edges) and *Midnight* (dark slides: radius 12, stroke 2, background `#0B1220`).

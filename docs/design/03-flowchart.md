@@ -16,7 +16,7 @@ A flowchart reads from the top left. A **terminator** (rounded, green) starts it
 
 ![Basic flowchart: a login flow, top to bottom](images/Flowchart_Basic.png)
 
-*Basic flowchart: a login flow, top to bottom. [Full size](images/Flowchart_Basic.png)*
+*Basic flowchart: a login flow, top to bottom. [Full size](images/Flowchart_Basic.png) · [HTML source](source/html/Flowchart_Basic.html)*
 
 What to notice in the basic example:
 
@@ -56,7 +56,7 @@ A plugin picks one of these for each part of a process, then fills in the text.
 
 ![Flowchart patterns](images/Flowchart_Patterns.png)
 
-*Flowchart patterns. [Full size](images/Flowchart_Patterns.png)*
+*Flowchart patterns. [Full size](images/Flowchart_Patterns.png) · [HTML source](source/html/Flowchart_Patterns.html)*
 
 | Pattern | When to use it |
 | --- | --- |
@@ -78,7 +78,7 @@ A plugin picks one of these for each part of a process, then fills in the text.
 
 ![Horizontal flowchart: left to right](images/Flowchart_Horizontal.png)
 
-*Horizontal flowchart: left to right. [Full size](images/Flowchart_Horizontal.png)*
+*Horizontal flowchart: left to right. [Full size](images/Flowchart_Horizontal.png) · [HTML source](source/html/Flowchart_Horizontal.html)*
 
 ### Swimlanes
 
@@ -86,7 +86,7 @@ When several actors share a process, one **lane** per actor shows who is respons
 
 ![Swimlane flowchart: a refund across customer, support and finance](images/Flowchart_Swimlane.png)
 
-*Swimlane flowchart: a refund across customer, support and finance. [Full size](images/Flowchart_Swimlane.png)*
+*Swimlane flowchart: a refund across customer, support and finance. [Full size](images/Flowchart_Swimlane.png) · [HTML source](source/html/Flowchart_Swimlane.html)*
 
 ## 5. The illustrated style
 
@@ -94,7 +94,7 @@ Work steps can become **cards**: a name pill, one line of explanation (six words
 
 ![Illustrated nodes: anatomy of a card, three levels of one step and lane colours](images/Flowchart_Illustrated.png)
 
-*Illustrated nodes: anatomy of a card, three levels of one step and lane colours. [Full size](images/Flowchart_Illustrated.png)*
+*Illustrated nodes: anatomy of a card, three levels of one step and lane colours. [Full size](images/Flowchart_Illustrated.png) · [HTML source](source/html/Flowchart_Illustrated.html)*
 
 Lane tints for cards: customer blue, app and server violet, payment amber, restaurant green, courier teal.
 
@@ -106,7 +106,7 @@ All the parts together: numbered steps, a subprocess, two decisions, a retry loo
 
 ![Complete flow: online payment](images/Flowchart_Complex.png)
 
-*Complete flow: online payment. [Full size](images/Flowchart_Complex.png)*
+*Complete flow: online payment. [Full size](images/Flowchart_Complex.png) · [HTML source](source/html/Flowchart_Complex.html)*
 
 ### 6.2 Food delivery, plain
 
@@ -114,7 +114,7 @@ One order from tap to doorstep. It combines swimlanes, screen cards, icons, a pa
 
 ![Complete flow: food delivery, plain](images/Flowchart_Delivery.png)
 
-*Complete flow: food delivery, plain. [Full size](images/Flowchart_Delivery.png)*
+*Complete flow: food delivery, plain. [Full size](images/Flowchart_Delivery.png) · [HTML source](source/html/Flowchart_Delivery.html)*
 
 ### 6.3 Food delivery, illustrated
 
@@ -122,7 +122,7 @@ The same order drawn with illustrated cards. Cards take the colour of their lane
 
 ![Complete flow: food delivery, illustrated](images/Flowchart_Delivery_Illustrated.png)
 
-*Complete flow: food delivery, illustrated. [Full size](images/Flowchart_Delivery_Illustrated.png)*
+*Complete flow: food delivery, illustrated. [Full size](images/Flowchart_Delivery_Illustrated.png) · [HTML source](source/html/Flowchart_Delivery_Illustrated.html)*
 
 ## 7. Numbers, connectors and subprocesses
 
@@ -146,7 +146,7 @@ Number chips are optional; use them when other text refers to steps. Branches ad
 
 ![Flowchart: rules board](images/Flowchart_Rules.png)
 
-*Flowchart: rules board. [Full size](images/Flowchart_Rules.png)*
+*Flowchart: rules board. [Full size](images/Flowchart_Rules.png) · [HTML source](source/html/Flowchart_Rules.html)*
 
 #### Shapes and colours
 

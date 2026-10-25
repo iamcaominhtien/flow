@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flowchart: Swimlane flowchart: who does what</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@keyframes dc-flow2{to{stroke-dashoffset:-12}}
+.flow2{stroke-dasharray:6 6;animation:dc-flow2 1.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 1160px; height: 800px; background: #F8FAFC; overflow: hidden">
+<div style="position:absolute;left:64px;top:48px;display:flex;flex-direction:column;gap:8px"><div style="font-size:24px;font-weight:600">Swimlane flowchart: who does what</div><div style="font-size:13px;line-height:20px;color:#475569;max-width:900px">Lanes show who is responsible. Every step sits in exactly one lane, arrows that change lane run straight across, and the flow reads left to right inside the lanes.</div></div>
+<div data-lint="box" style="position:absolute;left:64px;top:150px;width:1032px;height:190px;box-sizing:border-box;background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:0px;"></div>
+<div style="position:absolute;left:64px;top:150px;width:44px;height:190px;box-sizing:border-box;background:#1D4ED8;display:flex;align-items:center;justify-content:center"><span style="writing-mode:vertical-rl;transform:rotate(180deg);color:#fff;font-size:13px;font-weight:700;letter-spacing:.02em">Customer</span></div>
+<div data-lint="box" style="position:absolute;left:64px;top:340px;width:1032px;height:190px;box-sizing:border-box;background:#F3F1FD;border:1.5px solid #D4CEF7;border-radius:0px;"></div>
+<div style="position:absolute;left:64px;top:340px;width:44px;height:190px;box-sizing:border-box;background:#5B4BD6;display:flex;align-items:center;justify-content:center"><span style="writing-mode:vertical-rl;transform:rotate(180deg);color:#fff;font-size:13px;font-weight:700;letter-spacing:.02em">Support</span></div>
+<div data-lint="box" style="position:absolute;left:64px;top:530px;width:1032px;height:190px;box-sizing:border-box;background:#F0FBF2;border:1.5px solid #BBE7C4;border-radius:0px;"></div>
+<div style="position:absolute;left:64px;top:530px;width:44px;height:190px;box-sizing:border-box;background:#15803D;display:flex;align-items:center;justify-content:center"><span style="writing-mode:vertical-rl;transform:rotate(180deg);color:#fff;font-size:13px;font-weight:700;letter-spacing:.02em">Finance</span></div>
+<div style="position:absolute;left:180px;top:221px;width:160px;height:48px"><svg width="160" height="48" viewBox="0 0 160 48" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><rect x="1" y="1" width="158" height="46" rx="23.0" fill="#DCF5E1" stroke="#1E7A3C" stroke-width="2"/></svg><div style="position:absolute;left:10.0px;top:0;width:140px;height:48px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:16px;font-weight:600;color:#0F172A">Request refund</div></div>
+<div style="position:absolute;left:180px;top:407px;width:160px;height:56px"><svg width="160" height="56" viewBox="0 0 160 56" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><rect x="1" y="1" width="158" height="54" rx="10" fill="#DCEEFB" stroke="#1E5AA8" stroke-width="2"/></svg><div style="position:absolute;left:10.0px;top:0;width:140px;height:56px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:16px;font-weight:600;color:#0F172A">Review request</div></div>
+<div style="position:absolute;left:435px;top:385px;width:170px;height:100px"><svg width="170" height="100" viewBox="0 0 170 100" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="M85.0 1L169 50.0L85.0 99L1 50.0Z" fill="#FFF1DD" stroke="#B45309" stroke-width="2" stroke-linejoin="round"/></svg><div style="position:absolute;left:30.6px;top:0;width:108.8px;height:100px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:16px;font-weight:600;color:#0F172A">Eligible?</div></div>
+<div style="position:absolute;left:710px;top:407px;width:160px;height:56px"><svg width="160" height="56" viewBox="0 0 160 56" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><rect x="1" y="1" width="158" height="54" rx="10" fill="#DCEEFB" stroke="#1E5AA8" stroke-width="2"/></svg><div style="position:absolute;left:10.0px;top:0;width:140px;height:56px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:16px;font-weight:600;color:#0F172A">Send rejection</div></div>
+<div style="position:absolute;left:705px;top:221px;width:170px;height:48px"><svg width="170" height="48" viewBox="0 0 170 48" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><rect x="1" y="1" width="168" height="46" rx="23.0" fill="#DCF5E1" stroke="#1E7A3C" stroke-width="2"/></svg><div style="position:absolute;left:10.0px;top:0;width:150px;height:48px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:16px;font-weight:600;color:#0F172A">Rejection received</div></div>
+<div style="position:absolute;left:440px;top:597px;width:160px;height:56px"><svg width="160" height="56" viewBox="0 0 160 56" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><rect x="1" y="1" width="158" height="54" rx="10" fill="#DCEEFB" stroke="#1E5AA8" stroke-width="2"/></svg><div style="position:absolute;left:10.0px;top:0;width:140px;height:56px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:16px;font-weight:600;color:#0F172A">Issue refund</div></div>
+<div style="position:absolute;left:710px;top:601px;width:160px;height:48px"><svg width="160" height="48" viewBox="0 0 160 48" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><rect x="1" y="1" width="158" height="46" rx="23.0" fill="#DCF5E1" stroke="#1E7A3C" stroke-width="2"/></svg><div style="position:absolute;left:10.0px;top:0;width:140px;height:48px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:16px;font-weight:600;color:#0F172A">Refund sent</div></div>
+<svg width="12" height="138" viewBox="0 0 12 138" preserveAspectRatio="none" style="position:absolute;left:254px;top:269px;width:12px;height:138px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-1" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 6 0 L 6 133" marker-end="url(#dc-arrow-head-filled-1)"></path></svg>
+<svg width="95" height="12" viewBox="0 0 95 12" preserveAspectRatio="none" style="position:absolute;left:340px;top:429px;width:95px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-2" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 0 6 L 90 6" marker-end="url(#dc-arrow-head-filled-2)"></path></svg>
+<svg width="12" height="112" viewBox="0 0 12 112" preserveAspectRatio="none" style="position:absolute;left:514px;top:485px;width:12px;height:112px;overflow:visible;fill:none;stroke:#15803D;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-3" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#15803D" stroke="none" style="stroke:none;fill:#15803D"/></marker></defs><path d="M 6 0 L 6 107" marker-end="url(#dc-arrow-head-filled-3)"></path></svg>
+<div style="position:absolute;left:542px;top:511px;transform:translate(-50%,-50%);padding:2px 8px;border-radius:999px;background:#DCF5E1;color:#15803D;font-size:11px;font-weight:700;line-height:16px;white-space:nowrap;">Yes</div>
+<svg width="105" height="12" viewBox="0 0 105 12" preserveAspectRatio="none" style="position:absolute;left:605px;top:429px;width:105px;height:12px;overflow:visible;fill:none;stroke:#B42318;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-4" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#B42318" stroke="none" style="stroke:none;fill:#B42318"/></marker></defs><path d="M 0 6 L 100 6" marker-end="url(#dc-arrow-head-filled-4)"></path></svg>
+<div style="position:absolute;left:655px;top:419px;transform:translate(-50%,-50%);padding:2px 8px;border-radius:999px;background:#FDE4E4;color:#B42318;font-size:11px;font-weight:700;line-height:16px;white-space:nowrap;">No</div>
+<svg width="12" height="138" viewBox="0 0 12 138" preserveAspectRatio="none" style="position:absolute;left:784px;top:269px;width:12px;height:138px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-5" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 6 138 L 6 5" marker-end="url(#dc-arrow-head-filled-5)"></path></svg>
+<svg width="110" height="12" viewBox="0 0 110 12" preserveAspectRatio="none" style="position:absolute;left:600px;top:619px;width:110px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-6" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 0 6 L 105 6" marker-end="url(#dc-arrow-head-filled-6)"></path></svg>
+<div style="position:absolute;left:64px;top:744px;font-size:12px;line-height:18px;color:#475569;font-weight:400;white-space:nowrap;">Lane order follows the first hand-off: the actor who starts the process goes on top. A lane never holds a decision for someone else.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1160,"height":800}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

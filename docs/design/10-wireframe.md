@@ -33,7 +33,7 @@ A screen is built from the blocks on the Components page: navbar, sidebar, card,
 
 ![The wireframe blocks, from the Components page](images/Components_ScreenFlow.png)
 
-*The wireframe blocks, from the Components page. [Full size](images/Components_ScreenFlow.png)*
+*The wireframe blocks, from the Components page. [Full size](images/Components_ScreenFlow.png) · [HTML source](source/html/Components_ScreenFlow.html)*
 
 ## 3. The annotated screen
 
@@ -48,7 +48,7 @@ A wireframe alone shows layout but not intent. So the examples are **annotated**
 
 ![Annotated wireframe: checkout on a phone](images/Wireframe_Mobile.png)
 
-*Annotated wireframe: checkout on a phone. [Full size](images/Wireframe_Mobile.png)*
+*Annotated wireframe: checkout on a phone. [Full size](images/Wireframe_Mobile.png) · [HTML source](source/html/Wireframe_Mobile.html)*
 
 Three screens of one task (**1 · Cart**, **2 · Address and payment**, **3 · Confirmation**), in grey with blue for the primary action:
 
@@ -60,7 +60,7 @@ Three screens of one task (**1 · Cart**, **2 · Address and payment**, **3 · C
 
 ![Annotated wireframe: restaurant dashboard](images/Wireframe_Desktop.png)
 
-*Annotated wireframe: restaurant dashboard. [Full size](images/Wireframe_Desktop.png)*
+*Annotated wireframe: restaurant dashboard. [Full size](images/Wireframe_Desktop.png) · [HTML source](source/html/Wireframe_Desktop.html)*
 
 A desktop screen built from the same blocks: top bar (brand and place, search), side menu (Orders, Menu, Reviews, Payouts, Settings), four **figures** (Orders, Revenue, Prep time, Rating), an *Orders per hour* **chart**, a *Needs attention* **list** (a late order, a dish out of stock, a new review) and a **table** of live orders with a status and one action per row. Nine numbered details have notes below.
 
@@ -70,7 +70,7 @@ The desktop frame is 1320 × 760 with a browser bar; content margins are 28 px a
 
 ![States: one screen, four situations](images/Wireframe_States.png)
 
-*States: one screen, four situations. [Full size](images/Wireframe_States.png)*
+*States: one screen, four situations. [Full size](images/Wireframe_States.png) · [HTML source](source/html/Wireframe_States.html)*
 
 Every screen that loads data is drawn **four times**: the list itself (normal), **loading**, **empty** and **error**. Design all four, not just the first.
 
@@ -85,7 +85,7 @@ Every screen that loads data is drawn **four times**: the list itself (normal), 
 
 ![Responsive wireframe: one page, three widths](images/Wireframe_Responsive.png)
 
-*Responsive wireframe: one page, three widths. [Full size](images/Wireframe_Responsive.png)*
+*Responsive wireframe: one page, three widths. [Full size](images/Wireframe_Responsive.png) · [HTML source](source/html/Wireframe_Responsive.html)*
 
 The same menu page at **desktop (1024 px and up), tablet (640 to 1023 px) and phone (under 640 px)**. Columns drop from three to two to one, the filters move out of the way (a side panel on desktop, a button that opens a sheet below), and the links fold into a menu. A short note per change says what happens. Keep the three frames the **same height** so the difference is visible.
 
@@ -108,7 +108,7 @@ Phone: frame 330 × 680 (screen 298 wide), a 3 px ink border and 38 px corners. 
 
 ![Wireframe: rules board](images/Wireframe_Rules.png)
 
-*Wireframe: rules board. [Full size](images/Wireframe_Rules.png)*
+*Wireframe: rules board. [Full size](images/Wireframe_Rules.png) · [HTML source](source/html/Wireframe_Rules.html)*
 
 #### What it is for
 

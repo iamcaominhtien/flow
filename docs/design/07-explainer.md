@@ -32,7 +32,7 @@ Every other type in this design is a record: it must be complete and exact enoug
 
 ![Layered flow: how a web page reaches you](images/Explainer_Layers.png)
 
-*Layered flow: how a web page reaches you. [Full size](images/Explainer_Layers.png)*
+*Layered flow: how a web page reaches you. [Full size](images/Explainer_Layers.png) · [HTML source](source/html/Explainer_Layers.html)*
 
 Five bands (You, Finding the address, The edge, The app, The data) carry seven numbered cards: Your browser (1), DNS (2), CDN (3), Load balancer (4), Web server (5), Cache (6), Database (7). The blue path runs down the cards in order, with spoken labels (*asks "where is it?"*, *here is the address*, *no copy*, *sends the request*, *asks first*, *if not remembered*). A closing note gives the fast path: with a copy at the CDN, the trip ends at step 3. Notice that labels use everyday words, never protocol names.
 
@@ -40,7 +40,7 @@ Five bands (You, Finding the address, The edge, The app, The data) carry seven n
 
 ![Tree: what is inside a web project](images/Explainer_Tree.png)
 
-*Tree: what is inside a web project. [Full size](images/Explainer_Tree.png)*
+*Tree: what is inside a web project. [Full size](images/Explainer_Tree.png) · [HTML source](source/html/Explainer_Tree.html)*
 
 A root card (`my-app/`) and one row card for each important file or folder (`src/`, `public/`, `tests/`, `docs/`, `package.json`, `README.md`, `.env`). Each row has an icon, a mono name and one line of purpose; for example, `package.json` is "the shopping list: which libraries the project needs" and `.env` is "secrets such as passwords: never shared, never uploaded". A tree has no numbers because order does not matter.
 
@@ -48,7 +48,7 @@ A root card (`my-app/`) and one row card for each important file or folder (`src
 
 ![Comparison: SQL or NoSQL](images/Explainer_Compare.png)
 
-*Comparison: SQL or NoSQL. [Full size](images/Explainer_Compare.png)*
+*Comparison: SQL or NoSQL. [Full size](images/Explainer_Compare.png) · [HTML source](source/html/Explainer_Compare.html)*
 
 Two panels, a warm one and a cool one, and five rows read across: shape of the data, changing the shape, links between things, growing very large, best for. A **rule of thumb** closes it: start with SQL when the data has clear relationships and must stay correct; add NoSQL beside it when one kind of data is huge or its shape keeps changing; many systems use both. The title says it first: *neither is better; they fit different jobs*.
 
@@ -56,7 +56,7 @@ Two panels, a warm one and a cool one, and five rows read across: shape of the d
 
 ![Concept: what a cache does](images/Explainer_Concept.png)
 
-*Concept: what a cache does. [Full size](images/Explainer_Concept.png)*
+*Concept: what a cache does. [Full size](images/Explainer_Concept.png) · [HTML source](source/html/Explainer_Concept.html)*
 
 The **Cache** sits in the middle. Around it, four facts: Fast, Small, Temporary, A copy and not the original. Below, an analogy: *your desk* (the books you use every day are within reach) and *the library* (everything is here, but it takes a walk), joined by "not on the desk? walk".
 
@@ -64,7 +64,7 @@ The **Cache** sits in the middle. Around it, four facts: Fast, Small, Temporary,
 
 ![Complete explainer: what happens when you pay by card online](images/Explainer_Payment.png)
 
-*Complete explainer: what happens when you pay by card online. [Full size](images/Explainer_Payment.png)*
+*Complete explainer: what happens when you pay by card online. [Full size](images/Explainer_Payment.png) · [HTML source](source/html/Explainer_Payment.html)*
 
 This one combines three shapes in one page. Its title is a question, and its subtitle says what the reader will know afterwards: *a yes or no comes back in about two seconds, but the money moves days later*.
 
@@ -120,7 +120,7 @@ An explainer often *introduces* a technical diagram: the same icons and tints ap
 
 ![Explainer: rules board](images/Explainer_Rules.png)
 
-*Explainer: rules board. [Full size](images/Explainer_Rules.png)*
+*Explainer: rules board. [Full size](images/Explainer_Rules.png) · [HTML source](source/html/Explainer_Rules.html)*
 
 #### What it is for
 

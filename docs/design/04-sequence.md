@@ -16,7 +16,7 @@
 
 ![Basic sequence: sign in](images/Sequence_Basic.png)
 
-*Basic sequence: sign in. [Full size](images/Sequence_Basic.png)*
+*Basic sequence: sign in. [Full size](images/Sequence_Basic.png) · [HTML source](source/html/Sequence_Basic.html)*
 
 In the basic example, a user signs in:
 
@@ -32,7 +32,7 @@ The line says *how the call behaves*; the colour says *how much it matters*. A p
 
 ![Message kinds](images/Sequence_Messages.png)
 
-*Message kinds. [Full size](images/Sequence_Messages.png)*
+*Message kinds. [Full size](images/Sequence_Messages.png) · [HTML source](source/html/Sequence_Messages.html)*
 
 | Kind | Drawn as | Meaning |
 | --- | --- | --- |
@@ -57,7 +57,7 @@ A frame groups messages and says *when* they happen. Its tag names the kind, and
 
 ![Fragments: alt, opt, loop, par, break, critical, ref](images/Sequence_Fragments.png)
 
-*Fragments: alt, opt, loop, par, break, critical, ref. [Full size](images/Sequence_Fragments.png)*
+*Fragments: alt, opt, loop, par, break, critical, ref. [Full size](images/Sequence_Fragments.png) · [HTML source](source/html/Sequence_Fragments.html)*
 
 | Frame | Meaning | Example guard |
 | --- | --- | --- |
@@ -77,7 +77,7 @@ Six participants (Customer, App, Order API, Payment, Restaurant, Courier) and **
 
 ![Complete flow: food delivery, plain](images/Sequence_Delivery.png)
 
-*Complete flow: food delivery, plain. [Full size](images/Sequence_Delivery.png)*
+*Complete flow: food delivery, plain. [Full size](images/Sequence_Delivery.png) · [HTML source](source/html/Sequence_Delivery.html)*
 
 How to read it:
 
@@ -94,7 +94,7 @@ How to read it:
 
 ![Complete flow: food delivery, illustrated](images/Sequence_Delivery_Illustrated.png)
 
-*Complete flow: food delivery, illustrated. [Full size](images/Sequence_Delivery_Illustrated.png)*
+*Complete flow: food delivery, illustrated. [Full size](images/Sequence_Delivery_Illustrated.png) · [HTML source](source/html/Sequence_Delivery_Illustrated.html)*
 
 Only the headers change: a tinted card with a 64 px icon from the detailed set and a name pill, instead of a small header box. Messages, frames, bars and notes are identical, and every y position shifts by the extra header height.
 
@@ -134,7 +134,7 @@ Amber with a folded corner, one or two short sentences, beside a lifeline and ne
 
 ![Sequence: rules board](images/Sequence_Rules.png)
 
-*Sequence: rules board. [Full size](images/Sequence_Rules.png)*
+*Sequence: rules board. [Full size](images/Sequence_Rules.png) · [HTML source](source/html/Sequence_Rules.html)*
 
 #### Participants
 

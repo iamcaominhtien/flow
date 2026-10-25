@@ -24,7 +24,8 @@ Start with the [overview](00-overview.md), then [Foundations](01-foundations.md)
 | [13 Cloud, network, deployment](13-cloud.md) | Regions, networks, subnets, zones and trust levels |
 | [14 DFD](14-dfd.md) | How data moves: four symbols, three levels, balancing |
 | [15 Open items](15-open-items.md) | What is not designed, not tested, and what the review fixed |
-| [16 Board index](16-board-index.md) | Every board on the canvas, with its picture |
+| [16 Board index](16-board-index.md) | Every board on the canvas, with its picture and its HTML |
+| [Source](source/README.md) | The HTML of every board, the original canvas files and the Python scripts that drew them |
 
 ## How each type page is built
 
@@ -37,4 +38,4 @@ Start with the [overview](00-overview.md), then [Foundations](01-foundations.md)
 
 ## Images
 
-All pictures are in [`images/`](images/), one PNG per board, named after the board (`Sequence_Delivery.png`). They are screenshots of the design canvas at 1×, reduced to 256 colours to keep the repository small. Open one in its own tab to read small text.
+All pictures are in [`images/`](images/), one PNG per board, named after the board (`Sequence_Delivery.png`). They are screenshots of the design canvas at 1×, reduced to 256 colours to keep the repository small. Open one in its own tab to read small text. The HTML behind each picture is in [`source/html/`](source/html/), and opens in a browser with its animation.

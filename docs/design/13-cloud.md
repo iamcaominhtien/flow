@@ -44,7 +44,7 @@ Plain parts only, 196 × 68, with a flat icon from the **Cloud services** set (L
 
 ![Basic cloud diagram: a web app in one VPC](images/Cloud_Basic.png)
 
-*Basic cloud diagram: a web app in one VPC. [Full size](images/Cloud_Basic.png)*
+*Basic cloud diagram: a web app in one VPC. [Full size](images/Cloud_Basic.png) · [HTML source](source/html/Cloud_Basic.html)*
 
 Customers reach the app through an **edge** frame (a CDN that caches static files), then enter the **Region eu-west** and its **VPC 10.0.0.0/16**:
 
@@ -59,7 +59,7 @@ Blue is a request: HTTPS to the CDN, HTTPS on a miss to the load balancer, HTTP 
 
 ![Complete cloud diagram: food delivery on two availability zones](images/Cloud_Delivery.png)
 
-*Complete cloud diagram: food delivery on two availability zones. [Full size](images/Cloud_Delivery.png)*
+*Complete cloud diagram: food delivery on two availability zones. [Full size](images/Cloud_Delivery.png) · [HTML source](source/html/Cloud_Delivery.html)*
 
 Two zones mean **one can fail and orders keep flowing**. The three apps (Customer app, Restaurant tablet, Courier app) reach a **CDN and firewall** in the edge; behind it, the region holds a VPC split into **Zone a** and **Zone b**, each with the same three subnets in the same order, so a reader can compare them:
 
@@ -74,7 +74,7 @@ Two zones mean **one can fail and orders keep flowing**. The three apps (Custome
 
 ![Network diagram: offices joined to the cloud](images/Cloud_Network.png)
 
-*Network diagram: offices joined to the cloud. [Full size](images/Cloud_Network.png)*
+*Network diagram: offices joined to the cloud. [Full size](images/Cloud_Network.png) · [HTML source](source/html/Cloud_Network.html)*
 
 Two sites reach the private network over **encrypted tunnels**:
 
@@ -109,7 +109,7 @@ A link between sites is drawn **from device to device** (firewall to gateway), n
 
 ![Cloud: rules board](images/Cloud_Rules.png)
 
-*Cloud: rules board. [Full size](images/Cloud_Rules.png)*
+*Cloud: rules board. [Full size](images/Cloud_Rules.png) · [HTML source](source/html/Cloud_Rules.html)*
 
 #### What it shows
 

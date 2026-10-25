@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flowchart: Illustrated nodes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@keyframes dc-flow2{to{stroke-dashoffset:-12}}
+.flow2{stroke-dasharray:6 6;animation:dc-flow2 1.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 1280px; height: 1700px; background: #F8FAFC; overflow: hidden">
+<div style="position:absolute;left:64px;top:48px;display:flex;flex-direction:column;gap:8px"><div style="font-size:24px;font-weight:600">Illustrated nodes</div><div style="font-size:13px;line-height:20px;color:#475569;max-width:900px">An optional richer style for work steps: a name pill, one line of explanation and a large icon on a card tinted by its lane. Use it for the steps that matter or when the chart is for people outside the team. Plain nodes stay the default.</div></div>
+<div style="position:absolute;left:64px;top:150px;width:1152px;height:270px;box-sizing:border-box;background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:14px;"></div>
+<div style="position:absolute;left:88px;top:170px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Anatomy of a card</div>
+<div style="position:absolute;left:152px;top:252px;width:232px;height:96px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#FFF1DD"><div style="position:absolute;left:14px;top:14px;padding:2px 12px;border:2px solid #0F172A;border-radius:999px;background:#FFD9A3;box-shadow:0 3px 0 #0F172A;font-size:12.5px;font-weight:800;line-height:18px;white-space:nowrap">Authorize card</div><div style="position:absolute;left:14px;top:52px;width:132px;font-size:11.5px;line-height:15px;color:#334155">Check the card, hold the money</div><svg width="64" height="64" viewBox="0 0 64 64" style="position:absolute;left:154px;top:14.0px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="57" rx="22" ry="3.5" fill="rgba(15,23,42,0.13)"/>
+<g transform="rotate(8 32 32)"><rect x="9" y="10" width="46" height="32" rx="6" fill="#FFE2B0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /></g>
+<g transform="rotate(-8 32 32)">
+<rect x="6" y="16" width="52" height="34" rx="6" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M6 40h52v4a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6z" fill="#B8D6F2"/>
+<rect x="6" y="24" width="52" height="9" fill="#1D4ED8" stroke="#0F172A" stroke-width="2.5"/>
+<path d="M10 21c12-3 26-3 44 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+<rect x="12" y="37" width="11" height="8" rx="2" fill="#FFE2B0" stroke="#0F172A" stroke-width="2"/><path d="M12 41h11M17.5 37v8" stroke="#0F172A" stroke-width="1.4" fill="none"/>
+<circle cx="32" cy="41" r="1.7" fill="#0F172A"/><circle cx="38" cy="41" r="1.7" fill="#0F172A"/><circle cx="44" cy="41" r="1.7" fill="#0F172A"/><circle cx="50" cy="41" r="1.7" fill="#0F172A"/>
+<rect x="6" y="16" width="52" height="34" rx="6" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /></g></svg></div>
+<div style="position:absolute;left:172px;top:220px"></div>
+<div style="position:absolute;left:124px;top:262px;width:22px;height:22px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:700 12px/22px 'JetBrains Mono',monospace;text-align:center">1</div>
+<div style="position:absolute;left:124px;top:304px;width:22px;height:22px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:700 12px/22px 'JetBrains Mono',monospace;text-align:center">2</div>
+<div style="position:absolute;left:396px;top:304px;width:22px;height:22px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:700 12px/22px 'JetBrains Mono',monospace;text-align:center">3</div>
+<div style="position:absolute;left:124px;top:340px;width:22px;height:22px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:700 12px/22px 'JetBrains Mono',monospace;text-align:center">4</div>
+<div style="position:absolute;left:560px;top:192px;width:22px;height:22px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:700 12px/22px 'JetBrains Mono',monospace;text-align:center">1</div>
+<div style="position:absolute;left:594px;top:190px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>Name pill</b></div>
+<div style="position:absolute;left:594px;top:210px;font-size:12px;line-height:16px;color:#475569;font-weight:400;width:590px;">Verb and noun, three words at most. Bold, ink outline and a 3 px shadow. Tinted a step darker than the card.</div>
+<div style="position:absolute;left:560px;top:244px;width:22px;height:22px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:700 12px/22px 'JetBrains Mono',monospace;text-align:center">2</div>
+<div style="position:absolute;left:594px;top:242px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>One line of explanation</b></div>
+<div style="position:absolute;left:594px;top:262px;font-size:12px;line-height:16px;color:#475569;font-weight:400;width:590px;">Six words or fewer, slate, 11.5 px. Says what happens, not how.</div>
+<div style="position:absolute;left:560px;top:296px;width:22px;height:22px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:700 12px/22px 'JetBrains Mono',monospace;text-align:center">3</div>
+<div style="position:absolute;left:594px;top:294px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>Icon</b></div>
+<div style="position:absolute;left:594px;top:314px;font-size:12px;line-height:16px;color:#475569;font-weight:400;width:590px;">64 px, from the detailed set on the Icons page, chosen for the noun: Card for payment, Cart for order. Flat icons (56 px) are the fallback.</div>
+<div style="position:absolute;left:560px;top:348px;width:22px;height:22px;border-radius:999px;background:#0F172A;color:#7DD3CB;font:700 12px/22px 'JetBrains Mono',monospace;text-align:center">4</div>
+<div style="position:absolute;left:594px;top:346px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>Card</b></div>
+<div style="position:absolute;left:594px;top:366px;font-size:12px;line-height:16px;color:#475569;font-weight:400;width:590px;">232 × 96, 2 px ink border, radius 12, tinted by lane. Side bars inside the border make it a subprocess.</div>
+<div style="position:absolute;left:64px;top:440px;width:1152px;height:270px;box-sizing:border-box;background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:14px;"></div>
+<div style="position:absolute;left:88px;top:460px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Three levels of the same step</div>
+<div style="position:absolute;left:129px;top:552px;width:170px;height:56px"><svg width="170" height="56" viewBox="0 0 170 56" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><rect x="1" y="1" width="168" height="54" rx="10" fill="#DCEEFB" stroke="#1E5AA8" stroke-width="2"/></svg><div style="position:absolute;left:10.0px;top:0;width:150px;height:56px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:16px;font-weight:600;color:#0F172A">Authorize card</div></div>
+<div style="position:absolute;left:499px;top:552px;width:190px;height:56px"><svg width="190" height="56" viewBox="0 0 190 56" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><rect x="1" y="1" width="188" height="54" rx="10" fill="#DCEEFB" stroke="#1E5AA8" stroke-width="2"/></svg><svg width="18" height="18" viewBox="0 0 24 24" style="position:absolute;left:14px;top:19.0px" fill="none" stroke="#1E5AA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/></svg><div style="position:absolute;left:34.0px;top:0;width:146px;height:56px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:16px;font-weight:600;color:#0F172A">Authorize card</div></div>
+<div style="position:absolute;left:888px;top:532px;width:232px;height:96px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#FFF1DD"><div style="position:absolute;top:2px;bottom:2px;width:2px;background:#0F172A;left:10px"></div><div style="position:absolute;top:2px;bottom:2px;width:2px;background:#0F172A;left:218px"></div><div style="position:absolute;left:24px;top:14px;padding:2px 12px;border:2px solid #0F172A;border-radius:999px;background:#FFD9A3;box-shadow:0 3px 0 #0F172A;font-size:12.5px;font-weight:800;line-height:18px;white-space:nowrap">Authorize card</div><div style="position:absolute;left:24px;top:52px;width:122px;font-size:11.5px;line-height:15px;color:#334155">Check the card, hold the money</div><svg width="64" height="64" viewBox="0 0 64 64" style="position:absolute;left:154px;top:14.0px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="57" rx="22" ry="3.5" fill="rgba(15,23,42,0.13)"/>
+<g transform="rotate(8 32 32)"><rect x="9" y="10" width="46" height="32" rx="6" fill="#FFE2B0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /></g>
+<g transform="rotate(-8 32 32)">
+<rect x="6" y="16" width="52" height="34" rx="6" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M6 40h52v4a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6z" fill="#B8D6F2"/>
+<rect x="6" y="24" width="52" height="9" fill="#1D4ED8" stroke="#0F172A" stroke-width="2.5"/>
+<path d="M10 21c12-3 26-3 44 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+<rect x="12" y="37" width="11" height="8" rx="2" fill="#FFE2B0" stroke="#0F172A" stroke-width="2"/><path d="M12 41h11M17.5 37v8" stroke="#0F172A" stroke-width="1.4" fill="none"/>
+<circle cx="32" cy="41" r="1.7" fill="#0F172A"/><circle cx="38" cy="41" r="1.7" fill="#0F172A"/><circle cx="44" cy="41" r="1.7" fill="#0F172A"/><circle cx="50" cy="41" r="1.7" fill="#0F172A"/>
+<rect x="6" y="16" width="52" height="34" rx="6" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /></g></svg></div>
+<div style="position:absolute;left:130px;top:640px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>1 · Text</b></div>
+<div style="position:absolute;left:130px;top:660px;font-size:12px;line-height:16px;color:#475569;font-weight:400;width:300px;">Default. Every step, and all drafts.</div>
+<div style="position:absolute;left:510px;top:640px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>2 · Small icon</b></div>
+<div style="position:absolute;left:510px;top:660px;font-size:12px;line-height:16px;color:#475569;font-weight:400;width:300px;">The kind of work shows at a glance.</div>
+<div style="position:absolute;left:900px;top:640px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>3 · Illustrated card</b></div>
+<div style="position:absolute;left:900px;top:660px;font-size:12px;line-height:16px;color:#475569;font-weight:400;width:300px;">The steps people must notice, or charts for non-specialists.</div>
+<div style="position:absolute;left:88px;top:482px;font-size:12px;line-height:18px;color:#475569;font-weight:400;width:1000px;">Levels mix in one chart, as fidelity levels do in Screen flow. Upgrading a step changes its size, so leave room (see spacing).</div>
+<div style="position:absolute;left:64px;top:730px;width:1152px;height:360px;box-sizing:border-box;background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:14px;"></div>
+<div style="position:absolute;left:88px;top:750px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Lane colours, and which shapes become cards</div>
+<div style="position:absolute;left:88px;top:790px;width:46px;height:34px;box-sizing:border-box;border:2px solid #0F172A;border-radius:8px;background:#DCEEFB"></div>
+<div style="position:absolute;left:140px;top:799px;width:46px;height:16px;box-sizing:border-box;border:2px solid #0F172A;border-radius:999px;background:#BFDBFE"></div>
+<div style="position:absolute;left:204px;top:796px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>Customer</b></div>
+<div style="position:absolute;left:340px;top:798px;font-size:12px;line-height:18px;color:#475569;font-weight:400;white-space:nowrap;"><span style="font-family:JetBrains Mono,monospace">#DCEEFB · #BFDBFE</span></div>
+<div style="position:absolute;left:88px;top:842px;width:46px;height:34px;box-sizing:border-box;border:2px solid #0F172A;border-radius:8px;background:#E6E3FB"></div>
+<div style="position:absolute;left:140px;top:851px;width:46px;height:16px;box-sizing:border-box;border:2px solid #0F172A;border-radius:999px;background:#CFC8F7"></div>
+<div style="position:absolute;left:204px;top:848px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>App and server</b></div>
+<div style="position:absolute;left:340px;top:850px;font-size:12px;line-height:18px;color:#475569;font-weight:400;white-space:nowrap;"><span style="font-family:JetBrains Mono,monospace">#E6E3FB · #CFC8F7</span></div>
+<div style="position:absolute;left:88px;top:894px;width:46px;height:34px;box-sizing:border-box;border:2px solid #0F172A;border-radius:8px;background:#FFF1DD"></div>
+<div style="position:absolute;left:140px;top:903px;width:46px;height:16px;box-sizing:border-box;border:2px solid #0F172A;border-radius:999px;background:#FFD9A3"></div>
+<div style="position:absolute;left:204px;top:900px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>Payment</b></div>
+<div style="position:absolute;left:340px;top:902px;font-size:12px;line-height:18px;color:#475569;font-weight:400;white-space:nowrap;"><span style="font-family:JetBrains Mono,monospace">#FFF1DD · #FFD9A3</span></div>
+<div style="position:absolute;left:88px;top:946px;width:46px;height:34px;box-sizing:border-box;border:2px solid #0F172A;border-radius:8px;background:#DCF5E1"></div>
+<div style="position:absolute;left:140px;top:955px;width:46px;height:16px;box-sizing:border-box;border:2px solid #0F172A;border-radius:999px;background:#B5EBC1"></div>
+<div style="position:absolute;left:204px;top:952px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>Restaurant</b></div>
+<div style="position:absolute;left:340px;top:954px;font-size:12px;line-height:18px;color:#475569;font-weight:400;white-space:nowrap;"><span style="font-family:JetBrains Mono,monospace">#DCF5E1 · #B5EBC1</span></div>
+<div style="position:absolute;left:88px;top:998px;width:46px;height:34px;box-sizing:border-box;border:2px solid #0F172A;border-radius:8px;background:#D3F3EF"></div>
+<div style="position:absolute;left:140px;top:1007px;width:46px;height:16px;box-sizing:border-box;border:2px solid #0F172A;border-radius:999px;background:#A8E6DE"></div>
+<div style="position:absolute;left:204px;top:1004px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;white-space:nowrap;"><b>Courier</b></div>
+<div style="position:absolute;left:340px;top:1006px;font-size:12px;line-height:18px;color:#475569;font-weight:400;white-space:nowrap;"><span style="font-family:JetBrains Mono,monospace">#D3F3EF · #A8E6DE</span></div>
+<div style="position:absolute;left:88px;top:1056px;font-size:12px;line-height:18px;color:#475569;font-weight:400;width:560px;">Outside lanes, use the tone of the owner. No lanes: one tone per group of related steps.</div>
+<div style="position:absolute;left:700px;top:790px;width:52px;height:34px;box-sizing:border-box;border:2px solid #0F172A;border-radius:7px;background:#DCEEFB"><div style="position:absolute;left:5px;top:6px;width:20px;height:8px;border:1.5px solid #0F172A;border-radius:99px;background:#BFDBFE"></div></div>
+<div style="position:absolute;left:770px;top:790px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;width:420px;"><b>Process, input / output, document, preparation</b></div>
+<div style="position:absolute;left:770px;top:808px;font-size:12px;line-height:18px;color:#475569;font-weight:400;width:420px;">become a card; the icon says which</div>
+<div style="position:absolute;left:700px;top:842px;width:52px;height:34px;box-sizing:border-box;border:2px solid #0F172A;border-radius:7px;background:#FFF1DD"><div style="position:absolute;left:4px;top:1px;bottom:1px;width:1.5px;background:#0F172A"></div><div style="position:absolute;right:4px;top:1px;bottom:1px;width:1.5px;background:#0F172A"></div></div>
+<div style="position:absolute;left:770px;top:842px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;width:420px;"><b>Subprocess</b></div>
+<div style="position:absolute;left:770px;top:860px;font-size:12px;line-height:18px;color:#475569;font-weight:400;width:420px;">card with side bars</div>
+<div style="position:absolute;left:700px;top:894px;width:52px;height:34px"><svg width="52" height="34" viewBox="0 0 52 34" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><path d="M26.0 1L51 17.0L26.0 33L1 17.0Z" fill="#FFF1DD" stroke="#B45309" stroke-width="2" stroke-linejoin="round"/></svg></div>
+<div style="position:absolute;left:770px;top:894px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;width:420px;"><b>Decision</b></div>
+<div style="position:absolute;left:770px;top:912px;font-size:12px;line-height:18px;color:#475569;font-weight:400;width:420px;">stays a diamond, text only</div>
+<div style="position:absolute;left:700px;top:946px;width:52px;height:34px"><svg width="52" height="34" viewBox="0 0 52 34" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><rect x="1" y="1" width="50" height="32" rx="16.0" fill="#DCF5E1" stroke="#1E7A3C" stroke-width="2"/></svg></div>
+<div style="position:absolute;left:770px;top:946px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;width:420px;"><b>Start and end</b></div>
+<div style="position:absolute;left:770px;top:964px;font-size:12px;line-height:18px;color:#475569;font-weight:400;width:420px;">stay pills, small icon allowed</div>
+<div style="position:absolute;left:700px;top:998px;width:52px;height:34px"><svg width="34" height="34" viewBox="0 0 34 34" preserveAspectRatio="none" style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true"><circle cx="17.0" cy="17.0" r="16.0" fill="#FDE4E4" stroke="#B42318" stroke-width="2"/></svg></div>
+<div style="position:absolute;left:770px;top:998px;font-size:13px;line-height:20px;color:#0F172A;font-weight:400;width:420px;"><b>Connector</b></div>
+<div style="position:absolute;left:770px;top:1016px;font-size:12px;line-height:18px;color:#475569;font-weight:400;width:420px;">stays a circle</div>
+<div style="position:absolute;left:64px;top:1110px;width:1152px;height:330px;box-sizing:border-box;background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:14px;"></div>
+<div style="position:absolute;left:88px;top:1130px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Choosing icons</div>
+<ul style="position:absolute;left:88px;top:1156px;width:520px;margin:0;padding-left:18px;font-size:13px;line-height:20px;color:#334155"><li style="margin-bottom:6px">Match the noun, not the verb: Card for authorize card, Restaurant for pick up.</li><li style="margin-bottom:6px">One icon per card. Never two, never an icon that only decorates.</li><li style="margin-bottom:6px">The same thing gets the same icon everywhere in the chart.</li><li style="margin-bottom:6px">Take icons from the detailed set on the Icons page. If none fits, draw one in the same style: 64 grid, 2.5 px ink outline, three tones.</li><li style="margin-bottom:6px">Icons are optional. A card without an icon is allowed, but keep its text width.</li></ul>
+<div style="position:absolute;left:660px;top:1156px;font-size:12px;line-height:18px;color:#475569;font-weight:400;white-space:nowrap;"><b>Detailed set</b>, 12 of 45 shown</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:666px;top:1190px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="57" rx="22" ry="3.5" fill="rgba(15,23,42,0.13)"/>
+<g transform="rotate(8 32 32)"><rect x="9" y="10" width="46" height="32" rx="6" fill="#FFE2B0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /></g>
+<g transform="rotate(-8 32 32)">
+<rect x="6" y="16" width="52" height="34" rx="6" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M6 40h52v4a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6z" fill="#B8D6F2"/>
+<rect x="6" y="24" width="52" height="9" fill="#1D4ED8" stroke="#0F172A" stroke-width="2.5"/>
+<path d="M10 21c12-3 26-3 44 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+<rect x="12" y="37" width="11" height="8" rx="2" fill="#FFE2B0" stroke="#0F172A" stroke-width="2"/><path d="M12 41h11M17.5 37v8" stroke="#0F172A" stroke-width="1.4" fill="none"/>
+<circle cx="32" cy="41" r="1.7" fill="#0F172A"/><circle cx="38" cy="41" r="1.7" fill="#0F172A"/><circle cx="44" cy="41" r="1.7" fill="#0F172A"/><circle cx="50" cy="41" r="1.7" fill="#0F172A"/>
+<rect x="6" y="16" width="52" height="34" rx="6" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /></g></svg>
+<div style="position:absolute;left:660px;top:1256px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Card</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:756px;top:1190px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="58" rx="26" ry="3.5" fill="rgba(15,23,42,0.13)"/>
+<path d="M10 28h44v28H10z" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M44 28h10v28H44z" fill="#E2E8F0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M10 28h44v28H10z" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<rect x="13" y="35" width="11" height="11" rx="1.5" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/><path d="M15 38l5-1" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+<rect x="40" y="35" width="11" height="11" rx="1.5" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/>
+<path d="M26 56V38a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v18z" fill="#F59E3A" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="35" cy="47" r="1.4" fill="#0F172A"/>
+<path d="M6 10h52l5 15H1z" fill="#D92D20" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M19 10l-3 15M32 10v15M45 10l3 15M26 10l-1 15M39 10l1 15" stroke="none"/>
+<path d="M14 10l-4 15h8l2-15zM30 10l-2 15h8l-2-15zM46 10l2 15h8L52 10z" fill="#FFFFFF" stroke="none"/>
+<path d="M1 25a6.3 6.3 0 0 0 12.6 0 6.3 6.3 0 0 0 12.6 0 6.3 6.3 0 0 0 12.6 0 6.3 6.3 0 0 0 12.6 0 6.3 6.3 0 0 0 12.6 0" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M6 10h52l5 15H1z" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /></svg>
+<div style="position:absolute;left:750px;top:1256px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Restaurant</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:846px;top:1190px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="58" rx="22" ry="3.5" fill="rgba(15,23,42,0.13)"/>
+<path d="M18 17c-4 4 4 6 0 11M30 12c-4 4 4 6 0 11M42 17c-4 4 4 6 0 11" fill="none" stroke="#94A3B8" stroke-width="3" stroke-linecap="round"/>
+<circle cx="22" cy="30" r="4" fill="#15803D" stroke="#0F172A" stroke-width="2"/><circle cx="33" cy="29" r="4.5" fill="#D92D20" stroke="#0F172A" stroke-width="2"/><circle cx="43" cy="30.5" r="3.6" fill="#FFE2B0" stroke="#0F172A" stroke-width="2"/>
+<path d="M4 38h6M54 38h6" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="4"/>
+<path d="M9 35h46v7a17 17 0 0 1-17 17H26A17 17 0 0 1 9 42z" fill="#F59E3A" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M42 35h13v7a17 17 0 0 1-9 15l-4 2z" fill="#E07B12"/>
+<path d="M9 35h46v7a17 17 0 0 1-17 17H26A17 17 0 0 1 9 42z" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M15 41c0 5 3 9 7 11" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
+<rect x="7" y="31" width="50" height="8" rx="4" fill="#FFE2B0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /></svg>
+<div style="position:absolute;left:840px;top:1256px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Pot</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:936px;top:1190px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="58" rx="28" ry="3" fill="rgba(15,23,42,0.13)"/>
+<path d="M2 28h8M0 34h10M3 40h7" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+<rect x="12" y="14" width="24" height="22" rx="3.5" fill="#F59E3A" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M12 22h24" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/><path d="M26 14h10v8H26z" fill="#E07B12" stroke="none"/><rect x="12" y="14" width="24" height="22" rx="3.5" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="24" cy="29" r="3.4" fill="#FFFFFF" stroke="#0F172A" stroke-width="2"/>
+<path d="M18 46h22c5 0 8-3 8-7v-4h-9l-3 7H18z" fill="#7DD3CB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M48 49L43 20M38 20h10" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="3"/>
+<circle cx="15" cy="49" r="8" fill="#334155" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="15" cy="49" r="3.4" fill="#E2E8F0" stroke="#0F172A" stroke-width="2"/>
+<circle cx="49" cy="49" r="8" fill="#334155" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="49" cy="49" r="3.4" fill="#E2E8F0" stroke="#0F172A" stroke-width="2"/>
+<path d="M14 39h8" stroke="#0F172A" stroke-width="2" fill="none"/></svg>
+<div style="position:absolute;left:930px;top:1256px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Courier</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:1026px;top:1190px;overflow:visible" aria-hidden="true">
+<ellipse cx="38" cy="59" rx="20" ry="3" fill="rgba(15,23,42,0.13)"/>
+<circle cx="38" cy="34" r="20" fill="#FFE2B0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M38 14a20 20 0 0 1 0 40 20 20 0 0 0 0-40z" fill="#FFC970" opacity=".7"/><circle cx="38" cy="34" r="20" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="38" cy="34" r="13" fill="#FFF1DD" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/>
+<text x="38" y="39" text-anchor="middle" font-family="Inter, sans-serif" font-size="17" font-weight="800" fill="#B45309">$</text>
+<path d="M30 6A26 26 0 0 0 6 32" fill="none" stroke="#1D4ED8" stroke-width="5.5" stroke-linecap="round"/>
+<path d="M-1 28h14l-7 12z" fill="#1D4ED8" stroke="#0F172A" stroke-width="2.2" stroke-linejoin="round"/>
+<path d="M22 11c-4 1-7 3-10 6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".6"/></svg>
+<div style="position:absolute;left:1020px;top:1256px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Refund</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:1116px;top:1190px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="60" rx="24" ry="3" fill="rgba(15,23,42,0.13)"/>
+<path d="M9 14v36c0 6 10 10 23 10s23-4 23-10V14z" fill="#E6E3FB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M44 14h11v36c0 5-6 8-14 9.5z" fill="#CFC8F7" opacity=".85"/>
+<path d="M9 28c0 5 10 9 23 9s23-4 23-9M9 41c0 5 10 9 23 9s23-4 23-9" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2.2"/>
+<path d="M9 14v36c0 6 10 10 23 10s23-4 23-10V14" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<ellipse cx="32" cy="14" rx="23" ry="8.5" fill="#5B4BD6" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><ellipse cx="32" cy="12.5" rx="14" ry="3.5" fill="#fff" opacity=".35"/>
+<circle cx="16" cy="33" r="2" fill="#15803D" stroke="#0F172A" stroke-width="1.3"/><circle cx="16" cy="46" r="2" fill="#F59E3A" stroke="#0F172A" stroke-width="1.3"/>
+<path d="M13 22v18" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".6" transform="translate(0 -4)"/></svg>
+<div style="position:absolute;left:1110px;top:1256px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Database</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:666px;top:1300px;overflow:visible" aria-hidden="true"><ellipse cx="32" cy="60" rx="26" ry="3" fill="rgba(15,23,42,0.13)"/><rect x="7" y="5" width="50" height="15" rx="4.5" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M44 5h8.5a4.5 4.5 0 0 1 4.5 4.5v6a4.5 4.5 0 0 1-4.5 4.5H44z" fill="#B8D6F2" opacity=".8"/><rect x="7" y="5" width="50" height="15" rx="4.5" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="15" cy="12.5" r="2.3" fill="#15803D" stroke="#0F172A" stroke-width="1.5"/><circle cx="22" cy="12.5" r="2.3" fill="#F59E3A" stroke="#0F172A" stroke-width="1.5"/><path d="M31 10h18M31 15h12" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/><rect x="7" y="23" width="50" height="15" rx="4.5" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M44 23h8.5a4.5 4.5 0 0 1 4.5 4.5v6a4.5 4.5 0 0 1-4.5 4.5H44z" fill="#B8D6F2" opacity=".8"/><rect x="7" y="23" width="50" height="15" rx="4.5" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="15" cy="30.5" r="2.3" fill="#15803D" stroke="#0F172A" stroke-width="1.5"/><circle cx="22" cy="30.5" r="2.3" fill="#F59E3A" stroke="#0F172A" stroke-width="1.5"/><path d="M31 28h18M31 33h12" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/><rect x="7" y="41" width="50" height="15" rx="4.5" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M44 41h8.5a4.5 4.5 0 0 1 4.5 4.5v6a4.5 4.5 0 0 1-4.5 4.5H44z" fill="#B8D6F2" opacity=".8"/><rect x="7" y="41" width="50" height="15" rx="4.5" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="15" cy="48.5" r="2.3" fill="#15803D" stroke="#0F172A" stroke-width="1.5"/><circle cx="22" cy="48.5" r="2.3" fill="#F59E3A" stroke="#0F172A" stroke-width="1.5"/><path d="M31 46h18M31 51h12" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/><path d="M11 9c6-1 12-1 20 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/></svg>
+<div style="position:absolute;left:660px;top:1366px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Server</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:756px;top:1300px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="60" rx="14" ry="2.6" fill="rgba(15,23,42,0.13)"/>
+<rect x="17" y="3" width="30" height="55" rx="8" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M38 3h1a8 8 0 0 1 8 8v39a8 8 0 0 1-8 8h-1z" fill="#B8D6F2" opacity=".7"/><rect x="17" y="3" width="30" height="55" rx="8" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<rect x="21.5" y="10" width="21" height="38" rx="2.5" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/>
+<rect x="24" y="13" width="16" height="6" rx="1.5" fill="#1D4ED8"/><rect x="24" y="22" width="16" height="9" rx="2" fill="#FFF1DD"/><circle cx="29" cy="26.5" r="2.4" fill="#F59E3A"/><rect x="33" y="24" width="5" height="1.8" fill="#94A3B8"/><rect x="33" y="27.5" width="4" height="1.8" fill="#CBD5E1"/>
+<rect x="24" y="33" width="16" height="9" rx="2" fill="#DCF5E1"/><circle cx="29" cy="37.5" r="2.4" fill="#15803D"/><rect x="33" y="35" width="5" height="1.8" fill="#94A3B8"/><rect x="33" y="38.5" width="4" height="1.8" fill="#CBD5E1"/>
+<path d="M24 45h16" stroke="#E2E8F0" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M23 12l8-2-6 36-2 0z" fill="#fff" opacity=".35"/>
+<circle cx="32" cy="53" r="2.2" fill="#fff" stroke="#0F172A" stroke-width="2"/></svg>
+<div style="position:absolute;left:750px;top:1366px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Mobile</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:846px;top:1300px;overflow:visible" aria-hidden="true">
+<ellipse cx="34" cy="59" rx="22" ry="3" fill="rgba(15,23,42,0.13)"/>
+<path d="M2 8h9l8 34h30l8-26H15" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="3"/>
+<path d="M15 16h42l-8 26H21z" fill="#FFF1DD" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M50 16h7l-8 26h-7z" fill="#FFE2B0"/><path d="M15 16h42l-8 26H21z" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<rect x="23" y="22" width="11" height="13" rx="2" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/><path d="M26 25h5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+<circle cx="43" cy="31" r="6.5" fill="#15803D" stroke="#0F172A" stroke-width="2.2"/><path d="M43 24c0-3 2-4 4-4" stroke="#0F172A" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M40 29c1-2 2-2 3-2" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+<circle cx="25" cy="52" r="5" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="46" cy="52" r="5" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="25" cy="52" r="1.6" fill="#0F172A"/><circle cx="46" cy="52" r="1.6" fill="#0F172A"/></svg>
+<div style="position:absolute;left:840px;top:1366px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Cart</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:936px;top:1300px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="58" rx="16" ry="3.6" fill="rgba(15,23,42,0.13)"/>
+<path d="M32 3C20 3 12 12 12 23c0 15 20 34 20 34s20-19 20-34C52 12 44 3 32 3z" fill="#D92D20" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M32 3c12 0 20 9 20 20 0 15-20 34-20 34z" fill="#B42318" opacity=".55"/>
+<path d="M32 3C20 3 12 12 12 23c0 15 20 34 20 34s20-19 20-34C52 12 44 3 32 3z" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="32" cy="23" r="8.5" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M19 15c2-4 5-6 9-7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"/></svg>
+<div style="position:absolute;left:930px;top:1366px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Region</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:1026px;top:1300px;overflow:visible" aria-hidden="true">
+<ellipse cx="30" cy="59" rx="15" ry="2.6" fill="rgba(15,23,42,0.13)"/>
+<path d="M30 6c-11 0-16 8-16 18v12l-6 8h44l-6-8V24c0-10-5-18-16-18z" fill="#F59E3A" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M36 7c8 3 10 10 10 17v12l6 8H38l-2-1z" fill="#E07B12" opacity=".8"/>
+<path d="M30 6c-11 0-16 8-16 18v12l-6 8h44l-6-8V24c0-10-5-18-16-18z" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M19 22c1-6 5-10 10-11" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".75"/>
+<circle cx="30" cy="5" r="3.5" fill="#FFE2B0" stroke="#0F172A" stroke-width="2"/>
+<path d="M22 48a8 8 0 0 0 16 0z" fill="#FFE2B0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="48" cy="14" r="8.5" fill="#D92D20" stroke="#0F172A" stroke-width="2.5"/><text x="48" y="18" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#fff">1</text></svg>
+<div style="position:absolute;left:1020px;top:1366px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Bell</div>
+<svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:1116px;top:1300px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="59" rx="24" ry="3.2" fill="rgba(15,23,42,0.13)"/>
+<path d="M32 6l25 11-25 11L7 17z" fill="#FFE2B0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M7 17l25 11v31L7 48z" fill="#FFC970" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M57 17L32 28v31l25-11z" fill="#F59E3A" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M19.5 11.5l25 11v9l-6 2.7V25z" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/>
+<path d="M44 38l9-4v8l-9 4z" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/><path d="M46 40l5-2M46 43l4-2" stroke="#0F172A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+<path d="M11 21l7 3" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".8"/></svg>
+<div style="position:absolute;left:1110px;top:1366px;font-size:11px;line-height:17px;color:#334155;font-weight:400;width:72px;text-align:center;">Package</div>
+<div style="position:absolute;left:64px;top:1460px;width:1152px;height:210px;box-sizing:border-box;background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:14px;"></div>
+<div style="position:absolute;left:88px;top:1480px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Spacing</div>
+<ul style="position:absolute;left:88px;top:1506px;width:1000px;margin:0;padding-left:18px;font-size:13px;line-height:20px;color:#334155"><li style="margin-bottom:6px">Card 232 × 96 with a 64 px icon. Plain node 160 × 56. Screen card 150 × 92 with a Mobile icon.</li><li style="margin-bottom:6px">Gap between cards in a row: 90 px or more, 130 px when a trigger chip sits on the arrow.</li><li style="margin-bottom:6px">Lane height: 240 px with cards, 210 px with plain nodes. A lane holding both uses 240.</li><li style="margin-bottom:6px">Vertical gap between rows of cards: 56 px or more.</li><li style="margin-bottom:6px">Fork and join bars span the lanes they split and sit 90 px from the cards they feed.</li></ul>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1700}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en"><head>
+<!-- Standalone copy of the design-canvas board "Components_Process". Generated from source/canvas/Components_Process.dc.html; opens in any browser. -->
+<meta charset="utf-8">
+<title>Flow Components: Process and behavior</title>
+
+</head>
+<body>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h1,h2,h3,p{margin:0}
+.cd{background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pv{background:#F8FAFC;border-radius:10px;min-height:96px;display:flex;align-items:center;justify-content:center;gap:12px;padding:10px;box-sizing:border-box;flex-wrap:wrap}
+.nm{font-size:14px;font-weight:700}
+.cp{font-size:12px;line-height:1.5;color:#475569}
+.sec{display:flex;flex-direction:column;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.gh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.gh h2{font-size:22px;font-weight:800;letter-spacing:-0.01em}
+.gh span{font-size:13px;color:#475569}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow{animation:none}}
+</style>
+
+<div style="max-width: 1200px; margin: 0 auto; box-sizing: border-box; padding: 56px 32px 80px; display: flex; flex-direction: column; gap: 48px">
+
+<header style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="background: #1D4ED8; color: #FFFFFF; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 999px">Flow</span>
+<span style="font-size: 13px; font-weight: 600; color: #475569">Components · Process and behavior</span>
+</div>
+<h1 style="font-size: 40px; line-height: 1.1; font-weight: 800; letter-spacing: -0.02em">Process and behavior</h1>
+<p style="font-size: 16px; line-height: 1.55; color: #334155; max-width: 800px">Nodes and notation for flowcharts, business processes and behavior models: flowchart shapes, BPMN, state machines, use cases and data flow.</p>
+</header>
+
+<section class="sec">
+<div class="gh"><h2>Flowchart nodes</h2><span>Standard process shapes, one color role each</span></div>
+<div class="grid4">
+
+<div class="cd">
+<div class="pv">
+<svg width="132" height="70" viewBox="0 0 120 64" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M32 6h56a26 26 0 0 1 0 52H32a26 26 0 0 1 0-52z" fill="#DCF5E1" stroke="#1E7A3C" stroke-width="2"></path><path d="M0 0" fill="none" stroke="#1E7A3C" stroke-width="2"></path><text x="60" y="37" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Start / End</text></svg>
+</div>
+<span class="nm">Terminator</span>
+<span class="cp">Entry and exit of a flow. Green.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="132" height="70" viewBox="0 0 120 64" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M14 8h92a6 6 0 0 1 6 6v36a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6z" fill="#DCEEFB" stroke="#1E5AA8" stroke-width="2"></path><path d="M0 0" fill="none" stroke="#1E5AA8" stroke-width="2"></path><text x="60" y="37" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Process</text></svg>
+</div>
+<span class="nm">Process</span>
+<span class="cp">A single action or step. Blue.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="132" height="70" viewBox="0 0 120 64" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M60 4L112 32 60 60 8 32z" fill="#FFF1DD" stroke="#B45309" stroke-width="2"></path><path d="M0 0" fill="none" stroke="#B45309" stroke-width="2"></path><text x="60" y="37" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Yes / No?</text></svg>
+</div>
+<span class="nm">Decision</span>
+<span class="cp">Branch point, two or more exits. Amber.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="132" height="70" viewBox="0 0 120 64" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M26 8H114L94 56H6z" fill="#E6E3FB" stroke="#4F46A5" stroke-width="2"></path><path d="M0 0" fill="none" stroke="#4F46A5" stroke-width="2"></path><text x="60" y="37" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Read file</text></svg>
+</div>
+<span class="nm">Input / Output</span>
+<span class="cp">Data entering or leaving the flow. Violet.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="132" height="70" viewBox="0 0 120 64" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M8 8h104v40c-17-9-35 9-52 0S25 57 8 48z" fill="#FFFFFF" stroke="#334155" stroke-width="2"></path><path d="M0 0" fill="none" stroke="#334155" stroke-width="2"></path><text x="60" y="37" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Report</text></svg>
+</div>
+<span class="nm">Document</span>
+<span class="cp">A document or generated output.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="132" height="70" viewBox="0 0 120 64" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M14 8h92a6 6 0 0 1 6 6v36a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6z" fill="#DCEEFB" stroke="#1E5AA8" stroke-width="2"></path><path d="M20 8v48M100 8v48" fill="none" stroke="#1E5AA8" stroke-width="2"></path><text x="60" y="37" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Subprocess</text></svg>
+</div>
+<span class="nm">Subprocess</span>
+<span class="cp">Collapsed flow defined elsewhere.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="132" height="70" viewBox="0 0 120 64" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M28 8h64l20 24-20 24H28L8 32z" fill="#D3F3EF" stroke="#0F766E" stroke-width="2"></path><path d="M0 0" fill="none" stroke="#0F766E" stroke-width="2"></path><text x="60" y="37" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Set up</text></svg>
+</div>
+<span class="nm">Preparation</span>
+<span class="cp">Initialisation or setup step. Teal.</span>
+</div>
+
+<div class="cd">
+<div class="pv">
+<svg width="132" height="70" viewBox="0 0 120 64" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round"><path d="M34 32a26 26 0 1 0 52 0a26 26 0 1 0 -52 0z" fill="#FDE4E4" stroke="#B42318" stroke-width="2"></path><path d="M0 0" fill="none" stroke="#B42318" stroke-width="2"></path><text x="60" y="37" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#0F172A">A</text></svg>
+</div>
+<span class="nm">Connector</span>
+<span class="cp">Jump point to continue on another page.</span>
+</div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>BPMN and activity</h2><span>Events, gateways, tasks and pools for business process diagrams</span></div>
+<div class="grid4">
+
+<div class="cd"><div class="pv" style="min-height: 120px"><div style="width: 220px; border: 2px solid #0F172A; display: flex; background: #FFFFFF"><div style="width: 26px; background: #DCEEFB; border-right: 2px solid #0F172A; display: flex; align-items: center; justify-content: center"><span style="writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; font-weight: 800">Shop</span></div><div style="flex: 1"><div style="height: 40px; border-bottom: 1.5px solid #0F172A; display: flex"><span style="width: 22px; background: #F1F5F9; border-right: 1.5px solid #0F172A; display: flex; align-items: center; justify-content: center"><span style="writing-mode: vertical-rl; transform: rotate(180deg); font-size: 9px; font-weight: 700">Sales</span></span></div><div style="height: 40px; display: flex"><span style="width: 22px; background: #F1F5F9; border-right: 1.5px solid #0F172A; display: flex; align-items: center; justify-content: center"><span style="writing-mode: vertical-rl; transform: rotate(180deg); font-size: 9px; font-weight: 700">Ops</span></span></div></div></div></div><span class="nm">Pool and lanes</span><span class="cp">Pool is the participant, lanes are roles inside it.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="16" fill="#DCF5E1" stroke="#15803D" stroke-width="2"></circle></svg></div><span class="nm">Start event</span><span class="cp">Thin green circle.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="16" fill="#FFF1DD" stroke="#B45309" stroke-width="2"></circle><circle cx="30" cy="30" r="12" fill="none" stroke="#B45309" stroke-width="2"></circle></svg></div><span class="nm">Intermediate event</span><span class="cp">Double amber circle: timer, message, signal.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="16" fill="#FDE4E4" stroke="#D92D20" stroke-width="5"></circle></svg></div><span class="nm">End event</span><span class="cp">Thick rose circle.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="64" height="64" viewBox="0 0 60 60" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round"><path d="M30 4l26 26-26 26L4 30z" fill="#FFF1DD" stroke="#B45309" stroke-width="2"></path><path d="M22 22l16 16M38 22L22 38" fill="none" stroke="#B45309" stroke-width="3"></path></svg></div><span class="nm">Exclusive gateway</span><span class="cp">Diamond with X. One path is taken.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="64" height="64" viewBox="0 0 60 60" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round"><path d="M30 4l26 26-26 26L4 30z" fill="#FFF1DD" stroke="#B45309" stroke-width="2"></path><path d="M30 18v24M18 30h24" fill="none" stroke="#B45309" stroke-width="3"></path></svg></div><span class="nm">Parallel gateway</span><span class="cp">Diamond with plus. All paths run.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><div style="position: relative; width: 110px; height: 62px; background: #DCEEFB; border: 2px solid #1E5AA8; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700"><svg style="position: absolute; left: 6px; top: 5px" width="16" height="16" viewBox="0 0 48 48" aria-hidden="true" stroke="#0F172A" stroke-width="3" stroke-linejoin="round"><circle cx="24" cy="15" r="8" fill="#FFF1DD"></circle><path d="M7 43c0-9 7-15 17-15s17 6 17 15z" fill="#1D4ED8"></path></svg>Review order</div></div><span class="nm">User task</span><span class="cp">Rounded box with a person glyph.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><div style="position: relative; width: 110px; height: 62px; background: #E6E3FB; border: 2px solid #4F46A5; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700"><svg style="position: absolute; left: 6px; top: 5px" width="16" height="16" viewBox="0 0 48 48" aria-hidden="true" stroke="#0F172A" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M24 4v7M24 37v7M4 24h7M37 24h7M10 10l5 5M33 33l5 5M38 10l-5 5M15 33l-5 5" fill="none"></path><circle cx="24" cy="24" r="12" fill="#FFF1DD"></circle></svg>Charge card</div></div><span class="nm">Service task</span><span class="cp">Violet box with a gear glyph. Automated.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="64" height="64" viewBox="0 0 60 60" aria-hidden="true" stroke-linejoin="round"><path d="M14 4h24l10 10v42H14z" fill="#FFFFFF" stroke="#0F172A" stroke-width="2"></path><path d="M38 4v10h10" fill="#DCF5E1" stroke="#0F172A" stroke-width="2"></path></svg></div><span class="nm">Data object</span><span class="cp">Folded page for a document or record.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 120px"><svg width="150" height="40" viewBox="0 0 150 40" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="20" r="4" fill="#FFFFFF"></circle><path d="M12 20H140" fill="none" stroke-dasharray="6 4"></path><path d="M130 13l10 7-10 7z" fill="#FFFFFF"></path></svg></div><span class="nm">Message flow</span><span class="cp">Dashed line across pools, hollow head.</span></div>
+
+</div>
+</section>
+
+<section class="sec">
+<div class="gh"><h2>State machine, use case and data flow</h2><span>Notation for lifecycle, requirement and data-movement diagrams</span></div>
+<div class="grid4">
+
+<div class="cd"><div class="pv" style="min-height: 100px; gap: 20px"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10" fill="#0F172A"></circle></svg><svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="13" fill="#FFFFFF" stroke="#0F172A" stroke-width="2"></circle><circle cx="17" cy="17" r="7" fill="#0F172A"></circle></svg></div><span class="nm">Initial and final state</span><span class="cp">Filled dot starts, bullseye ends.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 100px"><div style="width: 140px; background: #FFFFFF; border: 2px solid #4F46A5; border-radius: 12px; overflow: hidden"><div style="background: #E6E3FB; text-align: center; font-size: 12px; font-weight: 700; padding: 6px; border-bottom: 1.5px solid #4F46A5">Paid</div><div style="padding: 6px 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px; line-height: 1.5; color: #334155">entry / notify()<br>exit / log()</div></div></div><span class="nm">State</span><span class="cp">Name on top, entry and exit actions below.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 100px; gap: 22px"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l17 17-17 17L3 20z" fill="#FFFFFF" stroke="#0F172A" stroke-width="2"></path></svg><svg width="90" height="16" viewBox="0 0 90 16" aria-hidden="true"><rect x="2" y="3" width="86" height="10" rx="2" fill="#0F172A"></rect></svg></div><span class="nm">Choice and fork / join</span><span class="cp">Diamond decides, thick bar splits or merges.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 100px"><svg width="200" height="50" viewBox="0 0 200 50" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 34H186" fill="none"></path><path d="M176 27l10 7-10 7z" fill="#0F172A"></path><text x="100" y="22" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10" fill="#0F172A" stroke="none">pay [ok] / charge()</text></svg></div><span class="nm">Transition</span><span class="cp">event [guard] / action, in mono above the line.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 110px"><svg width="150" height="76" viewBox="0 0 150 76" aria-hidden="true"><ellipse cx="75" cy="38" rx="68" ry="28" fill="#DCEEFB" stroke="#1E5AA8" stroke-width="2"></ellipse><text x="75" y="42" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#0F172A">Place order</text></svg></div><span class="nm">Use case</span><span class="cp">Oval with the goal as a verb phrase. Actor is reused from Sequence.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 110px"><div style="position: relative; border: 2px solid #0F172A; border-radius: 6px; padding: 26px 18px 14px; display: flex; gap: 8px"><span style="position: absolute; left: 10px; top: 5px; font-size: 11px; font-weight: 800">Shop</span><span style="background: #DCEEFB; border: 1.5px solid #1E5AA8; border-radius: 999px; padding: 8px 14px; font-size: 11px; font-weight: 600">Browse</span><span style="background: #DCEEFB; border: 1.5px solid #1E5AA8; border-radius: 999px; padding: 8px 14px; font-size: 11px; font-weight: 600">Pay</span></div></div><span class="nm">System boundary</span><span class="cp">Rectangle that holds use cases; actors stay outside.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 110px"><svg width="200" height="56" viewBox="0 0 200 56" aria-hidden="true" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 36H186" fill="none" stroke-dasharray="6 4"></path><path d="M176 29l10 7-10 7" fill="none"></path><text x="100" y="26" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10" fill="#0F172A" stroke="none">«include»</text></svg></div><span class="nm">Include and extend</span><span class="cp">Dashed open arrow with the keyword in guillemets.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 110px"><svg width="130" height="86" viewBox="0 0 130 86" aria-hidden="true"><rect x="6" y="6" width="118" height="74" rx="12" fill="#DCEEFB" stroke="#0F172A" stroke-width="2"></rect><path d="M6 30h118" stroke="#0F172A" stroke-width="2"></path><path d="M18 6h94a12 12 0 0 1 12 12v12H6V18A12 12 0 0 1 18 6z" fill="#BFDBFE" stroke="#0F172A" stroke-width="2"></path><text x="16" y="24" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#0F172A">1.0</text><text x="65" y="60" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#0F172A">Validate</text></svg></div><span class="nm">DFD process</span><span class="cp">Rounded box with its number in a header strip.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 110px"><svg width="130" height="50" viewBox="0 0 130 50" aria-hidden="true" stroke-linecap="round"><path d="M124 6H6v38h118" fill="#FFF1DD" stroke="#0F172A" stroke-width="2" stroke-linejoin="round"></path><path d="M22 6v38" stroke="#0F172A" stroke-width="2"></path><text x="14" y="30" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="10" fill="#0F172A">D1</text><text x="72" y="30" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#0F172A">Orders</text></svg></div><span class="nm">DFD data store</span><span class="cp">Open-ended box with an ID cell.</span></div>
+
+<div class="cd"><div class="pv" style="min-height: 110px"><svg width="130" height="64" viewBox="0 0 130 64" aria-hidden="true"><rect x="6" y="8" width="118" height="48" rx="3" fill="#DCEEFB" stroke="#0F172A" stroke-width="2"></rect><text x="18" y="26" font-family="'JetBrains Mono', monospace" font-size="10" fill="#475569">E1</text><text x="18" y="44" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#0F172A">Customer</text></svg></div><span class="nm">DFD external entity</span><span class="cp">Square corners, numbered E1: a source or sink outside the system.</span></div>
+
+</div>
+</section>
+
+</div>
+
+
+
+
+</body></html>

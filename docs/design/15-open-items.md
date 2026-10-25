@@ -51,5 +51,5 @@ The review before this document was written covered the whole canvas (104 boards
 ## 5. About this document
 
 - The pictures are **screenshots of the design canvas**, taken when this document was written. Animated lines are therefore still; the text says which lines move.
-- The canvas and the scripts that drew it live **outside this repository**. This document and its images are the record inside it.
+- The **HTML of every board and the Python scripts that drew them** are in [`source/`](source/README.md), so a board can be opened, read and rebuilt. The live design canvas and its runtime (`support.js`) stay **outside** this repository; the files in `source/` are a snapshot.
 - Every statement about what an example shows was checked against the picture or the board text when written. If a board is changed later, the matching page here must be updated; the board index ([16](16-board-index.md)) lists every board and the page that describes it.

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Standalone copy of the design-canvas board "ScreenFlow_Cond_Coded". Generated from source/canvas/ScreenFlow_Cond_Coded.dc.html; opens in any browser. -->
+<meta charset="utf-8">
+<title>Screen flow: conditions as codes</title>
+
+</head>
+<body>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+</style>
+
+<div style="position: relative; width: 1300px; height: 1100px; background: #F8FAFC">
+
+<svg width="109" height="8" viewBox="0 0 109 8" preserveAspectRatio="none" style="position: absolute; left: 184px; top: 284px; width: 109px; height: 8px; overflow: visible; fill: none; stroke: #475569; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-1" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#475569" stroke="none" style="stroke: none; fill: #475569; fill: context-stroke"/></marker></defs><path d="M 0 4 L 105 4" marker-end="url(#dc-arrow-head-filled-1)"></path></svg>
+<svg width="149" height="8" viewBox="0 0 149 8" preserveAspectRatio="none" style="position: absolute; left: 434px; top: 284px; width: 149px; height: 8px; overflow: visible; fill: none; stroke: #15803D; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-2" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#15803D" stroke="none" style="stroke: none; fill: #15803D; fill: context-stroke"/></marker></defs><path d="M 0 4 L 145 4" marker-end="url(#dc-arrow-head-filled-2)"></path></svg>
+<svg width="8" height="119" viewBox="0 0 8 119" preserveAspectRatio="none" style="position: absolute; left: 360px; top: 338px; width: 8px; height: 119px; overflow: visible; fill: none; stroke: #B42318; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-3" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#B42318" stroke="none" style="stroke: none; fill: #B42318; fill: context-stroke"/></marker></defs><path d="M 4 0 L 4 115" marker-end="url(#dc-arrow-head-filled-3)"></path></svg>
+<svg width="220" height="8" viewBox="0 0 220 8" preserveAspectRatio="none" style="position: absolute; left: 424px; top: 574px; width: 220px; height: 8px; overflow: visible; fill: none; stroke: #0F172A; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M 0 4 L 220 4"></path></svg>
+<svg width="8" height="169" viewBox="0 0 8 169" preserveAspectRatio="none" style="position: absolute; left: 640px; top: 409px; width: 8px; height: 169px; overflow: visible; fill: none; stroke: #0F172A; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-5" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#0F172A" stroke="none" style="stroke: none; fill: #0F172A; fill: context-stroke"/></marker></defs><path d="M 4 169 L 4 4" marker-end="url(#dc-arrow-head-filled-5)"></path></svg>
+<svg width="109" height="8" viewBox="0 0 109 8" preserveAspectRatio="none" style="position: absolute; left: 704px; top: 284px; width: 109px; height: 8px; overflow: visible; fill: none; stroke: #0F172A; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-6" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#0F172A" stroke="none" style="stroke: none; fill: #0F172A; fill: context-stroke"/></marker></defs><path d="M 0 4 L 105 4" marker-end="url(#dc-arrow-head-filled-6)"></path></svg>
+<svg width="149" height="8" viewBox="0 0 149 8" preserveAspectRatio="none" style="position: absolute; left: 954px; top: 284px; width: 149px; height: 8px; overflow: visible; fill: none; stroke: #15803D; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-7" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#15803D" stroke="none" style="stroke: none; fill: #15803D; fill: context-stroke"/></marker></defs><path d="M 0 4 L 145 4" marker-end="url(#dc-arrow-head-filled-7)"></path></svg>
+<svg width="8" height="119" viewBox="0 0 8 119" preserveAspectRatio="none" style="position: absolute; left: 880px; top: 338px; width: 8px; height: 119px; overflow: visible; fill: none; stroke: #B42318; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><defs><marker id="dc-arrow-head-filled-8" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#B42318" stroke="none" style="stroke: none; fill: #B42318; fill: context-stroke"/></marker></defs><path d="M 4 0 L 4 115" marker-end="url(#dc-arrow-head-filled-8)"></path></svg>
+
+<div style="position: absolute; left: 64px; top: 64px; font-size: 24px; font-weight: 600">Screen flow &middot; Conditions as codes and a table</div>
+
+<div style="position: absolute; left: 64px; top: 142px; width: 40px; height: 22px; border-radius: 999px; background: #0F172A; color: #7DD3CB; font-size: 11px; font-weight: 700; line-height: 22px; text-align: center">S00</div>
+<div style="position: absolute; left: 584px; top: 142px; width: 40px; height: 22px; border-radius: 999px; background: #0F172A; color: #7DD3CB; font-size: 11px; font-weight: 700; line-height: 22px; text-align: center">S02</div>
+<div style="position: absolute; left: 1104px; top: 142px; width: 40px; height: 22px; border-radius: 999px; background: #0F172A; color: #7DD3CB; font-size: 11px; font-weight: 700; line-height: 22px; text-align: center">S03</div>
+<div style="position: absolute; left: 304px; top: 432px; width: 40px; height: 22px; border-radius: 999px; background: #0F172A; color: #7DD3CB; font-size: 11px; font-weight: 700; line-height: 22px; text-align: center">S01</div>
+<div style="position: absolute; left: 824px; top: 432px; width: 40px; height: 22px; border-radius: 999px; background: #0F172A; color: #7DD3CB; font-size: 11px; font-weight: 700; line-height: 22px; text-align: center">S04</div>
+
+<div style="position: absolute; left: 294px; top: 238px; width: 140px; height: 100px; background: #FFE2B0; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; font-weight: 800; line-height: 15px">Logged<br>in?</div>
+<div style="position: absolute; left: 814px; top: 238px; width: 140px; height: 100px; background: #FFE2B0; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; font-weight: 800; line-height: 15px">Camera<br>allowed?</div>
+
+
+<div style="position: absolute; left: 64px; top: 168px; width: 120px; height: 240px; box-sizing: border-box; border: 3px solid #0F172A; border-radius: 16px; background: #FFFFFF; overflow: hidden">
+<span style="position: absolute; left: 46px; top: 6px; width: 22px; height: 4px; border-radius: 999px; background: #0F172A"></span>
+<span style="position: absolute; left: 37px; top: 78px; width: 40px; height: 40px; border-radius: 12px; background: #1D4ED8"></span>
+<span style="position: absolute; left: 0; top: 128px; width: 114px; text-align: center; font-size: 13px; font-weight: 800">Shop</span>
+<span style="position: absolute; left: 37px; top: 204px; width: 40px; height: 4px; border-radius: 999px; background: #CBD5E1"></span>
+</div>
+
+<div style="position: absolute; left: 584px; top: 168px; width: 120px; height: 240px; box-sizing: border-box; border: 3px solid #0F172A; border-radius: 16px; background: #FFFFFF; overflow: hidden">
+<span style="position: absolute; left: 46px; top: 6px; width: 22px; height: 4px; border-radius: 999px; background: #0F172A"></span>
+<span style="position: absolute; left: 12px; top: 20px; font-size: 13px; font-weight: 800">Shop</span>
+<span style="position: absolute; left: 10px; top: 42px; width: 94px; height: 20px; box-sizing: border-box; border: 1.5px solid #94A3B8; border-radius: 999px; font-size: 10px; line-height: 17px; padding-left: 8px; color: #475569">Search</span>
+<span style="position: absolute; left: 10px; top: 72px; width: 44px; height: 70px; box-sizing: border-box; border: 1.5px solid #94A3B8; border-radius: 8px; overflow: hidden"><span style="display: block; height: 38px; background: #E2E8F0"></span><span style="display: block; margin: 6px 6px 0; height: 6px; background: #0F172A; border-radius: 3px"></span></span>
+<span style="position: absolute; left: 60px; top: 72px; width: 44px; height: 70px; box-sizing: border-box; border: 1.5px solid #94A3B8; border-radius: 8px; overflow: hidden"><span style="display: block; height: 38px; background: #E2E8F0"></span><span style="display: block; margin: 6px 6px 0; height: 6px; background: #0F172A; border-radius: 3px"></span></span>
+<span style="position: absolute; left: 10px; top: 152px; width: 94px; height: 28px; border-radius: 8px; background: #1D4ED8; color: #FFFFFF; font-size: 11px; font-weight: 700; line-height: 28px; text-align: center">Scan</span>
+<span style="position: absolute; left: 8px; top: 198px; width: 98px; height: 28px; box-sizing: border-box; border: 1.5px solid #94A3B8; border-radius: 10px; display: flex; align-items: center; justify-content: space-around; padding: 0 8px"><span style="width: 12px; height: 12px; border-radius: 4px; background: #1D4ED8"></span><span style="width: 12px; height: 12px; border-radius: 4px; background: #CBD5E1"></span><span style="width: 12px; height: 12px; border-radius: 4px; background: #CBD5E1"></span><span style="width: 12px; height: 12px; border-radius: 4px; background: #CBD5E1"></span></span>
+<span style="position: absolute; left: 51px; top: 160px; width: 12px; height: 12px; box-sizing: border-box; border-radius: 999px; background: #D92D20; border: 2px solid #FFFFFF; box-shadow: 0 0 0 7px rgba(217,45,32,0.25)"></span>
+</div>
+
+<div style="position: absolute; left: 1104px; top: 168px; width: 120px; height: 240px; box-sizing: border-box; border: 3px solid #0F172A; border-radius: 16px; background: #FFFFFF; overflow: hidden">
+<span style="position: absolute; left: 46px; top: 6px; width: 22px; height: 4px; border-radius: 999px; background: #0F172A"></span>
+<span style="position: absolute; left: 10px; top: 34px; width: 94px; height: 130px; border-radius: 10px; background: #0F172A"></span>
+<span style="position: absolute; left: 29px; top: 62px; width: 56px; height: 56px; box-sizing: border-box; border: 2px solid #FFFFFF; border-radius: 8px"></span>
+<span style="position: absolute; left: 0; top: 176px; width: 114px; text-align: center; font-size: 11px; font-weight: 700">Scan code</span>
+</div>
+
+<div style="position: absolute; left: 304px; top: 458px; width: 120px; height: 240px; box-sizing: border-box; border: 3px solid #0F172A; border-radius: 16px; background: #FFFFFF; overflow: hidden">
+<span style="position: absolute; left: 46px; top: 6px; width: 22px; height: 4px; border-radius: 999px; background: #0F172A"></span>
+<span style="position: absolute; left: 37px; top: 26px; width: 40px; height: 40px; border-radius: 12px; background: #1D4ED8"></span>
+<span style="position: absolute; left: 10px; top: 86px; width: 94px; height: 26px; box-sizing: border-box; border: 2px solid #94A3B8; border-radius: 8px; font-size: 10px; line-height: 22px; padding-left: 8px; color: #475569">Email</span>
+<span style="position: absolute; left: 10px; top: 118px; width: 94px; height: 26px; box-sizing: border-box; border: 2px solid #94A3B8; border-radius: 8px; font-size: 10px; line-height: 22px; padding-left: 8px; color: #475569">Password</span>
+<span style="position: absolute; left: 10px; top: 158px; width: 94px; height: 30px; border-radius: 8px; background: #1D4ED8; color: #FFFFFF; font-size: 11px; font-weight: 700; line-height: 30px; text-align: center">Login</span>
+<span style="position: absolute; left: 51px; top: 167px; width: 12px; height: 12px; box-sizing: border-box; border-radius: 999px; background: #D92D20; border: 2px solid #FFFFFF; box-shadow: 0 0 0 7px rgba(217,45,32,0.25)"></span>
+</div>
+
+<div style="position: absolute; left: 824px; top: 458px; width: 120px; height: 240px; box-sizing: border-box; border: 3px solid #0F172A; border-radius: 16px; background: #FFFFFF; overflow: hidden">
+<span style="position: absolute; left: 46px; top: 6px; width: 22px; height: 4px; border-radius: 999px; background: #0F172A"></span>
+<svg style="position: absolute; left: 29px; top: 62px" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26" fill="#FDE4E4" stroke="#B42318" stroke-width="2"/><path d="M28 14v18" stroke="#B42318" stroke-width="4" stroke-linecap="round"/><circle cx="28" cy="40" r="2.500" fill="#B42318"/></svg>
+<span style="position: absolute; left: 0; top: 134px; width: 114px; text-align: center; font-size: 12px; font-weight: 800">Camera blocked</span>
+<span style="position: absolute; left: 22px; top: 156px; width: 70px; height: 6px; border-radius: 3px; background: #CBD5E1"></span>
+<span style="position: absolute; left: 10px; top: 190px; width: 94px; height: 28px; box-sizing: border-box; border: 2px solid #1D4ED8; border-radius: 8px; color: #1D4ED8; font-size: 11px; font-weight: 700; line-height: 24px; text-align: center">Open settings</span>
+</div>
+<div style="position: absolute; left: 224px; top: 256px; width: 30px; height: 22px; box-sizing: border-box; border-radius: 6px; background: #FFFFFF; border: 1.5px solid #0F172A; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; line-height: 19px; text-align: center">C1</div>
+<div style="position: absolute; left: 493px; top: 256px; width: 30px; height: 22px; box-sizing: border-box; border-radius: 6px; background: #FFFFFF; border: 1.5px solid #0F172A; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; line-height: 19px; text-align: center">C2</div>
+<div style="position: absolute; left: 376px; top: 379px; width: 30px; height: 22px; box-sizing: border-box; border-radius: 6px; background: #FFFFFF; border: 1.5px solid #0F172A; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; line-height: 19px; text-align: center">C3</div>
+<div style="position: absolute; left: 519px; top: 546px; width: 30px; height: 22px; box-sizing: border-box; border-radius: 6px; background: #FFFFFF; border: 1.5px solid #0F172A; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; line-height: 19px; text-align: center">C4</div>
+<div style="position: absolute; left: 744px; top: 256px; width: 30px; height: 22px; box-sizing: border-box; border-radius: 6px; background: #FFFFFF; border: 1.5px solid #0F172A; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; line-height: 19px; text-align: center">C5</div>
+<div style="position: absolute; left: 1014px; top: 256px; width: 30px; height: 22px; box-sizing: border-box; border-radius: 6px; background: #FFFFFF; border: 1.5px solid #0F172A; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; line-height: 19px; text-align: center">C6</div>
+<div style="position: absolute; left: 896px; top: 379px; width: 30px; height: 22px; box-sizing: border-box; border-radius: 6px; background: #FFFFFF; border: 1.5px solid #0F172A; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; line-height: 19px; text-align: center">C7</div>
+<div style="position: absolute; left: 64px; top: 740px; width: 1172px; box-sizing: border-box; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 12px; overflow: hidden; display: grid; grid-template-columns: 64px 220px 130px 1fr 1fr">
+<span style="padding: 10px 12px; background: #F1F5F9; font-size: 12px; font-weight: 700">Code</span>
+<span style="padding: 10px 12px; background: #F1F5F9; font-size: 12px; font-weight: 700">Transition</span>
+<span style="padding: 10px 12px; background: #F1F5F9; font-size: 12px; font-weight: 700">Trigger</span>
+<span style="padding: 10px 12px; background: #F1F5F9; font-size: 12px; font-weight: 700">Condition (guard)</span>
+<span style="padding: 10px 12px; background: #F1F5F9; font-size: 12px; font-weight: 700">Effect</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-weight: 700">C1</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">S00 &rarr; Logged in?</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">auto, 2 s</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #475569; ">splash timer elapsed</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; color: #334155">check session</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-weight: 700">C2</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">Logged in? &rarr; S02</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">system</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #15803D; ">token exists and is not expired</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; color: #334155">load profile</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-weight: 700">C3</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">Logged in? &rarr; S01</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">system</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #B42318; ">no token, or token expired</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; color: #334155">clear token</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-weight: 700">C4</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">S01 &rarr; S02</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">tap Login</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #15803D; ">email and password valid</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; color: #334155">save token</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-weight: 700">C5</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">S02 &rarr; Camera allowed?</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">tap Scan</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #475569; ">none</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; color: #334155">request camera permission</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-weight: 700">C6</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">Camera allowed? &rarr; S03</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">OS prompt</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #15803D; ">permission granted</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; color: #334155">open camera</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-weight: 700">C7</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">Camera allowed? &rarr; S04</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px">OS prompt</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #B42318; ">permission denied</span>
+<span style="padding: 10px 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; line-height: 18px; color: #334155">show settings link</span>
+</div>
+<div style="position: absolute; left: 64px; top: 1020px; width: 900px; font-size: 13px; line-height: 20px; color: #475569">Arrows carry only a code. Everything else lives in the table, so labels never crowd the diagram. Use this form when conditions are long, shared by several arrows, or reviewed by someone who does not read the diagram.</div>
+</div>
+
+
+</body>
+</html>

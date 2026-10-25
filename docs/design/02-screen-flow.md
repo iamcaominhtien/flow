@@ -16,7 +16,7 @@ A screen flow is the first diagram type that was designed, and it set several ha
 
 ![Anatomy of a screen flow: id, device frame, hotspot, transition chip, guard and back arrow](images/ScreenFlow_Anatomy.png)
 
-*Anatomy of a screen flow: id, device frame, hotspot, transition chip, guard and back arrow. [Full size](images/ScreenFlow_Anatomy.png)*
+*Anatomy of a screen flow: id, device frame, hotspot, transition chip, guard and back arrow. [Full size](images/ScreenFlow_Anatomy.png) · [HTML source](source/html/ScreenFlow_Anatomy.html)*
 
 1. **Screen id.** `S` and a number (S01). A letter marks a variant of the same screen: `S01b` is its error state.
 2. **Device frame.** The screen is drawn inside the frame of the device it exists on: phone, tablet, desktop, watch, portrait or landscape. The frame *is* the platform statement, so there are no "SP" or "PC" badges.
@@ -37,7 +37,7 @@ An arrow is written `trigger [guard] / effect`, for example `tap Login [valid] /
 
 ![Trigger types and condition syntax](images/ScreenFlow_Triggers.png)
 
-*Trigger types and condition syntax. [Full size](images/ScreenFlow_Triggers.png)*
+*Trigger types and condition syntax. [Full size](images/ScreenFlow_Triggers.png) · [HTML source](source/html/ScreenFlow_Triggers.html)*
 
 Why: dark and slate chips let a reader see at a glance whether the person or the system moves the flow forward. A long flow of slate chips is a flow the user cannot control, which is itself a design smell.
 
@@ -45,13 +45,13 @@ Why: dark and slate chips let a reader see at a glance whether the person or the
 
 ![Conditions written on the arrows](images/ScreenFlow_Cond_Inline.png)
 
-*Conditions written on the arrows. [Full size](images/ScreenFlow_Cond_Inline.png)*
+*Conditions written on the arrows. [Full size](images/ScreenFlow_Cond_Inline.png) · [HTML source](source/html/ScreenFlow_Cond_Inline.html)*
 
 While a label stays under about 20 characters it is written on the arrow. Longer conditions, or conditions shared by several arrows, get a short code (C1, C2) on the arrow and the full text in a table next to the diagram.
 
 ![Conditions as codes and a table](images/ScreenFlow_Cond_Coded.png)
 
-*Conditions as codes and a table. [Full size](images/ScreenFlow_Cond_Coded.png)*
+*Conditions as codes and a table. [Full size](images/ScreenFlow_Cond_Coded.png) · [HTML source](source/html/ScreenFlow_Cond_Coded.html)*
 
 Why: the diagram stays readable, and a reviewer who does not read diagrams can read the table.
 
@@ -70,19 +70,19 @@ Every level has the **same width and the same centre line**, so raising a screen
 
 ![Fidelity L0: names only](images/ScreenFlow_L0_Names.png)
 
-*Fidelity L0: names only. [Full size](images/ScreenFlow_L0_Names.png)*
+*Fidelity L0: names only. [Full size](images/ScreenFlow_L0_Names.png) · [HTML source](source/html/ScreenFlow_L0_Names.html)*
 
 ![Fidelity L1: skeleton frames](images/ScreenFlow_L1_Skeleton.png)
 
-*Fidelity L1: skeleton frames. [Full size](images/ScreenFlow_L1_Skeleton.png)*
+*Fidelity L1: skeleton frames. [Full size](images/ScreenFlow_L1_Skeleton.png) · [HTML source](source/html/ScreenFlow_L1_Skeleton.html)*
 
 ![Fidelity L2: key elements](images/ScreenFlow_L2_KeyElements.png)
 
-*Fidelity L2: key elements. [Full size](images/ScreenFlow_L2_KeyElements.png)*
+*Fidelity L2: key elements. [Full size](images/ScreenFlow_L2_KeyElements.png) · [HTML source](source/html/ScreenFlow_L2_KeyElements.html)*
 
 ![Mixed fidelity: each screen at the level its design has reached](images/ScreenFlow_Mixed.png)
 
-*Mixed fidelity: each screen at the level its design has reached. [Full size](images/ScreenFlow_Mixed.png)*
+*Mixed fidelity: each screen at the level its design has reached. [Full size](images/ScreenFlow_Mixed.png) · [HTML source](source/html/ScreenFlow_Mixed.html)*
 
 No default level has been chosen; the plugin should ask, or pick the level that matches the stage of the design.
 
@@ -94,11 +94,11 @@ The phone version walks one task end to end: S01 Welcome back (login), S02 the s
 
 ![The shop checkout on a phone](images/ScreenFlow_Shop_SP.png)
 
-*The shop checkout on a phone. [Full size](images/ScreenFlow_Shop_SP.png)*
+*The shop checkout on a phone. [Full size](images/ScreenFlow_Shop_SP.png) · [HTML source](source/html/ScreenFlow_Shop_SP.html)*
 
 ![The same checkout on desktop, with the same ids and actions](images/ScreenFlow_Shop_PC.png)
 
-*The same checkout on desktop, with the same ids and actions. [Full size](images/ScreenFlow_Shop_PC.png)*
+*The same checkout on desktop, with the same ids and actions. [Full size](images/ScreenFlow_Shop_PC.png) · [HTML source](source/html/ScreenFlow_Shop_PC.html)*
 
 ### 2.5 Devices and orientation
 
@@ -106,7 +106,7 @@ Rotating a phone changes the screen but not the place in the app, so it is a tra
 
 ![Orientation and tablet](images/ScreenFlow_Devices.png)
 
-*Orientation and tablet. [Full size](images/ScreenFlow_Devices.png)*
+*Orientation and tablet. [Full size](images/ScreenFlow_Devices.png) · [HTML source](source/html/ScreenFlow_Devices.html)*
 
 Frame sizes (drawn at roughly the scale shown):
 
@@ -129,7 +129,7 @@ Loading, data, empty and error are not four screens; they are four states of one
 
 ![States of one screen](images/ScreenFlow_States.png)
 
-*States of one screen. [Full size](images/ScreenFlow_States.png)*
+*States of one screen. [Full size](images/ScreenFlow_States.png) · [HTML source](source/html/ScreenFlow_States.html)*
 
 ### 3.2 Tab navigation
 
@@ -137,7 +137,7 @@ A tab bar lets the user jump between any two tabs. Drawing every pair of arrows 
 
 ![Tab navigation](images/ScreenFlow_Tabs.png)
 
-*Tab navigation. [Full size](images/ScreenFlow_Tabs.png)*
+*Tab navigation. [Full size](images/ScreenFlow_Tabs.png) · [HTML source](source/html/ScreenFlow_Tabs.html)*
 
 ### 3.3 Overlays
 
@@ -145,7 +145,7 @@ Modals, bottom sheets and toasts are drawn on the screen they cover, not as scre
 
 ![Overlays](images/ScreenFlow_Overlays.png)
 
-*Overlays. [Full size](images/ScreenFlow_Overlays.png)*
+*Overlays. [Full size](images/ScreenFlow_Overlays.png) · [HTML source](source/html/ScreenFlow_Overlays.html)*
 
 ### 3.4 Entry points and links
 
@@ -153,7 +153,7 @@ An app is rarely entered from one place. Each way in is a **green pill in a left
 
 ![Entry points and links](images/ScreenFlow_Entry.png)
 
-*Entry points and links. [Full size](images/ScreenFlow_Entry.png)*
+*Entry points and links. [Full size](images/ScreenFlow_Entry.png) · [HTML source](source/html/ScreenFlow_Entry.html)*
 
 ## 4. Complete flows
 
@@ -163,7 +163,7 @@ The complete example is a shop app drawn at mixed fidelity: **14 screens and 2 d
 
 ![Shop app: the full flow, phone above and desktop web below](images/ScreenFlow_Real_ShopApp.png)
 
-*Shop app: the full flow, phone above and desktop web below. [Full size](images/ScreenFlow_Real_ShopApp.png)*
+*Shop app: the full flow, phone above and desktop web below. [Full size](images/ScreenFlow_Real_ShopApp.png) · [HTML source](source/html/ScreenFlow_Real_ShopApp.html)*
 
 ### 4.2 The same flow with the main path highlighted
 
@@ -171,7 +171,7 @@ Only one route is animated: the happy path from launch to a paid order. Zones ar
 
 ![The shop app with the main path highlighted](images/ScreenFlow_Highlight.png)
 
-*The shop app with the main path highlighted. [Full size](images/ScreenFlow_Highlight.png)*
+*The shop app with the main path highlighted. [Full size](images/ScreenFlow_Highlight.png) · [HTML source](source/html/ScreenFlow_Highlight.html)*
 
 ## 5. Ids and names in detail
 
@@ -202,7 +202,7 @@ Only one route is animated: the happy path from launch to a paid order. Zones ar
 
 ![Screen flow: rules board](images/ScreenFlow_Rules.png)
 
-*Screen flow: rules board. [Full size](images/ScreenFlow_Rules.png)*
+*Screen flow: rules board. [Full size](images/ScreenFlow_Rules.png) · [HTML source](source/html/ScreenFlow_Rules.html)*
 
 #### IDs and names
 

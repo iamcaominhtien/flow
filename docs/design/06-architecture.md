@@ -20,7 +20,7 @@ If you have never drawn one, think of a map of a city's roads, not a timetable: 
 
 ![Components, lines and zones](images/Architecture_Notation.png)
 
-*Components, lines and zones. [Full size](images/Architecture_Notation.png)*
+*Components, lines and zones. [Full size](images/Architecture_Notation.png) · [HTML source](source/html/Architecture_Notation.html)*
 
 ### Components
 
@@ -49,7 +49,7 @@ Six arrangements appear in most systems. Each answers a question.
 
 ![Six common building blocks](images/Architecture_Patterns.png)
 
-*Six common building blocks. [Full size](images/Architecture_Patterns.png)*
+*Six common building blocks. [Full size](images/Architecture_Patterns.png) · [HTML source](source/html/Architecture_Patterns.html)*
 
 | Pattern | Question it answers | In one line |
 | --- | --- | --- |
@@ -66,7 +66,7 @@ A pattern is a small group of parts and lines. A plugin may add one to a diagram
 
 ![Basic architecture: a web app](images/Architecture_Basic.png)
 
-*Basic architecture: a web app. [Full size](images/Architecture_Basic.png)*
+*Basic architecture: a web app. [Full size](images/Architecture_Basic.png) · [HTML source](source/html/Architecture_Basic.html)*
 
 The classic three tiers. A **Browser** reaches the **Web app** through a **Load balancer** (blue, the path to the data); the app reads from the **Cache** first (a thin line, because the cache is an optimisation, not a requirement) and falls back to the **Database** with SQL. Two zones show where each part lives: a cloud region, and a private network that holds the cache and the database.
 
@@ -74,7 +74,7 @@ The classic three tiers. A **Browser** reaches the **Web app** through a **Load 
 
 ![Complete system: food delivery, plain](images/Architecture_Delivery.png)
 
-*Complete system: food delivery, plain. [Full size](images/Architecture_Delivery.png)*
+*Complete system: food delivery, plain. [Full size](images/Architecture_Delivery.png) · [HTML source](source/html/Architecture_Delivery.html)*
 
 Four layers from the phone to the data: **Clients** (Customer app, Restaurant tablet, Courier app), **Edge** (API gateway, Auth), **Services** (Dispatch, Order service, Payment service) and **Data** (Courier cache, Orders database, Event bus, Notifications), with a **Third party** frame to the right holding the Payment provider.
 
@@ -86,7 +86,7 @@ Four layers from the phone to the data: **Clients** (Customer app, Restaurant ta
 
 ![Complete system: food delivery, illustrated](images/Architecture_Delivery_Illustrated.png)
 
-*Complete system: food delivery, illustrated. [Full size](images/Architecture_Delivery_Illustrated.png)*
+*Complete system: food delivery, illustrated. [Full size](images/Architecture_Delivery_Illustrated.png) · [HTML source](source/html/Architecture_Delivery_Illustrated.html)*
 
 Lines, labels, zones and tints are identical. Only the box size differs: cards are 232 × 96 and layers sit 240 px apart, against 196 × 68 parts and 260 px in the plain diagram.
 
@@ -96,7 +96,7 @@ A diagram with about 33 parts, to prove the rules hold when a system is big. It 
 
 ![Complete system: video streaming platform, plain](images/Architecture_Streaming.png)
 
-*Complete system: video streaming platform, plain. [Full size](images/Architecture_Streaming.png)*
+*Complete system: video streaming platform, plain. [Full size](images/Architecture_Streaming.png) · [HTML source](source/html/Architecture_Streaming.html)*
 
 - **Blue** is the path of one tap on *Play*: app, gateway, Playback service, Catalog, Catalog database.
 - **Ink** lines are calls, **violet** lines are events and jobs, **dashed** lines are reads and copies.
@@ -104,7 +104,7 @@ A diagram with about 33 parts, to prove the rules hold when a system is big. It 
 
 ![Complete system: video streaming platform, illustrated](images/Architecture_Streaming_Illustrated.png)
 
-*Complete system: video streaming platform, illustrated. [Full size](images/Architecture_Streaming_Illustrated.png)*
+*Complete system: video streaming platform, illustrated. [Full size](images/Architecture_Streaming_Illustrated.png) · [HTML source](source/html/Architecture_Streaming_Illustrated.html)*
 
 The illustrated version of the same system is wider (3468 against 2860 px) because cards are larger.
 
@@ -134,7 +134,7 @@ The illustrated version of the same system is wider (3468 against 2860 px) becau
 
 ![Architecture: rules board](images/Architecture_Rules.png)
 
-*Architecture: rules board. [Full size](images/Architecture_Rules.png)*
+*Architecture: rules board. [Full size](images/Architecture_Rules.png) · [HTML source](source/html/Architecture_Rules.html)*
 
 #### Components
 

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Architecture: Notation: components, lines, zones</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@keyframes dc-flow2{to{stroke-dashoffset:-12}}
+.flow2{stroke-dasharray:6 6;animation:dc-flow2 1.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 1280px; height: 1020px; background: #F8FAFC; overflow: hidden">
+<div style="position:absolute;left:64px;top:48px;display:flex;flex-direction:column;gap:8px"><div style="font-size:24px;font-weight:600">Notation: components, lines, zones</div><div style="font-size:13px;line-height:20px;color:#475569;max-width:900px">How to read one box, one line and one frame. The same pieces are used in every architecture diagram.</div></div>
+<div style="position:absolute;left:64px;top:130px;width:1152px;height:330px;box-sizing:border-box;background:#fff;border:1px solid #E2E8F0;border-radius:14px"></div>
+<div style="position:absolute;left:86px;top:148px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Components</div>
+<div style="position:absolute;left:102px;top:216px;width:196px;height:68px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#E6E3FB"><svg width="38" height="38" viewBox="0 0 48 48" style="position:absolute;left:10px;top:13.0px;overflow:visible" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 8h28a4 4 0 0 1 4 4v6a4 4 0 0 1 -4 4h-28a4 4 0 0 1 -4 -4v-6a4 4 0 0 1 4 -4z" fill="#DCEEFB" stroke="#0F172A" stroke-width="2"/><path d="M10 26h28a4 4 0 0 1 4 4v6a4 4 0 0 1 -4 4h-28a4 4 0 0 1 -4 -4v-6a4 4 0 0 1 4 -4z" fill="#DCEEFB" stroke="#0F172A" stroke-width="2"/><path d="M12 15a2 2 0 1 0 4 0a2 2 0 1 0 -4 0z" fill="#15803D" stroke="#0F172A" stroke-width="2"/><path d="M12 33a2 2 0 1 0 4 0a2 2 0 1 0 -4 0z" fill="#F59E3A" stroke="#0F172A" stroke-width="2"/><path d="M22 15h14M22 33h14" fill="none" stroke="#0F172A" stroke-width="2"/></svg><div style="position:absolute;left:56px;right:6px;top:0;height:64px;display:flex;flex-direction:column;justify-content:center"><div style="font-size:13px;font-weight:800;line-height:16px;white-space:nowrap">Order service</div><div style="font-size:11px;line-height:15px;color:#475569;white-space:nowrap">checkout, status</div></div></div>
+<div style="position:absolute;left:84px;top:332px;width:232px;height:96px;box-sizing:border-box;border:2px solid #0F172A;border-radius:12px;background:#E6E3FB"><div style="position:absolute;left:14px;top:14px;padding:2px 12px;border:2px solid #0F172A;border-radius:999px;background:#CFC8F7;box-shadow:0 3px 0 #0F172A;font-size:12.5px;font-weight:800;line-height:18px;white-space:nowrap">Order service</div><div style="position:absolute;left:14px;top:52px;width:132px;font-size:11.5px;line-height:15px;color:#334155">checkout, status</div><svg width="64" height="64" viewBox="0 0 64 64" style="position:absolute;left:154px;top:14.0px;overflow:visible" aria-hidden="true"><ellipse cx="32" cy="60" rx="26" ry="3" fill="rgba(15,23,42,0.13)"/><rect x="7" y="5" width="50" height="15" rx="4.5" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M44 5h8.5a4.5 4.5 0 0 1 4.5 4.5v6a4.5 4.5 0 0 1-4.5 4.5H44z" fill="#B8D6F2" opacity=".8"/><rect x="7" y="5" width="50" height="15" rx="4.5" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="15" cy="12.5" r="2.3" fill="#15803D" stroke="#0F172A" stroke-width="1.5"/><circle cx="22" cy="12.5" r="2.3" fill="#F59E3A" stroke="#0F172A" stroke-width="1.5"/><path d="M31 10h18M31 15h12" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/><rect x="7" y="23" width="50" height="15" rx="4.5" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M44 23h8.5a4.5 4.5 0 0 1 4.5 4.5v6a4.5 4.5 0 0 1-4.5 4.5H44z" fill="#B8D6F2" opacity=".8"/><rect x="7" y="23" width="50" height="15" rx="4.5" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="15" cy="30.5" r="2.3" fill="#15803D" stroke="#0F172A" stroke-width="1.5"/><circle cx="22" cy="30.5" r="2.3" fill="#F59E3A" stroke="#0F172A" stroke-width="1.5"/><path d="M31 28h18M31 33h12" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/><rect x="7" y="41" width="50" height="15" rx="4.5" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M44 41h8.5a4.5 4.5 0 0 1 4.5 4.5v6a4.5 4.5 0 0 1-4.5 4.5H44z" fill="#B8D6F2" opacity=".8"/><rect x="7" y="41" width="50" height="15" rx="4.5" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><circle cx="15" cy="48.5" r="2.3" fill="#15803D" stroke="#0F172A" stroke-width="1.5"/><circle cx="22" cy="48.5" r="2.3" fill="#F59E3A" stroke="#0F172A" stroke-width="1.5"/><path d="M31 46h18M31 51h12" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/><path d="M11 9c6-1 12-1 20 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/></svg></div>
+<div style="position:absolute;left:340px;top:232px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Plain</div>
+<div style="position:absolute;left:340px;top:252px;font-size:12px;line-height:18px;color:#475569;font-weight:400;white-space:nowrap;">196 × 68. Flat icon, name, one line of detail.</div>
+<div style="position:absolute;left:340px;top:352px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Illustrated</div>
+<div style="position:absolute;left:340px;top:372px;font-size:12px;line-height:18px;color:#475569;font-weight:400;white-space:nowrap;">232 × 96. Name pill, one line of detail, 64 px icon.</div>
+<div style="position:absolute;left:760px;top:190px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Name</div>
+<div style="position:absolute;left:860px;top:190px;font-size:12px;line-height:17px;color:#475569;font-weight:400;width:330px;">What it is, in the team's words: Order service, Orders database. Two or three words.</div>
+<div style="position:absolute;left:760px;top:252px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Detail line</div>
+<div style="position:absolute;left:860px;top:252px;font-size:12px;line-height:17px;color:#475569;font-weight:400;width:330px;">The technology or the job, one short line: PostgreSQL, push and SMS. Never a sentence.</div>
+<div style="position:absolute;left:760px;top:314px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Icon</div>
+<div style="position:absolute;left:860px;top:314px;font-size:12px;line-height:17px;color:#475569;font-weight:400;width:330px;">From the same sets as the other diagram types. Pick by the noun: Database, Queue, Gateway.</div>
+<div style="position:absolute;left:760px;top:376px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Tint</div>
+<div style="position:absolute;left:860px;top:376px;font-size:12px;line-height:17px;color:#475569;font-weight:400;width:330px;">Groups parts by domain or owner, not by layer. Courier is teal everywhere.</div>
+<div style="position:absolute;left:64px;top:490px;width:560px;height:480px;box-sizing:border-box;background:#fff;border:1px solid #E2E8F0;border-radius:14px"></div>
+<div style="position:absolute;left:86px;top:508px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Lines</div>
+<svg width="142" height="12" viewBox="0 0 142 12" preserveAspectRatio="none" style="position:absolute;left:88px;top:564px;width:142px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-1" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 0 6 L 137 6" marker-end="url(#dc-arrow-head-filled-1)"></path></svg>
+<div style="position:absolute;left:256px;top:552px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Call or request</div>
+<div style="position:absolute;left:256px;top:572px;font-size:12px;line-height:17px;color:#475569;font-weight:400;width:340px;">A synchronous call. Ink, thin. Label the protocol or the action: HTTPS, SQL, charge.</div>
+<svg class="flow" width="142" height="12" viewBox="0 0 142 12" preserveAspectRatio="none" style="position:absolute;left:88px;top:644px;width:142px;height:12px;overflow:visible;fill:none;stroke:#1D4ED8;stroke-width:4;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-2" orient="auto" markerWidth="4" markerHeight="4" refX="2.0" refY="2.0" overflow="visible"><path d="M0 0 L4 2.0 L0 4 Z" fill="#1D4ED8" stroke="none" style="stroke:none;fill:#1D4ED8"/></marker></defs><path d="M 0 6 L 134 6" marker-end="url(#dc-arrow-head-filled-2)"></path></svg>
+<div style="position:absolute;left:256px;top:632px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Main path</div>
+<div style="position:absolute;left:256px;top:652px;font-size:12px;line-height:17px;color:#475569;font-weight:400;width:340px;">Blue, thick, animated fast. The one route the diagram is about. One per diagram.</div>
+<svg class="flow2" width="142" height="12" viewBox="0 0 142 12" preserveAspectRatio="none" style="position:absolute;left:88px;top:724px;width:142px;height:12px;overflow:visible;fill:none;stroke:#7C3AED;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-3" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#7C3AED" stroke="none" style="stroke:none;fill:#7C3AED"/></marker></defs><path d="M 0 6 L 137 6" marker-end="url(#dc-arrow-head-filled-3)"></path></svg>
+<div style="position:absolute;left:256px;top:712px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Event or message</div>
+<div style="position:absolute;left:256px;top:732px;font-size:12px;line-height:17px;color:#475569;font-weight:400;width:340px;">Violet, thin, animated slowly. Asynchronous: queues, topics, streams.</div>
+<svg width="142" height="12" viewBox="0 0 142 12" preserveAspectRatio="none" style="position:absolute;left:88px;top:804px;width:142px;height:12px;overflow:visible;fill:none;stroke:#475569;stroke-width:2;stroke-linejoin:round" stroke-dasharray="6 5"><defs><marker id="dc-arrow-head-filled-4" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#475569" stroke="none" style="stroke:none;fill:#475569"/></marker></defs><path d="M 0 6 L 137 6" marker-end="url(#dc-arrow-head-filled-4)"></path></svg>
+<div style="position:absolute;left:256px;top:792px;font-size:13px;line-height:20px;color:#0F172A;font-weight:800;white-space:nowrap;">Optional or copy</div>
+<div style="position:absolute;left:256px;top:812px;font-size:12px;line-height:17px;color:#475569;font-weight:400;width:340px;">Dashed slate. Replication, a fallback, or a return you want to show.</div>
+<div style="position:absolute;left:88px;top:880px;font-size:12px;line-height:18px;color:#334155;font-weight:400;white-space:nowrap;">A label sits on the line, a verb or a protocol, 90 px of room at least.</div>
+<div style="position:absolute;left:88px;top:905px;font-size:12px;line-height:18px;color:#334155;font-weight:400;white-space:nowrap;">Arrows show who starts the call, not which way the data flows.</div>
+<div style="position:absolute;left:656px;top:490px;width:560px;height:480px;box-sizing:border-box;background:#fff;border:1px solid #E2E8F0;border-radius:14px"></div>
+<div style="position:absolute;left:678px;top:508px;font-size:16px;line-height:24px;color:#0F172A;font-weight:800;white-space:nowrap;">Zones</div>
+<div style="position:absolute;left:690px;top:570px;width:500px;height:110px;box-sizing:border-box;background:rgba(29,78,216,0.06);border:1.5px dashed #64748B;border-radius:16px;"></div>
+<div style="position:absolute;left:708px;top:559px;height:22px;padding:0 12px;box-sizing:border-box;border-radius:999px;background:#0F172A;color:#FFFFFF;font-size:12px;font-weight:700;line-height:22px;text-align:center;white-space:nowrap">Cloud region</div>
+<div style="position:absolute;left:720px;top:600px;width:280px;height:65px;box-sizing:border-box;background:rgba(245,158,58,0.09);border:1.5px dashed #64748B;border-radius:16px;"></div>
+<div style="position:absolute;left:738px;top:589px;height:22px;padding:0 12px;box-sizing:border-box;border-radius:999px;background:#0F172A;color:#FFFFFF;font-size:12px;font-weight:700;line-height:22px;text-align:center;white-space:nowrap">Private network</div>
+<div style="position:absolute;left:690px;top:730px;width:250px;height:70px;box-sizing:border-box;background:rgba(21,128,61,0.07);border:1.5px dashed #64748B;border-radius:16px;"></div>
+<div style="position:absolute;left:708px;top:719px;height:22px;padding:0 12px;box-sizing:border-box;border-radius:999px;background:#0F172A;color:#FFFFFF;font-size:12px;font-weight:700;line-height:22px;text-align:center;white-space:nowrap">Layer</div>
+<div style="position:absolute;left:960px;top:730px;width:230px;height:70px;box-sizing:border-box;background:rgba(100,116,139,0.07);border:1.5px dashed #64748B;border-radius:16px;"></div>
+<div style="position:absolute;left:978px;top:719px;height:22px;padding:0 12px;box-sizing:border-box;border-radius:999px;background:#0F172A;color:#FFFFFF;font-size:12px;font-weight:700;line-height:22px;text-align:center;white-space:nowrap">Third party</div>
+<div style="position:absolute;left:690px;top:830px;font-size:12px;line-height:18px;color:#334155;font-weight:400;white-space:nowrap;">Frames nest, with 30 px between an outer and an inner edge.</div>
+<div style="position:absolute;left:690px;top:852px;font-size:12px;line-height:18px;color:#334155;font-weight:400;white-space:nowrap;">Label is a dark pill on the top left edge. One frame, one word or two.</div>
+<div style="position:absolute;left:690px;top:874px;font-size:12px;line-height:18px;color:#334155;font-weight:400;white-space:nowrap;">A part belongs to the smallest frame that holds it.</div>
+<div style="position:absolute;left:690px;top:940px;font-size:12px;line-height:18px;color:#334155;font-weight:400;white-space:nowrap;">A line from a frame edge means "any part inside" (one line, one label).</div>
+<div style="position:absolute;left:690px;top:896px;font-size:12px;line-height:18px;color:#334155;font-weight:400;white-space:nowrap;">Layer tints: clients blue, edge violet, services green, data amber,</div>
+<div style="position:absolute;left:690px;top:918px;font-size:12px;line-height:18px;color:#334155;font-weight:400;white-space:nowrap;">third party grey. Region and network frames take blue and amber.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1020}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

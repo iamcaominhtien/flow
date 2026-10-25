@@ -37,7 +37,7 @@ Only the **critical path** of a Gantt and the **dependency arrow** of a roadmap 
 
 ![Gantt: launching the delivery app](images/Planning_Gantt.png)
 
-*Gantt: launching the delivery app. [Full size](images/Planning_Gantt.png)*
+*Gantt: launching the delivery app. [Full size](images/Planning_Gantt.png) · [HTML source](source/html/Planning_Gantt.html)*
 
 Time runs left to right, one row per task. The example spans March to June (W1 to W14) in three phases: **Discover** (Research, Write the spec, with a milestone *Spec approved*), **Build** (Design, Mobile app, Payments, Backend API) and **Launch** (Beta test, Fix bugs, and a *Launch* milestone). Owners are circles with initials.
 
@@ -55,7 +55,7 @@ Axis and rows: weeks are 88 px wide with a month header above; a label column 30
 
 ![Org chart: the delivery team, plain](images/Planning_Org.png)
 
-*Org chart: the delivery team, plain. [Full size](images/Planning_Org.png)*
+*Org chart: the delivery team, plain. [Full size](images/Planning_Org.png) · [HTML source](source/html/Planning_Org.html)*
 
 Lines run from a manager down to the people who report to them. Two kinds of exception are shown: a **dashed line** is a working relationship without reporting (*Works with, no reporting line*), and a **dashed card** is an **open role** (the QA engineer in the example). The example runs from the CEO through three heads (Product, Engineering, Operations) to their teams.
 
@@ -63,7 +63,7 @@ A solid bus runs from a manager down to a bar and on to each report. Cards are 2
 
 ![Org chart: illustrated](images/Planning_Org_Illustrated.png)
 
-*Org chart: illustrated. [Full size](images/Planning_Org_Illustrated.png)*
+*Org chart: illustrated. [Full size](images/Planning_Org_Illustrated.png) · [HTML source](source/html/Planning_Org_Illustrated.html)*
 
 In the illustrated version each person is a **card** with a name pill, the role on one line and a person icon, tinted by team (blue for Product, green for Engineering, teal for Operations). The **open role** is the same card, faded, with a dashed border and the words *Open role*; the dashed *works with* line joins the Designer and the Mobile developer. Lines, roles and rules are unchanged.
 
@@ -71,7 +71,7 @@ In the illustrated version each person is a **card** with a name pill, the role 
 
 ![Mind map: launching the delivery app](images/Planning_Mind.png)
 
-*Mind map: launching the delivery app. [Full size](images/Planning_Mind.png)*
+*Mind map: launching the delivery app. [Full size](images/Planning_Mind.png) · [HTML source](source/html/Planning_Mind.html)*
 
 One topic in the middle (*Launch the delivery app*, goal: first orders in May), one colour per area of work (Product, Engineering, Marketing, Operations, Money and law, People) and a few short ideas on each branch. Read it in any order.
 
@@ -83,7 +83,7 @@ One topic in the middle (*Launch the delivery app*, goal: first orders in May), 
 
 ![Mind map: plain](images/Planning_Mind_Plain.png)
 
-*Mind map: plain. [Full size](images/Planning_Mind_Plain.png)*
+*Mind map: plain. [Full size](images/Planning_Mind_Plain.png) · [HTML source](source/html/Planning_Mind_Plain.html)*
 
 Tinted pills and underlined leaves, for quick maps. Same rules, no animation.
 
@@ -91,7 +91,7 @@ Tinted pills and underlined leaves, for quick maps. Same rules, no animation.
 
 ![Mind map: large, four levels, starting a food delivery company](images/Planning_Mind_Large.png)
 
-*Mind map: large, four levels, starting a food delivery company. [Full size](images/Planning_Mind_Large.png)*
+*Mind map: large, four levels, starting a food delivery company. [Full size](images/Planning_Mind_Large.png) · [HTML source](source/html/Planning_Mind_Large.html)*
 
 The simple map has two levels; real topics have more. This one has **four levels and seven branches** (Product, Engineering, Operations, Marketing and others) to show what happens when the subject is large:
 
@@ -104,7 +104,7 @@ The simple map has two levels; real topics have more. This one has **four levels
 
 ![Kanban: the delivery app sprint](images/Planning_Kanban.png)
 
-*Kanban: the delivery app sprint. [Full size](images/Planning_Kanban.png)*
+*Kanban: the delivery app sprint. [Full size](images/Planning_Kanban.png) · [HTML source](source/html/Planning_Kanban.html)*
 
 Work moves left to right through columns: Backlog, In progress, In review, Done. A card is one piece of work: a title, a **kind tag** (Feature, Bug, Chore) and an **owner circle**. A done card is struck through.
 
@@ -114,7 +114,7 @@ A column with a limit shows how full it is: **3 / 3** in the example. The pill t
 
 ![Roadmap: now, next, later](images/Planning_Roadmap.png)
 
-*Roadmap: now, next, later. [Full size](images/Planning_Roadmap.png)*
+*Roadmap: now, next, later. [Full size](images/Planning_Roadmap.png) · [HTML source](source/html/Planning_Roadmap.html)*
 
 **Themes in rows** (Ordering, Delivery, Growth), **time in columns** (Now: March to April, Next: May to June, Later: second half). A **solid card** is committed; a **dashed card** is an idea under study (*Group orders*, *Drone pilot*, *Loyalty points*, *New cities*), which may change or disappear.
 
@@ -137,7 +137,7 @@ The **blue arrow** is the one dependency that decides the order: *Courier tips c
 
 ![Planning: rules board](images/Planning_Rules.png)
 
-*Planning: rules board. [Full size](images/Planning_Rules.png)*
+*Planning: rules board. [Full size](images/Planning_Rules.png) · [HTML source](source/html/Planning_Rules.html)*
 
 #### What it covers
 

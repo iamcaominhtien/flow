@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Standalone copy of the design-canvas board "Explainer_Tree". Generated from source/canvas/Explainer_Tree.dc.html; opens in any browser. -->
+<meta charset="utf-8">
+<title>Explainer: Tree: what is inside a web project</title>
+
+</head>
+<body>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@keyframes dc-flow2{to{stroke-dashoffset:-12}}
+.flow2{stroke-dasharray:6 6;animation:dc-flow2 1.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}
+</style>
+
+<div style="position: relative; width: 1400px; height: 1200px; background: #F8FAFC; overflow: hidden">
+<div style="position:absolute;left:64px;top:44px;width:1272px"><div style="font-size:40px;line-height:46px;font-weight:800;letter-spacing:-0.5px">What is inside a web project</div><div style="font-size:16px;line-height:24px;color:#475569;margin-top:10px;max-width:900px">A project is a folder with a few well-known places in it. Knowing what each one is for makes any new project easy to read.</div></div>
+<div style="position:absolute;left:100px;top:535px;width:300px;height:210px;box-sizing:border-box;border:2px solid #0F172A;border-radius:16px;background:#FFF1DD"><svg width="88" height="88" viewBox="0 0 64 64" style="position:absolute;left:106.0px;top:14px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="60" rx="26" ry="3" fill="rgba(15,23,42,0.13)"/>
+<path d="M4 14a4 4 0 0 1 4-4h16l6 7h26a4 4 0 0 1 4 4v33a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z" fill="#FFC970" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<rect x="11" y="19" width="40" height="22" rx="2" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2.2"/><path d="M17 26h22M17 32h14" stroke="#94A3B8" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M4 28a4 4 0 0 1 4-4h48a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z" fill="#FFE2B0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M44 24h12a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4h-6z" fill="#F7C77E" opacity=".7"/>
+<path d="M9 32c4-1 9-1 14-1" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg><div style="position:absolute;left:0;right:0;top:112px;display:flex;justify-content:center"><div style="padding:3px 14px;border:2px solid #0F172A;border-radius:999px;background:#FFD9A3;box-shadow:0 3px 0 #0F172A;font-size:14px;font-weight:800;line-height:18px;white-space:nowrap">my-app/</div></div><div style="position:absolute;left:14px;right:14px;top:150px;text-align:center;font-size:12.5px;line-height:17px;color:#334155">The project folder. Everything below lives here.</div></div>
+<div style="position:absolute;left:640px;top:284.0px;width:700px;height:92px;box-sizing:border-box;border:2px solid #0F172A;border-radius:14px;background:#DCEEFB"><svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:16px;top:14px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="60" rx="26" ry="3" fill="rgba(15,23,42,0.13)"/>
+<rect x="3" y="7" width="58" height="48" rx="9" fill="#1E293B" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M44 7h8a9 9 0 0 1 9 9v30a9 9 0 0 1-9 9h-12z" fill="#0F172A" opacity=".55"/>
+<rect x="3" y="7" width="58" height="48" rx="9" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M24 22l-9 9 9 9M40 22l9 9-9 9" fill="none" stroke="#7DD3CB" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M35 19l-6 24" stroke="#F59E3A" stroke-width="4.5" stroke-linecap="round"/>
+<path d="M9 13c3-3 8-4 14-4" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".4"/></svg><div style="position:absolute;left:96px;top:14px;font:700 16px/22px 'JetBrains Mono',monospace">src/</div><div style="position:absolute;left:96px;top:42px;right:350px;font-size:13px;line-height:18px;color:#334155">The code you write. Most of your time is spent here.</div><div style="position:absolute;right:16px;top:30px;display:flex;align-items:center;gap:8px"><span style="font-size:11.5px;font-weight:700;color:#475569">inside:</span><span style="height:24px;padding:0 10px;border:2px solid #0F172A;border-radius:999px;background:#fff;font:600 12px/20px JetBrains Mono,monospace">components/</span><span style="height:24px;padding:0 10px;border:2px solid #0F172A;border-radius:999px;background:#fff;font:600 12px/20px JetBrains Mono,monospace">pages/</span><span style="height:24px;padding:0 10px;border:2px solid #0F172A;border-radius:999px;background:#fff;font:600 12px/20px JetBrains Mono,monospace">api/</span></div></div>
+<svg width="60" height="12" viewBox="0 0 60 12" preserveAspectRatio="none" style="position:absolute;left:400px;top:634px;width:60px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 0 6 L 60 6"></path></svg>
+<svg width="12" height="310" viewBox="0 0 12 310" preserveAspectRatio="none" style="position:absolute;left:454px;top:330px;width:12px;height:310px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 6 310 L 6 0"></path></svg>
+<svg width="180" height="12" viewBox="0 0 180 12" preserveAspectRatio="none" style="position:absolute;left:460px;top:324px;width:180px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-3" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 0 6 L 175 6" marker-end="url(#dc-arrow-head-filled-3)"></path></svg>
+<div style="position:absolute;left:640px;top:396.0px;width:700px;height:92px;box-sizing:border-box;border:2px solid #0F172A;border-radius:14px;background:#E6E3FB"><svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:16px;top:14px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="60" rx="18" ry="3" fill="rgba(15,23,42,0.13)"/>
+<circle cx="32" cy="31" r="26" fill="#D3F3EF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M14 18c4-3 8-3 11-1s1 6 4 8-1 8-5 8-7-5-9-7-3-6-1-8z" fill="#15803D" stroke="#0F172A" stroke-width="2" stroke-linejoin="round"/>
+<path d="M38 12c5 0 10 3 13 8-2 3-5 2-7 5s0 6-3 7-5-3-4-7 3-3 2-6-3-4-1-7z" fill="#15803D" stroke="#0F172A" stroke-width="2" stroke-linejoin="round"/>
+<path d="M32 5a26 26 0 0 1 0 52 26 26 0 0 0 0-52z" fill="#7DD3CB" opacity=".45"/>
+<ellipse cx="32" cy="31" rx="11" ry="26" fill="none" stroke="#0F172A" stroke-width="1.6" opacity=".35"/>
+<circle cx="32" cy="31" r="26" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M15 20c3-6 8-10 14-12" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg><div style="position:absolute;left:96px;top:14px;font:700 16px/22px 'JetBrains Mono',monospace">public/</div><div style="position:absolute;left:96px;top:42px;right:16px;font-size:13px;line-height:18px;color:#334155">Files sent to the browser as they are: images, icons, fonts.</div></div>
+<svg width="60" height="12" viewBox="0 0 60 12" preserveAspectRatio="none" style="position:absolute;left:400px;top:634px;width:60px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 0 6 L 60 6"></path></svg>
+<svg width="12" height="198" viewBox="0 0 12 198" preserveAspectRatio="none" style="position:absolute;left:454px;top:442px;width:12px;height:198px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 6 198 L 6 0"></path></svg>
+<svg width="180" height="12" viewBox="0 0 180 12" preserveAspectRatio="none" style="position:absolute;left:460px;top:436px;width:180px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-6" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 0 6 L 175 6" marker-end="url(#dc-arrow-head-filled-6)"></path></svg>
+<div style="position:absolute;left:640px;top:508.0px;width:700px;height:92px;box-sizing:border-box;border:2px solid #0F172A;border-radius:14px;background:#DCF5E1"><svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:16px;top:14px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="60" rx="18" ry="2.8" fill="rgba(15,23,42,0.13)"/>
+<circle cx="32" cy="31" r="26" fill="#15803D" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M32 5a26 26 0 0 1 0 52 26 26 0 0 0 0-52z" fill="#0F6B30" opacity=".5"/>
+<circle cx="32" cy="31" r="26" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M16 22c3-6 8-10 15-11" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".6"/>
+<path d="M19 32l9 9 17-19" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="57" cy="9" r="2.6" fill="#F59E3A"/><circle cx="7" cy="12" r="2.2" fill="#5B4BD6"/><path d="M56 50l3 3M59 50l-3 3" stroke="#7DD3CB" stroke-width="2.5" stroke-linecap="round"/></svg><div style="position:absolute;left:96px;top:14px;font:700 16px/22px 'JetBrains Mono',monospace">tests/</div><div style="position:absolute;left:96px;top:42px;right:16px;font-size:13px;line-height:18px;color:#334155">Small programs that check the code still works.</div></div>
+<svg width="60" height="12" viewBox="0 0 60 12" preserveAspectRatio="none" style="position:absolute;left:400px;top:634px;width:60px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 0 6 L 60 6"></path></svg>
+<svg width="12" height="86" viewBox="0 0 12 86" preserveAspectRatio="none" style="position:absolute;left:454px;top:554px;width:12px;height:86px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 6 86 L 6 0"></path></svg>
+<svg width="180" height="12" viewBox="0 0 180 12" preserveAspectRatio="none" style="position:absolute;left:460px;top:548px;width:180px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-9" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 0 6 L 175 6" marker-end="url(#dc-arrow-head-filled-9)"></path></svg>
+<div style="position:absolute;left:640px;top:620.0px;width:700px;height:92px;box-sizing:border-box;border:2px solid #0F172A;border-radius:14px;background:#D3F3EF"><svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:16px;top:14px;overflow:visible" aria-hidden="true"><ellipse cx="32" cy="60" rx="18" ry="2.8" fill="rgba(15,23,42,0.13)"/><circle cx="32" cy="31" r="26" fill="#1D4ED8" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M32 5a26 26 0 0 1 0 52 26 26 0 0 0 0-52z" fill="#173FB0" opacity=".5"/><circle cx="32" cy="31" r="26" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M16 22c3-6 8-10 15-11" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".6"/><circle cx="32" cy="19" r="4" fill="#fff"/><path d="M32 28v16" stroke="#fff" stroke-width="7" stroke-linecap="round"/></svg><div style="position:absolute;left:96px;top:14px;font:700 16px/22px 'JetBrains Mono',monospace">docs/</div><div style="position:absolute;left:96px;top:42px;right:16px;font-size:13px;line-height:18px;color:#334155">Notes for people: how to start, how it is built.</div></div>
+<svg width="60" height="12" viewBox="0 0 60 12" preserveAspectRatio="none" style="position:absolute;left:400px;top:634px;width:60px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 0 6 L 60 6"></path></svg>
+<svg width="12" height="26" viewBox="0 0 12 26" preserveAspectRatio="none" style="position:absolute;left:454px;top:640px;width:12px;height:26px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 6 0 L 6 26"></path></svg>
+<svg width="180" height="12" viewBox="0 0 180 12" preserveAspectRatio="none" style="position:absolute;left:460px;top:660px;width:180px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-12" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 0 6 L 175 6" marker-end="url(#dc-arrow-head-filled-12)"></path></svg>
+<div style="position:absolute;left:640px;top:732.0px;width:700px;height:92px;box-sizing:border-box;border:2px solid #0F172A;border-radius:14px;background:#FFF1DD"><svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:16px;top:14px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="59" rx="24" ry="3.2" fill="rgba(15,23,42,0.13)"/>
+<path d="M32 6l25 11-25 11L7 17z" fill="#FFE2B0" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M7 17l25 11v31L7 48z" fill="#FFC970" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M57 17L32 28v31l25-11z" fill="#F59E3A" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M19.5 11.5l25 11v9l-6 2.7V25z" fill="#DCEEFB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/>
+<path d="M44 38l9-4v8l-9 4z" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"/><path d="M46 40l5-2M46 43l4-2" stroke="#0F172A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+<path d="M11 21l7 3" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".8"/></svg><div style="position:absolute;left:96px;top:14px;font:700 16px/22px 'JetBrains Mono',monospace">package.json</div><div style="position:absolute;left:96px;top:42px;right:16px;font-size:13px;line-height:18px;color:#334155">The shopping list: which libraries the project needs.</div></div>
+<svg width="60" height="12" viewBox="0 0 60 12" preserveAspectRatio="none" style="position:absolute;left:400px;top:634px;width:60px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 0 6 L 60 6"></path></svg>
+<svg width="12" height="138" viewBox="0 0 12 138" preserveAspectRatio="none" style="position:absolute;left:454px;top:640px;width:12px;height:138px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 6 0 L 6 138"></path></svg>
+<svg width="180" height="12" viewBox="0 0 180 12" preserveAspectRatio="none" style="position:absolute;left:460px;top:772px;width:180px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-15" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 0 6 L 175 6" marker-end="url(#dc-arrow-head-filled-15)"></path></svg>
+<div style="position:absolute;left:640px;top:844.0px;width:700px;height:92px;box-sizing:border-box;border:2px solid #0F172A;border-radius:14px;background:#F1F5F9"><svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:16px;top:14px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="60" rx="20" ry="3" fill="rgba(15,23,42,0.13)"/>
+<path d="M12 3h27l15 15v41H12z" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" /><path d="M44 3h-5l15 15v41H44z" fill="#E2E8F0" opacity=".8"/><path d="M12 3h27l15 15v41H12z" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M39 3v15h15z" fill="#DCF5E1" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M19 28h22M19 36h26M19 44h16" stroke="#94A3B8" stroke-width="3.2" stroke-linecap="round"/>
+<rect x="19" y="49" width="12" height="6" rx="3" fill="#1D4ED8"/>
+<path d="M16 9l8-1" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><div style="position:absolute;left:96px;top:14px;font:700 16px/22px 'JetBrains Mono',monospace">README.md</div><div style="position:absolute;left:96px;top:42px;right:16px;font-size:13px;line-height:18px;color:#334155">The front door: what this is and how to run it.</div></div>
+<svg width="60" height="12" viewBox="0 0 60 12" preserveAspectRatio="none" style="position:absolute;left:400px;top:634px;width:60px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 0 6 L 60 6"></path></svg>
+<svg width="12" height="250" viewBox="0 0 12 250" preserveAspectRatio="none" style="position:absolute;left:454px;top:640px;width:12px;height:250px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 6 0 L 6 250"></path></svg>
+<svg width="180" height="12" viewBox="0 0 180 12" preserveAspectRatio="none" style="position:absolute;left:460px;top:884px;width:180px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-18" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 0 6 L 175 6" marker-end="url(#dc-arrow-head-filled-18)"></path></svg>
+<div style="position:absolute;left:640px;top:956.0px;width:700px;height:92px;box-sizing:border-box;border:2px solid #0F172A;border-radius:14px;background:#FDE4E4"><svg width="60" height="60" viewBox="0 0 64 64" style="position:absolute;left:16px;top:14px;overflow:visible" aria-hidden="true">
+<ellipse cx="32" cy="60" rx="20" ry="3" fill="rgba(15,23,42,0.13)"/>
+<path d="M17 29V21a15 15 0 0 1 30 0v8" fill="none" stroke="#0F172A" stroke-width="9" stroke-linecap="round"/>
+<path d="M17 29V21a15 15 0 0 1 30 0v8" fill="none" stroke="#CBD5E1" stroke-width="4.5" stroke-linecap="round"/>
+<rect x="8" y="28" width="48" height="31" rx="8" fill="#F59E3A" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<path d="M42 28h6a8 8 0 0 1 8 8v15a8 8 0 0 1-8 8H38z" fill="#E07B12" opacity=".85"/><rect x="8" y="28" width="48" height="31" rx="8" fill="none" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+<circle cx="32" cy="41" r="5" fill="#0F172A"/><path d="M32 41v9" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round"/>
+<path d="M14 34c2-3 5-4 9-4" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg><div style="position:absolute;left:96px;top:14px;font:700 16px/22px 'JetBrains Mono',monospace">.env</div><div style="position:absolute;left:96px;top:42px;right:16px;font-size:13px;line-height:18px;color:#334155">Secrets such as passwords. Never shared, never uploaded.</div></div>
+<svg width="60" height="12" viewBox="0 0 60 12" preserveAspectRatio="none" style="position:absolute;left:400px;top:634px;width:60px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 0 6 L 60 6"></path></svg>
+<svg width="12" height="362" viewBox="0 0 12 362" preserveAspectRatio="none" style="position:absolute;left:454px;top:640px;width:12px;height:362px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><path d="M 6 0 L 6 362"></path></svg>
+<svg width="180" height="12" viewBox="0 0 180 12" preserveAspectRatio="none" style="position:absolute;left:460px;top:996px;width:180px;height:12px;overflow:visible;fill:none;stroke:#0F172A;stroke-width:2;stroke-linejoin:round"><defs><marker id="dc-arrow-head-filled-21" orient="auto" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" overflow="visible"><path d="M0 0 L5 2.5 L0 5 Z" fill="#0F172A" stroke="none" style="stroke:none;fill:#0F172A"/></marker></defs><path d="M 0 6 L 175 6" marker-end="url(#dc-arrow-head-filled-21)"></path></svg>
+<div style="position:absolute;left:760px;top:388px;font-size:1px;line-height:1px;color:#475569;font-weight:400;white-space:nowrap;"></div>
+<div style="position:absolute;left:64px;top:1130px;font-size:13px;line-height:20px;color:#475569;font-weight:400;width:1200px;">Folder names end with a slash. Names with a dot are files. Order here is only for reading; real folders are listed alphabetically.</div>
+</div>
+
+
+</body>
+</html>

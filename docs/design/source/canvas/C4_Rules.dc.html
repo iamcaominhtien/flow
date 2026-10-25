@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>C4: Rules</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F8FAFC;font-family:'Inter',system-ui,sans-serif;color:#0F172A}
+h2,p,ul{margin:0}
+@keyframes dc-flow{to{stroke-dashoffset:-18}}
+.flow{stroke-dasharray:10 8;animation:dc-flow 0.7s linear infinite}
+@keyframes dc-flow2{to{stroke-dashoffset:-12}}
+.flow2{stroke-dasharray:6 6;animation:dc-flow2 1.8s linear infinite}
+@media (prefers-reduced-motion: reduce){.flow,.flow2{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 1280px; height: 1220px; background: #F8FAFC; overflow: hidden">
+<style>.rc{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}.rc h2{font-size:16px;font-weight:800}.rc li{font-size:13px;line-height:20px;color:#334155;margin-bottom:6px}.rc ul{padding-left:18px;margin:0}</style><div style="position:absolute;left:0;top:0;width:1280px;box-sizing:border-box;padding:64px;display:flex;flex-direction:column;gap:28px"><div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:24px;font-weight:600">C4 · Rules</div><div style="font-size:13px;line-height:20px;color:#475569;max-width:900px">C4 draws one system at four levels of zoom. These are the conventions every C4 diagram follows, and that a plugin can rely on. The three examples next to it show one delivery platform at levels 1, 2 and 3.</div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px"><div class="rc"><h2>Four levels, one question each</h2><ul><li><b>1 Context:</b> who uses the system and what it depends on? The system is one box.</li><li><b>2 Container:</b> what runs inside it? Apps, services, databases.</li><li><b>3 Component:</b> how is one container built? Controllers, handlers, clients.</li><li><b>4 Code:</b> classes. Not drawn here: use a UML class diagram.</li><li>One diagram answers one question. Never mix levels in one picture.</li></ul></div><div class="rc"><h2>Zooming</h2><ul><li>Each level opens exactly one box of the level above and keeps its neighbours as they were.</li><li>The box you open becomes a dashed frame with its label on the bottom edge. Lines from above can then enter it without crossing the label.</li><li>Neighbours of the opened box stay as boxes of the level above: people and outside systems on level 2, containers on level 3.</li><li>Use the same name, tint and icon for the same thing on every level.</li></ul></div><div class="rc"><h2>Elements</h2><ul><li>Five kinds: <b>person</b> (round corners), <b>software system</b>, <b>container</b>, <b>component</b>, and an <b>external system</b> (dashed border, grey).</li><li>Every box has a bold name, a line <span style="font-family:monospace">[Kind: technology]</span> and one sentence about its job.</li><li>Size: 280 × 132 (external boxes on a wide diagram 280 × 132 as well). Icon 40 px at top left, chosen by the noun.</li><li>Technology is in the type line, never in the name.</li></ul></div><div class="rc"><h2>Lines</h2><ul><li>One arrow per relationship, from the one that starts the call to the receiver.</li><li>The label is a verb phrase (<i>Charges cards using</i>) and, on levels 2 and 3, the protocol (<i>HTTPS, JSON</i>).</li><li>Colours as elsewhere: main path blue, thick, animated; event or message violet, thin, slow; everything else ink.</li><li>Orthogonal, at most two bends. Leave 90 px of line for a label.</li></ul></div><div class="rc"><h2>Boundaries</h2><ul><li>Level 1 has none: the system is a box. Level 2 draws the system as a frame, level 3 draws the container.</li><li>Frame tint follows the opened box. Label on the bottom edge: <i>Name [Software system]</i> or <i>Name [Container]</i>.</li><li>Parts in the frame sit at least 30 px inside it. Outside parties sit outside, with 240 px for a line that crosses.</li><li>A line crossing the frame is a call into or out of it: label it.</li></ul></div><div class="rc"><h2>Layout</h2><ul><li>People on the top row, the thing being studied in the middle, what it depends on below or to the right.</li><li>Columns 520 px apart, rows 270 px apart. Gap between boxes on a labelled line at least 240 px.</li><li>Eight to fifteen boxes is right. Past that, zoom into a part instead of drawing more.</li><li>Do not draw a database as a component. It is a container.</li></ul></div><div class="rc"><h2>Animation</h2><ul><li>One blue route per diagram: the story you tell (an order from the phone to the card network).</li><li>Violet is the event stream. Everything else is static.</li><li>The same route is blue on all three levels, so the zoom is easy to follow.</li><li>In draw.io each line has its own flow animation (flowAnimation=1) and its own duration: main route 500, event stream 1500. Checked in the draw.io viewer; SVG export not yet tested.</li></ul></div><div class="rc"><h2>What a plugin can rely on</h2><ul><li>An element is: id, kind, name, technology, description, icon, tone and (optionally) the frame it sits in.</li><li>A relationship is: from, to, label, protocol and kind (call, main, event).</li><li>A diagram is: level, the opened element and its elements. The plugin finds the neighbours from the level above.</li><li>Layout uses rows and columns with the spacing above.</li></ul></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1220}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
