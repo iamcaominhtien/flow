@@ -14,23 +14,27 @@ A relation reads from the "one" side to the "many" side by default. A many-to-ma
 stored as two relations and a junction table.
 """
 
+from dataclasses import replace
 from enum import StrEnum
 from typing import Any
 
 from ..model import Direction, Head, Role, Row, Scene, Shape, Tone
 from ..reader import Reader, SpecError, suggestion
 from ..spec import Spec, SpecEdge, SpecNode, check_explicit_cells
-from ..theme import icon_names
+from ..theme import icon_names, load_theme
 from . import flowchart
 
 ER = "er"
-SPEC_KEYS = {"type", "title", "desc", "tables", "relations"}
+SPEC_KEYS = {"type", "title", "desc", "tables", "relations", "style"}
 TABLE_KEYS = {"id", "name", "icon", "tone", "columns", "at"}
 COLUMN_KEYS = {"name", "type", "flags"}
 RELATION_KEYS = {
     "from", "to", "from_column", "to_column", "from_end", "to_end", "label", "style", "main",
 }  # fmt: skip
 AT_LENGTH = 2
+TABLE_GAP_PX = 150  # room for two cardinality marks and a label between two tables
+NULLABLE_MARK = "?"
+TABLE_ICON = "table"  # the icon of an illustrated table that names none
 
 
 class Cardinality(StrEnum):
@@ -67,16 +71,23 @@ HEAD_OF_CARDINALITY = {
 
 
 def _column_row(raw: dict[str, Any], read: Reader, where: str) -> Row:
-    """Build one table row from a column: the name on the left, the type and flags on the right."""
+    """Build one table row from a column.
+
+    The key flags (``PK``, ``FK``, ``UQ``) become chips before the name; the type goes on the
+    right, with a question mark when the column may be empty.
+    """
     read.check_keys(raw, COLUMN_KEYS, where)
     flags = raw.get("flags", [])
-    names = []
+    chips, is_nullable = [], False
     for index, flag in enumerate(flags if isinstance(flags, list) else []):
         member = read.enum(Flag, {"flags": flag}, "flags", f"{where}.flags[{index}]")
-        if member is not None:
-            names.append(member.value.upper())
-    right = " ".join(part for part in [read.text(raw, "type", where) or "", *names] if part)
-    return Row(left=read.text(raw, "name", where) or "", right=right)
+        if member is Flag.NULL:
+            is_nullable = True
+        elif member is not None:
+            chips.append(member.value.upper())
+    kind = read.text(raw, "type", where) or ""
+    right = kind + NULLABLE_MARK if is_nullable and kind else kind
+    return Row(left=read.text(raw, "name", where) or "", right=right, flags=tuple(chips))
 
 
 def _table(raw: object, where: str, read: Reader, icons: set[str]) -> SpecNode | None:
@@ -149,6 +160,13 @@ def _relation(
     )
 
 
+def _with_card(table: SpecNode, is_illustrated: bool) -> SpecNode:
+    """Return the table as an illustrated one (tall header, large icon) when the spec asks."""
+    if not is_illustrated:
+        return table
+    return replace(table, card=True, icon=table.icon or TABLE_ICON)
+
+
 def to_spec(raw: object) -> Spec:
     """Check an ER spec and turn it into the description the layout works on.
 
@@ -179,6 +197,7 @@ def to_spec(raw: object) -> Spec:
         for index, item in enumerate(raw.get("relations", []))
     ]
     title, description = read.text(raw, "title", "spec"), read.text(raw, "desc", "spec")
+    illustrated = read.illustrated(raw, "spec")
     if read.problems:
         raise SpecError(read.problems)
     return Spec(
@@ -186,8 +205,9 @@ def to_spec(raw: object) -> Spec:
         description=description,
         direction=Direction.DOWN,
         lanes=(),
-        nodes=tuple(tables.values()),
+        nodes=tuple(_with_card(table, illustrated) for table in tables.values()),
         edges=tuple(edge for edge in relations if edge is not None),
+        illustrated=illustrated,
     )
 
 
@@ -203,4 +223,12 @@ def layout_raw(raw: object) -> Scene:
     Raises:
         SpecError: If the spec is not valid.
     """
-    return flowchart.layout(to_spec(raw))
+    rules = load_theme().layout
+    wide = replace(
+        rules,
+        gap_vertical=TABLE_GAP_PX,
+        gap_vertical_labelled=TABLE_GAP_PX,
+        gap_horizontal=TABLE_GAP_PX,
+        gap_horizontal_labelled=TABLE_GAP_PX,
+    )
+    return flowchart.layout(to_spec(raw), wide)

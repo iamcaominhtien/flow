@@ -47,7 +47,9 @@ findings = canvas.write("out", "diagram")  # writes out/diagram.scene.json, .htm
 print(format_report(findings))
 ```
 
-- `Canvas.node(id, shape, text, NodeOptions(centre, icon=, tone=, number=, detail=, card=, width=, height=))`: the node is sized by the design's rules to hold its text (widened, never made taller, until it fits; at most two lines). You may force `width`/`height`.
+- `Canvas.node(id, shape, text, NodeOptions(centre, icon=, tone=, number=, detail=, card=, rows=, width=, height=))`: the node is sized by the design's rules to hold its text (widened, never made taller, until it fits; at most two lines). You may force `width`/`height`.
+- **ER tables:** `Canvas.node("orders", Shape.TABLE, "orders", NodeOptions(centre, rows=(Row("id", "uuid", ("PK",)), Row("customer_id", "uuid", ("FK",)), Row("note", "text?")), tone=Tone.VIOLET))` draws a table (`from flowlib.model import Row`); add `card=True, icon="cart"` for the illustrated one (tall header, name in a pill, large icon). A relation is `Canvas.edge("customers", "orders", Route(...))` with `head=Head.ZERO_MANY` and `tail=Head.ONE_ONLY` (also `ZERO_ONE`, `ONE_MANY`) for the crow's feet; leave 150 px or more between two tables that a labelled line joins.
+- Node ids that look like `e1`, `e2` are kept for the lines; the kit refuses them. The first y below the title and the description is `CONTENT_TOP_PX` (160) in `flowlib.author`: start the first lane or table at or below it.
 - `Box.port(side, along=0.5)` gives the attach point on `top`, `bottom`, `left`, `right`; `along` (0 to 1) moves it along the side, so a wide node or a bar can take several lines apart (`Route(leave_along=, arrive_along=)` does the same for a line). A diamond attaches only at its four tips. `canvas.boxes[id]` is the box; `box.centre` is its middle.
 - `Canvas.edge(from, to, Route(...))`: with no route the line leaves and enters the facing sides. `via` is a list of waypoints; corners are added so every segment is horizontal or vertical. A route is `leave`, `arrive`, `via`, `role`, `label`, `dashed`, `head`.
 - `Canvas.lane(...)` is a swimlane (a dark tab with the name, a lightly tinted band). `Canvas.zone(...)` is a dashed tinted group area with a name pill.
@@ -92,7 +94,7 @@ print(format_report(findings))
 
 ## Looking
 
-You cannot judge a layout from numbers. Render the HTML to an image and open it: with Chromium and Playwright if they are installed (`python3 -c "from playwright.sync_api import sync_playwright"` tells you), or any other renderer you have, then read the PNG. If the page is larger than the screenshot, crop and resize it. If you have no way to see the picture, say so plainly, rely on the check report, and keep the arrangement simple.
+You cannot judge a layout from numbers. Render the HTML to an image and open it: with Chromium and Playwright if they are installed (`python3 -c "from playwright.sync_api import sync_playwright"` tells you; if Playwright's own browser is missing but Chrome is installed, launch with `channel="chrome"`), or any other renderer you have, then read the PNG. If the page is larger than the screenshot, crop and resize it. If you have no way to see the picture, say so plainly, rely on the check report, and keep the arrangement simple.
 
 ## Do not
 

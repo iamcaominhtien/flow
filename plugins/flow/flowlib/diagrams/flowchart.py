@@ -10,20 +10,22 @@ from ..model import Direction, Scene
 from ..placement import place_nodes
 from ..routing import Port, route_edges
 from ..spec import Spec
-from ..theme import load_theme
+from ..theme import LayoutRules, load_theme
 
 
-def layout(spec: Spec) -> Scene:
+def layout(spec: Spec, rules: LayoutRules | None = None) -> Scene:
     """Place and route a flowchart, giving a scene ready to draw.
 
     Args:
         spec: The flowchart description.
+        rules: The layout rules; the design's by default. A diagram type that needs other gaps
+            (tables, for instance) passes its own.
 
     Returns:
         The scene: sized nodes at pixel positions, routed lines, swimlane frames, and a canvas
         that holds them.
     """
-    rules = load_theme().layout
+    rules = rules or load_theme().layout
     if spec.illustrated:
         spec = spec_io.with_cards(spec)
     grid = build_grid(spec)

@@ -146,6 +146,50 @@ def fit_table(
     Returns:
         The size; ``lines`` holds the title.
     """
+    extra = ICON_TEXT_RESERVE_PX if has_icon else 0
+    return _fit_table(title, sections, (extra, rules.table_header_height), rules)
+
+
+def fit_table_card(
+    title: str, sections: tuple[tuple[Row, ...], ...], rules: LayoutRules
+) -> FittedNode:
+    """Size an illustrated table: a tall header with the name in a pill and a large icon.
+
+    Args:
+        title: The table name, shown in a pill.
+        sections: The groups of rows, with a divider between groups.
+        rules: The layout rules.
+
+    Returns:
+        The size; ``lines`` holds the title.
+    """
+    extra = 2 * rules.card_pill_padding + rules.card_disc
+    return _fit_table(title, sections, (extra, rules.table_card_header_height), rules)
+
+
+def key_room(sections: tuple[tuple[Row, ...], ...], rules: LayoutRules) -> float:
+    """Return the width reserved before the column names for the key chips of a table.
+
+    Args:
+        sections: The groups of rows.
+        rules: The layout rules.
+
+    Returns:
+        Zero when no row has a chip; otherwise room for the most chips on one row.
+    """
+    most = max((len(row.flags) for section in sections for row in section), default=0)
+    if not most:
+        return 0
+    return most * rules.table_chip_width + (most - 1) * 2 + rules.table_chip_gap
+
+
+def _fit_table(
+    title: str,
+    sections: tuple[tuple[Row, ...], ...],
+    header: tuple[float, float],
+    rules: LayoutRules,
+) -> FittedNode:
+    """Size a table from its title, its rows and its header: (extra width, height)."""
     mono_width = rules.char_width_em * rules.detail_font_size
     widest_row = max(
         (
@@ -155,19 +199,17 @@ def fit_table(
         ),
         default=0,
     )
-    header = estimate_text_width(title, rules, DEFAULT_FONT_SIZE_PX) + (
-        ICON_TEXT_RESERVE_PX if has_icon else 0
-    )
+    widest_row += key_room(sections, rules)
+    header_extra, header_height = header
+    title_width = estimate_text_width(title, rules, DEFAULT_FONT_SIZE_PX) + header_extra
     width = max(
         rules.table_min_width,
         widest_row + 2 * rules.table_padding_x,
-        header + 2 * rules.table_padding_x,
+        title_width + 2 * rules.table_padding_x,
     )
     rows = sum(len(section) for section in sections)
     gaps = max(len(sections) - 1, 0) * rules.table_section_gap
-    height = (
-        rules.table_header_height + rows * rules.table_row_height + gaps + rules.table_bottom_pad
-    )
+    height = header_height + rows * rules.table_row_height + gaps + rules.table_bottom_pad
     return FittedNode(
         width=min(width, rules.max_node_width + rules.table_extra_width),
         height=height,

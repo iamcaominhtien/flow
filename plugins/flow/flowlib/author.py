@@ -7,6 +7,7 @@ way a line runs, how groups are arranged. A script calls ``node``, ``edge``, ``l
 ``zone`` and then ``write``, which draws the HTML and draw.io files and runs the checks.
 """
 
+import re
 from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from itertools import pairwise
@@ -26,17 +27,29 @@ from .model import (
     Node,
     Point,
     Role,
+    Row,
     Scene,
     Shape,
     Tone,
 )
-from .sizing import NodeContent, estimate_text_width, fit_card, fit_node, wrap_text
+from .sizing import (
+    FittedNode,
+    NodeContent,
+    estimate_text_width,
+    fit_card,
+    fit_node,
+    fit_table,
+    fit_table_card,
+    wrap_text,
+)
 from .text_area import text_area_width
-from .theme import load_theme
+from .theme import LayoutRules, load_theme
 
 CAPTIONED_SHAPES = {Shape.START, Shape.END, Shape.INTERMEDIATE, Shape.ACTOR}  # the text goes under
 LABEL_KIND_OF_ROLE = {Role.YES: LabelKind.YES, Role.NO: LabelKind.NO, Role.BACK: LabelKind.BACK}
 MIDDLE = 0.5
+LINE_ID = re.compile(r"e\d+")  # the ids the canvas gives to lines
+CONTENT_TOP_PX = 160  # the first y below the title and the description
 GATEWAY_SIZE_PX = 56  # a BPMN gateway is a small diamond; its name goes under it
 GATEWAY_ICONS = {"x", "plus"}  # a diamond with one of these marks is a BPMN gateway
 TEXT_SLACK_PX = 48  # room added to the estimated width of free text, so it stays on one line
@@ -163,11 +176,13 @@ class Canvas:
         """
         if name in self.boxes:
             raise ValueError(f"the id '{name}' is used twice")
+        if LINE_ID.fullmatch(name):
+            raise ValueError(f"the id '{name}' is kept for lines (e1, e2, ...); name the node else")
         rules = load_theme().layout
         is_gateway = shape is Shape.DECISION and options.icon in GATEWAY_ICONS
         captioned = shape in CAPTIONED_SHAPES or is_gateway
         content = NodeContent(text, options.detail or "", options.icon is not None)
-        fitted = fit_card(content, rules) if options.card else fit_node(shape, content, rules)
+        fitted = _fit(shape, content, options, rules)
         if captioned:
             fitted = replace(
                 fitted, width=rules.min_sizes[shape][0], height=rules.min_sizes[shape][1]
@@ -194,6 +209,7 @@ class Canvas:
             detail=fitted.detail,
             caption=text if captioned else None,
             card=options.card,
+            sections=(options.rows,) if options.rows else (),
         )
         box = Box(placed)
         self.boxes[name] = box
@@ -322,6 +338,7 @@ class NodeOptions:
     number: str | None = None
     detail: str | None = None
     card: bool = False
+    rows: tuple[Row, ...] = ()
     width: float | None = None
     height: float | None = None
 
@@ -340,6 +357,20 @@ class Route:
     dashed: bool = False
     head: Head = Head.FILLED
     tail: Head = Head.NONE
+
+
+def _fit(
+    shape: Shape, content: NodeContent, options: "NodeOptions", rules: LayoutRules
+) -> FittedNode:
+    """Size a node by the design's rules: a table to its rows, a card, or any other shape."""
+    if shape is Shape.TABLE:
+        sections = (options.rows,)
+        if options.card:
+            return fit_table_card(content.title, sections, rules)
+        return fit_table(content.title, sections, content.has_icon, rules)
+    if options.card:
+        return fit_card(content, rules)
+    return fit_node(shape, content, rules)
 
 
 def sentence_case(text: str) -> str:

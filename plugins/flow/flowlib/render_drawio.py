@@ -21,7 +21,7 @@ from .drawio_common import (
 )
 from .drawio_lines import add_divider, add_edge
 from .markup import esc, fmt
-from .model import Frame, FrameVariant, Node, Scene, Shape, Tone
+from .model import KEY_FLAG_TONES, Frame, FrameVariant, Node, Row, Scene, Shape, Tone
 from .shapes import BOX_CORNER_RADIUS_PX, STROKE_WIDTH_PX, SUBPROCESS_BAR_INSET_PX
 from .sizing import estimate_text_width
 from .text_area import ICON_TEXT_RESERVE_PX
@@ -56,6 +56,9 @@ NOTE_FOLD_PX = 16
 TABLE_ARC_PERCENT = 6
 TABLE_TEXT_INSET_PX = 12
 ROW_PADDING_PX = 12
+CHIP_FONT_SIZE_PX = 9
+TABLE_PILL_HEIGHT_PX = 28  # the name pill in the header of an illustrated table
+TABLE_CARD_ICON_PX = 52
 CYLINDER_CAP_PX = 10
 START_STROKE_WIDTH_PX = 2
 END_STROKE_WIDTH_PX = 5
@@ -232,6 +235,8 @@ def _node_style(node: Node, theme: Theme) -> str:
     """Return the full style of a node cell: outline, colours and text."""
     colors = theme.shapes[node.shape]
     fill = theme.tones[node.tone].box if node.tone else colors.fill
+    if node.shape is Shape.TABLE and node.card:
+        fill = theme.tones[node.tone or Tone.GRAY].pill
     style = {
         "html": 1,
         "whiteSpace": "wrap",
@@ -250,12 +255,12 @@ def _node_style(node: Node, theme: Theme) -> str:
         icon_room = ICON_LEFT_PX + ICON_SIZE_PX if node.icon else 0
         style.update(
             {
-                "startSize": theme.layout.table_header_height,
+                "startSize": _table_header_height(node, theme),
                 "swimlaneFillColor": "#FFFFFF",
                 "spacingLeft": TABLE_TEXT_INSET_PX + icon_room,
             }
         )
-    if node.card:
+    if node.card and node.shape is not Shape.TABLE:
         style.update(_card_text_style(node, theme))
     elif node.icon and node.shape is not Shape.TABLE:
         style["spacingLeft"] = ICON_TEXT_RESERVE_PX
@@ -282,6 +287,8 @@ def _node_value(node: Node, theme: Theme) -> str:
     """Return the label of a node: its caption, or its title followed by its detail lines."""
     if node.caption:
         return esc(node.caption)
+    if node.shape is Shape.TABLE and node.card:
+        return ""
     if node.card:
         return _label_value(node.detail)
     title = _label_value(node.text)
@@ -312,7 +319,9 @@ def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
     add_geometry(cell, (node.x, node.y, node.width, node.height))
     if node.shape is Shape.TABLE:
         _add_table_rows(root, node, theme)
-    if node.card:
+    if node.shape is Shape.TABLE and node.card:
+        _add_table_card_parts(root, node, theme)
+    elif node.card:
         _add_card_parts(root, node, theme)
     elif node.icon:
         icon_style = style_string(
@@ -320,7 +329,7 @@ def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
         )
         icon = add_vertex(root, f"icon-{node.id}", "", icon_style)
         icon.set("parent", f"node-{node.id}")  # a child cell moves with its node
-        band = theme.layout.table_header_height if node.shape is Shape.TABLE else node.height
+        band = _table_header_height(node, theme) if node.shape is Shape.TABLE else node.height
         icon_top = (band - ICON_SIZE_PX) / 2
         is_marker = node.shape in CENTERED_ICON_SHAPES and not node.text
         icon_left = (node.width - ICON_SIZE_PX) / 2 if is_marker else ICON_LEFT_PX
@@ -390,14 +399,72 @@ def _add_card_parts(root: ET.Element, node: Node, theme: Theme) -> None:
     add_geometry(pill, ((node.width - pill_width) / 2, top, pill_width, rules.card_pill_height))
 
 
-def _row_value(left: str, right: str) -> str:
-    """Return a table row as a one-line HTML table with the name left and the note right."""
+def _chip_value(flag: str, theme: Theme) -> str:
+    """Return one key chip as an HTML span with the tint of its kind."""
+    tone = theme.tones[KEY_FLAG_TONES.get(flag, Tone.GRAY)]
+    style = (
+        f"background:{tone.pill};color:{tone.accent};border-radius:4px;padding:1px 5px;"
+        f"font-size:{CHIP_FONT_SIZE_PX}px;font-weight:bold;font-family:{theme.fonts.sans}"
+    )
+    return f'<span style="{style}">{esc(flag)}</span>'
+
+
+def _row_value(row: Row, theme: Theme) -> str:
+    """Return a table row as a one-line HTML table: chips and name on the left, type right."""
+    chips = "&nbsp;".join(_chip_value(flag, theme) for flag in row.flags)
+    name = f"<b>{esc(row.left)}</b>" if "PK" in row.flags else esc(row.left)
+    left = f"{chips}&nbsp;&nbsp;{name}" if chips else name
     return (
         '<table style="width:100%;border-collapse:collapse"><tr>'
-        f'<td style="padding-left:{ROW_PADDING_PX}px">{esc(left)}</td>'
-        f'<td align="right" style="padding-right:{ROW_PADDING_PX}px">{esc(right)}</td>'
-        "</tr></table>"
+        f'<td style="padding-left:{ROW_PADDING_PX}px">{left}</td>'
+        f'<td align="right" style="padding-right:{ROW_PADDING_PX}px;color:{theme.slate}">'
+        f"{esc(row.right)}</td></tr></table>"
     )
+
+
+def _table_header_height(node: Node, theme: Theme) -> float:
+    """Return the height of a table header: tall when the table is illustrated."""
+    if node.card:
+        return theme.layout.table_card_header_height
+    return theme.layout.table_header_height
+
+
+def _add_table_card_parts(root: ET.Element, node: Node, theme: Theme) -> None:
+    """Add the name pill and the large icon in the header of an illustrated table."""
+    rules = theme.layout
+    tone = theme.tones[node.tone or Tone.GRAY]
+    parent = f"node-{node.id}"
+    pill_width = (
+        estimate_text_width(" ".join(node.text), rules, node.font_size)
+        + 2 * rules.card_pill_padding
+    )
+    pill_style = style_string(
+        {
+            "rounded": 1,
+            "arcSize": PILL_ARC_PERCENT,
+            "html": 1,
+            "strokeColor": theme.shapes[node.shape].stroke,
+            "strokeWidth": STROKE_WIDTH_PX,
+            "fillColor": "#FFFFFF",
+            "fontColor": theme.ink,
+            "fontSize": fmt(node.font_size),
+            "fontStyle": FONT_BOLD,
+            "fontFamily": theme.fonts.sans,
+        }
+    )
+    pill = add_vertex(root, f"pill-{node.id}", esc(" ".join(node.text)), pill_style)
+    pill.set("parent", parent)
+    top = (rules.table_card_header_height - TABLE_PILL_HEIGHT_PX) / 2
+    add_geometry(pill, (TABLE_TEXT_INSET_PX, top, pill_width, TABLE_PILL_HEIGHT_PX))
+    if not node.icon:
+        return
+    make = _detailed_data_uri if has_detailed_icon(node.icon) else _icon_data_uri
+    image = make(node.icon, tone.stroke, TABLE_CARD_ICON_PX)
+    icon = add_vertex(root, f"icon-{node.id}", "", style_string({"shape": "image", "image": image}))
+    icon.set("parent", parent)
+    left = node.width - TABLE_TEXT_INSET_PX - TABLE_CARD_ICON_PX
+    icon_top = (rules.table_card_header_height - TABLE_CARD_ICON_PX) / 2
+    add_geometry(icon, (left, icon_top, TABLE_CARD_ICON_PX, TABLE_CARD_ICON_PX))
 
 
 def _add_table_rows(root: ET.Element, node: Node, theme: Theme) -> None:
@@ -420,16 +487,13 @@ def _add_table_rows(root: ET.Element, node: Node, theme: Theme) -> None:
             "fontFamily": theme.fonts.mono,
         }
     )
-    y = rules.table_header_height
+    y = _table_header_height(node, theme)
     for section_index, section in enumerate(node.sections):
         if section_index:
             y += rules.table_section_gap
         for row_index, row in enumerate(section):
             cell = add_vertex(
-                root,
-                f"row-{node.id}-{section_index}-{row_index}",
-                _row_value(row.left, row.right),
-                style,
+                root, f"row-{node.id}-{section_index}-{row_index}", _row_value(row, theme), style
             )
             cell.set("parent", f"node-{node.id}")
             add_geometry(cell, (0, y, node.width, rules.table_row_height))

@@ -10,7 +10,7 @@ sys.path.insert(0, str(PLUGIN_DIR))
 import pytest  # noqa: E402
 from flowlib.author import Canvas, NodeOptions, Route, Side, sentence_case  # noqa: E402
 from flowlib.check import Severity  # noqa: E402
-from flowlib.model import Role, Shape, Tone  # noqa: E402
+from flowlib.model import Role, Row, Shape, Tone  # noqa: E402
 
 
 def _small_canvas() -> Canvas:
@@ -129,9 +129,28 @@ def test_an_event_is_a_circle_whatever_its_caption() -> None:
     canvas = Canvas()
     for index, shape in enumerate((Shape.START, Shape.END, Shape.INTERMEDIATE)):
         box = canvas.node(
-            f"e{index}",
+            f"event{index}",
             shape,
             "A very long caption for an event",
             NodeOptions((100, 100 + index * 80)),
         )
         assert box.node.width == box.node.height == 38
+
+
+def test_a_node_may_not_take_an_id_the_canvas_gives_to_lines() -> None:
+    """An id such as e1 would clash with the first line when the scene is read back."""
+    canvas = Canvas("A test", "One step")
+    with pytest.raises(ValueError, match="kept for lines"):
+        canvas.node("e1", Shape.PROCESS, "Check", NodeOptions((200, 230)))
+
+
+def test_a_table_is_sized_by_its_rows_and_has_a_taller_header_when_illustrated() -> None:
+    """The illustrated table has the same rows under a header of the card height."""
+    rows = (Row("id", "uuid", ("PK",)), Row("customer_id", "uuid", ("FK",)))
+    canvas = Canvas("Schema", "Two tables")
+    plain = canvas.node("plain", Shape.TABLE, "orders", NodeOptions((300, 300), rows=rows))
+    card = canvas.node(
+        "card", Shape.TABLE, "orders", NodeOptions((700, 300), rows=rows, card=True, icon="cart")
+    )
+    assert card.node.height - plain.node.height == 28
+    assert plain.node.sections == (rows,)
