@@ -1,0 +1,87 @@
+{
+ "type": "dfd",
+ "title": "Level 0, context: food delivery, illustrated",
+ "desc": "The whole system is one process. The diagram shows only what crosses its border: data in and data out, between the system and the four outside parties.",
+ "elements": [
+  {
+   "id": "customer",
+   "label": "Customer",
+   "kind": "external",
+   "tone": "blue",
+   "icon": "user"
+  },
+  {
+   "id": "restaurant",
+   "label": "Restaurant",
+   "kind": "external",
+   "tone": "green",
+   "icon": "store"
+  },
+  {
+   "id": "courier",
+   "label": "Courier",
+   "kind": "external",
+   "tone": "teal",
+   "icon": "courier"
+  },
+  {
+   "id": "payment",
+   "label": "Payment provider",
+   "kind": "external",
+   "tone": "gray",
+   "icon": "card"
+  },
+  {
+   "id": "system",
+   "label": "Delivery system",
+   "detail": "takes orders, charges, dispatches",
+   "icon": "package"
+  }
+ ],
+ "flows": [
+  {
+   "from": "customer",
+   "to": "system",
+   "label": "Basket, card details",
+   "main": true
+  },
+  {
+   "from": "system",
+   "to": "customer",
+   "label": "Confirmation, tracking"
+  },
+  {
+   "from": "system",
+   "to": "restaurant",
+   "label": "Order ticket"
+  },
+  {
+   "from": "restaurant",
+   "to": "system",
+   "label": "Ready signal"
+  },
+  {
+   "from": "system",
+   "to": "courier",
+   "label": "Delivery job"
+  },
+  {
+   "from": "courier",
+   "to": "system",
+   "label": "Job reply, location, drop-off proof"
+  },
+  {
+   "from": "system",
+   "to": "payment",
+   "label": "Charge request",
+   "main": true
+  },
+  {
+   "from": "payment",
+   "to": "system",
+   "label": "Payment result",
+   "main": true
+  }
+ ],
+ "style": "illustrated"
+}

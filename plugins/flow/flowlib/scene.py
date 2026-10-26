@@ -29,6 +29,7 @@ from .model import (
     FrameVariant,
     Head,
     LabelKind,
+    Marker,
     Node,
     Point,
     Role,
@@ -48,7 +49,7 @@ FRAME_KEYS = {"id", "x", "y", "width", "height", "label", "tone", "variant", "gu
 DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
 NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections", "card", "dashed"}
-NODE_KEYS |= {"screen", "chip"}
+NODE_KEYS |= {"screen", "chip", "markers"}
 ROW_KEYS = {"left", "right", "flags"}
 EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label", "extras"}
 LABEL_KEYS = {"text", "at", "kind", "number", "icon"}
@@ -187,6 +188,7 @@ def _dump_node(node: Node) -> dict[str, Any]:
         "sections": [[_dump_row(row) for row in section] for section in node.sections],
         "screen": dump_screen(node.screen) if node.screen else None,
         "chip": _dump_label(node.chip) if node.chip else None,
+        "markers": [marker.value for marker in node.markers],
     }
     written.update({key: value for key, value in optional.items() if value})
     return written
@@ -364,7 +366,19 @@ class _SceneParser:
             if "screen" in raw
             else None,
             chip=self._label(raw.get("chip"), f"{where}.chip") if "chip" in raw else None,
+            markers=self._markers(raw.get("markers", []), where),
         )
+
+    def _markers(self, raw: object, where: str) -> tuple[Marker, ...]:
+        """Read the BPMN marks of a node."""
+        if not isinstance(raw, list):
+            self._read.report(where, "'markers' must be a list")
+            return ()
+        found = [
+            self._read.enum(Marker, {"markers": item}, "markers", f"{where}.markers[{index}]")
+            for index, item in enumerate(raw)
+        ]
+        return tuple(marker for marker in found if marker is not None)
 
     def _sections(self, raw: object, where: str) -> tuple[tuple[Row, ...], ...]:
         """Read the row groups of a table node."""

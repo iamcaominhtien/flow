@@ -26,6 +26,7 @@ HEAD_ARROWS = {
     Head.FILLED: "block",
     Head.OPEN: "open",
     Head.DOT: "oval",
+    Head.CIRCLE: "oval",
     Head.TRIANGLE: "block",
     Head.DIAMOND: "diamond",
     Head.DIAMOND_FILLED: "diamond",

@@ -1,4 +1,4 @@
-"""Tests for the data-driven graph types: DFD, C4, cloud, use case, BPMN, class and screen flow."""
+"""Tests for the data-driven graph types: C4, cloud, use case, BPMN, class and screen flow."""
 
 import copy
 import json
@@ -11,7 +11,6 @@ ROOT = Path(__file__).resolve().parent.parent
 PLUGIN_DIR = ROOT / "plugins" / "flow"
 EXAMPLES = ROOT / "examples"
 CASES = {
-    "order-dfd.spec.json": "dfd",
     "delivery-c4.spec.json": "c4",
     "web-cloud.spec.json": "cloud",
     "shop-usecase.spec.json": "usecase",
@@ -85,7 +84,7 @@ def test_actor_label_goes_under_the_figure() -> None:
 
 def test_unknown_kind_and_style_are_refused() -> None:
     """A wrong kind or line style fails and lists the choices."""
-    raw = raw_example("order-dfd.spec.json")
+    raw = raw_example("refund-bpmn.spec.json")
     raw["elements"][0]["kind"] = "robot"
     raw["flows"][0]["style"] = "zigzag"
     with pytest.raises(SpecError) as caught:
@@ -97,9 +96,9 @@ def test_unknown_kind_and_style_are_refused() -> None:
 
 def test_a_link_to_a_missing_item_gets_a_suggestion() -> None:
     """A misspelt end of a link names the likely item."""
-    raw = raw_example("order-dfd.spec.json")
-    raw["flows"][0]["to"] = "procs"
-    with pytest.raises(SpecError, match="proc"):
+    raw = raw_example("refund-bpmn.spec.json")
+    raw["flows"][0]["to"] = "chek"
+    with pytest.raises(SpecError, match="check"):
         diagrams.layout(raw)
 
 

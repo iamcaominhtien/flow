@@ -43,6 +43,29 @@ class Shape(StrEnum):
     ELLIPSE = "ellipse"
     SCREEN = "screen"
     FLAG = "flag"
+    TASK = "task"  # a BPMN task: a rounded box with an ink outline
+    DFD_PROCESS = "dfd_process"  # a rounded box with its number in a header strip (Gane-Sarson)
+    DFD_STORE = "dfd_store"  # a box open on the right, with an id cell on the left
+
+
+class Marker(StrEnum):
+    """A small mark inside a BPMN event, task or gateway that names its kind or trigger."""
+
+    MESSAGE = "message"  # an outlined envelope: a message event, or a receive task
+    MESSAGE_FILLED = "message_filled"  # a filled envelope: a send task
+    TIMER = "timer"
+    ERROR = "error"
+    SIGNAL = "signal"
+    USER = "user"
+    SERVICE = "service"
+    MANUAL = "manual"
+    CROSS = "cross"  # an exclusive gateway
+    PLUS = "plus"  # a parallel gateway
+    CIRCLE = "circle"  # an inclusive gateway
+    EVENT_BASED = "event_based"  # a ringed pentagon
+    LOOP = "loop"
+    MULTI_INSTANCE = "multi_instance"  # three bars
+    SUBPROCESS = "subprocess"  # a small box with a plus at the bottom
 
 
 class Role(StrEnum):
@@ -56,6 +79,7 @@ class Role(StrEnum):
     DATA = "data"
     LIFELINE = "lifeline"
     LOGICAL = "logical"
+    ASSOCIATION = "association"  # a dotted line from a task to a data store
 
 
 class LabelKind(StrEnum):
@@ -101,6 +125,7 @@ class Head(StrEnum):
     TRIANGLE = "triangle"
     DIAMOND = "diamond"
     DIAMOND_FILLED = "diamond_filled"
+    CIRCLE = "circle"  # a hollow circle: the start of a message flow
     ONE = "one"
     MANY = "many"
     ONE_ONLY = "one_only"
@@ -111,6 +136,7 @@ class Head(StrEnum):
 
 SYMBOL_HEADS = (
     Head.TRIANGLE,
+    Head.CIRCLE,
     Head.DIAMOND,
     Head.DIAMOND_FILLED,
     Head.ONE,
@@ -128,6 +154,9 @@ class FrameVariant(StrEnum):
     AREA = "area"
     LANE = "lane"
     FRAGMENT = "fragment"
+    POOL = "pool"  # a white pool with a coloured band on the left that carries the name
+    BLACK_BOX = "black_box"  # a pool drawn only as a filled bar with its name
+    OPENED = "opened"  # the dashed frame around a process that a lower-level diagram opens
 
 
 class Side(StrEnum):
@@ -327,6 +356,7 @@ class Node:
     card: bool = False  # drawn as an illustrated card: a large icon, a name pill, a detail line
     dashed: bool = False  # a dashed outline: a reference to something drawn elsewhere
     screen: ScreenView | None = None  # what a screen of a screen flow shows
+    markers: tuple[Marker, ...] = ()  # BPMN marks: the trigger, the task type, the repeat
     chip: EdgeLabel | None = None  # a chip on the node; ``at`` is relative to its top-left
 
 

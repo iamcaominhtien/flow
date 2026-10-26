@@ -61,6 +61,13 @@ class Code(StrEnum):
     START_PLACEMENT = "start-placement"
     END_PLACEMENT = "end-placement"
     SEQUENCE_LABEL_LONG = "sequence-label-long"
+    DFD_PROCESS_COUNT = "dfd-process-count"
+    DFD_STORE_ONE_WAY = "dfd-store-one-way"
+    BPMN_MESSAGE_WITHIN_POOL = "bpmn-message-within-pool"
+    BPMN_SEQUENCE_ACROSS_POOLS = "bpmn-sequence-across-pools"
+    BPMN_TOO_MANY_ELEMENTS = "bpmn-too-many-elements"
+    BPMN_ROUTE_BENDS = "bpmn-route-bends"
+    BPMN_MAIN_PATH = "bpmn-main-path"
 
 
 @dataclass(frozen=True)
@@ -506,6 +513,7 @@ def check_scene(scene: Scene) -> list[Finding]:
     Returns:
         All findings, errors first.
     """
+    from .check_notation import check_notation
     from .lint import lint_scene
 
     rules = load_theme().layout
@@ -521,6 +529,7 @@ def check_scene(scene: Scene) -> list[Finding]:
         *check_overlaps(scene),
         *check_borders(scene, rules),
         *check_label_length(scene),
+        *check_notation(scene),
     ]
     named = [_with_names(finding, scene) for finding in findings]
     return sorted(named, key=lambda finding: finding.severity is not Severity.ERROR)

@@ -217,9 +217,10 @@ def _store(width: float, height: float, colors: ShapeColors) -> str:
 def _ring(width: float, height: float, colors: ShapeColors, stroke_width: float) -> str:
     """Draw a circle outline with the given stroke width, inset so that it is not clipped."""
     radius = min(width, height) / 2 - stroke_width / 2
+    dash = f' stroke-dasharray="{colors.dash}"' if colors.dash else ""
     return (
         f'<circle cx="{fmt(width / 2)}" cy="{fmt(height / 2)}" r="{fmt(radius)}" '
-        f'fill="{colors.fill}" stroke="{colors.stroke}" stroke-width="{fmt(stroke_width)}"/>'
+        f'fill="{colors.fill}" stroke="{colors.stroke}" stroke-width="{fmt(stroke_width)}"{dash}/>'
     )
 
 
@@ -320,6 +321,9 @@ DRAWERS: dict[Shape, Drawer] = {
     Shape.ELLIPSE: _ellipse,
     Shape.SCREEN: _rounded_box,
     Shape.FLAG: _flag,
+    Shape.TASK: _rounded_box,
+    Shape.DFD_PROCESS: _rounded_box,
+    Shape.DFD_STORE: _store,
 }
 
 

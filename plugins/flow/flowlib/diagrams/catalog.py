@@ -1,4 +1,4 @@
-"""The graph-family types that are only data: DFD, C4, cloud, use case, BPMN, class, screen flow."""
+"""The graph-family types that are only data: C4, cloud, use case, BPMN, class, screen flow."""
 
 from typing import Any
 
@@ -19,16 +19,6 @@ def _class_sections(raw: dict[str, Any], where: str, read: Reader) -> dict[str, 
     return {"sections": tuple(section for section in (attributes, methods) if section)}
 
 
-DFD = GraphType(
-    name="DFD",
-    nodes_key="elements",
-    links_key="flows",
-    kinds={"process": Shape.ELLIPSE, "external": Shape.ENTITY, "store": Shape.STORE},
-    default_kind="process",
-    line_kinds={"flow": FLOW},
-    default_line="flow",
-    default_role=Role.DATA,
-)
 C4 = GraphType(
     name="C4",
     nodes_key="elements",
@@ -153,7 +143,6 @@ SCREEN = GraphType(
 )
 
 TYPES: dict[str, GraphType] = {
-    "dfd": DFD,
     "c4": C4,
     "cloud": CLOUD,
     "usecase": USE_CASE,
