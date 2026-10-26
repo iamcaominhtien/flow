@@ -1,0 +1,295 @@
+{
+  "type": "c4",
+  "title": "Level 2, containers: food delivery",
+  "desc": "Zoom into the platform. A container is something that runs on its own: an app, a service, a database. Each line says how two containers talk. People and outside systems stay as they were on level 1.",
+  "opens": {
+    "spec": "delivery-c4-context.spec.json",
+    "element": "platform"
+  },
+  "elements": [
+    {
+      "id": "customer",
+      "at": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "staff",
+      "at": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "courier",
+      "at": [
+        0,
+        2
+      ]
+    },
+    {
+      "id": "psp",
+      "at": [
+        3,
+        4
+      ]
+    },
+    {
+      "id": "map",
+      "at": [
+        1,
+        4
+      ]
+    },
+    {
+      "id": "sms",
+      "at": [
+        4,
+        4
+      ]
+    },
+    {
+      "id": "custapp",
+      "label": "Customer app",
+      "kind": "container",
+      "technology": "iOS, Android",
+      "description": "Browse, order, track.",
+      "icon": "phone",
+      "tone": "blue",
+      "at": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "tablet",
+      "label": "Restaurant tablet",
+      "kind": "container",
+      "technology": "web app",
+      "description": "Incoming orders on the kitchen screen.",
+      "icon": "laptop",
+      "tone": "green",
+      "at": [
+        1,
+        1
+      ]
+    },
+    {
+      "id": "courierapp",
+      "label": "Courier app",
+      "kind": "container",
+      "technology": "iOS, Android",
+      "description": "Jobs, routes, proof of delivery.",
+      "icon": "phone",
+      "tone": "teal",
+      "at": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "gateway",
+      "label": "API gateway",
+      "kind": "container",
+      "technology": "Kong",
+      "description": "Routing, auth checks, rate limits.",
+      "icon": "api-gateway",
+      "tone": "violet",
+      "at": [
+        2,
+        1
+      ]
+    },
+    {
+      "id": "dispatch",
+      "label": "Dispatch service",
+      "kind": "container",
+      "technology": "Go",
+      "description": "Matches orders to couriers.",
+      "icon": "courier",
+      "tone": "teal",
+      "at": [
+        3,
+        0
+      ]
+    },
+    {
+      "id": "order",
+      "label": "Order service",
+      "kind": "container",
+      "technology": "Kotlin, Spring",
+      "description": "Checkout, order status, events.",
+      "icon": "server",
+      "tone": "violet",
+      "at": [
+        3,
+        1
+      ]
+    },
+    {
+      "id": "payment",
+      "label": "Payment service",
+      "kind": "container",
+      "technology": "Kotlin, Spring",
+      "description": "Charges and refunds.",
+      "icon": "card",
+      "tone": "amber",
+      "at": [
+        3,
+        2
+      ]
+    },
+    {
+      "id": "cache",
+      "label": "Location cache",
+      "kind": "database",
+      "technology": "Redis",
+      "description": "Live courier positions.",
+      "icon": "in-memory-cache",
+      "tone": "teal",
+      "at": [
+        4,
+        0
+      ]
+    },
+    {
+      "id": "db",
+      "label": "Orders database",
+      "kind": "database",
+      "technology": "PostgreSQL",
+      "description": "Orders, customers, menus.",
+      "icon": "sql-database",
+      "tone": "violet",
+      "at": [
+        4,
+        1
+      ]
+    },
+    {
+      "id": "bus",
+      "label": "Event bus",
+      "kind": "container",
+      "technology": "Kafka",
+      "description": "Order and delivery events.",
+      "icon": "event-stream",
+      "tone": "amber",
+      "at": [
+        4,
+        2
+      ]
+    },
+    {
+      "id": "notify",
+      "label": "Notification service",
+      "kind": "container",
+      "technology": "Node.js",
+      "description": "Builds and sends messages.",
+      "icon": "bell",
+      "tone": "green",
+      "at": [
+        4,
+        3
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": "customer",
+      "to": "custapp",
+      "label": "Orders food using",
+      "main": true
+    },
+    {
+      "from": "staff",
+      "to": "tablet",
+      "label": "Accepts orders using"
+    },
+    {
+      "from": "courier",
+      "to": "courierapp",
+      "label": "Gets jobs using"
+    },
+    {
+      "from": "custapp",
+      "to": "gateway",
+      "protocol": "HTTPS, JSON",
+      "main": true
+    },
+    {
+      "from": "tablet",
+      "to": "gateway",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "courierapp",
+      "to": "gateway",
+      "protocol": "HTTPS, JSON"
+    },
+    {
+      "from": "courierapp",
+      "to": "map",
+      "label": "Shows routes using",
+      "protocol": "SDK"
+    },
+    {
+      "from": "gateway",
+      "to": "dispatch",
+      "protocol": "REST"
+    },
+    {
+      "from": "gateway",
+      "to": "order",
+      "protocol": "REST",
+      "main": true
+    },
+    {
+      "from": "order",
+      "to": "dispatch",
+      "label": "assigns courier",
+      "protocol": "gRPC"
+    },
+    {
+      "from": "order",
+      "to": "payment",
+      "protocol": "gRPC",
+      "main": true
+    },
+    {
+      "from": "payment",
+      "to": "psp",
+      "protocol": "HTTPS API",
+      "main": true
+    },
+    {
+      "from": "dispatch",
+      "to": "cache",
+      "label": "positions",
+      "protocol": "RESP"
+    },
+    {
+      "from": "order",
+      "to": "db",
+      "protocol": "SQL"
+    },
+    {
+      "from": "order",
+      "to": "bus",
+      "label": "order.placed",
+      "kind": "event"
+    },
+    {
+      "from": "bus",
+      "to": "notify",
+      "label": "consumes",
+      "kind": "event"
+    },
+    {
+      "from": "notify",
+      "to": "sms",
+      "label": "sends",
+      "protocol": "HTTPS",
+      "kind": "event"
+    }
+  ]
+}

@@ -1,0 +1,567 @@
+{
+  "type": "architecture",
+  "title": "Complete system: video streaming platform, illustrated",
+  "desc": "A large system in seven layers. Blue is the path of one tap on Play: app, gateway, playback service, catalog, catalog database. Ink lines are calls, violet lines are events and jobs, dashed lines are reads and copies. A line from a frame edge means \"from any part inside\".",
+  "zones": [
+    {
+      "id": "clients",
+      "label": "Clients",
+      "tone": "blue"
+    },
+    {
+      "id": "edge",
+      "label": "Edge",
+      "tone": "violet"
+    },
+    {
+      "id": "third",
+      "label": "Third party",
+      "tone": "gray"
+    },
+    {
+      "id": "services",
+      "label": "Services",
+      "tone": "green"
+    },
+    {
+      "id": "pipeline",
+      "label": "Video pipeline",
+      "tone": "violet"
+    },
+    {
+      "id": "data",
+      "label": "Data",
+      "tone": "amber"
+    },
+    {
+      "id": "analytics",
+      "label": "Analytics",
+      "tone": "teal"
+    },
+    {
+      "id": "obs",
+      "label": "Observability",
+      "tone": "gray"
+    }
+  ],
+  "components": [
+    {
+      "id": "web",
+      "label": "Web player",
+      "detail": "browser",
+      "icon": "browser",
+      "zone": "clients",
+      "at": [
+        0,
+        0
+      ],
+      "tone": "blue"
+    },
+    {
+      "id": "mobile",
+      "label": "Mobile app",
+      "detail": "iOS, Android",
+      "icon": "phone",
+      "zone": "clients",
+      "at": [
+        0,
+        1
+      ],
+      "tone": "blue"
+    },
+    {
+      "id": "tv",
+      "label": "Smart TV app",
+      "detail": "living room",
+      "icon": "laptop",
+      "zone": "clients",
+      "at": [
+        0,
+        2
+      ],
+      "tone": "blue"
+    },
+    {
+      "id": "studio",
+      "label": "Creator studio",
+      "detail": "upload and edit",
+      "icon": "laptop",
+      "zone": "clients",
+      "at": [
+        0,
+        6
+      ],
+      "tone": "violet"
+    },
+    {
+      "id": "cdn",
+      "label": "CDN",
+      "detail": "video segments",
+      "icon": "cdn",
+      "zone": "edge",
+      "at": [
+        1,
+        0
+      ],
+      "tone": "violet"
+    },
+    {
+      "id": "gateway",
+      "label": "API gateway",
+      "detail": "routing, limits",
+      "icon": "api-gateway",
+      "zone": "edge",
+      "at": [
+        1,
+        1
+      ],
+      "tone": "violet"
+    },
+    {
+      "id": "auth",
+      "label": "Auth",
+      "detail": "tokens, sessions",
+      "icon": "identity-iam",
+      "zone": "edge",
+      "at": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "upload",
+      "label": "Upload gateway",
+      "detail": "resumable uploads",
+      "icon": "api-gateway",
+      "zone": "edge",
+      "at": [
+        1,
+        6
+      ],
+      "tone": "violet"
+    },
+    {
+      "id": "psp",
+      "label": "Payment provider",
+      "detail": "card network",
+      "icon": "card",
+      "zone": "third",
+      "at": [
+        1,
+        4
+      ]
+    },
+    {
+      "id": "playback",
+      "label": "Playback",
+      "detail": "manifests, licences",
+      "icon": "server",
+      "zone": "services",
+      "at": [
+        2,
+        1
+      ],
+      "tone": "green"
+    },
+    {
+      "id": "catalog",
+      "label": "Catalog",
+      "detail": "titles, metadata",
+      "icon": "server",
+      "zone": "services",
+      "at": [
+        2,
+        2
+      ],
+      "tone": "green"
+    },
+    {
+      "id": "profiles",
+      "label": "Profiles",
+      "detail": "accounts, history",
+      "icon": "server",
+      "zone": "services",
+      "at": [
+        2,
+        3
+      ],
+      "tone": "green"
+    },
+    {
+      "id": "billing",
+      "label": "Billing",
+      "detail": "plans, invoices",
+      "icon": "card",
+      "zone": "services",
+      "at": [
+        2,
+        4
+      ],
+      "tone": "amber"
+    },
+    {
+      "id": "search",
+      "label": "Search",
+      "detail": "queries, suggest",
+      "icon": "search",
+      "zone": "services",
+      "at": [
+        2,
+        5
+      ],
+      "tone": "green"
+    },
+    {
+      "id": "ingest",
+      "label": "Ingest",
+      "detail": "validates files",
+      "icon": "server",
+      "zone": "pipeline",
+      "at": [
+        2,
+        6
+      ],
+      "tone": "violet"
+    },
+    {
+      "id": "raw",
+      "label": "Raw uploads",
+      "detail": "original files",
+      "icon": "bucket",
+      "zone": "pipeline",
+      "at": [
+        2,
+        7
+      ],
+      "tone": "violet"
+    },
+    {
+      "id": "jobs",
+      "label": "Job queue",
+      "detail": "transcode jobs",
+      "icon": "message-queue",
+      "zone": "pipeline",
+      "at": [
+        3.5,
+        6
+      ],
+      "tone": "violet"
+    },
+    {
+      "id": "transcoder",
+      "label": "Transcoder",
+      "detail": "worker containers",
+      "icon": "batch-scheduler",
+      "zone": "pipeline",
+      "at": [
+        3.5,
+        7
+      ],
+      "tone": "violet"
+    },
+    {
+      "id": "library",
+      "label": "Video library",
+      "detail": "HLS segments",
+      "icon": "bucket",
+      "zone": "data",
+      "at": [
+        4,
+        0
+      ],
+      "tone": "violet"
+    },
+    {
+      "id": "session",
+      "label": "Session cache",
+      "detail": "Redis",
+      "icon": "in-memory-cache",
+      "zone": "data",
+      "at": [
+        4,
+        1
+      ],
+      "tone": "green"
+    },
+    {
+      "id": "catalogdb",
+      "label": "Catalog DB",
+      "detail": "document store",
+      "icon": "nosql-database",
+      "zone": "data",
+      "at": [
+        4,
+        2
+      ],
+      "tone": "green"
+    },
+    {
+      "id": "profilesdb",
+      "label": "Profiles DB",
+      "detail": "PostgreSQL",
+      "icon": "sql-database",
+      "zone": "data",
+      "at": [
+        4,
+        3
+      ],
+      "tone": "green"
+    },
+    {
+      "id": "billingdb",
+      "label": "Billing DB",
+      "detail": "PostgreSQL",
+      "icon": "sql-database",
+      "zone": "data",
+      "at": [
+        4,
+        4
+      ],
+      "tone": "amber"
+    },
+    {
+      "id": "index",
+      "label": "Search index",
+      "detail": "inverted index",
+      "icon": "table",
+      "zone": "data",
+      "at": [
+        4,
+        5
+      ],
+      "tone": "green"
+    },
+    {
+      "id": "events",
+      "label": "Event stream",
+      "detail": "play, search, billing",
+      "icon": "event-stream",
+      "zone": "analytics",
+      "at": [
+        5.2,
+        1.5
+      ],
+      "tone": "teal"
+    },
+    {
+      "id": "processor",
+      "label": "Stream processor",
+      "detail": "windows, joins",
+      "icon": "function",
+      "zone": "analytics",
+      "at": [
+        5.2,
+        2.5
+      ],
+      "tone": "teal"
+    },
+    {
+      "id": "lake",
+      "label": "Data lake",
+      "detail": "raw events",
+      "icon": "data-lake",
+      "zone": "analytics",
+      "at": [
+        5.2,
+        3.5
+      ],
+      "tone": "teal"
+    },
+    {
+      "id": "warehouse",
+      "label": "Data warehouse",
+      "detail": "reports",
+      "icon": "data-warehouse",
+      "zone": "analytics",
+      "at": [
+        5.2,
+        4.5
+      ],
+      "tone": "teal"
+    },
+    {
+      "id": "dash",
+      "label": "Dashboards",
+      "detail": "for the business",
+      "icon": "bar-chart",
+      "zone": "analytics",
+      "at": [
+        5.2,
+        5.5
+      ],
+      "tone": "teal"
+    },
+    {
+      "id": "monitoring",
+      "label": "Monitoring",
+      "detail": "metrics, alerts",
+      "icon": "monitoring",
+      "zone": "obs",
+      "at": [
+        6.4,
+        1
+      ]
+    },
+    {
+      "id": "logging",
+      "label": "Logging",
+      "detail": "central logs",
+      "icon": "logging",
+      "zone": "obs",
+      "at": [
+        6.4,
+        2
+      ]
+    }
+  ],
+  "links": [
+    {
+      "from": "web",
+      "to": "cdn",
+      "label": "video segments"
+    },
+    {
+      "from": "mobile",
+      "to": "gateway",
+      "label": "HTTPS",
+      "main": true
+    },
+    {
+      "from": "tv",
+      "to": "gateway",
+      "label": "HTTPS, web and TV"
+    },
+    {
+      "from": "studio",
+      "to": "upload",
+      "label": "upload"
+    },
+    {
+      "from": "cdn",
+      "to": "library",
+      "label": "origin fetch",
+      "kind": "copy"
+    },
+    {
+      "from": "gateway",
+      "to": "auth",
+      "label": "verify token"
+    },
+    {
+      "from": "gateway",
+      "to": "playback",
+      "label": "start playback",
+      "main": true
+    },
+    {
+      "from": "gateway",
+      "to": "services",
+      "label": "REST, gRPC"
+    },
+    {
+      "from": "playback",
+      "to": "catalog",
+      "label": "title info",
+      "main": true
+    },
+    {
+      "from": "catalog",
+      "to": "catalogdb",
+      "label": "read",
+      "main": true
+    },
+    {
+      "from": "playback",
+      "to": "session",
+      "label": "sessions"
+    },
+    {
+      "from": "profiles",
+      "to": "profilesdb",
+      "label": "accounts"
+    },
+    {
+      "from": "billing",
+      "to": "billingdb",
+      "label": "ledger"
+    },
+    {
+      "from": "search",
+      "to": "index",
+      "label": "query"
+    },
+    {
+      "from": "billing",
+      "to": "psp",
+      "label": "charge"
+    },
+    {
+      "from": "upload",
+      "to": "ingest",
+      "label": "chunks"
+    },
+    {
+      "from": "ingest",
+      "to": "raw",
+      "label": "original"
+    },
+    {
+      "from": "ingest",
+      "to": "jobs",
+      "label": "new job",
+      "kind": "event"
+    },
+    {
+      "from": "raw",
+      "to": "transcoder",
+      "label": "read",
+      "kind": "copy"
+    },
+    {
+      "from": "jobs",
+      "to": "transcoder",
+      "label": "job",
+      "kind": "event"
+    },
+    {
+      "from": "transcoder",
+      "to": "library",
+      "label": "HLS segments"
+    },
+    {
+      "from": "playback",
+      "to": "events",
+      "label": "play and search events",
+      "kind": "event"
+    },
+    {
+      "from": "events",
+      "to": "processor",
+      "label": "events",
+      "kind": "event"
+    },
+    {
+      "from": "processor",
+      "to": "lake",
+      "label": "sink",
+      "kind": "event"
+    },
+    {
+      "from": "lake",
+      "to": "warehouse",
+      "label": "ETL"
+    },
+    {
+      "from": "warehouse",
+      "to": "dash",
+      "label": "SQL"
+    },
+    {
+      "from": "services",
+      "to": "obs",
+      "label": "metrics and logs",
+      "kind": "copy"
+    }
+  ],
+  "style": "illustrated"
+}

@@ -1,0 +1,94 @@
+{
+  "type": "c4",
+  "title": "Level 1, system context: food delivery",
+  "desc": "Who uses the platform and which outside systems it depends on. The platform is one box here; its insides are not shown. Dashed boxes are systems we do not own.",
+  "elements": [
+    {
+      "id": "customer",
+      "label": "Customer",
+      "kind": "person",
+      "icon": "user",
+      "tone": "blue",
+      "description": "Orders food and tracks the delivery."
+    },
+    {
+      "id": "staff",
+      "label": "Restaurant staff",
+      "kind": "person",
+      "icon": "team",
+      "tone": "green",
+      "description": "Accept orders and mark them ready."
+    },
+    {
+      "id": "courier",
+      "label": "Courier",
+      "kind": "person",
+      "icon": "courier",
+      "tone": "teal",
+      "description": "Picks up and delivers orders."
+    },
+    {
+      "id": "platform",
+      "label": "Delivery platform",
+      "kind": "system",
+      "icon": "server",
+      "description": "Takes orders, charges payments, dispatches couriers and keeps everyone informed."
+    },
+    {
+      "id": "psp",
+      "label": "Payment provider",
+      "kind": "external",
+      "icon": "card",
+      "description": "Charges and refunds cards."
+    },
+    {
+      "id": "map",
+      "label": "Map service",
+      "kind": "external",
+      "icon": "globe",
+      "description": "Routes and arrival times."
+    },
+    {
+      "id": "sms",
+      "label": "Push and SMS gateway",
+      "kind": "external",
+      "icon": "bell",
+      "description": "Delivers messages to phones."
+    }
+  ],
+  "relations": [
+    {
+      "from": "customer",
+      "to": "platform",
+      "label": "Orders food using",
+      "main": true
+    },
+    {
+      "from": "staff",
+      "to": "platform",
+      "label": "Accept orders using"
+    },
+    {
+      "from": "courier",
+      "to": "platform",
+      "label": "Gets jobs from"
+    },
+    {
+      "from": "platform",
+      "to": "psp",
+      "label": "Charges cards using",
+      "main": true
+    },
+    {
+      "from": "platform",
+      "to": "map",
+      "label": "Routes and ETAs from"
+    },
+    {
+      "from": "platform",
+      "to": "sms",
+      "label": "Sends messages using",
+      "kind": "event"
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "type": "c4",
+  "title": "Level 3, components: the Order service",
+  "desc": "Zoom into one container. A component is a part inside it: a controller, a handler, a client. Neighbours are shown as containers, because that is what they are from here.",
+  "opens": {
+    "spec": "delivery-c4-container.spec.json",
+    "element": "order"
+  },
+  "elements": [
+    {
+      "id": "gateway",
+      "at": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "controller",
+      "label": "Order controller",
+      "kind": "component",
+      "technology": "Spring REST",
+      "description": "Receives the calls from the gateway.",
+      "icon": "code",
+      "tone": "violet",
+      "at": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "checkout",
+      "label": "Checkout handler",
+      "kind": "component",
+      "technology": "Kotlin",
+      "description": "Validates the basket and drives checkout.",
+      "icon": "workflow",
+      "tone": "violet",
+      "at": [
+        2,
+        0
+      ]
+    },
+    {
+      "id": "pay",
+      "label": "Payment client",
+      "kind": "component",
+      "technology": "gRPC",
+      "description": "Asks the payment service to charge.",
+      "icon": "plugin",
+      "tone": "amber",
+      "at": [
+        2,
+        1
+      ]
+    },
+    {
+      "id": "state",
+      "label": "Order state machine",
+      "kind": "component",
+      "technology": "Kotlin",
+      "description": "Placed, paid, cooking, on the way, delivered.",
+      "icon": "flag",
+      "tone": "violet",
+      "at": [
+        3,
+        0
+      ]
+    },
+    {
+      "id": "publisher",
+      "label": "Event publisher",
+      "kind": "component",
+      "technology": "Kafka client",
+      "description": "Emits an event for every state change.",
+      "icon": "pub-sub",
+      "tone": "amber",
+      "at": [
+        3,
+        1
+      ]
+    },
+    {
+      "id": "repo",
+      "label": "Order repository",
+      "kind": "component",
+      "technology": "Spring Data",
+      "description": "Reads and writes orders.",
+      "icon": "table",
+      "tone": "violet",
+      "at": [
+        4,
+        0
+      ]
+    },
+    {
+      "id": "payment",
+      "at": [
+        2,
+        2
+      ]
+    },
+    {
+      "id": "bus",
+      "at": [
+        3,
+        2
+      ]
+    },
+    {
+      "id": "db",
+      "at": [
+        5,
+        0
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": "gateway",
+      "to": "controller",
+      "protocol": "REST",
+      "main": true
+    },
+    {
+      "from": "controller",
+      "to": "checkout",
+      "label": "calls",
+      "main": true
+    },
+    {
+      "from": "checkout",
+      "to": "pay",
+      "label": "charge",
+      "main": true
+    },
+    {
+      "from": "pay",
+      "to": "payment",
+      "protocol": "gRPC",
+      "main": true
+    },
+    {
+      "from": "checkout",
+      "to": "state",
+      "label": "marks paid"
+    },
+    {
+      "from": "state",
+      "to": "repo",
+      "label": "save"
+    },
+    {
+      "from": "repo",
+      "to": "db",
+      "protocol": "SQL"
+    },
+    {
+      "from": "state",
+      "to": "publisher",
+      "label": "publishes",
+      "kind": "event"
+    },
+    {
+      "from": "publisher",
+      "to": "bus",
+      "label": "order.placed",
+      "kind": "event"
+    }
+  ]
+}

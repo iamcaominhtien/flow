@@ -16,6 +16,7 @@ sys.path.insert(0, str(PLUGIN_DIR))
 
 from flowlib import diagrams, render_drawio, render_html, scene  # noqa: E402
 from flowlib.check import Code, Severity, check_scene  # noqa: E402
+from flowlib.model import Shape  # noqa: E402
 from flowlib.reader import SpecError  # noqa: E402
 
 
@@ -34,12 +35,12 @@ def test_example_has_no_errors() -> None:
     assert [f for f in found if f.severity is Severity.ERROR] == []
 
 
-def test_boxes_with_an_icon_become_cards_and_the_others_stay_plain() -> None:
-    """A component with an icon is a card; one without is a plain box."""
+def test_every_component_becomes_a_wide_card_even_without_an_icon() -> None:
+    """An illustrated architecture draws every part as a card; a part with no icon has none."""
     raw = shop_raw()
     del raw["components"][1]["icon"]
-    cards = {node.id: node.card for node in diagrams.layout(raw).nodes}
-    assert cards == {"web": True, "api": False, "db": True, "pay": True}
+    shapes = {node.id: node.shape for node in diagrams.layout(raw).nodes}
+    assert set(shapes.values()) == {Shape.WIDE_CARD}
 
 
 def test_plain_style_has_no_cards() -> None:
@@ -50,7 +51,7 @@ def test_plain_style_has_no_cards() -> None:
 
 
 def test_cards_are_taller_than_plain_boxes() -> None:
-    """A card holds a disc, a pill and a detail line, so it is taller than a plain box."""
+    """A card (96 px) is taller than a plain part (68 px)."""
     raw = shop_raw()
     card = diagrams.layout(raw).nodes[0]
     del raw["style"]
@@ -58,11 +59,11 @@ def test_cards_are_taller_than_plain_boxes() -> None:
     assert card.height > plain.height
 
 
-def test_card_flag_survives_the_scene_file() -> None:
-    """Writing a scene and reading it back keeps the card flag."""
+def test_card_shape_survives_the_scene_file() -> None:
+    """Writing a scene and reading it back keeps the card shape."""
     original = diagrams.layout(shop_raw())
     again = scene.parse(scene.dump(original))
-    assert [node.card for node in again.nodes] == [True] * 4
+    assert [node.shape for node in again.nodes] == [Shape.WIDE_CARD] * 4
 
 
 def test_both_renderers_draw_pills_and_use_the_detailed_icon_when_there_is_one() -> None:
@@ -76,13 +77,13 @@ def test_both_renderers_draw_pills_and_use_the_detailed_icon_when_there_is_one()
     assert xml.count('id="disc-') == 0
 
 
-def test_an_icon_without_a_detailed_drawing_gets_a_disc() -> None:
-    """The bike icon has no detailed twin, so its card keeps the tinted disc in both outputs."""
+def test_an_icon_without_a_detailed_drawing_is_drawn_flat() -> None:
+    """The bike icon has no detailed twin, so its card shows the flat icon and no disc."""
     raw = shop_raw()
     raw["components"][0]["icon"] = "bike"
     drawn = diagrams.layout(raw)
-    assert "border-radius:50%" in render_html.render(drawn)
-    assert render_drawio.render(drawn).count('id="disc-') == 1
+    assert "border-radius:50%" not in render_html.render(drawn)
+    assert render_drawio.render(drawn).count('id="icon-web"') == 1
 
 
 def test_a_name_too_long_for_the_pill_is_flagged() -> None:

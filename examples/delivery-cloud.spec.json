@@ -1,0 +1,214 @@
+{
+  "type": "cloud",
+  "title": "Complete cloud diagram: food delivery on two availability zones",
+  "desc": "The delivery platform on a managed cloud. Two zones mean one can fail and orders keep flowing. Blue is one order: from the phone, through the edge, into a zone, to the primary database. Violet is the event stream and the database copy.",
+  "frames": [
+    {
+      "id": "edge",
+      "kind": "edge"
+    },
+    {
+      "id": "region",
+      "kind": "region",
+      "label": "Region eu-west"
+    },
+    {
+      "id": "vpc",
+      "kind": "vpc",
+      "range": "10.0.0.0/16",
+      "parent": "region"
+    },
+    {
+      "id": "za",
+      "kind": "zone",
+      "label": "Zone a",
+      "parent": "vpc"
+    },
+    {
+      "id": "zb",
+      "kind": "zone",
+      "label": "Zone b",
+      "parent": "vpc"
+    },
+    {
+      "id": "pa",
+      "kind": "public",
+      "parent": "za"
+    },
+    {
+      "id": "ra",
+      "kind": "private",
+      "parent": "za"
+    },
+    {
+      "id": "da",
+      "kind": "data",
+      "parent": "za"
+    },
+    {
+      "id": "pb",
+      "kind": "public",
+      "parent": "zb"
+    },
+    {
+      "id": "rb",
+      "kind": "private",
+      "parent": "zb"
+    },
+    {
+      "id": "db_b",
+      "kind": "data",
+      "parent": "zb"
+    }
+  ],
+  "parts": [
+    {
+      "id": "customer",
+      "label": "Customer app",
+      "detail": "iOS, Android",
+      "icon": "phone",
+      "tone": "blue"
+    },
+    {
+      "id": "tablet",
+      "label": "Restaurant tablet",
+      "detail": "kitchen screen",
+      "icon": "laptop",
+      "tone": "green"
+    },
+    {
+      "id": "courier",
+      "label": "Courier app",
+      "detail": "iOS, Android",
+      "icon": "phone",
+      "tone": "teal"
+    },
+    {
+      "id": "cdn",
+      "label": "CDN and firewall",
+      "detail": "caching, bot filter",
+      "icon": "firewall-waf",
+      "tone": "violet",
+      "frame": "edge"
+    },
+    {
+      "id": "lba",
+      "label": "Load balancer",
+      "detail": "zone a",
+      "icon": "load-balancer",
+      "tone": "violet",
+      "frame": "pa"
+    },
+    {
+      "id": "k8sa",
+      "label": "Kubernetes node",
+      "detail": "order and dispatch pods",
+      "icon": "kubernetes",
+      "tone": "blue",
+      "frame": "ra"
+    },
+    {
+      "id": "primary",
+      "label": "Primary database",
+      "detail": "PostgreSQL",
+      "icon": "sql-database",
+      "tone": "violet",
+      "frame": "da"
+    },
+    {
+      "id": "lbb",
+      "label": "Load balancer",
+      "detail": "zone b",
+      "icon": "load-balancer",
+      "tone": "violet",
+      "frame": "pb"
+    },
+    {
+      "id": "k8sb",
+      "label": "Kubernetes node",
+      "detail": "order and dispatch pods",
+      "icon": "kubernetes",
+      "tone": "blue",
+      "frame": "rb"
+    },
+    {
+      "id": "replica",
+      "label": "Replica database",
+      "detail": "read only",
+      "icon": "sql-database",
+      "tone": "violet",
+      "frame": "db_b"
+    },
+    {
+      "id": "queue",
+      "label": "Event queue",
+      "detail": "order events",
+      "icon": "message-queue",
+      "tone": "amber",
+      "frame": "region"
+    }
+  ],
+  "links": [
+    {
+      "from": "customer",
+      "to": "cdn",
+      "label": "HTTPS",
+      "main": true
+    },
+    {
+      "from": "tablet",
+      "to": "cdn",
+      "label": "HTTPS"
+    },
+    {
+      "from": "courier",
+      "to": "cdn",
+      "label": "HTTPS"
+    },
+    {
+      "from": "cdn",
+      "to": "lba",
+      "label": "HTTPS",
+      "main": true
+    },
+    {
+      "from": "cdn",
+      "to": "lbb",
+      "label": "HTTPS"
+    },
+    {
+      "from": "lba",
+      "to": "k8sa",
+      "label": "HTTP",
+      "main": true
+    },
+    {
+      "from": "lbb",
+      "to": "k8sb",
+      "label": "HTTP"
+    },
+    {
+      "from": "k8sa",
+      "to": "primary",
+      "label": "SQL",
+      "main": true
+    },
+    {
+      "from": "k8sb",
+      "to": "replica",
+      "label": "SQL, reads"
+    },
+    {
+      "from": "primary",
+      "to": "replica",
+      "label": "replication",
+      "kind": "copy"
+    },
+    {
+      "from": "k8sb",
+      "to": "queue",
+      "label": "order.placed",
+      "kind": "event"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "type": "cloud",
+  "title": "Network diagram: offices joined to the cloud",
+  "desc": "Two sites reach the private network over encrypted tunnels. Admins coming from the internet can only enter through the bastion in the DMZ. Blue is a head-office user reaching the database.",
+  "frames": [
+    {
+      "id": "head",
+      "kind": "onprem",
+      "label": "Head office"
+    },
+    {
+      "id": "branch",
+      "kind": "onprem",
+      "label": "Branch restaurant"
+    },
+    {
+      "id": "region",
+      "kind": "region",
+      "label": "Region eu-west"
+    },
+    {
+      "id": "vpc",
+      "kind": "vpc",
+      "range": "10.0.0.0/16",
+      "parent": "region"
+    },
+    {
+      "id": "dmz",
+      "kind": "dmz",
+      "label": "DMZ subnet",
+      "parent": "vpc"
+    },
+    {
+      "id": "priv",
+      "kind": "private",
+      "parent": "vpc"
+    },
+    {
+      "id": "data",
+      "kind": "data",
+      "parent": "vpc"
+    }
+  ],
+  "parts": [
+    {
+      "id": "remote",
+      "label": "Remote admin",
+      "detail": "from the internet",
+      "icon": "laptop"
+    },
+    {
+      "id": "laptops",
+      "label": "Staff laptops",
+      "detail": "office Wi-Fi",
+      "icon": "laptop",
+      "tone": "blue",
+      "frame": "head"
+    },
+    {
+      "id": "fw",
+      "label": "Office firewall",
+      "detail": "allows VPN only",
+      "icon": "firewall",
+      "frame": "head"
+    },
+    {
+      "id": "router",
+      "label": "Branch router",
+      "detail": "tablets and printer",
+      "icon": "wifi",
+      "tone": "teal",
+      "frame": "branch"
+    },
+    {
+      "id": "vpn",
+      "label": "VPN gateway",
+      "detail": "IPsec tunnels",
+      "icon": "virtual-network",
+      "tone": "violet",
+      "frame": "dmz"
+    },
+    {
+      "id": "bastion",
+      "label": "Bastion host",
+      "detail": "SSH jump server",
+      "icon": "terminal",
+      "frame": "dmz"
+    },
+    {
+      "id": "dash",
+      "label": "Admin dashboard",
+      "detail": "internal tools",
+      "icon": "dashboard",
+      "tone": "blue",
+      "frame": "priv"
+    },
+    {
+      "id": "orders",
+      "label": "Orders database",
+      "detail": "PostgreSQL",
+      "icon": "sql-database",
+      "tone": "violet",
+      "frame": "data"
+    }
+  ],
+  "links": [
+    {
+      "from": "laptops",
+      "to": "fw",
+      "label": "office network",
+      "main": true
+    },
+    {
+      "from": "fw",
+      "to": "vpn",
+      "label": "IPsec VPN",
+      "main": true
+    },
+    {
+      "from": "router",
+      "to": "vpn",
+      "label": "IPsec VPN",
+      "kind": "event"
+    },
+    {
+      "from": "vpn",
+      "to": "dash",
+      "label": "HTTPS",
+      "main": true
+    },
+    {
+      "from": "remote",
+      "to": "bastion",
+      "label": "SSH"
+    },
+    {
+      "from": "bastion",
+      "to": "dash",
+      "label": "SSH"
+    },
+    {
+      "from": "dash",
+      "to": "orders",
+      "label": "SQL",
+      "main": true
+    }
+  ]
+}

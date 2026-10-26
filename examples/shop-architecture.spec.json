@@ -3,24 +3,117 @@
   "title": "Architecture: online shop",
   "desc": "The web app calls the API; the API reads the database and hands payments to a queue that the worker drains.",
   "zones": [
-    {"id": "cloud", "label": "Cloud", "tone": "blue"},
-    {"id": "backend", "label": "Backend", "tone": "violet", "parent": "cloud"}
+    {
+      "id": "clients",
+      "label": "Clients",
+      "tone": "blue"
+    },
+    {
+      "id": "edge",
+      "label": "Edge",
+      "tone": "violet"
+    },
+    {
+      "id": "backend",
+      "label": "Backend",
+      "tone": "green"
+    },
+    {
+      "id": "third",
+      "label": "Third party",
+      "tone": "gray",
+      "beside": "backend"
+    }
   ],
   "components": [
-    {"id": "browser", "label": "Browser", "kind": "client", "icon": "user"},
-    {"id": "web", "label": "Web app", "zone": "cloud", "icon": "phone"},
-    {"id": "api", "label": "API", "detail": "REST, JSON", "zone": "backend", "tone": "violet"},
-    {"id": "db", "label": "Orders DB", "kind": "database", "zone": "backend", "tone": "violet"},
-    {"id": "queue", "label": "Payment queue", "kind": "queue", "zone": "backend", "tone": "violet"},
-    {"id": "worker", "label": "Worker", "zone": "backend", "tone": "violet"},
-    {"id": "psp", "label": "Payment provider", "kind": "external", "icon": "card"}
+    {
+      "id": "browser",
+      "label": "Browser",
+      "detail": "customer",
+      "icon": "user",
+      "zone": "clients"
+    },
+    {
+      "id": "web",
+      "label": "Web app",
+      "detail": "React",
+      "icon": "phone",
+      "zone": "edge"
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "detail": "REST, JSON",
+      "icon": "server",
+      "zone": "backend",
+      "tone": "violet"
+    },
+    {
+      "id": "db",
+      "label": "Orders DB",
+      "detail": "PostgreSQL",
+      "icon": "database",
+      "zone": "backend",
+      "tone": "violet"
+    },
+    {
+      "id": "queue",
+      "label": "Payment queue",
+      "detail": "jobs",
+      "icon": "queue",
+      "zone": "backend",
+      "tone": "amber"
+    },
+    {
+      "id": "worker",
+      "label": "Worker",
+      "detail": "charges cards",
+      "icon": "gear",
+      "zone": "backend",
+      "tone": "green"
+    },
+    {
+      "id": "psp",
+      "label": "Payment provider",
+      "detail": "card network",
+      "icon": "card",
+      "zone": "third"
+    }
   ],
   "links": [
-    {"from": "browser", "to": "web", "label": "HTTPS", "main": true},
-    {"from": "web", "to": "api", "label": "calls", "main": true},
-    {"from": "api", "to": "db", "label": "reads and writes"},
-    {"from": "api", "to": "queue", "label": "enqueues", "style": "async"},
-    {"from": "queue", "to": "worker", "style": "async"},
-    {"from": "worker", "to": "psp", "label": "charges"}
+    {
+      "from": "browser",
+      "to": "web",
+      "label": "HTTPS",
+      "main": true
+    },
+    {
+      "from": "web",
+      "to": "api",
+      "label": "calls",
+      "main": true
+    },
+    {
+      "from": "api",
+      "to": "db",
+      "label": "reads and writes"
+    },
+    {
+      "from": "api",
+      "to": "queue",
+      "label": "enqueues",
+      "kind": "event"
+    },
+    {
+      "from": "queue",
+      "to": "worker",
+      "label": "job",
+      "kind": "event"
+    },
+    {
+      "from": "worker",
+      "to": "psp",
+      "label": "charge"
+    }
   ]
 }
