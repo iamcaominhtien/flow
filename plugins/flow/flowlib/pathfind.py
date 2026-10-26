@@ -18,6 +18,7 @@ BEND_COST_PX = 30.0
 CROSSING_COST_PX = 60.0
 OVERLAP_COST_PER_PX = 6.0
 TRACK_GAP_PX = 10.0  # a route may run this far beside a line already drawn
+TRACK_REACH_PX = 150.0  # but only for lines that pass this close to an end of the route
 OUTSIDE_MARGIN_PX = 40.0
 MIN_CORRIDOR_PX = 8.0  # a gap narrower than this gets no middle line
 SAME_LINE_PX = 2.0
@@ -66,6 +67,16 @@ def _corridors(edges: set[float]) -> list[float]:
     return sorted(lines)
 
 
+def _near(first: Point, second: Point, end: Point) -> bool:
+    """Tell whether a segment passes within reach of an end of the route."""
+    low_x, high_x = sorted((first[0], second[0]))
+    low_y, high_y = sorted((first[1], second[1]))
+    return (
+        low_x - TRACK_REACH_PX < end[0] < high_x + TRACK_REACH_PX
+        and low_y - TRACK_REACH_PX < end[1] < high_y + TRACK_REACH_PX
+    )
+
+
 def _grid(space: SearchSpace, ends: tuple[Point, Point]) -> tuple[list[float], list[float]]:
     """Build the grid lines of the search: x lines and y lines."""
     xs = {point[0] for point in ends}
@@ -74,6 +85,8 @@ def _grid(space: SearchSpace, ends: tuple[Point, Point]) -> tuple[list[float], l
         xs.update((left, right))
         ys.update((top, bottom))
     for first, second in space.lines:
+        if not any(_near(first, second, end) for end in ends):
+            continue
         if abs(first[0] - second[0]) < SAME_LINE_PX:
             xs.update((first[0] - TRACK_GAP_PX, first[0] + TRACK_GAP_PX))
         else:
@@ -137,12 +150,28 @@ class _Search:
         self.first: State = (self.xs.index(start[0]), self.ys.index(start[1]), -1)
         self.best: dict[State, float] = {self.first: 0.0}
         self.parent: dict[State, State] = {}
+        self.steps: dict[tuple[tuple[int, int], tuple[int, int]], float | None] = {}
         self.ticket = count()
         self.queue = [(0.0, next(self.ticket), self.first)]
 
     def point(self, column: int, row: int) -> Point:
         """Return the coordinates of a grid crossing."""
         return (self.xs[column], self.ys[row])
+
+    def step_cost(self, here: tuple[int, int], there: tuple[int, int]) -> float | None:
+        """Return the cost of one step between neighbouring grid crossings, None when blocked.
+
+        The answer does not depend on how the step is reached, so it is kept.
+        """
+        key = (here, there)
+        if key not in self.steps:
+            start, end = self.point(*here), self.point(*there)
+            if _blocked(self.space, start, end):
+                self.steps[key] = None
+            else:
+                length = abs(end[0] - start[0]) + abs(end[1] - start[1])
+                self.steps[key] = length + _line_cost(self.space, start, end)
+        return self.steps[key]
 
     def expand(self, state: State) -> None:
         """Push every step that can be taken from a state."""
@@ -151,16 +180,16 @@ class _Search:
             target = (column + step_x, row + step_y)
             if not (0 <= target[0] < len(self.xs) and 0 <= target[1] < len(self.ys)):
                 continue
-            here, there = self.point(column, row), self.point(*target)
-            if _blocked(self.space, here, there):
+            step = self.step_cost((column, row), target)
+            if step is None:
                 continue
             bend = BEND_COST_PX if heading not in (-1, direction) else 0.0
-            step = abs(there[0] - here[0]) + abs(there[1] - here[1])
-            cost = self.best[state] + step + bend + _line_cost(self.space, here, there)
+            cost = self.best[state] + step + bend
             key = (target[0], target[1], direction)
             if cost < self.best.get(key, float("inf")):
                 self.best[key] = cost
                 self.parent[key] = state
+                there = self.point(*target)
                 goal = self.point(*self.goal)
                 guess = abs(goal[0] - there[0]) + abs(goal[1] - there[1])
                 heapq.heappush(self.queue, (cost + guess, next(self.ticket), key))

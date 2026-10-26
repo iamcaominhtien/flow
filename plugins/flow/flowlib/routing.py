@@ -436,8 +436,22 @@ def _stub(node: Node, port: Port, caption_port: Port) -> Point:
     return (x + out_x * STUB_PX, y + out_y * STUB_PX)
 
 
+def _facing(source: Node, target: Node) -> list[Port]:
+    """Return the sides of a node that look towards another node."""
+    (source_x, source_y), (target_x, target_y) = _center(source), _center(target)
+    delta = (target_x - source_x, target_y - source_y)
+    return [
+        port
+        for port, (out_x, out_y) in OUTWARD.items()
+        if out_x * delta[0] + out_y * delta[1] > SAME_LINE_TOLERANCE_PX
+    ]
+
+
 def _search_route(source: Node, target: Node, context: _Context) -> _Route | None:
-    """Search for a route around the boxes and the lines already drawn, over all side pairs.
+    """Search for a route around the boxes and the lines already drawn.
+
+    The sides that face the other node are tried first; every side is tried only when those
+    find no route, because each pair of sides costs a search.
 
     Args:
         source: Where the line starts.
@@ -448,25 +462,42 @@ def _search_route(source: Node, target: Node, context: _Context) -> _Route | Non
         The cheapest route found, or None when no pair of sides can be joined.
     """
     space = SearchSpace(_obstacles(context), tuple(context.lines))
-    best: tuple[float, _Route] | None = None
-    for leave in Port:
-        for arrive in Port:
-            found = find_route(
-                space,
-                _stub(source, leave, context.caption_port),
-                _stub(target, arrive, context.caption_port),
-            )
-            if found is None:
-                continue
-            cost = found.cost + _reuse_cost(source, target, (leave, arrive), context)
-            points = [
-                _attach(source, leave, context.caption_port),
-                *found.points,
-                _attach(target, arrive, context.caption_port),
-            ]
-            if best is None or cost < best[0]:
-                best = (cost, _Route(points, leaves=leave, arrives=arrive, channel=None))
+    pairs = [
+        (leave, arrive) for leave in _facing(source, target) for arrive in _facing(target, source)
+    ]
+    best = _best_of(pairs, (source, target), space, context)
+    if best is None:
+        pairs = [(leave, arrive) for leave in Port for arrive in Port]
+        best = _best_of(pairs, (source, target), space, context)
     return None if best is None else best[1]
+
+
+def _best_of(
+    pairs: list[tuple[Port, Port]],
+    ends: tuple[Node, Node],
+    space: SearchSpace,
+    context: _Context,
+) -> tuple[float, _Route] | None:
+    """Search each pair of sides and return the cheapest route with its cost, or None."""
+    source, target = ends
+    best: tuple[float, _Route] | None = None
+    for leave, arrive in pairs:
+        found = find_route(
+            space,
+            _stub(source, leave, context.caption_port),
+            _stub(target, arrive, context.caption_port),
+        )
+        if found is None:
+            continue
+        cost = found.cost + _reuse_cost(source, target, (leave, arrive), context)
+        points = [
+            _attach(source, leave, context.caption_port),
+            *found.points,
+            _attach(target, arrive, context.caption_port),
+        ]
+        if best is None or cost < best[0]:
+            best = (cost, _Route(points, leaves=leave, arrives=arrive, channel=None))
+    return best
 
 
 def _reuse_cost(source: Node, target: Node, ports: tuple[Port, Port], context: _Context) -> float:
@@ -500,6 +531,33 @@ def _route_one(spec_edge: SpecEdge, returning: bool, context: _Context) -> list[
     context.used_ports.add((target.id, route.arrives))
     context.lines.extend(pairwise(route.points))
     return route.points
+
+
+def route_across(
+    nodes: dict[str, Node], ends: tuple[str, str], lines: list[tuple[Point, Point]], port: Port
+) -> list[Point]:
+    """Route one line between two placed nodes by searching around every box.
+
+    Used when nodes have been moved after the first routing, so a line has to be drawn again.
+
+    Args:
+        nodes: Every node at its final place.
+        ends: The ids of the source and the target.
+        lines: The segments already drawn, which the route should avoid.
+        port: The side the captions hang from.
+
+    Returns:
+        The points of the route; a plain right-angled path when the search finds none.
+    """
+    rules = load_theme().layout
+    context = _Context(nodes, rules, set(), {}, port)
+    context.lines.extend(lines)
+    source, target = nodes[ends[0]], nodes[ends[1]]
+    route = _search_route(source, target, context)
+    if route is not None:
+        return route.points
+    start, end = _center(source), _center(target)
+    return [start, (start[0], end[1]), end]
 
 
 def route_edges(spec: Spec, grid: Grid, placement: Placement, rules: LayoutRules) -> list[Edge]:

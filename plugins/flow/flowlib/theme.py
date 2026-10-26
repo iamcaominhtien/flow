@@ -90,6 +90,8 @@ class LayoutRules:
     zone_padding: float
     zone_label_room: float
     lane_padding: float
+    fold_extent: float
+    band_gap: float
     lane_min_size: float
     min_canvas_width: float
     title_block_height: float

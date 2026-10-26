@@ -3,11 +3,12 @@
 from .. import spec as spec_io
 from .. import transpose
 from ..canvas import fit_canvas
+from ..fold import Folded, fold
 from ..labels import place_labels
 from ..layered import build_grid
 from ..model import Direction, Scene
 from ..placement import place_nodes
-from ..routing import route_edges
+from ..routing import Port, route_edges
 from ..spec import Spec
 from ..theme import load_theme
 
@@ -30,6 +31,9 @@ def layout(spec: Spec) -> Scene:
     nodes = tuple(placement.nodes.values())
     frames = placement.frames
     edges = tuple(route_edges(spec, grid, placement, rules))
+    caption_port = Port.RIGHT if spec.direction is Direction.RIGHT else Port.BOTTOM
+    folded = fold(Folded(nodes, frames, edges), rules, caption_port)
+    nodes, frames, edges = folded.nodes, folded.frames, folded.edges
     if spec.direction is Direction.RIGHT:
         nodes = tuple(transpose.node(node) for node in nodes)
         frames = tuple(transpose.frame(frame) for frame in frames)

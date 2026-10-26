@@ -323,6 +323,8 @@
     "min_canvas_width": 640,
     "chip_font_size": 11,
     "lane_padding": 36,
+    "fold_extent": 2400,
+    "band_gap": 60,
     "lane_min_size": 180,
     "table_header_height": 32,
     "table_row_height": 24,
