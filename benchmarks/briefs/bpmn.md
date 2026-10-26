@@ -1,6 +1,6 @@
 # Briefs: BPMN
 
-Three briefs at levels A, B and C. See [README](README.md) for the format and how to run them.
+Four briefs: levels A, B and C, and a second level C. See [README](README.md) for the format and how to run them.
 
 ---
 
@@ -176,3 +176,114 @@ In Regulatory Oversight Authority: FastTrackSafetyNoticeTask flows to Acknowledg
 ### Uncertain
 
 * The domain details were written to give the diagram a realistic shape; they were not checked against the cited sources.
+
+---
+
+## bpmn-C-02 — Cross-Border E-Commerce Order Fulfilment with Fraud Review, Customs and Returns
+
+* **type:** bpmn
+* **level:** C
+* **elements:** 46
+* **connections:** 55
+* **groups:** Customer, Online Shop, Payment and Fraud Service, Logistics Carrier
+
+### Brief
+
+The model has 46 elements in 4 groups: Customer, Online Shop, Payment and Fraud Service, Logistics Carrier. Every name below is one element to draw, and every sentence describes connections to draw.
+
+In Customer: OrderIntentStarted flows to PlaceOrderTask. PlaceOrderTask sends a message to ValidateOrderTask (sends the order). ProvideVerificationTask sends a message to ManualReviewTask (sends identity documents). ReceiveParcelTask flows to SatisfiedGateway. SatisfiedGateway flows to OrderCompletedEnd if the customer is satisfied; flows to RequestReturnTask if the customer is not satisfied. RequestReturnTask sends a message to InspectReturnTask (asks to return the item).
+
+In Online Shop: ValidateOrderTask flows to StockCheckGateway. StockCheckGateway flows to BackorderNoticeTask if the item is out of stock; flows to ReserveStockTask if the item is in stock. BackorderNoticeTask flows to CancelOrderTask. ReserveStockTask flows to RequestPaymentTask. RequestPaymentTask sends a message to AuthorizePaymentTask (asks for authorization). ParallelPrepGateway flows to PickAndPackTask; flows to GenerateInvoiceTask; flows to CustomsDeclarationTask. PickAndPackTask flows to PrepJoinGateway. GenerateInvoiceTask flows to PrepJoinGateway. CustomsDeclarationTask flows to PrepJoinGateway. PrepJoinGateway flows to HandoverToCarrierTask. HandoverToCarrierTask sends a message to ScheduleCollectionTask (books the pickup). InspectReturnTask flows to RefundGateway. RefundGateway flows to IssueRefundTask if the item is accepted; flows to ReturnRejectedEnd if the item is rejected. IssueRefundTask sends a message to ProcessRefundTask (asks for the refund); flows to RestockItemTask. RestockItemTask flows to RestockedEnd. CancelOrderTask flows to OrderCancelledEnd.
+
+In Payment and Fraud Service: AuthorizePaymentTask flows to FraudScoreTask. FraudScoreTask flows to FraudGateway. FraudGateway flows to CapturePaymentTask if the risk is low; flows to ManualReviewTask if the risk is medium; flows to PaymentDeclinedErrorEvent if the risk is high. ManualReviewTask sends a message to ProvideVerificationTask (asks for documents); flows to VerificationTimer. VerificationTimer flows to ReviewOutcomeGateway if the waiting period ends. ReviewOutcomeGateway flows to CapturePaymentTask if the customer is verified; flows to PaymentDeclinedErrorEvent if the customer is not verified; flows to ManualReviewTask if more evidence is needed. CapturePaymentTask sends a message to ParallelPrepGateway (the payment is captured). PaymentDeclinedErrorEvent sends a message to CancelOrderTask (the payment is declined). ProcessRefundTask flows to RefundSettledEnd.
+
+In Logistics Carrier: ScheduleCollectionTask flows to CollectParcelTask. CollectParcelTask flows to CustomsClearanceTask. CustomsClearanceTask flows to CustomsGateway. CustomsGateway flows to LineHaulTransportTask if the parcel is cleared; flows to HoldParcelTask if the parcel is held for inspection. HoldParcelTask flows to CustomsClearanceTask if the inspection is finished. LineHaulTransportTask flows to LastMileDeliveryTask. LastMileDeliveryTask flows to DeliveryAttemptGateway. DeliveryAttemptGateway sends a message to ReceiveParcelTask (the parcel is delivered); flows to LastMileDeliveryTask if the next attempt is scheduled; flows to ReturnToSenderTask if three attempts failed. ReturnToSenderTask flows to ReturnToSenderEnd; sends a message to InspectReturnTask (the parcel is back at the shop).
+
+### Must show
+
+* The 4 groups (Customer, Online Shop, Payment and Fraud Service, Logistics Carrier) contain exactly the elements listed under Structure.
+* A parallel split into three tasks (ParallelPrepGateway) and its join (PrepJoinGateway).
+* Fan-out of three: FraudGateway, ParallelPrepGateway, DeliveryAttemptGateway, ReviewOutcomeGateway.
+* 4 loops: ReviewOutcomeGateway to ManualReviewTask, HoldParcelTask to CustomsClearanceTask, DeliveryAttemptGateway to LastMileDeliveryTask, and the verification exchange between ManualReviewTask and ProvideVerificationTask.
+* 11 connections cross between groups; 11 of them are message flows.
+
+### Traps
+
+* Three message flows meet in the Online Shop pool from three other pools (CapturePaymentTask, PaymentDeclinedErrorEvent, ReturnToSenderTask or RequestReturnTask), so lines converge on a few elements.
+* The customer pool is small but receives messages from two pools and sends to two.
+* A returned parcel starts a second process (inspection and refund) inside the same pools.
+
+### Structure
+
+**Elements**
+
+- Customer: OrderIntentStarted, PlaceOrderTask, ProvideVerificationTask, ReceiveParcelTask, SatisfiedGateway, RequestReturnTask, OrderCompletedEnd
+- Online Shop: ValidateOrderTask, StockCheckGateway, BackorderNoticeTask, ReserveStockTask, RequestPaymentTask, ParallelPrepGateway, PickAndPackTask, GenerateInvoiceTask, CustomsDeclarationTask, PrepJoinGateway, HandoverToCarrierTask, InspectReturnTask, RefundGateway, IssueRefundTask, RestockItemTask, RestockedEnd, CancelOrderTask, OrderCancelledEnd, ReturnRejectedEnd
+- Payment and Fraud Service: AuthorizePaymentTask, FraudScoreTask, FraudGateway, ManualReviewTask, VerificationTimer, ReviewOutcomeGateway, CapturePaymentTask, PaymentDeclinedErrorEvent, ProcessRefundTask, RefundSettledEnd
+- Logistics Carrier: ScheduleCollectionTask, CollectParcelTask, CustomsClearanceTask, CustomsGateway, HoldParcelTask, LineHaulTransportTask, LastMileDeliveryTask, DeliveryAttemptGateway, ReturnToSenderTask, ReturnToSenderEnd
+
+**Connections**
+
+- OrderIntentStarted -> PlaceOrderTask
+- PlaceOrderTask -> ValidateOrderTask (sends the order; message)
+- ProvideVerificationTask -> ManualReviewTask (sends identity documents; message)
+- ReceiveParcelTask -> SatisfiedGateway
+- SatisfiedGateway -> OrderCompletedEnd (the customer is satisfied)
+- SatisfiedGateway -> RequestReturnTask (the customer is not satisfied)
+- RequestReturnTask -> InspectReturnTask (asks to return the item; message)
+- ValidateOrderTask -> StockCheckGateway
+- StockCheckGateway -> BackorderNoticeTask (the item is out of stock)
+- BackorderNoticeTask -> CancelOrderTask
+- StockCheckGateway -> ReserveStockTask (the item is in stock)
+- ReserveStockTask -> RequestPaymentTask
+- RequestPaymentTask -> AuthorizePaymentTask (asks for authorization; message)
+- ParallelPrepGateway -> PickAndPackTask
+- ParallelPrepGateway -> GenerateInvoiceTask
+- ParallelPrepGateway -> CustomsDeclarationTask
+- PickAndPackTask -> PrepJoinGateway
+- GenerateInvoiceTask -> PrepJoinGateway
+- CustomsDeclarationTask -> PrepJoinGateway
+- PrepJoinGateway -> HandoverToCarrierTask
+- HandoverToCarrierTask -> ScheduleCollectionTask (books the pickup; message)
+- InspectReturnTask -> RefundGateway
+- RefundGateway -> IssueRefundTask (the item is accepted)
+- RefundGateway -> ReturnRejectedEnd (the item is rejected)
+- IssueRefundTask -> ProcessRefundTask (asks for the refund; message)
+- IssueRefundTask -> RestockItemTask
+- RestockItemTask -> RestockedEnd
+- CancelOrderTask -> OrderCancelledEnd
+- AuthorizePaymentTask -> FraudScoreTask
+- FraudScoreTask -> FraudGateway
+- FraudGateway -> CapturePaymentTask (the risk is low)
+- FraudGateway -> ManualReviewTask (the risk is medium)
+- FraudGateway -> PaymentDeclinedErrorEvent (the risk is high)
+- ManualReviewTask -> ProvideVerificationTask (asks for documents; message)
+- ManualReviewTask -> VerificationTimer
+- VerificationTimer -> ReviewOutcomeGateway (the waiting period ends)
+- ReviewOutcomeGateway -> CapturePaymentTask (the customer is verified)
+- ReviewOutcomeGateway -> PaymentDeclinedErrorEvent (the customer is not verified)
+- ReviewOutcomeGateway -> ManualReviewTask (more evidence is needed)
+- CapturePaymentTask -> ParallelPrepGateway (the payment is captured; message)
+- PaymentDeclinedErrorEvent -> CancelOrderTask (the payment is declined; message)
+- ProcessRefundTask -> RefundSettledEnd
+- ScheduleCollectionTask -> CollectParcelTask
+- CollectParcelTask -> CustomsClearanceTask
+- CustomsClearanceTask -> CustomsGateway
+- CustomsGateway -> LineHaulTransportTask (the parcel is cleared)
+- CustomsGateway -> HoldParcelTask (the parcel is held for inspection)
+- HoldParcelTask -> CustomsClearanceTask (the inspection is finished)
+- LineHaulTransportTask -> LastMileDeliveryTask
+- LastMileDeliveryTask -> DeliveryAttemptGateway
+- DeliveryAttemptGateway -> ReceiveParcelTask (the parcel is delivered; message)
+- DeliveryAttemptGateway -> LastMileDeliveryTask (the next attempt is scheduled)
+- DeliveryAttemptGateway -> ReturnToSenderTask (three attempts failed)
+- ReturnToSenderTask -> ReturnToSenderEnd
+- ReturnToSenderTask -> InspectReturnTask (the parcel is back at the shop; message)
+
+### Sources
+
+* OMG Business Process Model and Notation 2.0 specification (event, gateway and message flow semantics): https://www.omg.org/spec/BPMN/2.0/
+
+### Uncertain
+
+* The domain details were written to give the diagram a realistic shape; they were not checked against real fulfilment or card-network rules.

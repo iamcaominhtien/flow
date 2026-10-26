@@ -10,13 +10,14 @@ import check_briefs  # noqa: E402
 
 EXPECTED_TYPES = 8
 LEVELS_PER_TYPE = 3
+EXTRA_BRIEFS = 1  # a second level C brief for BPMN
 
 
 def test_the_briefs_have_no_format_errors() -> None:
     """Every brief has its fields and sections, matches its file and is in the index."""
     briefs, report = check_briefs.check()
     assert report.errors == []
-    assert len(briefs) == EXPECTED_TYPES * LEVELS_PER_TYPE
+    assert len(briefs) == EXPECTED_TYPES * LEVELS_PER_TYPE + EXTRA_BRIEFS
 
 
 def test_each_type_has_one_brief_per_level() -> None:

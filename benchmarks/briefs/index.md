@@ -19,6 +19,7 @@ Titles, levels and the element and connection counts. For the eight level C brie
 | bpmn-A-01 | bpmn | A | Enterprise Expense Reimbursement and Auditing Process | 10 | 11 |
 | bpmn-B-01 | bpmn | B | Commercial Real Estate Mortgage Underwriting and Syndication | 24 | 28 |
 | bpmn-C-01 | bpmn | C | Multinational Clinical Trial Pharmacovigilance Safety Protocol | 41 | 48 |
+| bpmn-C-02 | bpmn | C | Cross-Border E-Commerce Order Fulfilment with Fraud Review, Customs and Returns | 46 | 55 |
 | state-A-01 | state | A | Kubernetes Pod Container Lifecycle and Phase Transition Model | 9 | 11 |
 | state-B-01 | state | B | Distributed E-Commerce Order Fulfillment and Settlement Engine | 22 | 27 |
 | state-C-01 | state | C | Autonomous Spacecraft Rendezvous and Proximity Docking System | 41 | 51 |

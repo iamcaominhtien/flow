@@ -75,6 +75,8 @@ print(format_report(findings))
 - Keep the page readable at normal zoom: aim for no more than about 3000 px wide and 2500 px tall. A long chain of steps should be folded into a column or into rows, not left as one very long row.
 - A node that many lines meet (a hub) can be a tall bar or a wide band so the lines arrive in parallel and apart, instead of bunching into one point.
 - Put what belongs together close and group it in a lane or a zone; put the main path where the eye starts (top left) and let it run to the end.
+- Use the space. If a large part of the page is empty (a corner, half of a zone), move things so the diagram is compact: put the legend under or beside the diagram where it does not leave a hole, shrink zones to their contents, and bring far-apart groups closer. An empty zone corner is a sign the arrangement can be tighter.
+- Give a hub or a big shared node a `tone` (`NodeOptions(tone=Tone.AMBER)`) so it stands out from its neighbours; any shape takes a tone, which tints its fill.
 - Avoid several near-parallel lines closer than about 12 px, and lines that cross a whole page. Move a node, change the side a line uses, or give a line a waypoint.
 - Use one icon style per diagram. Cards (illustrated) are for the few steps people must notice, not for every step.
 
