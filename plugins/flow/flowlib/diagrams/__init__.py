@@ -10,7 +10,9 @@ from . import (
     architecture,
     boards,
     bpmn,
+    c4,
     catalog,
+    cloud,
     concept,
     dfd,
     er,
@@ -24,12 +26,16 @@ from . import (
 )
 
 THEME_KEY = "theme"
-DFD = "dfd"  # the one type whose layout needs the folder of the spec
+SOURCE_AWARE: dict[str, Callable[[object, Path | None], Scene]] = {
+    "dfd": dfd.layout_raw,
+    "c4": c4.layout_raw,
+}  # the types whose layout needs the folder of the spec, to find the level above
 
 Layout = Callable[[object], Scene]
 
 LAYOUTS: dict[str, Layout] = {
     "architecture": architecture.layout_raw,
+    "cloud": cloud.layout_raw,
     "flowchart": flowchart.layout_raw,
     "sequence": sequence.layout_raw,
     "state": state.layout_raw,
@@ -45,7 +51,6 @@ LAYOUTS: dict[str, Layout] = {
     **{name: graph.layout_with(each) for name, each in catalog.TYPES.items()},
     "screen": screenflow.layout_raw,
     "bpmn": bpmn.layout_raw,
-    DFD: dfd.layout_raw,
 }
 
 
@@ -64,12 +69,12 @@ def layout(raw: object, source_dir: Path | None = None) -> Scene:
         SpecError: If the type is missing or unknown, or the spec for that type is not valid.
     """
     kind = raw.get("type") if isinstance(raw, dict) else None
-    if kind not in LAYOUTS:
-        known = ", ".join(sorted(LAYOUTS))
+    if kind not in LAYOUTS and kind not in SOURCE_AWARE:
+        known = ", ".join(sorted({*LAYOUTS, *SOURCE_AWARE}))
         raise SpecError([f"spec: 'type' must be one of: {known}"])
     theme = _read_theme(raw)
     spec = {key: value for key, value in raw.items() if key != THEME_KEY}
-    scene = dfd.layout_raw(spec, source_dir) if kind == DFD else LAYOUTS[kind](spec)
+    scene = SOURCE_AWARE[kind](spec, source_dir) if kind in SOURCE_AWARE else LAYOUTS[kind](spec)
     return replace(scene, theme=theme, diagram=kind)
 
 

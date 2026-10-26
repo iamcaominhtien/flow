@@ -19,41 +19,6 @@ def _class_sections(raw: dict[str, Any], where: str, read: Reader) -> dict[str, 
     return {"sections": tuple(section for section in (attributes, methods) if section)}
 
 
-C4 = GraphType(
-    name="C4",
-    nodes_key="elements",
-    links_key="relations",
-    kinds={
-        "person": Shape.ACTOR,
-        "system": Shape.PROCESS,
-        "external": Shape.SUBPROCESS,
-        "container": Shape.PROCESS,
-        "component": Shape.PROCESS,
-        "database": Shape.CYLINDER,
-    },
-    default_kind="system",
-    line_kinds=CALLS,
-    default_line="call",
-    has_zones=True,
-)
-CLOUD = GraphType(
-    name="cloud",
-    nodes_key="resources",
-    links_key="links",
-    kinds={
-        "service": Shape.PROCESS,
-        "client": Shape.TERMINATOR,
-        "external": Shape.SUBPROCESS,
-        "balancer": Shape.DECISION,
-        "database": Shape.CYLINDER,
-        "storage": Shape.STORE,
-        "queue": Shape.PREPARATION,
-    },
-    default_kind="service",
-    line_kinds=CALLS,
-    default_line="call",
-    has_zones=True,
-)
 USE_CASE = GraphType(
     name="use case",
     nodes_key="items",
@@ -105,8 +70,6 @@ SCREEN = GraphType(
 )
 
 TYPES: dict[str, GraphType] = {
-    "c4": C4,
-    "cloud": CLOUD,
     "usecase": USE_CASE,
     "class": CLASS,
     "screen": SCREEN,

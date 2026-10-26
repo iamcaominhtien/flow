@@ -1,7 +1,7 @@
 """The data flow diagram in the Gane-Sarson style: outside parties, processes and stores.
 
 See ``dfd_spec`` for the spec format. The layout puts every box on a grid (``dfd_grid``),
-routes the flows (``dfd_routes``) and, for a level 2 diagram, draws a dashed frame around the
+routes the flows (``grid_routes``) and, for a level 2 diagram, draws a dashed frame around the
 process that was opened.
 """
 
@@ -25,8 +25,8 @@ from ..model import (
 )
 from ..theme import DfdRules, Theme, load_theme
 from .dfd_grid import Cell, assign_cells
-from .dfd_routes import route_flows
 from .dfd_spec import CONTEXT_LEVEL, DfdSpec, Element, Flow, Kind, read_spec
+from .grid_routes import route_flows
 
 NAME_FONT_SIZE_PX = 13
 FRAME_ID = "opened"

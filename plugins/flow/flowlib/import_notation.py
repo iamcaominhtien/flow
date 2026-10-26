@@ -11,6 +11,7 @@ from dataclasses import replace
 from xml.etree import ElementTree as ET
 
 from .drawio_common import FLOW_FRAME_KEY, FLOW_HOST_KEY, FLOW_MARKERS_KEY, FLOW_SHAPE_KEY
+from .html_zones import ZONE_VARIANTS
 from .model import Frame, FrameVariant, Marker, Node, Shape, Tone
 from .theme import load_theme
 
@@ -22,6 +23,9 @@ TAB_PREFIX = "tab-"
 FRAME_PREFIX = "frame-"
 OPENED_LABEL_PREFIX = "label-frame-"
 DFD_SHAPES = (Shape.DFD_PROCESS, Shape.DFD_STORE)
+C4_SHAPES = (Shape.C4_BOX, Shape.C4_PERSON)
+TYPE_LINE_END = "]"  # the mono ``[Kind: technology]`` line of a C4 box ends here
+C4_MIN_LINES = 2
 TAG = re.compile(r"<[^>]+>")
 
 
@@ -89,7 +93,19 @@ def notation_frame(frame: Frame, style: dict[str, str], cells: dict[str, ET.Elem
     pill = cells.get(OPENED_LABEL_PREFIX + stem)
     if pill is not None:
         label = _text(pill) or label
+    if variant in ZONE_VARIANTS:
+        return _zone_frame(replace(frame, variant=variant, label=label), style)
     return replace(frame, variant=variant, label=label, tone=_pill_tone(tab) or frame.tone)
+
+
+def _zone_frame(frame: Frame, style: dict[str, str]) -> Frame:
+    """Read the tone and the border of a cloud frame or an architecture layer from its style."""
+    stroke = style.get("strokeColor", "").lower()
+    tone = next(
+        (name for name, colors in load_theme().tones.items() if colors.stroke.lower() == stroke),
+        frame.tone,
+    )
+    return replace(frame, tone=tone, is_solid=style.get("dashed") == "0")
 
 
 def _text(cell: ET.Element) -> str:
@@ -132,6 +148,10 @@ def notation_node(node: Node, cell: ET.Element, cells: dict[str, ET.Element]) ->
     if shape is None:
         return node
     node = replace(node, shape=shape)
+    if shape in C4_SHAPES:
+        return _c4_parts(node)
+    if shape is Shape.WIDE_CARD:
+        return _wide_parts(node, cell, cells)
     return _dfd_parts(node, cell, cells) if _is_dfd(node) else node
 
 
@@ -142,6 +162,25 @@ def _flow_shape(style: dict[str, str]) -> Shape | None:
         return Shape(name) if name else None
     except ValueError:
         return None
+
+
+def _c4_parts(node: Node) -> Node:
+    """Read the name, the type line and the sentence of a C4 box from its label."""
+    lines = node.text
+    if len(lines) < C4_MIN_LINES or not lines[1].startswith("["):
+        return node
+    type_line, _, rest = lines[1].partition(TYPE_LINE_END)
+    sentence = tuple(line for line in (rest.strip(), *lines[2:]) if line)
+    return replace(node, text=lines[:1], technology=type_line + TYPE_LINE_END, detail=sentence)
+
+
+def _wide_parts(node: Node, cell: ET.Element, cells: dict[str, ET.Element]) -> Node:
+    """Read the name and the detail of an illustrated architecture card from its parts."""
+    stem = cell.get("id", "").removeprefix(NODE_PREFIX)
+    pill, detail = cells.get(f"pill-{stem}"), cells.get(f"detail-{stem}")
+    name = (_text(pill),) if pill is not None else node.text
+    lines = (_text(detail),) if detail is not None else ()
+    return replace(node, text=name, detail=lines)
 
 
 def _is_dfd(node: Node) -> bool:

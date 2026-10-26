@@ -122,6 +122,18 @@
     "task": {
       "fill": "#DCEEFB",
       "stroke": "#0F172A"
+    },
+    "c4_box": {
+      "fill": "#E6E3FB",
+      "stroke": "#0F172A"
+    },
+    "c4_person": {
+      "fill": "#DCEEFB",
+      "stroke": "#0F172A"
+    },
+    "wide_card": {
+      "fill": "#DCEEFB",
+      "stroke": "#0F172A"
     }
   },
   "tones": {
@@ -434,6 +446,18 @@
       "task": [
         130,
         64
+      ],
+      "c4_box": [
+        280,
+        132
+      ],
+      "c4_person": [
+        280,
+        132
+      ],
+      "wide_card": [
+        232,
+        96
       ]
     },
     "max_node_width": 320,
@@ -736,6 +760,18 @@
           "stroke": "#E2E8F0"
         },
         "task": {
+          "fill": "#12263F",
+          "stroke": "#E2E8F0"
+        },
+        "c4_box": {
+          "fill": "#1E1B3A",
+          "stroke": "#E2E8F0"
+        },
+        "c4_person": {
+          "fill": "#12263F",
+          "stroke": "#E2E8F0"
+        },
+        "wide_card": {
           "fill": "#12263F",
           "stroke": "#E2E8F0"
         }
@@ -1065,5 +1101,72 @@
     "stub": 18,
     "content_pad": 60,
     "pool_right_pad": 60
+  },
+  "c4": {
+    "box_size": [
+      280,
+      132
+    ],
+    "system_size": [
+      360,
+      150
+    ],
+    "column_pitch": 520,
+    "row_pitch": 270,
+    "pair_gap": 60,
+    "channel_step": 24,
+    "channel_clearance": 70,
+    "frame_pad": 40,
+    "frame_pad_bottom": 64,
+    "icon_size": 40,
+    "padding": 14,
+    "name_font_size": 13,
+    "tech_font_size": 10,
+    "text_font_size": 11,
+    "text_line_height": 15,
+    "text_left": 62,
+    "name_top": 14,
+    "text_top": 68
+  },
+  "cloud": {
+    "part_size": [
+      196,
+      68
+    ],
+    "row_pitch": 255,
+    "column_pitch": 520,
+    "frame_gap": 30,
+    "part_pad": 40,
+    "pair_gap": 60,
+    "channel_step": 24,
+    "channel_clearance": 70,
+    "pill_height": 22,
+    "pill_inset": 16,
+    "site_offset": 2,
+    "edge_row": 1,
+    "public_row": 3,
+    "private_row": 4,
+    "data_row": 5,
+    "tint_alpha": 0.1,
+    "border_width": 1.5
+  },
+  "architecture": {
+    "part_size": [
+      196,
+      68
+    ],
+    "card_size": [
+      232,
+      96
+    ],
+    "layer_pitch": 260,
+    "card_layer_pitch": 240,
+    "column_pitch": 436,
+    "card_column_pitch": 472,
+    "frame_gap": 30,
+    "pair_gap": 60,
+    "channel_step": 24,
+    "channel_clearance": 70,
+    "card_icon_size": 64
   }
 }

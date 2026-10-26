@@ -1,218 +1,45 @@
-"""The architecture diagram: components grouped in zones, joined by calls and data flows.
+"""The architecture diagram: components in layers, zones around them, lines between them.
 
-The JSON format::
-
-    {"type": "architecture", "title": "...", "desc": "...", "direction": "down|right",
-     "zones": [{"id", "label", "tone", "parent"}],
-     "components": [{"id", "label", "kind": "service|client|external|database|store|queue",
-                     "detail", "icon", "tone", "zone", "at": [row, column]}],
-     "links": [{"from": "component", "to": "component", "label",
-                "style": "call|async", "main": true}]}
-
-A ``call`` is a solid line; an ``async`` link (a queue, an event) is dashed. A component in a
-zone is drawn inside that zone's frame; a zone with a ``parent`` is drawn inside the parent.
+See ``architecture_spec`` for the spec format. Every top-level zone is a layer and a row of the
+grid; a third party sits in the row of the layer that calls it. Each zone becomes a frame drawn
+around what it holds. A line may start or end on a frame. Plain parts are 196 x 68 and layers
+260 px apart; illustrated cards are 232 x 96 and 240 px apart (design 06 section 7).
 """
 
-from enum import StrEnum
-from typing import Any
+from dataclasses import dataclass
 
-from ..model import Direction, Head, Role, Scene, Shape, Tone
-from ..reader import Reader, SpecError, suggestion
-from ..spec import Spec, SpecEdge, SpecNode, SpecZone, check_explicit_cells
-from ..theme import icon_names
-from . import flowchart
+from ..check import Rect, node_rect
+from ..model import Frame, FrameVariant, Node, Role, Scene, Shape
+from ..theme import ArchitectureRules, Theme, load_theme
+from .architecture_spec import ArchitectureSpec, Component, Link, LinkKind, Zone, read_spec
+from .grid_frames import frame_node, grown, pill_rect, shift_into_canvas, union
+from .grid_routes import Extras, GridSpacing, route_flows
+from .grid_scene import Heading, Line, build_edges, finish_scene
 
-SPEC_KEYS = {"type", "title", "desc", "direction", "zones", "components", "links", "style"}
-ZONE_KEYS = {"id", "label", "tone", "parent"}
-COMPONENT_KEYS = {"id", "label", "kind", "detail", "icon", "tone", "zone", "at"}
-LINK_KEYS = {"from", "to", "label", "style", "main"}
-AT_LENGTH = 2
-DEFAULT_ZONE_TONE = Tone.GRAY
-
-
-class ComponentKind(StrEnum):
-    """What a component is; decides its outline."""
-
-    SERVICE = "service"
-    CLIENT = "client"
-    EXTERNAL = "external"
-    DATABASE = "database"
-    STORE = "store"
-    QUEUE = "queue"
-
-
-class LinkStyle(StrEnum):
-    """A call waits for an answer; an async link does not."""
-
-    CALL = "call"
-    ASYNC = "async"
-
-
-SHAPE_OF_KIND = {
-    ComponentKind.SERVICE: Shape.PROCESS,
-    ComponentKind.CLIENT: Shape.TERMINATOR,
-    ComponentKind.EXTERNAL: Shape.SUBPROCESS,
-    ComponentKind.DATABASE: Shape.CYLINDER,
-    ComponentKind.STORE: Shape.STORE,
-    ComponentKind.QUEUE: Shape.PREPARATION,
+LINE_ROLES: dict[LinkKind, Role] = {
+    LinkKind.CALL: Role.NEXT,
+    LinkKind.MAIN: Role.MAIN,
+    LinkKind.EVENT: Role.DATA,
+    LinkKind.COPY: Role.BACK,
 }
+Cell = tuple[float, float]
 
 
-def _zone(raw: object, where: str, read: Reader) -> SpecZone | None:
-    """Build one zone, or report why it cannot be built."""
-    if not isinstance(raw, dict):
-        read.report(where, "must be an object")
-        return None
-    read.check_keys(raw, ZONE_KEYS, where)
-    identifier = read.identifier(raw, where)
-    return SpecZone(
-        id=identifier,
-        label=read.text(raw, "label", where) or identifier,
-        tone=read.enum(Tone, raw, "tone", where) or DEFAULT_ZONE_TONE,
-        parent=raw.get("parent"),
-    )
+@dataclass(frozen=True)
+class Style:
+    """The sizes of one style of the diagram: plain parts or illustrated cards."""
 
-
-def _check_zone_parents(zones: dict[str, SpecZone], read: Reader) -> None:
-    """Report a zone whose parent is unknown or whose parents form a loop."""
-    for zone in zones.values():
-        where = f"zone '{zone.id}'"
-        if zone.parent is not None and zone.parent not in zones:
-            hint = suggestion(zone.parent, zones)
-            read.report(where, f"'parent' names '{zone.parent}', which is not a zone{hint}")
-            continue
-        seen = {zone.id}
-        current = zone
-        while current.parent in zones:
-            current = zones[current.parent]
-            if current.id in seen:
-                read.report(where, "'parent' makes a loop of zones")
-                break
-            seen.add(current.id)
-
-
-def _component(
-    raw: object, where: str, read: Reader, known: tuple[set[str], set[str]]
-) -> SpecNode | None:
-    """Build one component as a node, or report why it cannot be built."""
-    icons, zones = known
-    if not isinstance(raw, dict):
-        read.report(where, "must be an object")
-        return None
-    read.check_keys(raw, COMPONENT_KEYS, where)
-    icon, zone = raw.get("icon"), raw.get("zone")
-    if icon is not None and icon not in icons:
-        read.report(where, f"unknown icon '{icon}'; use one of: {', '.join(sorted(icons))}")
-    if zone is not None and zone not in zones:
-        read.report(where, f"'zone' names '{zone}', which is not a zone{suggestion(zone, zones)}")
-    at = raw.get("at")
-    if at is not None and not (isinstance(at, list) and len(at) == AT_LENGTH):
-        read.report(where, "'at' must be [row, column]")
-        at = None
-    identifier = read.identifier(raw, where)
-    kind = read.enum(ComponentKind, raw, "kind", where) or ComponentKind.SERVICE
-    return SpecNode(
-        id=identifier,
-        kind=SHAPE_OF_KIND[kind],
-        text=read.text(raw, "label", where) or identifier,
-        icon=icon,
-        tone=read.enum(Tone, raw, "tone", where),
-        number=None,
-        side=None,
-        lane=None,
-        detail=read.text(raw, "detail", where) or "",
-        at=(int(at[0]), int(at[1])) if at else None,
-        zone=zone,
-    )
-
-
-def _link(
-    raw: object, where: str, read: Reader, components: dict[str, SpecNode]
-) -> SpecEdge | None:
-    """Build one link as an edge, or report why it cannot be built."""
-    if not isinstance(raw, dict):
-        read.report(where, "must be an object")
-        return None
-    read.check_keys(raw, LINK_KEYS, where)
-    ends = []
-    for key in ("from", "to"):
-        name = raw.get(key)
-        if name not in components:
-            read.report(
-                where,
-                f"'{key}' names '{name}', which is not a component{suggestion(name, components)}",
-            )
-        ends.append(name if name in components else "")
-    style = read.enum(LinkStyle, raw, "style", where) or LinkStyle.CALL
-    return SpecEdge(
-        source=ends[0],
-        target=ends[1],
-        role=Role.MAIN if raw.get("main") is True else Role.DATA,
-        label=read.text(raw, "label", where),
-        head=Head.FILLED,
-        dashed=style is LinkStyle.ASYNC,
-    )
-
-
-def _list(raw: dict[str, Any], key: str) -> list[object]:
-    """Return a field that should be a list, or an empty list when it is not one."""
-    value = raw.get(key, [])
-    return value if isinstance(value, list) else []
-
-
-def to_spec(raw: object) -> Spec:
-    """Check an architecture spec and turn it into the description the layout works on.
-
-    Args:
-        raw: The result of ``json.loads`` on an architecture spec.
-
-    Returns:
-        The components as nodes, the links as edges and the zones.
-
-    Raises:
-        SpecError: With every problem found.
-    """
-    if not isinstance(raw, dict):
-        raise SpecError(["the spec must be a JSON object"])
-    read = Reader()
-    read.check_keys(raw, SPEC_KEYS, "spec")
-    built_zones = [_zone(item, f"zones[{i}]", read) for i, item in enumerate(_list(raw, "zones"))]
-    zones = {zone.id: zone for zone in built_zones if zone is not None}
-    _check_zone_parents(zones, read)
-    known = (icon_names(), set(zones))
-    built = [
-        _component(item, f"components[{i}]", read, known)
-        for i, item in enumerate(_list(raw, "components"))
-    ]
-    components = {node.id: node for node in built if node is not None}
-    check_explicit_cells(components.values(), read)
-    if not components:
-        read.report("spec", "'components' must list at least one component")
-    links = [
-        _link(item, f"links[{i}]", read, components) for i, item in enumerate(_list(raw, "links"))
-    ]
-    direction = read.enum(Direction, raw, "direction", "spec") or Direction.DOWN
-    illustrated = read.illustrated(raw, "spec")
-    title, description = read.text(raw, "title", "spec"), read.text(raw, "desc", "spec")
-    if read.problems:
-        raise SpecError(read.problems)
-    return Spec(
-        title=title,
-        description=description,
-        direction=direction,
-        lanes=(),
-        nodes=tuple(components.values()),
-        edges=tuple(edge for edge in links if edge is not None),
-        zones=tuple(zones.values()),
-        illustrated=illustrated,
-    )
+    part_size: tuple[float, float]
+    layer_pitch: float
+    column_pitch: float
+    shape: Shape
 
 
 def layout_raw(raw: object) -> Scene:
     """Lay out an architecture diagram from a parsed JSON spec.
 
     Args:
-        raw: The result of ``json.loads`` on an architecture spec.
+        raw: The result of ``json.loads`` on an ``architecture`` spec.
 
     Returns:
         The scene.
@@ -220,4 +47,164 @@ def layout_raw(raw: object) -> Scene:
     Raises:
         SpecError: If the spec is not valid.
     """
-    return flowchart.layout(to_spec(raw))
+    return layout(read_spec(raw))
+
+
+def layout(spec: ArchitectureSpec) -> Scene:
+    """Place the components of a checked spec, frame them in their zones and route the links.
+
+    Args:
+        spec: The checked spec.
+
+    Returns:
+        The scene, with its canvas fitted.
+    """
+    theme = load_theme()
+    style = _style(spec, theme.architecture)
+    nodes = _place(spec, style, theme)
+    frames = _frames(spec, nodes, theme.architecture)
+    nodes, frames = shift_into_canvas(nodes, frames, theme)
+    spacing = GridSpacing(
+        style.layer_pitch,
+        style.column_pitch,
+        theme.architecture.pair_gap,
+        theme.architecture.channel_step,
+        theme.architecture.channel_clearance,
+    )
+    lines = tuple(_line(link) for link in spec.links)
+    extras = Extras(
+        frames={f.id: frame_node(f) for f in frames if _is_end(f, spec)},
+        blocked=[pill_rect(frame, theme) for frame in frames if frame.label],
+    )
+    routes = route_flows(nodes, lines, spacing, extras)
+    heading = Heading(spec.title, spec.description)
+    return finish_scene(
+        heading, (tuple(frames), tuple(nodes.values()), build_edges(lines, routes, set(nodes)))
+    )
+
+
+def _style(spec: ArchitectureSpec, rules: ArchitectureRules) -> Style:
+    """Return the sizes of the style the spec asks for."""
+    if spec.illustrated:
+        return Style(
+            rules.card_size, rules.card_layer_pitch, rules.card_column_pitch, Shape.WIDE_CARD
+        )
+    return Style(rules.part_size, rules.layer_pitch, rules.column_pitch, Shape.PROCESS)
+
+
+def _is_end(frame: Frame, spec: ArchitectureSpec) -> bool:
+    """Tell whether a line starts or ends on a frame."""
+    return any(frame.id in (link.source, link.target) for link in spec.links)
+
+
+def _line(link: Link) -> Line:
+    """Build the line of a link: blue for the main path, violet for events, slate for a copy."""
+    return Line(link.source, link.target, link.label, LINE_ROLES[link.kind])
+
+
+def _layers(spec: ArchitectureSpec) -> list[str | None]:
+    """Return the layers top to bottom: the open row first when a component has no zone."""
+    layers: list[str | None] = [
+        zone.id for zone in spec.zones if zone.parent is None and zone.beside is None
+    ]
+    if any(component.zone is None for component in spec.components):
+        layers.insert(0, None)
+    return layers
+
+
+def _row_of(spec: ArchitectureSpec, component: Component) -> str | None:
+    """Return the layer a component is in; a third party is in the layer it sits beside."""
+    top = spec.top_zone(component.zone)
+    if top is None:
+        return None
+    return top.beside or top.id
+
+
+def _cells(spec: ArchitectureSpec) -> dict[str, Cell]:
+    """Return the cell of every component: its layer is the row, its order the column."""
+    layers = _layers(spec)
+    rows = {layer: [c for c in spec.components if _row_of(spec, c) == layer] for layer in layers}
+    widest = max(len(members) for members in rows.values())
+    cells: dict[str, Cell] = {}
+    for row, layer in enumerate(layers):
+        members = _in_order(spec, rows[layer])
+        start = (widest - len(members)) / 2
+        cells.update({c.id: (start + column, row) for column, c in enumerate(members)})
+    cells.update({c.id: (c.at[1], c.at[0]) for c in spec.components if c.at is not None})
+    return cells
+
+
+def _in_order(spec: ArchitectureSpec, members: list[Component]) -> list[Component]:
+    """Order a row: the layer's own components first, then each third party beside it."""
+
+    def is_beside(component: Component) -> int:
+        top = spec.top_zone(component.zone)
+        return 1 if top is not None and top.beside else 0
+
+    return sorted(members, key=is_beside)
+
+
+def _place(spec: ArchitectureSpec, style: Style, theme: Theme) -> dict[str, Node]:
+    """Build the node of every component at its pixel position."""
+    cells = _cells(spec)
+    return {c.id: _node(c, cells[c.id], style, theme) for c in spec.components}
+
+
+def _node(component: Component, cell: Cell, style: Style, theme: Theme) -> Node:
+    """Build the node of a component: a part or a card centred on its cell."""
+    width, height = style.part_size
+    return Node(
+        id=component.id,
+        shape=style.shape,
+        x=cell[0] * style.column_pitch - width / 2,
+        y=cell[1] * style.layer_pitch - height / 2,
+        width=width,
+        height=height,
+        text=(component.label,),
+        icon=component.icon,
+        tone=component.tone,
+        number=None,
+        font_size=theme.type_scale.node.size,
+        detail=(component.detail,) if component.detail else (),
+    )
+
+
+def _depth(spec: ArchitectureSpec, zone: Zone) -> int:
+    """Return how many zones are around a zone."""
+    by_id = {z.id: z for z in spec.zones}
+    depth, current = 0, zone
+    while current.parent in by_id:
+        current = by_id[current.parent]
+        depth += 1
+    return depth
+
+
+def _frames(
+    spec: ArchitectureSpec, nodes: dict[str, Node], rules: ArchitectureRules
+) -> list[Frame]:
+    """Return the frames, outer ones first, each as large as what it holds plus 30 px."""
+    rects: dict[str, Rect] = {}
+    for zone in sorted(spec.zones, key=lambda z: -_depth(spec, z)):
+        members = [
+            grown(node_rect(nodes[c.id]), rules.frame_gap)
+            for c in spec.components
+            if c.zone == zone.id
+        ]
+        members += [grown(rects[z.id], rules.frame_gap) for z in spec.zones if z.parent == zone.id]
+        rects[zone.id] = union(members)
+    outer_first = sorted(spec.zones, key=lambda z: _depth(spec, z))
+    return [_frame(zone, rects[zone.id]) for zone in outer_first]
+
+
+def _frame(zone: Zone, rect: Rect) -> Frame:
+    """Build the frame of a zone: dashed, tinted, with a dark pill."""
+    return Frame(
+        id=zone.id,
+        x=rect.left,
+        y=rect.top,
+        width=rect.right - rect.left,
+        height=rect.bottom - rect.top,
+        label=zone.label,
+        tone=zone.tone,
+        variant=FrameVariant.LAYER,
+    )

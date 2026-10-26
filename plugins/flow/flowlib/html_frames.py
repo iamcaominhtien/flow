@@ -1,5 +1,6 @@
 """Draw the frames of BPMN pools and of an opened DFD process as HTML."""
 
+from .html_zones import ZONE_VARIANTS, zone_html
 from .markup import esc, px, tag
 from .model import Frame, FrameVariant
 from .theme import Theme
@@ -14,7 +15,7 @@ OPENED_PILL_HEIGHT_PX = 22
 OPENED_PILL_PADDING_PX = 12
 OPENED_PILL_FONT_SIZE_PX = 11
 PILL_RADIUS_PX = 999
-BAND_VARIANTS = (FrameVariant.POOL, FrameVariant.BLACK_BOX, FrameVariant.OPENED)
+BAND_VARIANTS = (FrameVariant.POOL, FrameVariant.BLACK_BOX, FrameVariant.OPENED, *ZONE_VARIANTS)
 
 
 def frame_with_band_html(frame: Frame, theme: Theme) -> str:
@@ -27,6 +28,8 @@ def frame_with_band_html(frame: Frame, theme: Theme) -> str:
     Returns:
         The markup of the frame and its label.
     """
+    if frame.variant in ZONE_VARIANTS:
+        return zone_html(frame, theme)
     if frame.variant is FrameVariant.POOL:
         return _pool_html(frame, theme)
     if frame.variant is FrameVariant.BLACK_BOX:

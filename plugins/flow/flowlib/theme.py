@@ -22,6 +22,9 @@ DFD_SIZE_KEYS = (
     "context_process_size",
 )  # the fields of ``DfdRules`` that are a (width, height) pair in ``theme.json``
 BPMN_SIZE_KEYS = ("task_size", "data_store_size")
+C4_SIZE_KEYS = ("box_size", "system_size")
+CLOUD_SIZE_KEYS = ("part_size",)
+ARCHITECTURE_SIZE_KEYS = ("part_size", "card_size")
 
 
 @dataclass(frozen=True)
@@ -250,6 +253,70 @@ class DfdRules:
 
 
 @dataclass(frozen=True)
+class C4Rules:
+    """Sizes and gaps of a C4 diagram (design 12). Lengths are in pixels."""
+
+    box_size: tuple[float, float]
+    system_size: tuple[float, float]
+    column_pitch: float
+    row_pitch: float
+    pair_gap: float
+    channel_step: float
+    channel_clearance: float
+    frame_pad: float
+    frame_pad_bottom: float
+    icon_size: float
+    padding: float
+    name_font_size: float
+    tech_font_size: float
+    text_font_size: float
+    text_line_height: float
+    text_left: float
+    name_top: float
+    text_top: float
+
+
+@dataclass(frozen=True)
+class CloudRules:
+    """Sizes and gaps of a cloud diagram (design 13). Lengths are in pixels."""
+
+    part_size: tuple[float, float]
+    row_pitch: float
+    column_pitch: float
+    frame_gap: float
+    part_pad: float
+    pair_gap: float
+    channel_step: float
+    channel_clearance: float
+    pill_height: float
+    pill_inset: float
+    site_offset: float
+    edge_row: int
+    public_row: int
+    private_row: int
+    data_row: int
+    tint_alpha: float
+    border_width: float
+
+
+@dataclass(frozen=True)
+class ArchitectureRules:
+    """Sizes and gaps of an architecture diagram (design 06). Lengths are in pixels."""
+
+    part_size: tuple[float, float]
+    card_size: tuple[float, float]
+    layer_pitch: float
+    card_layer_pitch: float
+    column_pitch: float
+    card_column_pitch: float
+    frame_gap: float
+    pair_gap: float
+    channel_step: float
+    channel_clearance: float
+    card_icon_size: float
+
+
+@dataclass(frozen=True)
 class BpmnRules:
     """Sizes and gaps of a BPMN diagram (design 11 section 7). Lengths are in pixels."""
 
@@ -363,6 +430,9 @@ class Theme:
     screen: ScreenRules
     dfd: DfdRules
     bpmn: BpmnRules
+    c4: C4Rules
+    cloud: CloudRules
+    architecture: ArchitectureRules
 
 
 def _line_style(raw: dict[str, Any]) -> LineStyle:
@@ -430,6 +500,11 @@ def _bpmn_rules(raw: dict[str, Any]) -> BpmnRules:
     return BpmnRules(**{**raw, **sizes})
 
 
+def _sized(raw: dict[str, Any], keys: tuple[str, ...]) -> dict[str, Any]:
+    """Return a rules object with each of ``keys`` turned into a ``(width, height)`` tuple."""
+    return {**raw, **{key: _pair(raw[key]) for key in keys}}
+
+
 def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
     """Build a theme from the parsed ``theme.json``, with a theme's overrides already merged.
 
@@ -472,6 +547,9 @@ def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
         screen=_screen_rules(raw["screen"]),
         dfd=_dfd_rules(raw["dfd"]),
         bpmn=_bpmn_rules(raw["bpmn"]),
+        c4=C4Rules(**_sized(raw["c4"], C4_SIZE_KEYS)),
+        cloud=CloudRules(**_sized(raw["cloud"], CLOUD_SIZE_KEYS)),
+        architecture=ArchitectureRules(**_sized(raw["architecture"], ARCHITECTURE_SIZE_KEYS)),
     )
 
 
