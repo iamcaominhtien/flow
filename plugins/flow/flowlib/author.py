@@ -37,6 +37,7 @@ from .theme import load_theme
 CAPTIONED_SHAPES = {Shape.START, Shape.END, Shape.INTERMEDIATE, Shape.ACTOR}  # the text goes under
 LABEL_KIND_OF_ROLE = {Role.YES: LabelKind.YES, Role.NO: LabelKind.NO, Role.BACK: LabelKind.BACK}
 MIDDLE = 0.5
+GATEWAY_ICONS = {"x", "plus"}  # a diamond with one of these marks is a BPMN gateway
 TEXT_SLACK_PX = 48  # room added to the estimated width of free text, so it stays on one line
 TEXT_HEIGHT_PX = 24
 LEGEND_ROW_PX = 28  # the height of one legend line
@@ -44,7 +45,7 @@ LEGEND_SAMPLE_PX = 50  # the length of the sample line
 LEGEND_TEXT_OFFSET_PX = 90  # where the words start, to the right of the sample line
 LEGEND_WORDS = {
     Role.MAIN: "Main path, animated fast: the route a normal case takes",
-    Role.DATA: "Data stream, animated slowly",
+    Role.DATA: "Message between pools, or a data stream: dashed, animated slowly",
     Role.YES: "Yes exit of a decision",
     Role.NO: "No exit, or a failure",
     Role.BACK: "Retry or return",
@@ -171,7 +172,8 @@ class Canvas:
             fitted = replace(
                 fitted, lines=tuple(wrap_text(text, rules, area, DEFAULT_FONT_SIZE_PX))
             )
-        captioned = shape in CAPTIONED_SHAPES
+        is_gateway = shape is Shape.DECISION and options.icon in GATEWAY_ICONS
+        captioned = shape in CAPTIONED_SHAPES or is_gateway
         placed = Node(
             id=name,
             shape=shape,

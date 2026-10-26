@@ -112,3 +112,13 @@ def test_a_card_is_tall_enough_for_its_icon_pill_and_detail() -> None:
     card = canvas.node("b", Shape.PROCESS, "Update FIB", options)
     assert card.node.height > plain.node.height + 60
     assert card.node.width >= 180
+
+
+def test_a_gateway_with_a_mark_shows_its_name_as_a_caption() -> None:
+    """A BPMN gateway keeps its mark inside and its question under it."""
+    canvas = Canvas()
+    gate = canvas.node(
+        "g", Shape.DECISION, "Verified?", NodeOptions((100, 100), icon="x", width=64, height=64)
+    )
+    assert gate.node.caption == "Verified?"
+    assert gate.node.text == ()
