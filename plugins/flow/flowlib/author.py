@@ -30,7 +30,7 @@ from .model import (
     Shape,
     Tone,
 )
-from .sizing import NodeContent, estimate_text_width, fit_node, wrap_text
+from .sizing import NodeContent, estimate_text_width, fit_card, fit_node, wrap_text
 from .text_area import text_area_width
 from .theme import load_theme
 
@@ -163,7 +163,7 @@ class Canvas:
             raise ValueError(f"the id '{name}' is used twice")
         rules = load_theme().layout
         content = NodeContent(text, options.detail or "", options.icon is not None)
-        fitted = fit_node(shape, content, rules)
+        fitted = fit_card(content, rules) if options.card else fit_node(shape, content, rules)
         width = options.width or fitted.width
         height = options.height or fitted.height
         if options.width:

@@ -102,3 +102,13 @@ def test_a_legend_adds_a_heading_and_one_line_per_role(tmp_path: Path) -> None:
     assert len([edge for edge in canvas.edges if edge.id.startswith("legend-line")]) == 3
     findings = canvas.write(tmp_path, "legend")
     assert not [finding for finding in findings if finding.severity is Severity.ERROR]
+
+
+def test_a_card_is_tall_enough_for_its_icon_pill_and_detail() -> None:
+    """A card is sized as a card, so its name and detail sit inside its box."""
+    canvas = Canvas()
+    plain = canvas.node("a", Shape.PROCESS, "Update FIB", NodeOptions((100, 100)))
+    options = NodeOptions((300, 100), icon="database", detail="Forwarding table updated", card=True)
+    card = canvas.node("b", Shape.PROCESS, "Update FIB", options)
+    assert card.node.height > plain.node.height + 60
+    assert card.node.width >= 180
