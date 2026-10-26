@@ -38,6 +38,7 @@ from .model import (
     Tone,
 )
 from .reader import POINT_LENGTH, Reader, is_number
+from .screen_scene import dump_screen, parse_screen
 from .theme import icon_names
 
 Built = TypeVar("Built")
@@ -47,9 +48,10 @@ FRAME_KEYS = {"id", "x", "y", "width", "height", "label", "tone", "variant", "gu
 DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
 NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections", "card", "dashed"}
+NODE_KEYS |= {"screen", "chip"}
 ROW_KEYS = {"left", "right", "flags"}
 EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label", "extras"}
-LABEL_KEYS = {"text", "at", "kind", "number"}
+LABEL_KEYS = {"text", "at", "kind", "number", "icon"}
 MIN_ROUTE_POINTS = 2
 
 
@@ -181,8 +183,20 @@ def _dump_node(node: Node) -> dict[str, Any]:
         "card": node.card,
         "dashed": node.dashed,
         "sections": [[_dump_row(row) for row in section] for section in node.sections],
+        "screen": dump_screen(node.screen) if node.screen else None,
+        "chip": _dump_label(node.chip) if node.chip else None,
     }
     written.update({key: value for key, value in optional.items() if value})
+    return written
+
+
+def _dump_label(label: EdgeLabel) -> dict[str, Any]:
+    """Write a label chip in the JSON format; the number and the icon are left out when absent."""
+    written: dict[str, Any] = {"text": label.text, "at": list(label.at), "kind": label.kind.value}
+    if label.number:
+        written["number"] = label.number
+    if label.icon:
+        written["icon"] = label.icon
     return written
 
 
@@ -201,18 +215,9 @@ def _dump_edge(edge: Edge) -> dict[str, Any]:
     if edge.target:
         written["to"] = edge.target
     if edge.label:
-        written["label"] = {
-            "text": edge.label.text,
-            "at": list(edge.label.at),
-            "kind": edge.label.kind.value,
-        }
-        if edge.label.number:
-            written["label"]["number"] = edge.label.number
+        written["label"] = _dump_label(edge.label)
     if edge.extras:
-        written["extras"] = [
-            {"text": extra.text, "at": list(extra.at), "kind": extra.kind.value}
-            for extra in edge.extras
-        ]
+        written["extras"] = [_dump_label(extra) for extra in edge.extras]
     return written
 
 
@@ -352,6 +357,10 @@ class _SceneParser:
             sections=self._sections(raw.get("sections", []), where),
             card=raw.get("card") is True,
             dashed=raw.get("dashed") is True,
+            screen=parse_screen(raw["screen"], f"{where}.screen", read)
+            if "screen" in raw
+            else None,
+            chip=self._label(raw.get("chip"), f"{where}.chip") if "chip" in raw else None,
         )
 
     def _sections(self, raw: object, where: str) -> tuple[tuple[Row, ...], ...]:
@@ -451,4 +460,7 @@ class _SceneParser:
         at = self._read.point(raw.get("at"), f"{where}.at")
         kind = self._read.enum(LabelKind, raw, "kind", where) or LabelKind.PLAIN
         number = self._read.text(raw, "number", where)
-        return EdgeLabel(text=raw["text"], at=at, kind=kind, number=number) if at else None
+        icon = self._read.text(raw, "icon", where)
+        return (
+            EdgeLabel(text=raw["text"], at=at, kind=kind, number=number, icon=icon) if at else None
+        )

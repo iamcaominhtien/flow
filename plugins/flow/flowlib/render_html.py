@@ -1,10 +1,23 @@
 """Render a scene as one self-contained HTML file: boxes, inline SVG and CSS animation."""
 
+from dataclasses import replace
+
 from .html_lines import lines_layer
 from .html_nodes import node_html
 from .markup import esc, fmt, px, tag
-from .model import Divider, EdgeLabel, Frame, FrameVariant, Role, Scene, Shape
-from .theme import Theme, load_theme
+from .model import (
+    MONO_LABEL_KINDS,
+    Divider,
+    EdgeLabel,
+    Frame,
+    FrameVariant,
+    LabelKind,
+    Node,
+    Role,
+    Scene,
+    Shape,
+)
+from .theme import Theme, icon_svg, load_theme
 
 FONTS_URL = (
     "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800"
@@ -59,6 +72,10 @@ FRAGMENT_GUARD_DROP_PX = 2
 
 # Label chip on a line
 NUMBER_SIZE_PX = 16
+BOLD_CHIP_WEIGHT = 700
+EFFECT_WEIGHT = 400
+CHIP_ICON_GAP_PX = 4
+CODE_CHIP_RADIUS_PX = 4
 NUMBER_GAP_PX = 6
 CHIP_PADDING = "2px 8px"
 CHIP_LINE_HEIGHT_PX = 16
@@ -248,6 +265,32 @@ def _number_html(number: str, theme: Theme) -> str:
     return tag("span", style, esc(number))
 
 
+def _chip_font(label: EdgeLabel, theme: Theme) -> dict[str, str]:
+    """Return the font of a chip: mono for a guard or a code, bold for a trigger."""
+    if label.kind in MONO_LABEL_KINDS:
+        scale = theme.type_scale.mono
+        weight = BOLD_CHIP_WEIGHT if label.kind is LabelKind.CODE else scale.weight
+        return {
+            "font-family": f"'{theme.fonts.mono}',monospace",
+            "font-size": px(scale.size),
+            "font-weight": str(weight),
+        }
+    if label.kind is LabelKind.EFFECT:
+        return {"font-size": px(theme.type_scale.mono.size), "font-weight": str(EFFECT_WEIGHT)}
+    is_trigger = label.kind in (LabelKind.USER, LabelKind.SYSTEM)
+    weight = BOLD_CHIP_WEIGHT if is_trigger else theme.type_scale.edge.weight
+    return {"font-size": px(theme.type_scale.edge.size), "font-weight": str(weight)}
+
+
+def _chip_icon_html(label: EdgeLabel, theme: Theme) -> str:
+    """Draw the small icon at the start of a system trigger chip, or return nothing."""
+    if label.icon is None:
+        return ""
+    size = theme.screen.trigger_icon
+    place = f'style="vertical-align:middle;margin-right:{px(CHIP_ICON_GAP_PX)}"'
+    return icon_svg(label.icon, size, theme.chips[label.kind].foreground, place)
+
+
 def _label_chip_html(label: EdgeLabel, theme: Theme) -> str:
     """Draw the chip that names a line, centred on the label position."""
     colors = theme.chips[label.kind]
@@ -260,13 +303,22 @@ def _label_chip_html(label: EdgeLabel, theme: Theme) -> str:
         "border-radius": px(PILL_RADIUS_PX),
         "background": colors.background,
         "color": colors.foreground,
-        "font-size": px(theme.type_scale.edge.size),
-        "font-weight": str(theme.type_scale.edge.weight),
         "line-height": px(CHIP_LINE_HEIGHT_PX),
         "white-space": "nowrap",
+        **_chip_font(label, theme),
     }
+    if label.kind is LabelKind.CODE:
+        style["border"] = f"1px solid {colors.foreground}"
+        style["border-radius"] = px(CODE_CHIP_RADIUS_PX)
     number = _number_html(label.number, theme) if label.number else ""
-    return tag("div", style, number + esc(label.text))
+    return tag("div", style, number + _chip_icon_html(label, theme) + esc(label.text))
+
+
+def _node_chip_html(node: Node, theme: Theme) -> str:
+    """Draw the chip that hangs on a node, such as the event that decides a decision."""
+    assert node.chip is not None
+    at = (node.x + node.chip.at[0], node.y + node.chip.at[1])
+    return _label_chip_html(replace(node.chip, at=at), theme)
 
 
 def _title_html(scene: Scene, theme: Theme) -> str:
@@ -332,6 +384,7 @@ def render(scene: Scene) -> str:
     layers.append(lines_layer(overlay, theme, size))
     layers += [_label_chip_html(edge.label, theme) for edge in scene.edges if edge.label]
     layers += [_label_chip_html(extra, theme) for edge in scene.edges for extra in edge.extras]
+    layers += [_node_chip_html(node, theme) for node in scene.nodes if node.chip]
     layers.append(_title_html(scene, theme))
     canvas = {
         "position": "relative",

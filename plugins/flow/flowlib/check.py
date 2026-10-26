@@ -10,7 +10,7 @@ from enum import StrEnum
 from itertools import combinations, pairwise
 
 from .html_nodes import CAPTION_FONT_SIZE_PX, CAPTION_GAP_PX, CAPTION_WIDTH_PX
-from .model import Edge, Frame, Node, Point, Role, Scene, Shape
+from .model import Edge, EdgeLabel, Frame, LabelKind, Node, Point, Role, Scene, Shape
 from .sizing import LINE_HEIGHT_FACTOR, estimate_text_width
 from .text_area import text_area_width
 from .theme import LayoutRules, load_theme
@@ -20,6 +20,15 @@ NODE_CLEARANCE_PX = 4.0  # nodes closer than this count as touching
 LINE_CLEARANCE_PX = 2.0
 MIN_CROSSING_EDGES = 2
 MIN_OVERLAP_PX = 32.0  # a shorter shared stretch is a junction at a node, not an overlap
+INLINE_LABEL_MAX_CHARS = 20  # design 02: longer words go in a table, under a code
+WORDS_KINDS = (
+    LabelKind.USER,
+    LabelKind.SYSTEM,
+    LabelKind.GUARD_OK,
+    LabelKind.GUARD_FAIL,
+    LabelKind.EFFECT,
+)  # the kinds that carry the words of a screen flow transition
+WRAPPING_CHARS = 2  # the brackets of a guard, or the slash and space of an effect
 MIN_SHARED_BUS_PX = 240.0  # lines of one kind that leave one node may share a bus this long
 
 
@@ -43,6 +52,7 @@ class Code(StrEnum):
     CAPTION_COVERED = "caption-covered"
     CROSSES_BORDER = "crosses-border"
     ON_DIVIDER = "on-divider"
+    LABEL_TOO_LONG = "label-too-long"
 
 
 @dataclass(frozen=True)
@@ -255,7 +265,7 @@ def check_text_fit(scene: Scene, rules: LayoutRules) -> list[Finding]:
     """Report nodes whose text probably does not fit, judging by the estimated text width."""
     findings = []
     for node in scene.nodes:
-        if not node.text:
+        if not node.text or node.screen is not None:
             continue
         room = text_area_width(node.shape, node.width, node.icon is not None)
         if node.card:
@@ -274,6 +284,35 @@ def check_text_fit(scene: Scene, rules: LayoutRules) -> list[Finding]:
                 )
             )
     return findings
+
+
+def check_label_length(scene: Scene) -> list[Finding]:
+    """Report words on an arrow that are longer than a screen flow allows inline.
+
+    Design 02 writes a condition on the arrow while it stays under about 20 characters; a longer
+    one, or one shared by several arrows, becomes a code with a row in a table.
+    """
+    findings = []
+    for edge in scene.edges:
+        for label in (*([edge.label] if edge.label else []), *edge.extras):
+            if label.kind not in WORDS_KINDS or _words_length(label) <= INLINE_LABEL_MAX_CHARS:
+                continue
+            findings.append(
+                Finding(
+                    Severity.WARNING,
+                    Code.LABEL_TOO_LONG,
+                    f"the words on '{edge.id}' are longer than {INLINE_LABEL_MAX_CHARS} "
+                    "characters; use conditions: coded",
+                    (edge.id,),
+                )
+            )
+    return findings
+
+
+def _words_length(label: EdgeLabel) -> int:
+    """Return how many characters of a label are the author's words, without its brackets."""
+    is_wrapped = label.kind in (LabelKind.GUARD_OK, LabelKind.GUARD_FAIL, LabelKind.EFFECT)
+    return len(label.text) - (WRAPPING_CHARS if is_wrapped else 0)
 
 
 def _crosses(first: tuple[Point, Point], second: tuple[Point, Point]) -> bool:
@@ -466,6 +505,7 @@ def check_scene(scene: Scene) -> list[Finding]:
         *check_crossings(scene),
         *check_overlaps(scene),
         *check_borders(scene, rules),
+        *check_label_length(scene),
     ]
     named = [_with_names(finding, scene) for finding in findings]
     return sorted(named, key=lambda finding: finding.severity is not Severity.ERROR)

@@ -4,9 +4,17 @@ import math
 import xml.etree.ElementTree as ET
 from itertools import pairwise
 
-from .drawio_common import LAYER_CELL_ID, add_geometry, add_vertex, font_style, style_string
+from .drawio_common import (
+    FONT_BOLD,
+    LAYER_CELL_ID,
+    add_geometry,
+    add_vertex,
+    font_style,
+    style_string,
+)
+from .drawio_screen import chip_value
 from .markup import esc, fmt
-from .model import SYMBOL_HEADS, Edge, EdgeLabel, Head, Node, Point
+from .model import MONO_LABEL_KINDS, SYMBOL_HEADS, Edge, EdgeLabel, Head, LabelKind, Node, Point
 from .theme import LineStyle, Theme
 
 CHIP_SPACING_PX = 3  # room around the text of a label chip
@@ -28,6 +36,7 @@ HEAD_ARROWS = {
     Head.ZERO_MANY: "ERzeroToMany",
     Head.ONE_MANY: "ERoneToMany",
 }
+BOLD_CHIP_KINDS = (LabelKind.USER, LabelKind.SYSTEM, LabelKind.CODE)
 FILLED_HEADS = (Head.FILLED, Head.DOT, Head.DIAMOND_FILLED)
 SYMBOL_HEAD_SIZE_PX = 12
 EXTRA_LABEL_WIDTH_PX = 60
@@ -154,6 +163,13 @@ def _label_style(edge: Edge, theme: Theme) -> dict[str, object]:
     }
     if chip.background != NO_COLOR:
         style["labelBackgroundColor"] = chip.background
+    if edge.label.kind in MONO_LABEL_KINDS:
+        style["fontFamily"] = theme.fonts.mono
+        style["fontSize"] = fmt(theme.type_scale.mono.size)
+    if edge.label.kind in BOLD_CHIP_KINDS:
+        style["fontStyle"] = FONT_BOLD
+    if edge.label.kind is LabelKind.CODE:
+        style["labelBorderColor"] = chip.foreground
     return style
 
 
@@ -181,12 +197,12 @@ def _edge_style(edge: Edge, nodes: dict[str, Node], theme: Theme) -> str:
     return style_string(style)
 
 
-def _label_value(edge: Edge) -> str:
-    """Return the label of an edge as HTML: the step number in bold, then the text."""
+def _label_value(edge: Edge, theme: Theme) -> str:
+    """Return the label of an edge as HTML: the step number in bold, then the icon and the text."""
     if edge.label is None:
         return ""
     number = f"<b>{esc(edge.label.number)}</b>&nbsp;" if edge.label.number else ""
-    return number + esc(edge.label.text)
+    return number + chip_value(edge.label, theme)
 
 
 def add_edge(root: ET.Element, edge: Edge, nodes: dict[str, Node], theme: Theme) -> None:
@@ -200,7 +216,7 @@ def add_edge(root: ET.Element, edge: Edge, nodes: dict[str, Node], theme: Theme)
     """
     attributes = {
         "id": f"edge-{edge.id}",
-        "value": _label_value(edge),
+        "value": _label_value(edge, theme),
         "style": _edge_style(edge, nodes, theme),
         "edge": "1",
         "parent": LAYER_CELL_ID,
@@ -233,6 +249,7 @@ def add_edge(root: ET.Element, edge: Edge, nodes: dict[str, Node], theme: Theme)
 def _add_extra(root: ET.Element, cell_id: str, extra: EdgeLabel, theme: Theme) -> None:
     """Add a small free-standing text next to the end of a line, such as a multiplicity."""
     chip = theme.chips[extra.kind]
+    family = theme.fonts.sans if extra.kind is LabelKind.EFFECT else theme.fonts.mono
     style = style_string(
         {
             "text": "",
@@ -244,7 +261,7 @@ def _add_extra(root: ET.Element, cell_id: str, extra: EdgeLabel, theme: Theme) -
             "fontSize": fmt(theme.type_scale.mono.size),
             "fontStyle": font_style(theme.type_scale.mono.weight),
             "fontColor": chip.foreground,
-            "fontFamily": theme.fonts.mono,
+            "fontFamily": family,
         }
     )
     cell = add_vertex(root, cell_id, esc(extra.text), style)

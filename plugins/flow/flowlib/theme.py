@@ -193,6 +193,61 @@ class SequenceRules:
 
 
 @dataclass(frozen=True)
+class ScreenRules:
+    """Sizes, gaps and colours of a screen flow (design 02). Lengths are in pixels."""
+
+    sizes: dict[str, tuple[float, float]]  # device frame sizes by name
+    radius: dict[str, float]  # corner radius of each device frame
+    border: float
+    card_height: float
+    decision: tuple[float, float]
+    entry: tuple[float, float]
+    flag: tuple[float, float]
+    tab: tuple[float, float]
+    gap: float
+    gap_labelled: float
+    channel_pitch: float
+    channel_margin: float
+    chip_room: float
+    chip_height: float
+    chip_padding: float
+    chip_gap: float
+    trigger_chip_height: float
+    trigger_icon: float
+    zone_pad_x: float
+    zone_pad_top: float
+    zone_pad_bottom: float
+    zone_gap: float
+    table_gap: float
+    port_pitch: float
+    port_clear: float
+    inner_pad: float
+    title_size: float
+    text_size: float
+    element_height: float
+    element_gap: float
+    element_radius: float
+    bar_height: float
+    bar_gap: float
+    notch_width: float
+    notch_height: float
+    notch_top: float
+    browser_bar: float
+    illustration: float
+    hotspot_radius: float
+    halo_radius: float
+    tab_height: float
+    tab_dot: float
+    hatch_stripe: float
+    scrim_opacity: float
+    halo_color: str
+    hotspot_color: str
+    dot_red: str
+    dot_amber: str
+    dot_green: str
+
+
+@dataclass(frozen=True)
 class Theme:
     """Every colour, line style and animation the renderers use."""
 
@@ -216,6 +271,7 @@ class Theme:
     chips: dict[LabelKind, ChipColors]
     layout: LayoutRules
     sequence: SequenceRules
+    screen: ScreenRules
 
 
 def _line_style(raw: dict[str, Any]) -> LineStyle:
@@ -249,6 +305,21 @@ def _layout_rules(raw: dict[str, Any]) -> LayoutRules:
     """
     sizes = {Shape(name): (size[0], size[1]) for name, size in raw["min_sizes"].items()}
     return LayoutRules(**{**raw, "min_sizes": sizes})
+
+
+def _screen_rules(raw: dict[str, Any]) -> ScreenRules:
+    """Build the screen flow rules from their JSON object.
+
+    Args:
+        raw: The ``screen`` object of ``theme.json``.
+
+    Returns:
+        The rules, with each size as a ``(width, height)`` tuple.
+    """
+    pairs = ("decision", "entry", "flag", "tab")
+    sizes = {name: (size[0], size[1]) for name, size in raw["sizes"].items()}
+    tuples = {name: (raw[name][0], raw[name][1]) for name in pairs}
+    return ScreenRules(**{**raw, **tuples, "sizes": sizes})
 
 
 def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
@@ -290,6 +361,7 @@ def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
         chips={LabelKind(name): ChipColors(**colors) for name, colors in raw["chips"].items()},
         layout=_layout_rules(raw["layout"]),
         sequence=SequenceRules(**raw["sequence"]),
+        screen=_screen_rules(raw["screen"]),
     )
 
 

@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 
+from .html_screen import screen_html
 from .markup import esc, px, tag
 from .model import KEY_FLAG_TONES, Node, Row, Shape, Tone
 from .shapes import outline_svg, table_radius
@@ -378,6 +379,18 @@ def _card_html(node: Node, theme: Theme) -> str:
     return html
 
 
+def _screen_node_html(node: Node, theme: Theme) -> str:
+    """Draw a screen of a screen flow: its parts sit in a box of the size of the node."""
+    box = {
+        **ABSOLUTE,
+        "left": px(node.x),
+        "top": px(node.y),
+        "width": px(node.width),
+        "height": px(node.height),
+    }
+    return tag("div", box, screen_html(node, theme), data_id=node.id)
+
+
 def node_html(node: Node, theme: Theme) -> str:
     """Draw one node: its outline, icon and text, its badge and its caption.
 
@@ -388,6 +401,8 @@ def node_html(node: Node, theme: Theme) -> str:
     Returns:
         The markup of the node and of what hangs on it.
     """
+    if node.screen is not None:
+        return _screen_node_html(node, theme)
     colors = theme.shapes[node.shape]
     if node.tone is not None and node.shape is not Shape.TABLE:
         colors = replace(colors, fill=theme.tones[node.tone].box)

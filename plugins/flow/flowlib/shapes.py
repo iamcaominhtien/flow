@@ -34,6 +34,9 @@ DOCUMENT_WAVE_FRACTION = 0.2  # height of the wavy bottom edge, as a fraction of
 DOCUMENT_WAVE_PEAK_FACTOR = 2.2
 DOCUMENT_WAVE_CONTROL_FRACTION = 0.75
 
+FLAG_POINT_PX = 16  # how deep the notch and the point of a flag are
+FLAG_POINT_DIVISOR = 6
+
 Drawer = Callable[[float, float, ShapeColors], str]
 
 
@@ -271,6 +274,17 @@ def _circle(width: float, height: float, colors: ShapeColors) -> str:
     return f'<circle cx="{fmt(width / 2)}" cy="{fmt(height / 2)}" r="{fmt(radius)}" {paint}/>'
 
 
+def _flag(width: float, height: float, colors: ShapeColors) -> str:
+    """Draw an off-page connector: a notch on the left and a point on the right."""
+    paint = _paint(colors)
+    notch = min(FLAG_POINT_PX, width / FLAG_POINT_DIVISOR)
+    return (
+        f'<path d="M{INSET_PX} {INSET_PX}H{fmt(width - notch)}L{fmt(width - INSET_PX)} '
+        f"{fmt(height / 2)}L{fmt(width - notch)} {fmt(height - INSET_PX)}H{INSET_PX}"
+        f'L{fmt(notch)} {fmt(height / 2)}Z" {paint} stroke-linejoin="round"/>'
+    )
+
+
 DRAWERS: dict[Shape, Drawer] = {
     Shape.TERMINATOR: _pill,
     Shape.FAIL: _pill,
@@ -294,6 +308,8 @@ DRAWERS: dict[Shape, Drawer] = {
     Shape.INTERMEDIATE: _intermediate,
     Shape.ACTOR: _actor,
     Shape.ELLIPSE: _ellipse,
+    Shape.SCREEN: _rounded_box,
+    Shape.FLAG: _flag,
 }
 
 

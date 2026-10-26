@@ -1,0 +1,149 @@
+"""Write and read what a screen node shows, in the JSON of a scene and in a draw.io style.
+
+The scene format of a screen node is ``"screen": {"code", "title", "device", "orientation",
+"mini", "fidelity", "content", "hatch", "elements": [{"text", "style", "at", "on", "hotspot"}],
+"overlay", "overlay_title", "tab": [active, count], "undecided", "chip_place"}``; keys that hold
+their default are left out.
+"""
+
+import base64
+import json
+from typing import Any
+
+from .model import (
+    ChipPlace,
+    Content,
+    Device,
+    ElementStyle,
+    Fidelity,
+    Layer,
+    Orientation,
+    Overlay,
+    Placement,
+    ScreenElement,
+    ScreenView,
+)
+from .reader import Reader
+
+SCREEN_KEYS = {"code", "title", "device", "orientation", "mini", "fidelity", "content", "hatch"}
+SCREEN_KEYS |= {"elements", "overlay", "overlay_title", "tab", "undecided", "chip_place"}
+ELEMENT_KEYS = {"text", "style", "at", "on", "hotspot"}
+TAB_LENGTH = 2
+DEFAULT_VIEW = ScreenView(code="")
+
+
+def dump_screen(view: ScreenView) -> dict[str, Any]:
+    """Turn a screen view into JSON, leaving out what holds its default.
+
+    Args:
+        view: What a screen node shows.
+
+    Returns:
+        A JSON-style dict that ``parse_screen`` accepts.
+    """
+    written: dict[str, Any] = {"code": view.code, "title": view.title}
+    written["device"] = view.device.value
+    written["fidelity"] = view.fidelity.value
+    optional = {
+        "orientation": view.orientation.value
+        if view.orientation != DEFAULT_VIEW.orientation
+        else None,
+        "mini": view.is_mini,
+        "content": view.content.value if view.content is not Content.HATCH else None,
+        "hatch": view.hatch_label,
+        "elements": [_dump_element(element) for element in view.elements],
+        "overlay": view.overlay.value if view.overlay else None,
+        "overlay_title": view.overlay_title,
+        "tab": [view.tab_active, view.tab_count] if view.tab_active is not None else None,
+        "undecided": view.is_undecided,
+        "chip_place": view.chip_place.value if view.chip_place is not ChipPlace.ABOVE else None,
+    }
+    written.update({key: value for key, value in optional.items() if value})
+    return written
+
+
+def _dump_element(element: ScreenElement) -> dict[str, Any]:
+    """Write one named element of a screen."""
+    written: dict[str, Any] = {"text": element.text, "style": element.style.value}
+    written["at"] = element.placement.value
+    if element.layer is Layer.OVERLAY:
+        written["on"] = element.layer.value
+    if not element.is_hotspot:
+        written["hotspot"] = False
+    return written
+
+
+def parse_screen(raw: object, where: str, read: Reader) -> ScreenView | None:
+    """Read a screen view from its JSON, or report why it cannot be read.
+
+    Args:
+        raw: The ``screen`` object of a node.
+        where: Where the object is, for messages.
+        read: The reader that collects problems.
+
+    Returns:
+        The view, or None when it is not an object.
+    """
+    if not isinstance(raw, dict):
+        read.report(where, "'screen' must be an object")
+        return None
+    read.check_keys(raw, SCREEN_KEYS, where)
+    tab = raw.get("tab")
+    has_tab = isinstance(tab, list) and len(tab) == TAB_LENGTH
+    return ScreenView(
+        code=read.text(raw, "code", where) or "",
+        title=read.text(raw, "title", where) or "",
+        device=read.enum(Device, raw, "device", where) or Device.PHONE,
+        orientation=read.enum(Orientation, raw, "orientation", where) or Orientation.PORTRAIT,
+        is_mini=raw.get("mini") is True,
+        fidelity=read.enum(Fidelity, raw, "fidelity", where) or Fidelity.L0,
+        content=read.enum(Content, raw, "content", where) or Content.HATCH,
+        hatch_label=read.text(raw, "hatch", where) or "",
+        elements=_parse_elements(raw.get("elements", []), where, read),
+        overlay=read.enum(Overlay, raw, "overlay", where),
+        overlay_title=read.text(raw, "overlay_title", where) or "",
+        tab_active=tab[0] if has_tab else None,
+        tab_count=tab[1] if has_tab else 0,
+        is_undecided=raw.get("undecided") is True,
+        chip_place=read.enum(ChipPlace, raw, "chip_place", where) or ChipPlace.ABOVE,
+    )
+
+
+def _parse_elements(raw: object, where: str, read: Reader) -> tuple[ScreenElement, ...]:
+    """Read the named elements of a screen."""
+    if not isinstance(raw, list):
+        read.report(where, "'elements' must be a list")
+        return ()
+    found = []
+    for index, item in enumerate(raw):
+        place = f"{where}.elements[{index}]"
+        if not isinstance(item, dict):
+            read.report(place, "must be an object")
+            continue
+        read.check_keys(item, ELEMENT_KEYS, place)
+        found.append(
+            ScreenElement(
+                text=read.text(item, "text", place) or "",
+                style=read.enum(ElementStyle, item, "style", place) or ElementStyle.PRIMARY,
+                placement=read.enum(Placement, item, "at", place) or Placement.BOTTOM,
+                layer=Layer.OVERLAY if item.get("on") == Layer.OVERLAY.value else Layer.BASE,
+                is_hotspot=item.get("hotspot", True) is not False,
+            )
+        )
+    return tuple(found)
+
+
+def encode_screen(view: ScreenView) -> str:
+    """Pack a screen view into one word that fits in a draw.io style, which has no semicolons."""
+    text = json.dumps(dump_screen(view), separators=(",", ":"))
+    return base64.urlsafe_b64encode(text.encode()).decode().rstrip("=")
+
+
+def decode_screen(packed: str) -> ScreenView | None:
+    """Unpack what ``encode_screen`` wrote, or return None when it cannot be read."""
+    padded = packed + "=" * (-len(packed) % 4)
+    try:
+        raw = json.loads(base64.urlsafe_b64decode(padded.encode()).decode())
+    except ValueError:
+        return None
+    return parse_screen(raw, "screen", Reader())
