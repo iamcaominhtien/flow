@@ -109,6 +109,10 @@ The icon library is 40 flat line icons plus 97 detailed icons (23 of them are th
 - [x] Support editing existing `.drawio` files (`flow.py edit` with a fixed list of operations; no layout)
 - [ ] Documentation and examples
 
+## Benchmarks
+
+`benchmarks/` holds 24 test briefs (8 diagram types, 3 sizes each) taken from public subjects, and a checker for them. See [benchmarks/README.md](benchmarks/README.md). None of them has been run through the plugin yet.
+
 ## Contributing
 
 The project is just getting started. Ideas and issues are welcome; contribution guidelines will follow.
