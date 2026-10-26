@@ -5,7 +5,8 @@ from difflib import get_close_matches
 from enum import StrEnum
 from typing import Any, TypeVar
 
-from .model import Point
+from .model import DEFAULT_THEME, Point
+from .theme import theme_names
 
 Member = TypeVar("Member", bound=StrEnum)
 
@@ -152,6 +153,22 @@ class Reader:
         if value not in (PLAIN_STYLE, ILLUSTRATED_STYLE):
             self.report(where, f"unknown style '{value}'; use plain or illustrated")
         return value == ILLUSTRATED_STYLE
+
+    def theme(self, raw: dict[str, Any]) -> str:
+        """Read the ``theme`` field of a spec or scene: a theme name, ``pastel`` by default.
+
+        Args:
+            raw: The object that holds the field.
+
+        Returns:
+            The theme name; the default when the field is absent or not a theme (a problem is
+            reported for the second case).
+        """
+        value = raw.get("theme", DEFAULT_THEME)
+        if value in theme_names():
+            return value
+        self.report("theme", f"unknown theme '{value}'; use one of: {', '.join(theme_names())}")
+        return DEFAULT_THEME
 
     def point(self, raw: object, where: str) -> Point | None:
         """Read an ``[x, y]`` pair, or report a problem."""

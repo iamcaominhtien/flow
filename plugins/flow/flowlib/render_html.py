@@ -13,7 +13,6 @@ FONTS_URL = (
 
 # Text inside a node
 LINE_HEIGHT_FACTOR = 1.25
-NODE_TEXT_WEIGHT = 600
 NOTE_TEXT_WEIGHT = 400
 DOCUMENT_LABEL_TRIM_PX = 6  # the wavy bottom of a document leaves less room for text
 DOCUMENT_ICON_LIFT_PX = 3
@@ -38,13 +37,11 @@ BADGE_PADDING_X_PX = 6
 BADGE_FONT_SIZE_PX = 11
 
 # Frame
-FRAME_RADIUS_PX = 16
 FRAME_BORDER_PX = 1.5
 FRAME_PILL_INSET_X_PX = 16
 FRAME_PILL_INSET_Y_PX = 12
 PILL_HEIGHT_PX = 22
 PILL_PADDING_X_PX = 12
-PILL_FONT_SIZE_PX = 12
 PILL_RADIUS_PX = 999
 
 LANE_BORDER_PX = 1  # the thin outline of a swimlane
@@ -64,14 +61,11 @@ FRAGMENT_GUARD_DROP_PX = 2
 NUMBER_SIZE_PX = 16
 NUMBER_GAP_PX = 6
 CHIP_PADDING = "2px 8px"
-CHIP_FONT_SIZE_PX = 11
 CHIP_LINE_HEIGHT_PX = 16
 
 # Title block
 TITLE_LEFT_PX = 64
 TITLE_TOP_PX = 48
-TITLE_FONT_SIZE_PX = 24
-TITLE_WEIGHT = 600
 DESCRIPTION_FONT_SIZE_PX = 13
 DESCRIPTION_LINE_HEIGHT_PX = 20
 DESCRIPTION_MAX_WIDTH_PX = 900
@@ -97,7 +91,7 @@ def _frame_html(frame: Frame, theme: Theme) -> str:
         "box-sizing": "border-box",
         "background": tone.box,
         "border": f"{px(FRAME_BORDER_PX)} dashed {tone.pill}",
-        "border-radius": px(FRAME_RADIUS_PX),
+        "border-radius": px(theme.style.frame_radius),
     }
     html = tag("div", area, data_id=frame.id)
     if frame.label:
@@ -111,8 +105,8 @@ def _frame_html(frame: Frame, theme: Theme) -> str:
             "border-radius": px(PILL_RADIUS_PX),
             "background": tone.pill,
             "color": theme.ink,
-            "font-size": px(PILL_FONT_SIZE_PX),
-            "font-weight": "700",
+            "font-size": px(theme.type_scale.pill.size),
+            "font-weight": str(theme.type_scale.pill.weight),
             "line-height": px(PILL_HEIGHT_PX),
             "white-space": "nowrap",
         }
@@ -147,7 +141,7 @@ def _lane_html(frame: Frame, theme: Theme) -> str:
         "height": px(frame.height if is_row else tab_size),
         "box-sizing": "border-box",
         "background": tone.accent,
-        "color": "#FFFFFF",
+        "color": theme.on_accent,
         "font-size": px(LANE_TAB_FONT_SIZE_PX),
         "font-weight": "700",
         "display": "flex",
@@ -182,14 +176,14 @@ def _fragment_html(frame: Frame, theme: Theme) -> str:
         "box-sizing": "border-box",
         "background": tone.box,
         "border": f"{px(FRAME_BORDER_PX)} solid {tone.stroke}",
-        "border-radius": px(FRAGMENT_RADIUS_PX),
+        "border-radius": px(min(FRAGMENT_RADIUS_PX, theme.style.frame_radius)),
     }
     html = tag("div", area, data_id=frame.id)
     tab = {
         "padding": f"0 {px(FRAGMENT_TAG_PADDING_X_PX)}",
         "height": px(FRAGMENT_TAG_HEIGHT_PX),
         "line-height": px(FRAGMENT_TAG_HEIGHT_PX),
-        "background": "#FFFFFF",
+        "background": theme.paper,
         "border": f"1px solid {tone.stroke}",
         "border-top": "none",
         "border-left": "none",
@@ -266,8 +260,8 @@ def _label_chip_html(label: EdgeLabel, theme: Theme) -> str:
         "border-radius": px(PILL_RADIUS_PX),
         "background": colors.background,
         "color": colors.foreground,
-        "font-size": px(CHIP_FONT_SIZE_PX),
-        "font-weight": "700",
+        "font-size": px(theme.type_scale.edge.size),
+        "font-weight": str(theme.type_scale.edge.weight),
         "line-height": px(CHIP_LINE_HEIGHT_PX),
         "white-space": "nowrap",
     }
@@ -279,7 +273,10 @@ def _title_html(scene: Scene, theme: Theme) -> str:
     """Draw the title and the description of a scene, or return nothing without a title."""
     if not scene.title:
         return ""
-    title_style = {"font-size": px(TITLE_FONT_SIZE_PX), "font-weight": str(TITLE_WEIGHT)}
+    title_style = {
+        "font-size": px(theme.type_scale.title.size),
+        "font-weight": str(theme.type_scale.title.weight),
+    }
     title = tag("div", title_style, esc(scene.title))
     description = ""
     if scene.description:
@@ -325,7 +322,7 @@ def render(scene: Scene) -> str:
     Returns:
         A complete HTML document with no script and no file besides the web fonts.
     """
-    theme = load_theme()
+    theme = load_theme(scene.theme)
     size = (scene.width, scene.height)
     underlay = tuple(edge for edge in scene.edges if edge.role is Role.LIFELINE)
     overlay = tuple(edge for edge in scene.edges if edge.role is not Role.LIFELINE)

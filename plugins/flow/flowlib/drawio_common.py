@@ -8,7 +8,14 @@ Bounds = tuple[float, float, float, float]  # x, y, width, height
 
 ROOT_CELL_ID = "0"
 LAYER_CELL_ID = "1"
+FRAME_LABEL_PREFIX = "label-"  # a frame's name is a pill cell with this id prefix + the frame's id
 FONT_BOLD = 1  # the draw.io ``fontStyle`` bit for bold
+BOLD_FROM_WEIGHT = 600  # draw.io has no weights: a text of this weight or more is bold
+
+
+def font_style(weight: int) -> int:
+    """Return the draw.io ``fontStyle`` for a font weight: bold from 600, regular below."""
+    return FONT_BOLD if weight >= BOLD_FROM_WEIGHT else 0
 
 
 def style_string(parts: dict[str, object]) -> str:

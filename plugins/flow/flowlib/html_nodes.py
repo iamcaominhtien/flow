@@ -4,14 +4,13 @@ from dataclasses import replace
 
 from .markup import esc, px, tag
 from .model import KEY_FLAG_TONES, Node, Row, Shape, Tone
-from .shapes import outline_svg
+from .shapes import outline_svg, table_radius
 from .sizing import key_room
 from .text_area import text_area_width
-from .theme import ShapeColors, Theme, detailed_icon_svg, has_detailed_icon, icon_svg
+from .theme import Theme, detailed_icon_svg, has_detailed_icon, icon_svg
 
 # Text inside a node
 LINE_HEIGHT_FACTOR = 1.25
-NODE_TEXT_WEIGHT = 600
 NOTE_TEXT_WEIGHT = 400
 DETAIL_TEXT_WEIGHT = 400
 DETAIL_GAP_PX = 2
@@ -42,14 +41,13 @@ PILL_RADIUS_PX = 999
 
 # Table node
 TABLE_TEXT_PADDING_PX = 14
-TABLE_ROW_FONT_SIZE_PX = 11
-TABLE_RULE_COLOR = "#CBD5E1"
-TABLE_ROW_RULE_COLOR = "#E2E8F0"
-TABLE_HEADER_RADIUS_PX = 7
+TABLE_HEADER_INSET_PX = (
+    1  # the header sits inside the outline, so its corners are this much tighter
+)
 TABLE_PILL_HEIGHT_PX = 28  # the name pill in the header of an illustrated table
 TABLE_CARD_ICON_PX = 52
 TABLE_CHIP_HEIGHT_PX = 16
-TABLE_CHIP_FONT_SIZE_PX = 9
+TABLE_CHIP_FONT_SIZE_PX = 10
 TABLE_CHIP_RADIUS_PX = 4
 
 # Caption under a node
@@ -105,7 +103,7 @@ def _label_html(node: Node, theme: Theme) -> str:
         "text-align": "left" if is_note else "center",
         "font-size": px(node.font_size),
         "line-height": px(int(node.font_size * LINE_HEIGHT_FACTOR)),
-        "font-weight": str(NOTE_TEXT_WEIGHT if is_note else NODE_TEXT_WEIGHT),
+        "font-weight": str(NOTE_TEXT_WEIGHT if is_note else theme.type_scale.node.weight),
         "color": theme.slate if is_note else theme.ink,
     }
     title = "<br>".join(esc(line) for line in node.text)
@@ -156,7 +154,8 @@ def _header_box(node: Node, theme: Theme) -> dict[str, str]:
     """Return the style of the coloured band at the top of a table."""
     tone = theme.tones[node.tone or Tone.GRAY]
     stroke = theme.shapes[node.shape].stroke
-    radius = f"{px(TABLE_HEADER_RADIUS_PX)} {px(TABLE_HEADER_RADIUS_PX)} 0 0"
+    corner = px(table_radius(theme.shapes[node.shape]) - TABLE_HEADER_INSET_PX)
+    radius = f"{corner} {corner} 0 0"
     return {
         **ABSOLUTE,
         "left": "1px",
@@ -181,7 +180,7 @@ def _table_title_html(node: Node, theme: Theme) -> str:
             "display": "flex",
             "align-items": "center",
             "font-size": px(node.font_size),
-            "font-weight": str(NODE_TEXT_WEIGHT),
+            "font-weight": str(theme.type_scale.node.weight),
             "color": theme.ink,
         }
         return tag("div", title, name)
@@ -195,14 +194,15 @@ def _table_title_html(node: Node, theme: Theme) -> str:
         "border": f"2px solid {stroke}",
         "border-radius": px(PILL_RADIUS_PX),
         "background": theme.tones[node.tone or Tone.GRAY].box,
-        "box-shadow": f"0 3px 0 {stroke}",
         "box-sizing": "border-box",
         "font-size": px(node.font_size),
-        "font-weight": str(NODE_TEXT_WEIGHT),
+        "font-weight": str(theme.type_scale.pill.weight),
         "line-height": px(TABLE_PILL_HEIGHT_PX - 4),
         "color": theme.ink,
         "white-space": "nowrap",
     }
+    if theme.style.shadow:
+        pill["box-shadow"] = f"0 3px 0 {stroke}"
     return (
         tag("div", _header_box(node, theme))
         + tag("div", pill, name)
@@ -237,7 +237,7 @@ def _table_html(node: Node, theme: Theme) -> str:
                 "left": "1px",
                 "top": px(y + rules.table_section_gap / 2 - 1),
                 "width": px(node.width - 2),
-                "border-top": f"1px solid {TABLE_RULE_COLOR}",
+                "border-top": f"1px solid {theme.rule}",
             }
             html += tag("div", rule)
             y += rules.table_section_gap
@@ -258,7 +258,7 @@ def _chip_html(flag: str, theme: Theme) -> str:
         "margin-right": "2px",
         "border-radius": px(TABLE_CHIP_RADIUS_PX),
         "background": tone.pill,
-        "color": tone.accent,
+        "color": tone.label,
         "font": (
             f"700 {px(TABLE_CHIP_FONT_SIZE_PX)}/{px(TABLE_CHIP_HEIGHT_PX)} "
             f"'{theme.fonts.sans}',sans-serif"
@@ -275,6 +275,7 @@ def _row_html(row: Row, place: tuple[float, float, float, bool], theme: Theme) -
     """
     width, top, key_width, has_rule = place
     rules = theme.layout
+    mono = theme.type_scale.mono
     style = {
         **ABSOLUTE,
         "left": "1px",
@@ -285,7 +286,7 @@ def _row_html(row: Row, place: tuple[float, float, float, bool], theme: Theme) -
         "padding": f"0 {px(TABLE_TEXT_PADDING_PX)}",
         "display": "flex",
         "align-items": "center",
-        "border-top": f"1px solid {TABLE_ROW_RULE_COLOR}" if has_rule else "0",
+        "border-top": f"1px solid {theme.row_rule}" if has_rule else "0",
         "font-size": px(rules.table_name_font_size),
         "color": theme.ink,
     }
@@ -293,7 +294,7 @@ def _row_html(row: Row, place: tuple[float, float, float, bool], theme: Theme) -
     key_cell = tag("span", {"display": "inline-block", "width": px(key_width)}, chips)
     weight = "700" if "PK" in row.flags else "500"
     name = tag("span", {"font-weight": weight, "flex": "1"}, esc(row.left))
-    kind_font = f"500 {px(TABLE_ROW_FONT_SIZE_PX)}/1 '{theme.fonts.mono}',monospace"
+    kind_font = f"{mono.weight} {px(mono.size)}/1 '{theme.fonts.mono}',monospace"
     kind = tag("span", {"color": theme.slate, "font": kind_font}, esc(row.right))
     return tag("div", style, (key_cell if key_width else "") + name + kind)
 
@@ -309,7 +310,7 @@ def _caption_html(node: Node, theme: Theme) -> str:
         "width": px(CAPTION_WIDTH_PX),
         "text-align": "center",
         "font-size": px(CAPTION_FONT_SIZE_PX),
-        "font-weight": str(NODE_TEXT_WEIGHT),
+        "font-weight": str(theme.type_scale.node.weight),
         "color": theme.ink,
         "line-height": px(int(CAPTION_FONT_SIZE_PX * LINE_HEIGHT_FACTOR)),
     }
@@ -356,7 +357,7 @@ def _card_html(node: Node, theme: Theme) -> str:
         "border-radius": px(PILL_RADIUS_PX),
         "background": tone.pill,
         "font-size": px(node.font_size),
-        "font-weight": str(NODE_TEXT_WEIGHT),
+        "font-weight": str(theme.type_scale.pill.weight),
         "line-height": px(rules.card_pill_height),
         "color": theme.ink,
         "white-space": "nowrap",
@@ -389,7 +390,7 @@ def node_html(node: Node, theme: Theme) -> str:
     """
     colors = theme.shapes[node.shape]
     if node.tone is not None and node.shape is not Shape.TABLE:
-        colors = ShapeColors(fill=theme.tones[node.tone].box, stroke=colors.stroke)
+        colors = replace(colors, fill=theme.tones[node.tone].box)
     if node.dashed:
         colors = replace(colors, dash=DASH_PATTERN)
     inside = outline_svg(node.shape, node.width, node.height, colors)

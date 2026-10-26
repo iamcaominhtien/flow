@@ -88,12 +88,13 @@ def test_edge_without_terminals_still_has_end_points() -> None:
     assert {"sourcePoint", "targetPoint"} <= names
 
 
-def test_animated_roles_use_flow_animation_at_the_speed_of_the_page() -> None:
-    """Main and data lines are animated; a normal line is not."""
+def test_animated_roles_use_flow_animation_with_the_recipe_of_the_design() -> None:
+    """Main and data lines are animated, at 500 and 1500 ms; a normal line is not."""
     cells = cells_of(render_drawio.render(example_scene(SHAPES_SCENE)))
     main, data, normal = (style_of(cells[f"edge-{name}"]) for name in ("m1", "d1", "n1"))
     assert main["flowAnimation"] == "1"
-    assert int(data["flowAnimationDuration"]) > int(main["flowAnimationDuration"])
+    assert int(main["flowAnimationDuration"]) == 500
+    assert int(data["flowAnimationDuration"]) == 1500
     assert "flowAnimation" not in normal
 
 

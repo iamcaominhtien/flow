@@ -1,9 +1,10 @@
 """The diagram types. Each type turns a JSON spec into a scene; this module picks the type."""
 
 from collections.abc import Callable
+from dataclasses import replace
 
-from ..model import Scene
-from ..reader import SpecError
+from ..model import DEFAULT_THEME, Scene
+from ..reader import Reader, SpecError
 from . import (
     architecture,
     boards,
@@ -17,6 +18,8 @@ from . import (
     timeline,
     tree,
 )
+
+THEME_KEY = "theme"
 
 Layout = Callable[[object], Scene]
 
@@ -54,4 +57,25 @@ def layout(raw: object) -> Scene:
     if kind not in LAYOUTS:
         known = ", ".join(sorted(LAYOUTS))
         raise SpecError([f"spec: 'type' must be one of: {known}"])
-    return LAYOUTS[kind](raw)
+    theme = _read_theme(raw)
+    spec = {key: value for key, value in raw.items() if key != THEME_KEY}
+    return replace(LAYOUTS[kind](spec), theme=theme)
+
+
+def _read_theme(raw: dict[str, object]) -> str:
+    """Read and check the ``theme`` field that every spec type accepts.
+
+    Args:
+        raw: The spec, a JSON object.
+
+    Returns:
+        The theme name, ``pastel`` when the spec has none.
+
+    Raises:
+        SpecError: If the theme is not one of the known themes.
+    """
+    reader = Reader()
+    theme = reader.theme(raw) if THEME_KEY in raw else DEFAULT_THEME
+    if reader.problems:
+        raise SpecError(reader.problems)
+    return theme

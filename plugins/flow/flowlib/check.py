@@ -10,11 +10,12 @@ from enum import StrEnum
 from itertools import combinations, pairwise
 
 from .html_nodes import CAPTION_FONT_SIZE_PX, CAPTION_GAP_PX, CAPTION_WIDTH_PX
-from .model import Edge, Node, Point, Role, Scene
+from .model import Edge, Frame, Node, Point, Role, Scene, Shape
 from .sizing import LINE_HEIGHT_FACTOR, estimate_text_width
 from .text_area import text_area_width
 from .theme import LayoutRules, load_theme
 
+BORDER_TOLERANCE_PX = 1.0  # a part this close to a frame's border counts as inside or outside
 NODE_CLEARANCE_PX = 4.0  # nodes closer than this count as touching
 LINE_CLEARANCE_PX = 2.0
 MIN_CROSSING_EDGES = 2
@@ -40,6 +41,8 @@ class Code(StrEnum):
     LINES_CROSS = "lines-cross"
     LINES_OVERLAP = "lines-overlap"
     CAPTION_COVERED = "caption-covered"
+    CROSSES_BORDER = "crosses-border"
+    ON_DIVIDER = "on-divider"
 
 
 @dataclass(frozen=True)
@@ -366,6 +369,83 @@ def check_overlaps(scene: Scene) -> list[Finding]:
     return findings
 
 
+def frame_rect(frame: Frame) -> Rect:
+    """Return the rectangle a frame covers."""
+    return Rect(frame.x, frame.y, frame.x + frame.width, frame.y + frame.height)
+
+
+def _straddles(part: Rect, frame: Rect) -> bool:
+    """Tell whether a part lies partly inside a frame and partly outside it.
+
+    A part that holds the whole frame (a big box over a small frame) is not a straddle.
+    """
+    tolerance = BORDER_TOLERANCE_PX
+    if not part.overlaps(frame, -tolerance):
+        return False
+    inside = (
+        part.left >= frame.left - tolerance
+        and part.right <= frame.right + tolerance
+        and part.top >= frame.top - tolerance
+        and part.bottom <= frame.bottom + tolerance
+    )
+    holds = (
+        part.left <= frame.left + tolerance
+        and part.right >= frame.right - tolerance
+        and part.top <= frame.top + tolerance
+        and part.bottom >= frame.bottom - tolerance
+    )
+    return not inside and not holds
+
+
+def _parts(scene: Scene, rules: LayoutRules) -> list[tuple[str, Rect]]:
+    """Return what a frame border or a divider must not cut: nodes and the chips of lines.
+
+    An activation bar is left out: it is long on purpose and may run past a fragment.
+    """
+    parts = [(node.id, node_rect(node)) for node in scene.nodes if node.shape is not Shape.BAR]
+    for edge in scene.edges:
+        rect = label_rect(edge, rules)
+        if rect is not None:
+            parts.append((edge.id, rect))
+    return parts
+
+
+def check_borders(scene: Scene, rules: LayoutRules) -> list[Finding]:
+    """Report a node or a label that straddles a frame border or sits on a divider.
+
+    A part belongs inside a frame or outside it (design 01 section 10, check 3). The frame
+    borders are those of zones, pools, lanes and fragments; the dividers are the dashed lines
+    across a fragment. Both are warnings, since a long box may cross a frame on purpose.
+    """
+    findings = []
+    for part_id, rect in _parts(scene, rules):
+        for frame in scene.frames:
+            frame_box = frame_rect(frame)
+            if _straddles(rect, frame_box):
+                findings.append(_border_finding(part_id, frame, Code.CROSSES_BORDER))
+            if any(_on_divider(rect, frame_box, divider.y) for divider in frame.dividers):
+                findings.append(_border_finding(part_id, frame, Code.ON_DIVIDER))
+    return findings
+
+
+def _on_divider(part: Rect, frame: Rect, y: float) -> bool:
+    """Tell whether a part inside a frame's width is cut by the divider at height ``y``."""
+    if not part.overlaps(frame, -BORDER_TOLERANCE_PX):
+        return False
+    return part.top + BORDER_TOLERANCE_PX < y < part.bottom - BORDER_TOLERANCE_PX
+
+
+def _border_finding(part_id: str, frame: Frame, code: Code) -> Finding:
+    """Build the warning for a part that is cut by a frame border or a divider."""
+    where = "straddles the border of" if code is Code.CROSSES_BORDER else "sits on a divider of"
+    return Finding(
+        Severity.WARNING,
+        code,
+        f"'{part_id}' {where} the frame '{frame.id}'; move it inside or outside",
+        (part_id, frame.id),
+    )
+
+
 def check_scene(scene: Scene) -> list[Finding]:
     """Run every check on a scene.
 
@@ -385,6 +465,7 @@ def check_scene(scene: Scene) -> list[Finding]:
         *check_text_fit(scene, rules),
         *check_crossings(scene),
         *check_overlaps(scene),
+        *check_borders(scene, rules),
     ]
     named = [_with_names(finding, scene) for finding in findings]
     return sorted(named, key=lambda finding: finding.severity is not Severity.ERROR)

@@ -11,7 +11,8 @@ OPEN_HEAD_STROKE = 1  # in marker units, so it grows with the line width
 HEAD_MARKERS = (Head.FILLED, Head.OPEN, Head.DOT)
 # Symbol heads (UML and entity-relationship) are drawn in pixels, whatever the line width. Each
 # shape is a list of SVG parts in a box 24 px high whose x runs from -24 to 0, where the line
-# ends at x = 0 and y = 12. ``{c}`` stands for the line colour and ``{w}`` for white.
+# ends at x = 0 and y = 12. ``{c}`` stands for the line colour and ``{w}`` for the fill of a
+# hollow head.
 SYMBOL_BOX_PX = 24
 SYMBOL_MIDDLE_PX = 12
 LINE = 'stroke="{c}" stroke-width="2"'
@@ -29,7 +30,6 @@ SYMBOL_SHAPES: dict[Head, str] = {
     Head.ZERO_MANY: f'<circle cx="-24" cy="12" r="5" fill="{{w}}" {LINE}/>{CROWS_FOOT}',
     Head.ONE_MANY: f'<path d="M-22 1V23" {LINE}/>{CROWS_FOOT}',
 }
-WHITE = "#FFFFFF"
 
 
 def _pull_back(points: tuple[Point, ...], gap: float) -> list[Point]:
@@ -150,7 +150,7 @@ def _symbol_markers(theme: Theme) -> list[str]:
     markers = []
     for role, line in theme.roles.items():
         for head, shape in SYMBOL_SHAPES.items():
-            body = shape.format(c=line.color, w=WHITE)
+            body = shape.format(c=line.color, w=theme.paper)
             markers.append(
                 f'<marker id="head-{role.value}-{head.value}" orient="auto-start-reverse" '
                 f'markerUnits="userSpaceOnUse" markerWidth="{SYMBOL_BOX_PX}" '
