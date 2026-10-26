@@ -189,11 +189,11 @@ def test_drawio_style_strings_of_design_section_three() -> None:
     cells = {
         cell.get("id"): cell.get("style", "") for cell in ET.fromstring(rendered).iter("mxCell")
     }
-    container = cells["frame-zone-cloud"]
+    container = cells["frame-backend"]
     for pair in ("dashed=1;", "dashPattern=4 3;", "container=1;", "collapsible=0;", "arcSize=6;"):
         assert pair in container
     assert "strokeWidth=1.5;" in container
-    pill = cells["label-frame-zone-cloud"]
+    pill = cells["label-frame-backend"]
     for pair in ("rounded=1;", "arcSize=50;", "strokeColor=none;", "fontStyle=1;", "fontSize=13;"):
         assert pair in pill
     node = cells["node-api"]

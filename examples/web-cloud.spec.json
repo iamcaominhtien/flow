@@ -1,22 +1,143 @@
 {
   "type": "cloud",
-  "title": "Cloud: web app in one VPC",
-  "desc": "Traffic enters through a load balancer, reaches two app servers, and the app uses a database and a queue.",
-  "zones": [
-    {"id": "region", "label": "Region", "tone": "blue"},
-    {"id": "vpc", "label": "VPC", "tone": "violet", "parent": "region"}
+  "title": "Basic cloud diagram: a web app in one VPC",
+  "desc": "Frames show where things live: edge, region, network, then a subnet for each trust level. Public parts face the internet, private parts do the work, the data tier is reachable only from the private one.",
+  "frames": [
+    {
+      "id": "edge",
+      "kind": "edge"
+    },
+    {
+      "id": "region",
+      "kind": "region",
+      "label": "Region eu-west"
+    },
+    {
+      "id": "vpc",
+      "kind": "vpc",
+      "range": "10.0.0.0/16",
+      "parent": "region"
+    },
+    {
+      "id": "pub",
+      "kind": "public",
+      "parent": "vpc"
+    },
+    {
+      "id": "priv",
+      "kind": "private",
+      "parent": "vpc"
+    },
+    {
+      "id": "data",
+      "kind": "data",
+      "parent": "vpc"
+    }
   ],
-  "resources": [
-    {"id": "users", "label": "Users", "kind": "client"},
-    {"id": "lb", "label": "Load balancer", "kind": "balancer", "zone": "vpc"},
-    {"id": "app", "label": "App servers", "detail": "2 instances", "zone": "vpc"},
-    {"id": "db", "label": "Database", "kind": "database", "zone": "vpc"},
-    {"id": "jobs", "label": "Job queue", "kind": "queue", "zone": "vpc"}
+  "parts": [
+    {
+      "id": "customers",
+      "label": "Customers",
+      "detail": "browsers",
+      "icon": "browser",
+      "tone": "blue"
+    },
+    {
+      "id": "cdn",
+      "label": "CDN",
+      "detail": "caches static files",
+      "icon": "cdn",
+      "tone": "violet",
+      "frame": "edge"
+    },
+    {
+      "id": "lb",
+      "label": "Load balancer",
+      "detail": "spreads traffic",
+      "icon": "load-balancer",
+      "tone": "violet",
+      "frame": "pub"
+    },
+    {
+      "id": "appa",
+      "label": "App server A",
+      "detail": "container",
+      "icon": "container",
+      "tone": "blue",
+      "frame": "priv"
+    },
+    {
+      "id": "appb",
+      "label": "App server B",
+      "detail": "container",
+      "icon": "container",
+      "tone": "blue",
+      "frame": "priv"
+    },
+    {
+      "id": "db",
+      "label": "Database",
+      "detail": "PostgreSQL",
+      "icon": "sql-database",
+      "tone": "green",
+      "frame": "data"
+    },
+    {
+      "id": "cache",
+      "label": "Cache",
+      "detail": "Redis",
+      "icon": "in-memory-cache",
+      "tone": "teal",
+      "frame": "data"
+    },
+    {
+      "id": "files",
+      "label": "Object storage",
+      "detail": "images, uploads",
+      "icon": "object-storage",
+      "tone": "amber",
+      "frame": "region"
+    }
   ],
   "links": [
-    {"from": "users", "to": "lb", "label": "HTTPS", "main": true},
-    {"from": "lb", "to": "app", "main": true},
-    {"from": "app", "to": "db"},
-    {"from": "app", "to": "jobs", "style": "async"}
+    {
+      "from": "customers",
+      "to": "cdn",
+      "label": "HTTPS",
+      "main": true
+    },
+    {
+      "from": "cdn",
+      "to": "lb",
+      "label": "HTTPS, on a miss",
+      "main": true
+    },
+    {
+      "from": "lb",
+      "to": "appa",
+      "label": "HTTP",
+      "main": true
+    },
+    {
+      "from": "lb",
+      "to": "appb",
+      "label": "HTTP"
+    },
+    {
+      "from": "appa",
+      "to": "db",
+      "label": "SQL",
+      "main": true
+    },
+    {
+      "from": "appb",
+      "to": "cache",
+      "label": "get, set"
+    },
+    {
+      "from": "appb",
+      "to": "files",
+      "label": "files, HTTPS"
+    }
   ]
 }

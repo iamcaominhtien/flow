@@ -46,6 +46,9 @@ class Shape(StrEnum):
     TASK = "task"  # a BPMN task: a rounded box with an ink outline
     DFD_PROCESS = "dfd_process"  # a rounded box with its number in a header strip (Gane-Sarson)
     DFD_STORE = "dfd_store"  # a box open on the right, with an id cell on the left
+    C4_BOX = "c4_box"  # a C4 system, container or component: icon, name, [Kind: technology], text
+    C4_PERSON = "c4_person"  # the same box with rounder corners: a person of a C4 diagram
+    WIDE_CARD = "wide_card"  # an illustrated architecture part: name pill, detail, large icon
 
 
 class Marker(StrEnum):
@@ -157,6 +160,8 @@ class FrameVariant(StrEnum):
     POOL = "pool"  # a white pool with a coloured band on the left that carries the name
     BLACK_BOX = "black_box"  # a pool drawn only as a filled bar with its name
     OPENED = "opened"  # the dashed frame around a process that a lower-level diagram opens
+    NETWORK = "network"  # a cloud frame: solid or dashed by kind, with a pill in its own colour
+    LAYER = "layer"  # an architecture frame: dashed and tinted, with a dark pill label
 
 
 class Side(StrEnum):
@@ -278,6 +283,7 @@ class Frame:
     variant: FrameVariant = FrameVariant.AREA
     guard: str | None = None
     dividers: tuple[Divider, ...] = ()
+    is_solid: bool = False  # a solid border, for the frames of a cloud diagram that are not dashed
 
 
 @dataclass(frozen=True)
@@ -351,6 +357,7 @@ class Node:
     number: str | None
     font_size: float
     detail: tuple[str, ...] = ()
+    technology: str = ""  # the mono ``[Kind: technology]`` line of a C4 box
     caption: str | None = None
     caption_above: bool = False  # the caption hangs above the node, where a line leaves below
     sections: tuple[tuple[Row, ...], ...] = ()

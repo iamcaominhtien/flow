@@ -3,15 +3,17 @@
 from dataclasses import replace
 
 from .cards import card_parts
+from .html_c4 import c4_html, is_c4_node
 from .html_dfd import dfd_html, is_dfd_node
 from .html_screen import screen_html
+from .html_wide import is_wide_card, wide_card_html
 from .marks import mark_slots, mark_svg
 from .markup import esc, px, tag
 from .model import KEY_FLAG_TONES, Node, Row, Shape, Tone
 from .shapes import outline_svg, table_radius
 from .sizing import key_room
 from .text_area import text_area_width
-from .theme import Theme, detailed_icon_svg, has_detailed_icon, icon_svg
+from .theme import ShapeColors, Theme, detailed_icon_svg, has_detailed_icon, icon_svg
 
 # Text inside a node
 LINE_HEIGHT_FACTOR = 1.25
@@ -435,6 +437,22 @@ def _screen_node_html(node: Node, theme: Theme) -> str:
     return tag("div", box, screen_html(node, theme), data_id=node.id)
 
 
+def _inside_html(node: Node, theme: Theme, colors: ShapeColors) -> str:
+    """Draw what sits on the outline of a node: notation parts, a card, a table or icon and text."""
+    if is_dfd_node(node):
+        return dfd_html(node, theme)
+    if is_c4_node(node):
+        return c4_html(node, theme)
+    if is_wide_card(node):
+        return wide_card_html(node, theme)
+    if node.card and node.shape is not Shape.TABLE:
+        return _card_html(node, theme)
+    if node.shape is Shape.TABLE:
+        header = "" if node.card else _icon_html(node, colors.stroke, _header_height(node, theme))
+        return _table_html(node, theme) + header
+    return _icon_html(node, colors.stroke) + _label_html(node, theme)
+
+
 def node_html(node: Node, theme: Theme) -> str:
     """Draw one node: its outline, icon and text, its badge and its caption.
 
@@ -453,17 +471,7 @@ def node_html(node: Node, theme: Theme) -> str:
     if node.dashed:
         colors = replace(colors, dash=DASH_PATTERN)
     inside = outline_svg(node.shape, node.width, node.height, colors)
-    if is_dfd_node(node):
-        inside += dfd_html(node, theme)
-    elif node.card and node.shape is not Shape.TABLE:
-        inside += _card_html(node, theme)
-    elif node.shape is Shape.TABLE:
-        inside += _table_html(node, theme)
-        if not node.card:
-            inside += _icon_html(node, colors.stroke, _header_height(node, theme))
-    else:
-        inside += _icon_html(node, colors.stroke) + _label_html(node, theme)
-    inside += _marks_html(node, theme)
+    inside += _inside_html(node, theme, colors) + _marks_html(node, theme)
     box = {
         **ABSOLUTE,
         "left": px(node.x),

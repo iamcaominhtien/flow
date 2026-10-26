@@ -5,11 +5,11 @@ allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py *)
 
 # Cloud diagram
 
-You write a short **spec**. A script places the boxes, routes the lines, checks the result and writes the files. Never write coordinates or HTML yourself.
+You write a short **spec**: the frames, the parts in them and the links. A script places the parts on a grid, sizes each frame around what it holds, routes the lines, checks the trust levels and writes the files. Never write coordinates or HTML yourself.
 
 ## Steps
 
-1. List the resources, the nested zones (region, network, subnet) they sit in, and the traffic between them.
+1. List the frames (edge, region, VPC, zones, subnets, sites), the parts in the smallest frame that holds each, and the traffic between them.
 2. Write `diagrams/<name>.spec.json` in the current project.
 3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` and `<name>.drawio` next to the spec and prints a check report. Exit code 0: no error; 2: errors found (files still written); 1: the spec is invalid and the message lists every problem.
 4. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Do not say the diagram "looks good": you have not seen it.
@@ -20,95 +20,49 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 ```json
 {
   "type": "cloud",
-  "title": "Cloud: web app in one VPC",
-  "desc": "Traffic enters through a load balancer, reaches two app servers, and the app uses a database and a queue.",
-  "zones": [
-    {
-      "id": "region",
-      "label": "Region",
-      "tone": "blue"
-    },
-    {
-      "id": "vpc",
-      "label": "VPC",
-      "tone": "violet",
-      "parent": "region"
-    }
+  "title": "Basic cloud diagram: a web app in one VPC",
+  "frames": [
+    {"id": "edge", "kind": "edge"},
+    {"id": "region", "kind": "region", "label": "Region eu-west"},
+    {"id": "vpc", "kind": "vpc", "range": "10.0.0.0/16", "parent": "region"},
+    {"id": "pub", "kind": "public", "parent": "vpc"},
+    {"id": "priv", "kind": "private", "parent": "vpc"},
+    {"id": "data", "kind": "data", "parent": "vpc"}
   ],
-  "resources": [
-    {
-      "id": "users",
-      "label": "Users",
-      "kind": "client"
-    },
-    {
-      "id": "lb",
-      "label": "Load balancer",
-      "kind": "balancer",
-      "zone": "vpc"
-    },
-    {
-      "id": "app",
-      "label": "App servers",
-      "detail": "2 instances",
-      "zone": "vpc"
-    },
-    {
-      "id": "db",
-      "label": "Database",
-      "kind": "database",
-      "zone": "vpc"
-    },
-    {
-      "id": "jobs",
-      "label": "Job queue",
-      "kind": "queue",
-      "zone": "vpc"
-    }
+  "parts": [
+    {"id": "users", "label": "Customers", "detail": "browsers", "icon": "browser"},
+    {"id": "cdn", "label": "CDN", "detail": "caches static files", "icon": "cdn", "frame": "edge"},
+    {"id": "lb", "label": "Load balancer", "detail": "spreads traffic", "icon": "load-balancer", "frame": "pub"},
+    {"id": "app", "label": "App server", "detail": "container", "icon": "container", "frame": "priv"},
+    {"id": "db", "label": "Database", "detail": "PostgreSQL", "icon": "sql-database", "frame": "data"},
+    {"id": "files", "label": "Object storage", "detail": "images, uploads", "icon": "object-storage", "frame": "region"}
   ],
   "links": [
-    {
-      "from": "users",
-      "to": "lb",
-      "label": "HTTPS",
-      "main": true
-    },
-    {
-      "from": "lb",
-      "to": "app",
-      "main": true
-    },
-    {
-      "from": "app",
-      "to": "db"
-    },
-    {
-      "from": "app",
-      "to": "jobs",
-      "style": "async"
-    }
+    {"from": "users", "to": "cdn", "label": "HTTPS", "main": true},
+    {"from": "cdn", "to": "lb", "label": "HTTPS, on a miss", "main": true},
+    {"from": "lb", "to": "app", "label": "HTTP", "main": true},
+    {"from": "app", "to": "db", "label": "SQL", "main": true},
+    {"from": "app", "to": "files", "label": "files, HTTPS"}
   ]
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
-- **Resource**: `id`, `label`, `kind` (`service` default, `client`, `external`, `balancer`, `database`, `storage`, `queue`), `detail`, `icon`, `tone`, `zone`.
-- **Zone**: `id`, `label`, optional `tone` and `parent` to nest it (a VPC inside a region).
-- **Link**: `from`, `to`, `label`, `style` (`call` solid, `async` dashed), `main: true`.
-- Top level: `type` (`cloud`), `title`, `desc`, optional `direction` (`down` default, or `right`).
-- Optional `at: [row, column]` on an item places it on an explicit grid cell. Use it only when the automatic placement is wrong.
-- Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
-
-## Illustrated style
-
-Add `"style": "illustrated"` at the top level to draw each box that has an `icon` as a card: a large icon on a tinted disc, the name in a pill, and the `detail` text under it. Boxes without an icon stay plain. Cards are bigger, so use it for a few boxes (about eight or fewer), give each a `tone` and a short `detail`, and keep names short: the name stays on one line. The default is `"style": "plain"`. Icons with a detailed drawing (shaded, with a highlight and a ground shadow) show it on a card in place of the disc: `bell calendar card cart chat cloud code database file folder globe key lock mail phone pot refund search server store user warn wifi`. More names that exist only in the detailed set and can be used in any spec: `admin api-gateway approved-doc backup-archive bar-chart batch-scheduler block-storage bot browser bucket cache cdn ci-cd cluster container container-registry containers courier cpu dashboard data-lake data-warehouse dns email-service error event event-stream file-storage firewall firewall-waf flag function gateway id-card idea identity-iam in-memory-cache info json kubernetes laptop launch load-balancer logging message-queue ml-model money monitoring nosql-database object-storage package pie-chart pipeline plugin private-network pub-sub pub-sub-topic queue region schedule secrets security serverless-function sql-database start stop success table target team terminal virtual-machine virtual-network workflow`.
+- **Frame**: `id`, `kind`, optional `label` (the name of the kind by default), `range` (the address range of a `vpc`, put into its label) and `parent` (the frame it sits in). The kind fixes the colour and the line: `region` blue solid, `vpc` violet dashed, `zone` grey dashed, `public` subnet green dashed, `private` subnet amber dashed, `data` subnet teal dashed, `onprem` (an office or data centre) slate solid, `dmz` red dashed, `edge` violet dashed. Frames nest: edge or region, then VPC, then zone, then subnet. Each has a coloured pill with its name on the top edge, at the left; lines never enter there. The frame is drawn around its parts and inner frames (30 px between a frame and the next one inside it, 40 px between a subnet and its parts).
+- **Part**: `id`, `label` (by role: *Primary database*), `detail` (the technology or the zone: *PostgreSQL*, *zone a*), `icon`, `tone`, `frame` (the smallest frame that holds it; none for a user or a remote admin outside the cloud), `at: [row, column]`. Parts are 196 x 68. Icons of the Cloud services set: `load-balancer kubernetes sql-database nosql-database message-queue firewall-waf firewall virtual-network private-network cdn object-storage block-storage in-memory-cache container virtual-machine serverless-function dns api-gateway identity-iam secrets monitoring logging`, plus `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`.
+- **Link**: `from` and `to` (parts: a link between sites runs from device to device, never frame to frame), `label` (a protocol or what travels: *HTTPS*, *IPsec VPN*, *replication*; required), `kind` (`call` ink, `main` blue, `event` or `copy` violet) or `main: true`. One blue route: one request from user to data. Violet is the event stream or the database copy, or a second site tunnel.
+- **Trust levels**, top to bottom: the internet and the edge (0), a public subnet or a DMZ (1), a private subnet (2), a data subnet (3). The build refuses a database (`database`, `sql-database`, `nosql-database` icon) in a public subnet or a DMZ, a link that skips two levels (internet to data), and zones of one VPC that do not hold the same subnets. Parts that sit in no subnet (a managed queue or storage in the region frame, a part in the VPC frame) are not checked.
+- **Layout**: the row follows the trust level (users above, edge, then public, private and data subnets; 255 px between rows); each zone takes as many columns as its fullest subnet and the same subnets sit on the same rows in every zone; a managed service in the region frame goes right of the VPC; on-premises sites go left of the region, remote users above. Two parts that would share a cell are moved apart. Give `at` to a part to override.
+- `theme` (optional): `pastel` (default), `technical` or `midnight`. Cloud diagrams are plain only; `style: illustrated` is refused.
+- More than about 16 parts: split by region or by network.
 
 ## Limits to tell the user
 
-- There are no provider icons (AWS, GCP, Azure logos). Use the built-in icons or draw one; say so if the user expects official icons.
+- There are no provider icons (AWS, GCP, Azure logos); the parts use the generic Cloud services icons. Say so if the user expects official ones.
+- Frames are not snapped to a 40 px grid, and route tables, security-group rules, CIDR planning and multi-region failover are not drawn.
+- A line may cross a frame border where it must; a label never sits on one.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
 - Fixes beyond the spec: see the flowchart skill (overrides file).
 
 Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.
 
-For a large or dense diagram (more than about 15 elements, many groups, or a hub with many lines) the automatic layout gives long pages and bundled lines; use the `author` skill (`/flow:author`) instead, which lays the diagram out by hand and looks at the result.
+For a large or dense diagram (more than about 15 elements, many groups, or a hub with many lines) the automatic layout can give long lines; use the `author` skill (`/flow:author`) instead, which lays the diagram out by hand and looks at the result.

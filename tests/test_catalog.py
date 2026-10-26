@@ -1,4 +1,4 @@
-"""Tests for the data-driven graph types: C4, cloud, use case, BPMN, class and screen flow."""
+"""Tests for the data-driven graph types: use case, BPMN, class and screen flow."""
 
 import copy
 import json
@@ -11,8 +11,6 @@ ROOT = Path(__file__).resolve().parent.parent
 PLUGIN_DIR = ROOT / "plugins" / "flow"
 EXAMPLES = ROOT / "examples"
 CASES = {
-    "delivery-c4.spec.json": "c4",
-    "web-cloud.spec.json": "cloud",
     "shop-usecase.spec.json": "usecase",
     "refund-bpmn.spec.json": "bpmn",
     "shapes-class.spec.json": "class",
@@ -72,14 +70,6 @@ def test_bpmn_gateway_is_a_diamond_without_label_text_by_default() -> None:
     shapes = {node.id: node for node in scene.nodes}
     assert shapes["ok"].shape is Shape.DECISION
     assert shapes["begin"].text == ()
-
-
-def test_actor_label_goes_under_the_figure() -> None:
-    """A person in C4 keeps its name as a caption, not as text over the figure."""
-    scene = diagrams.layout(raw_example("delivery-c4.spec.json"))
-    customer = next(node for node in scene.nodes if node.id == "customer")
-    assert customer.caption == "Customer"
-    assert customer.text == ()
 
 
 def test_unknown_kind_and_style_are_refused() -> None:

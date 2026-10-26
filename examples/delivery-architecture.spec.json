@@ -1,0 +1,267 @@
+{
+  "type": "architecture",
+  "title": "Complete system: food delivery",
+  "desc": "Four layers from the phone to the data. Blue is the path of one order: placed in the app, through the gateway to the order service, charged, and paid through the provider. Violet is the event stream that wakes everything else.",
+  "zones": [
+    {
+      "id": "clients",
+      "label": "Clients",
+      "tone": "blue"
+    },
+    {
+      "id": "edge",
+      "label": "Edge",
+      "tone": "violet"
+    },
+    {
+      "id": "services",
+      "label": "Services",
+      "tone": "green"
+    },
+    {
+      "id": "data",
+      "label": "Data",
+      "tone": "amber"
+    },
+    {
+      "id": "third",
+      "label": "Third party",
+      "tone": "gray",
+      "beside": "services"
+    }
+  ],
+  "components": [
+    {
+      "id": "customer",
+      "label": "Customer app",
+      "detail": "iOS, Android",
+      "icon": "phone",
+      "zone": "clients",
+      "tone": "blue",
+      "at": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "tablet",
+      "label": "Restaurant tablet",
+      "detail": "kitchen screen",
+      "icon": "laptop",
+      "zone": "clients",
+      "tone": "green",
+      "at": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "courier",
+      "label": "Courier app",
+      "detail": "iOS, Android",
+      "icon": "phone",
+      "zone": "clients",
+      "tone": "teal",
+      "at": [
+        0,
+        2
+      ]
+    },
+    {
+      "id": "gateway",
+      "label": "API gateway",
+      "detail": "routing, rate limits",
+      "icon": "api-gateway",
+      "zone": "edge",
+      "tone": "violet",
+      "at": [
+        1,
+        1
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Auth",
+      "detail": "tokens, sessions",
+      "icon": "identity-iam",
+      "zone": "edge",
+      "at": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "dispatch",
+      "label": "Dispatch",
+      "detail": "matches couriers",
+      "icon": "courier",
+      "zone": "services",
+      "tone": "teal",
+      "at": [
+        2,
+        0
+      ]
+    },
+    {
+      "id": "order",
+      "label": "Order service",
+      "detail": "checkout, status",
+      "icon": "server",
+      "zone": "services",
+      "tone": "violet",
+      "at": [
+        2,
+        1
+      ]
+    },
+    {
+      "id": "payment",
+      "label": "Payment service",
+      "detail": "charges, refunds",
+      "icon": "card",
+      "zone": "services",
+      "tone": "amber",
+      "at": [
+        2,
+        2
+      ]
+    },
+    {
+      "id": "psp",
+      "label": "Payment provider",
+      "detail": "card network",
+      "icon": "card",
+      "zone": "third",
+      "at": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": "cache",
+      "label": "Courier cache",
+      "detail": "live locations",
+      "icon": "in-memory-cache",
+      "zone": "data",
+      "tone": "teal",
+      "at": [
+        3,
+        0
+      ]
+    },
+    {
+      "id": "db",
+      "label": "Orders database",
+      "detail": "PostgreSQL",
+      "icon": "sql-database",
+      "zone": "data",
+      "tone": "violet",
+      "at": [
+        3,
+        1
+      ]
+    },
+    {
+      "id": "bus",
+      "label": "Event bus",
+      "detail": "order events",
+      "icon": "event-stream",
+      "zone": "data",
+      "tone": "amber",
+      "at": [
+        3,
+        2
+      ]
+    },
+    {
+      "id": "notify",
+      "label": "Notifications",
+      "detail": "push and SMS",
+      "icon": "bell",
+      "zone": "data",
+      "tone": "green",
+      "at": [
+        3,
+        3
+      ]
+    }
+  ],
+  "links": [
+    {
+      "from": "customer",
+      "to": "gateway",
+      "label": "HTTPS",
+      "main": true
+    },
+    {
+      "from": "tablet",
+      "to": "gateway",
+      "label": "HTTPS"
+    },
+    {
+      "from": "courier",
+      "to": "gateway",
+      "label": "HTTPS + GPS"
+    },
+    {
+      "from": "gateway",
+      "to": "auth",
+      "label": "verify token"
+    },
+    {
+      "from": "gateway",
+      "to": "order",
+      "label": "create order",
+      "main": true
+    },
+    {
+      "from": "gateway",
+      "to": "dispatch",
+      "label": "courier status"
+    },
+    {
+      "from": "gateway",
+      "to": "payment",
+      "label": "refunds"
+    },
+    {
+      "from": "order",
+      "to": "dispatch",
+      "label": "assign courier"
+    },
+    {
+      "from": "order",
+      "to": "payment",
+      "label": "charge",
+      "main": true
+    },
+    {
+      "from": "payment",
+      "to": "psp",
+      "label": "HTTPS API",
+      "main": true
+    },
+    {
+      "from": "dispatch",
+      "to": "cache",
+      "label": "positions"
+    },
+    {
+      "from": "order",
+      "to": "db",
+      "label": "write"
+    },
+    {
+      "from": "order",
+      "to": "bus",
+      "label": "order.placed",
+      "kind": "event"
+    },
+    {
+      "from": "bus",
+      "to": "notify",
+      "label": "order.placed",
+      "kind": "event"
+    }
+  ]
+}

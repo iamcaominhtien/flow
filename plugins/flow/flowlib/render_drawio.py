@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 from collections.abc import Callable
 
 from .cards import card_parts
+from .drawio_c4 import add_c4_icon, c4_style, c4_value
 from .drawio_common import (
     FONT_BOLD,
     FRAME_LABEL_PREFIX,
@@ -31,8 +32,11 @@ from .drawio_notation import (
     marks_style,
 )
 from .drawio_screen import add_node_chip, add_screen_parts, screen_style
+from .drawio_wide import add_wide_parts, wide_style
+from .html_c4 import is_c4_node
 from .html_dfd import is_dfd_node
 from .html_frames import BAND_VARIANTS
+from .html_wide import is_wide_card
 from .markup import esc, fmt
 from .model import KEY_FLAG_TONES, REF_FRAGMENT, Frame, FrameVariant, Node, Row, Scene, Shape, Tone
 from .shapes import SUBPROCESS_BAR_INSET_PX
@@ -71,6 +75,9 @@ ROUNDED_SHAPES = (
     Shape.PROCESS,
     Shape.TASK,
     Shape.DFD_PROCESS,
+    Shape.C4_BOX,
+    Shape.C4_PERSON,
+    Shape.WIDE_CARD,
 )  # boxes whose corner radius is in pixels
 SHADOW_SHAPES = (  # the rounded boxes of design 01 section 3 carry ``shadow=1``
     Shape.TERMINATOR,
@@ -290,6 +297,9 @@ SHAPE_STYLES: dict[Shape, Callable[[Node], dict[str, object]]] = {
     Shape.TASK: _box_style,
     Shape.DFD_PROCESS: _box_style,
     Shape.DFD_STORE: _store_style,
+    Shape.C4_BOX: _box_style,
+    Shape.C4_PERSON: _box_style,
+    Shape.WIDE_CARD: _box_style,
 }
 
 
@@ -352,11 +362,19 @@ def _node_style(node: Node, theme: Theme) -> str:
     if node.caption:
         style.update(ABOVE if node.caption_above else BELOW)
     style.update(marks_style(node))
-    if is_dfd_node(node):
-        style.update(dfd_style(node, theme))
-    else:
-        style.update(_kind_pairs(node, theme))
+    style.update(_text_pairs(node, theme))
     return style_string(style)
+
+
+def _text_pairs(node: Node, theme: Theme) -> dict[str, object]:
+    """Return the style pairs that place the text of a node: by its notation, or by its kind."""
+    if is_dfd_node(node):
+        return dfd_style(node, theme)
+    if is_c4_node(node):
+        return c4_style(node, theme)
+    if is_wide_card(node):
+        return wide_style(node)
+    return _kind_pairs(node, theme)
 
 
 def _card_text_style(node: Node, theme: Theme) -> dict[str, object]:
@@ -382,10 +400,10 @@ def _label_value(lines: tuple[str, ...]) -> str:
 
 def _node_value(node: Node, theme: Theme) -> str:
     """Return the label of a node: its caption, or its title followed by its detail lines."""
-    if node.screen is not None or (node.shape is Shape.TABLE and node.card):
+    if node.screen is not None or (node.shape is Shape.TABLE and node.card) or is_wide_card(node):
         return ""
-    if is_dfd_node(node):
-        return dfd_value(node, theme)
+    if is_dfd_node(node) or is_c4_node(node):
+        return dfd_value(node, theme) if is_dfd_node(node) else c4_value(node, theme)
     if node.caption:
         return esc(node.caption)
     if node.card:
@@ -422,8 +440,19 @@ def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
         add_node_chip(root, node, theme)
     if node.shape is Shape.TABLE:
         _add_table_rows(root, node, theme)
+    _add_inside(root, node, theme)
+    add_marks(root, node, theme)
+    _add_badge_and_note(root, node, theme)
+
+
+def _add_inside(root: ET.Element, node: Node, theme: Theme) -> None:
+    """Add the child cells that sit on a node: notation parts, card parts or the icon."""
     if is_dfd_node(node):
         add_dfd_parts(root, node, theme)
+    elif is_c4_node(node):
+        add_c4_icon(root, node, theme)
+    elif is_wide_card(node):
+        add_wide_parts(root, node, theme)
     elif node.shape is Shape.TABLE and node.card:
         _add_table_card_parts(root, node, theme)
     elif node.card:
@@ -439,8 +468,6 @@ def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
         is_marker = node.shape in CENTERED_ICON_SHAPES and not node.text
         icon_left = (node.width - ICON_SIZE_PX) / 2 if is_marker else ICON_LEFT_PX
         add_geometry(icon, (icon_left, icon_top, ICON_SIZE_PX, ICON_SIZE_PX))
-    add_marks(root, node, theme)
-    _add_badge_and_note(root, node, theme)
 
 
 def _add_badge_and_note(root: ET.Element, node: Node, theme: Theme) -> None:

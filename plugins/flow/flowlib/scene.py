@@ -45,11 +45,23 @@ from .theme import icon_names
 Built = TypeVar("Built")
 
 SCENE_KEYS = {"size", "title", "desc", "frames", "nodes", "edges", "theme", "diagram"}
-FRAME_KEYS = {"id", "x", "y", "width", "height", "label", "tone", "variant", "guard", "dividers"}
+FRAME_KEYS = {
+    "id",
+    "x",
+    "y",
+    "width",
+    "height",
+    "label",
+    "tone",
+    "variant",
+    "guard",
+    "dividers",
+    "solid",
+}
 DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
 NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections", "card", "dashed"}
-NODE_KEYS |= {"screen", "chip", "markers", "caption_above", "host"}
+NODE_KEYS |= {"screen", "chip", "markers", "caption_above", "host", "technology"}
 ROW_KEYS = {"left", "right", "flags"}
 EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label", "extras"}
 LABEL_KEYS = {"text", "at", "kind", "number", "icon"}
@@ -150,6 +162,8 @@ def _dump_frame(frame: Frame) -> dict[str, Any]:
     }
     if frame.guard:
         written["guard"] = frame.guard
+    if frame.is_solid:
+        written["solid"] = True
     if frame.dividers:
         written["dividers"] = [
             {"y": divider.y, "guard": divider.guard} for divider in frame.dividers
@@ -191,6 +205,7 @@ def _dump_node(node: Node) -> dict[str, Any]:
         "chip": _dump_label(node.chip) if node.chip else None,
         "markers": [marker.value for marker in node.markers],
         "host": node.host,
+        "technology": node.technology,
     }
     written.update({key: value for key, value in optional.items() if value})
     return written
@@ -317,6 +332,7 @@ class _SceneParser:
             tone=read.enum(Tone, raw, "tone", where) or Tone.GRAY,
             variant=read.enum(FrameVariant, raw, "variant", where) or FrameVariant.AREA,
             guard=read.text(raw, "guard", where),
+            is_solid=raw.get("solid") is True,
             dividers=self._dividers(raw.get("dividers", []), where),
         )
 
@@ -371,6 +387,7 @@ class _SceneParser:
             chip=self._label(raw.get("chip"), f"{where}.chip") if "chip" in raw else None,
             markers=self._markers(raw.get("markers", []), where),
             host=read.text(raw, "host", where),
+            technology=read.text(raw, "technology", where) or "",
         )
 
     def _markers(self, raw: object, where: str) -> tuple[Marker, ...]:

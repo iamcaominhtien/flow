@@ -15,6 +15,7 @@ CROSS_STROKE_WIDTH_PX = 2.5
 CYLINDER_CAP_PX = 10  # the height of the half-ellipse at the top and bottom of a cylinder
 TABLE_RADIUS_PX = 8
 ENTITY_RADIUS_PX = 2
+PERSON_RADIUS_PX = 28  # the round corners of a person of a C4 diagram
 END_STROKE_WIDTH_PX = 5
 INTERMEDIATE_RING_GAP_PX = 4
 ACTOR_HEAD_FRACTION = 0.12  # head radius as a fraction of the actor's height
@@ -69,6 +70,11 @@ def _rounded_box(width: float, height: float, colors: ShapeColors) -> str:
         f'<rect x="{INSET_PX}" y="{INSET_PX}" width="{fmt(width - 2 * INSET_PX)}" '
         f'height="{fmt(height - 2 * INSET_PX)}" rx="{fmt(colors.radius)}" {paint}/>'
     )
+
+
+def _person_box(width: float, height: float, colors: ShapeColors) -> str:
+    """Draw a rectangle with the round corners of a person."""
+    return _rounded_box(width, height, replace(colors, radius=PERSON_RADIUS_PX))
 
 
 def _subprocess(width: float, height: float, colors: ShapeColors) -> str:
@@ -324,6 +330,9 @@ DRAWERS: dict[Shape, Drawer] = {
     Shape.TASK: _rounded_box,
     Shape.DFD_PROCESS: _rounded_box,
     Shape.DFD_STORE: _store,
+    Shape.C4_BOX: _rounded_box,
+    Shape.C4_PERSON: _person_box,
+    Shape.WIDE_CARD: _rounded_box,
 }
 
 
