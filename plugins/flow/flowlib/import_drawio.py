@@ -17,15 +17,23 @@ from xml.etree import ElementTree as ET
 from .canvas import fit_canvas
 from .drawio_common import FRAME_LABEL_PREFIX
 from .geometry import border_point, center_of
+from .import_screen import (
+    CHIP_PREFIX,
+    attach_words,
+    is_edge_words,
+    is_screen_part,
+    label_kind,
+    line_role,
+    screen_node,
+    words_kind,
+)
 from .model import (
     Edge,
     EdgeLabel,
     Frame,
     Head,
-    LabelKind,
     Node,
     Point,
-    Role,
     Row,
     Scene,
     Shape,
@@ -37,6 +45,7 @@ from .theme import load_theme
 TITLE_CELL_ID = "title"
 DESCRIPTION_CELL_ID = "description"
 LAYER_IDS = {"0", "1"}
+BORDER_TOLERANCE_PX = 1.0
 MARGIN_PX = 64.0
 TITLE_ROOM_PX = 100.0
 MARK_MAX_SIZE_PX = 48.0
@@ -252,15 +261,30 @@ def _route(cell: ET.Element, nodes: dict[str, Node], offset: Point) -> tuple[Poi
     bends = _waypoints(cell, offset)
     start = _terminal_point(cell, "sourcePoint", offset)
     end = _terminal_point(cell, "targetPoint", offset)
-    if source is not None:
+    if source is not None and not _is_on_border(start, source):
         aim = bends[0] if bends else (center_of(target) if target else end)
         start = border_point(source, aim) if aim else None
-    if target is not None:
+    if target is not None and not _is_on_border(end, target):
         aim = bends[-1] if bends else (center_of(source) if source else start)
         end = border_point(target, aim) if aim else None
     if start is None or end is None:
         return None
     return (start, *bends, end)
+
+
+def _is_on_border(point: Point | None, node: Node) -> bool:
+    """Tell whether a point lies on the border of a node, as the ends of a Flow line do."""
+    if point is None:
+        return False
+    inside_x = node.x - BORDER_TOLERANCE_PX <= point[0] <= node.x + node.width + BORDER_TOLERANCE_PX
+    inside_y = (
+        node.y - BORDER_TOLERANCE_PX <= point[1] <= node.y + node.height + BORDER_TOLERANCE_PX
+    )
+    near_x = min(abs(point[0] - node.x), abs(point[0] - node.x - node.width)) <= BORDER_TOLERANCE_PX
+    near_y = (
+        min(abs(point[1] - node.y), abs(point[1] - node.y - node.height)) <= BORDER_TOLERANCE_PX
+    )
+    return inside_x and inside_y and (near_x or near_y)
 
 
 def _middle(points: tuple[Point, ...]) -> Point:
@@ -278,12 +302,10 @@ def _edge(cell: ET.Element, nodes: dict[str, Node], offset: Point) -> Edge | Non
         return None
     lines = plain_lines(cell.get("value", ""))
     middle = _middle(points)
-    label = EdgeLabel(" ".join(lines), middle, LabelKind.TEXT) if lines else None
-    main_color = load_theme().roles[Role.MAIN].color.lower()
-    is_main = style.get("strokeColor", "").lower() == main_color
+    label = EdgeLabel(" ".join(lines), middle, label_kind(style)) if lines else None
     return Edge(
         id=cell.get("id", ""),
-        role=Role.MAIN if is_main else Role.NEXT,
+        role=line_role(style),
         points=points,
         label=label,
         source=cell.get("source") if cell.get("source") in nodes else None,
@@ -361,7 +383,7 @@ class _Import:
         elif _is_label_only(style):
             self.notes.append(f"skipped the free text '{cell.get('value', '')[:30]}'")
         else:
-            node = _node(cell, style, self.box(cell))
+            node = screen_node(_node(cell, style, self.box(cell)), style)
             self.nodes[node.id] = node
 
 
@@ -382,6 +404,42 @@ def _origin(cells: list[ET.Element], has_title: bool) -> Point:
     if not boxes:
         return (0.0, 0.0)
     return (MARGIN_PX - min(box[0] for box in boxes), top - min(box[1] for box in boxes))
+
+
+def _with_chips(cells: dict[str, ET.Element], nodes: dict[str, Node]) -> dict[str, Node]:
+    """Give each node the chip that hangs on it, such as the event that decides a decision."""
+    result = dict(nodes)
+    for cell in cells.values():
+        node = result.get(cell.get("parent", ""))
+        box = _bounds(cell)
+        if node is None or box is None or not cell.get("id", "").startswith(CHIP_PREFIX):
+            continue
+        text = " ".join(plain_lines(cell.get("value", "")))
+        kind = label_kind(parse_style(cell.get("style", "")))
+        at = (box[0] + box[2] / 2, box[1] + box[3] / 2)
+        result[node.id] = replace(node, chip=EdgeLabel(text, at, kind))
+    return result
+
+
+def _edge_words(cells: dict[str, ET.Element], offset: Point) -> list[tuple[str, EdgeLabel]]:
+    """Read the guard and effect text cells that are named after a line.
+
+    Returns:
+        The id of each line with the label found for it, placed on the page.
+    """
+    found = []
+    for cell in cells.values():
+        if cell.get("vertex") != "1" or not is_edge_words(cell):
+            continue
+        box = _bounds(cell)
+        if box is None:
+            continue
+        centre = (box[0] + box[2] / 2 + offset[0], box[1] + box[3] / 2 + offset[1])
+        style = parse_style(cell.get("style", ""))
+        text = " ".join(plain_lines(cell.get("value", "")))
+        owner = cell.get("id", "").rsplit("-end", 1)[0]
+        found.append((owner, EdgeLabel(text, centre, words_kind(style))))
+    return found
 
 
 def convert(path: Path) -> ImportResult:
@@ -405,6 +463,8 @@ def convert(path: Path) -> ImportResult:
         if c.get("id") not in text_ids
         and not _is_table_row(c, cells)
         and not _is_frame_label(c, cells)
+        and not is_screen_part(c, cells, parse_style)
+        and not is_edge_words(c)
     ]
     top_level = [c for c in drawn if c.get("parent") in LAYER_IDS]
     texts = {name: plain_lines(cells[name].get("value", "")) for name in text_ids if name in cells}
@@ -422,6 +482,8 @@ def convert(path: Path) -> ImportResult:
             state.notes.append(f"skipped the edge '{cell.get('id')}': its ends are not placed")
         else:
             edges.append(edge)
+    edges = attach_words(edges, _edge_words(cells, state.offset))
+    state.nodes = _with_chips(cells, state.nodes)
     scene = Scene(
         width=0,
         height=0,

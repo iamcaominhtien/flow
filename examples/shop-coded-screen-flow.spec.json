@@ -1,0 +1,166 @@
+{
+  "type": "screen",
+  "title": "Screen flow · Conditions as codes and a table",
+  "desc": "Arrows carry only a code; everything else lives in the table, so labels never crowd the diagram. Use this form when conditions are long, shared by several arrows, or reviewed by someone who does not read diagrams.",
+  "conditions": "coded",
+  "screens": [
+    {
+      "id": "s00",
+      "code": "S00",
+      "label": "Shop",
+      "at": [
+        0,
+        0
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "content": "splash"
+    },
+    {
+      "id": "logged",
+      "kind": "decision",
+      "label": "Logged in?",
+      "at": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "s02",
+      "code": "S02",
+      "label": "Shop",
+      "at": [
+        0,
+        2
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "tab": 1,
+      "elements": [
+        "Scan"
+      ]
+    },
+    {
+      "id": "camera",
+      "kind": "decision",
+      "label": "Camera allowed?",
+      "at": [
+        0,
+        3
+      ]
+    },
+    {
+      "id": "s03",
+      "code": "S03",
+      "label": "Scan code",
+      "at": [
+        0,
+        4
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2"
+    },
+    {
+      "id": "s01",
+      "code": "S01",
+      "label": "Login",
+      "at": [
+        1,
+        1
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "elements": [
+        {
+          "text": "Email",
+          "style": "field",
+          "hotspot": false
+        },
+        {
+          "text": "Password",
+          "style": "field",
+          "hotspot": false
+        },
+        "Login"
+      ]
+    },
+    {
+      "id": "s04",
+      "code": "S04",
+      "label": "Camera blocked",
+      "at": [
+        1,
+        3
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "content": "error",
+      "elements": [
+        {
+          "text": "Open settings",
+          "style": "outline"
+        }
+      ]
+    }
+  ],
+  "taps": [
+    {
+      "from": "s00",
+      "to": "logged",
+      "trigger": "auto, 2 s",
+      "system": "clock",
+      "guard": "splash timer elapsed",
+      "effect": "check session"
+    },
+    {
+      "from": "logged",
+      "to": "s02",
+      "trigger": "system",
+      "guard": "token exists and is not expired",
+      "effect": "load profile"
+    },
+    {
+      "from": "logged",
+      "to": "s01",
+      "trigger": "system",
+      "guard": "no token, or token expired",
+      "effect": "clear token",
+      "kind": "failure"
+    },
+    {
+      "from": "s01",
+      "to": "s02",
+      "trigger": "tap Login",
+      "guard": "email and password valid",
+      "effect": "save token"
+    },
+    {
+      "from": "s02",
+      "to": "camera",
+      "trigger": "tap Scan",
+      "effect": "request camera permission"
+    },
+    {
+      "from": "camera",
+      "to": "s03",
+      "trigger": "OS prompt",
+      "system": "shield",
+      "guard": "permission granted",
+      "effect": "open camera"
+    },
+    {
+      "from": "camera",
+      "to": "s04",
+      "trigger": "OS prompt",
+      "system": "shield",
+      "guard": "permission denied",
+      "effect": "show settings link",
+      "kind": "failure"
+    }
+  ]
+}

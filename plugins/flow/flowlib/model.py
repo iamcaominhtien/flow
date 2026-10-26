@@ -38,6 +38,8 @@ class Shape(StrEnum):
     INTERMEDIATE = "intermediate"
     ACTOR = "actor"
     ELLIPSE = "ellipse"
+    SCREEN = "screen"
+    FLAG = "flag"
 
 
 class Role(StrEnum):
@@ -62,6 +64,12 @@ class LabelKind(StrEnum):
     BACK = "back"
     TEXT = "text"
     TEXT_FAIL = "text_fail"
+    USER = "user"
+    SYSTEM = "system"
+    CODE = "code"
+    GUARD_OK = "guard_ok"
+    GUARD_FAIL = "guard_fail"
+    EFFECT = "effect"
 
 
 class Tone(StrEnum):
@@ -73,8 +81,10 @@ class Tone(StrEnum):
     GREEN = "green"
     TEAL = "teal"
     GRAY = "gray"
+    RED = "red"
 
 
+MONO_LABEL_KINDS = (LabelKind.CODE, LabelKind.GUARD_OK, LabelKind.GUARD_FAIL)  # drawn in mono
 KEY_FLAG_TONES: dict[str, Tone] = {"PK": Tone.AMBER, "FK": Tone.BLUE, "UQ": Tone.VIOLET}
 
 
@@ -122,6 +132,82 @@ class Side(StrEnum):
 
     LEFT = "left"
     RIGHT = "right"
+
+
+class Device(StrEnum):
+    """The kind of device a screen is drawn in; the frame is the platform statement."""
+
+    PHONE = "phone"
+    TABLET = "tablet"
+    DESKTOP = "desktop"
+    WATCH = "watch"
+
+
+class Orientation(StrEnum):
+    """Whether a device frame is tall or wide."""
+
+    PORTRAIT = "portrait"
+    LANDSCAPE = "landscape"
+
+
+class Fidelity(StrEnum):
+    """How far the design of a screen has been decided (design 02 section 2.3)."""
+
+    L0 = "L0"
+    L1 = "L1"
+    L2 = "L2"
+    L3 = "L3"
+
+
+class Content(StrEnum):
+    """What the body of an L2 screen shows besides its named elements."""
+
+    HATCH = "hatch"
+    SPLASH = "splash"
+    SUCCESS = "success"
+    ERROR = "error"
+    LOADING = "loading"
+    EMPTY = "empty"
+
+
+class Overlay(StrEnum):
+    """A modal, a bottom sheet or a toast drawn on the screen it covers."""
+
+    MODAL = "modal"
+    SHEET = "sheet"
+    TOAST = "toast"
+
+
+class ElementStyle(StrEnum):
+    """How a named element of a screen looks."""
+
+    PRIMARY = "primary"
+    SECONDARY = "secondary"
+    OUTLINE = "outline"
+    DANGER = "danger"
+    FIELD = "field"
+
+
+class Placement(StrEnum):
+    """Where a named element sits on its screen."""
+
+    TOP = "top"
+    BOTTOM = "bottom"
+
+
+class ChipPlace(StrEnum):
+    """Where the id chip of a screen sits: above its left or right corner, or below it."""
+
+    ABOVE = "above"
+    ABOVE_RIGHT = "above_right"
+    BELOW = "below"
+
+
+class Layer(StrEnum):
+    """Whether an element belongs to the screen or to the overlay on it."""
+
+    BASE = "base"
+    OVERLAY = "overlay"
 
 
 class Direction(StrEnum):
@@ -175,6 +261,49 @@ class Row:
 
 
 @dataclass(frozen=True)
+class EdgeLabel:
+    """A chip that sits on a line, centred on ``at``."""
+
+    text: str
+    at: Point
+    kind: LabelKind
+    number: str | None = None
+    icon: str | None = None  # an icon drawn before the text, as on the chip of a system trigger
+
+
+@dataclass(frozen=True)
+class ScreenElement:
+    """An element of a screen that causes a transition; a red dot marks the tapped one."""
+
+    text: str
+    style: ElementStyle = ElementStyle.PRIMARY
+    placement: Placement = Placement.BOTTOM
+    layer: Layer = Layer.BASE
+    is_hotspot: bool = True
+
+
+@dataclass(frozen=True)
+class ScreenView:
+    """What a screen node shows: its device frame, its fidelity level and its named elements."""
+
+    code: str  # the text of the id chip, such as ``S31 · loading``
+    title: str = ""  # the name of the screen, drawn at the top of its body
+    device: Device = Device.PHONE
+    orientation: Orientation = Orientation.PORTRAIT
+    is_mini: bool = False
+    fidelity: Fidelity = Fidelity.L0
+    content: Content = Content.HATCH
+    hatch_label: str = ""
+    elements: tuple[ScreenElement, ...] = ()
+    overlay: Overlay | None = None
+    overlay_title: str = ""
+    tab_active: int | None = None
+    tab_count: int = 0
+    is_undecided: bool = False
+    chip_place: ChipPlace = ChipPlace.ABOVE  # moved when a line would run through the chip
+
+
+@dataclass(frozen=True)
 class Node:
     """One box of the diagram."""
 
@@ -194,16 +323,8 @@ class Node:
     sections: tuple[tuple[Row, ...], ...] = ()
     card: bool = False  # drawn as an illustrated card: a large icon, a name pill, a detail line
     dashed: bool = False  # a dashed outline: a reference to something drawn elsewhere
-
-
-@dataclass(frozen=True)
-class EdgeLabel:
-    """A chip that sits on a line, centred on ``at``."""
-
-    text: str
-    at: Point
-    kind: LabelKind
-    number: str | None = None
+    screen: ScreenView | None = None  # what a screen of a screen flow shows
+    chip: EdgeLabel | None = None  # a chip on the node; ``at`` is relative to its top-left
 
 
 @dataclass(frozen=True)

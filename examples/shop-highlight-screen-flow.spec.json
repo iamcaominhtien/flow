@@ -1,0 +1,287 @@
+{
+  "type": "screen",
+  "title": "Shop app · Main path highlighted",
+  "desc": "The animated blue line is the happy path from launch to a paid order. Zones are colour-coded; branches and failures stay as plain thin arrows so the main route reads first.",
+  "zones": [
+    {
+      "id": "start",
+      "label": "Start and browse",
+      "tone": "blue"
+    },
+    {
+      "id": "checkout",
+      "label": "Checkout",
+      "tone": "violet"
+    },
+    {
+      "id": "result",
+      "label": "Payment result",
+      "tone": "green"
+    },
+    {
+      "id": "exceptions",
+      "label": "Exceptions",
+      "tone": "red"
+    }
+  ],
+  "screens": [
+    {
+      "id": "s00",
+      "code": "S00",
+      "label": "Splash",
+      "at": [
+        0,
+        0
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "start",
+      "fidelity": "L2",
+      "content": "splash"
+    },
+    {
+      "id": "s10",
+      "code": "S10",
+      "label": "Home",
+      "at": [
+        0,
+        1
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "start",
+      "fidelity": "L2",
+      "elements": [
+        {
+          "text": "Search bar",
+          "style": "secondary",
+          "at": "top"
+        }
+      ]
+    },
+    {
+      "id": "s11",
+      "code": "S11",
+      "label": "Search",
+      "at": [
+        0,
+        2
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "start",
+      "fidelity": "L2",
+      "elements": [
+        {
+          "text": "Result item",
+          "style": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "s12",
+      "code": "S12",
+      "label": "Product",
+      "at": [
+        0,
+        3
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "start",
+      "fidelity": "L2",
+      "elements": [
+        "Add to cart"
+      ]
+    },
+    {
+      "id": "s14",
+      "code": "S14",
+      "label": "Out of stock",
+      "at": [
+        0,
+        4
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "start",
+      "tone": "red",
+      "fidelity": "L2",
+      "content": "error",
+      "elements": [
+        {
+          "text": "Notify me",
+          "style": "outline",
+          "hotspot": false
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "code": "S13",
+      "label": "Cart",
+      "at": [
+        1,
+        0
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "checkout",
+      "fidelity": "L2",
+      "elements": [
+        "Checkout"
+      ]
+    },
+    {
+      "id": "s20",
+      "code": "S20",
+      "label": "Address",
+      "at": [
+        1,
+        1
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "checkout",
+      "fidelity": "L2",
+      "elements": [
+        "Continue"
+      ]
+    },
+    {
+      "id": "s21",
+      "code": "S21",
+      "label": "Payment",
+      "at": [
+        1,
+        2
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "checkout",
+      "fidelity": "L2",
+      "elements": [
+        "Pay"
+      ]
+    },
+    {
+      "id": "pay-ok",
+      "kind": "decision",
+      "label": "Payment ok?",
+      "trigger": "API result",
+      "system": "cloud",
+      "zone": "result",
+      "at": [
+        1,
+        3
+      ]
+    },
+    {
+      "id": "s22",
+      "code": "S22",
+      "label": "Order complete",
+      "at": [
+        1,
+        4
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "result",
+      "fidelity": "L2",
+      "content": "success"
+    },
+    {
+      "id": "s23",
+      "code": "S23",
+      "label": "Payment failed",
+      "at": [
+        2,
+        3
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "exceptions",
+      "fidelity": "L2",
+      "content": "error",
+      "elements": [
+        {
+          "text": "Retry button",
+          "style": "outline"
+        }
+      ]
+    }
+  ],
+  "taps": [
+    {
+      "from": "s00",
+      "to": "s10",
+      "trigger": "auto 2 s",
+      "system": "clock",
+      "main": true
+    },
+    {
+      "from": "s10",
+      "to": "s11",
+      "trigger": "tap search",
+      "main": true
+    },
+    {
+      "from": "s11",
+      "to": "s12",
+      "trigger": "tap result",
+      "main": true
+    },
+    {
+      "from": "s12",
+      "to": "s14",
+      "guard": "out of stock",
+      "kind": "failure"
+    },
+    {
+      "from": "s12",
+      "to": "s13",
+      "trigger": "add to cart",
+      "guard": "in stock",
+      "main": true
+    },
+    {
+      "from": "s13",
+      "to": "s20",
+      "trigger": "tap Checkout",
+      "guard": "cart not empty",
+      "main": true
+    },
+    {
+      "from": "s20",
+      "to": "s21",
+      "trigger": "tap Continue",
+      "guard": "address valid",
+      "main": true
+    },
+    {
+      "from": "s21",
+      "to": "pay-ok",
+      "trigger": "tap Pay",
+      "main": true
+    },
+    {
+      "from": "pay-ok",
+      "to": "s22",
+      "guard": "paid",
+      "effect": "send receipt",
+      "main": true
+    },
+    {
+      "from": "pay-ok",
+      "to": "s23",
+      "guard": "declined",
+      "kind": "failure"
+    },
+    {
+      "from": "s23",
+      "to": "s21",
+      "trigger": "tap Retry",
+      "kind": "retry"
+    }
+  ]
+}

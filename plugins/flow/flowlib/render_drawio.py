@@ -21,6 +21,7 @@ from .drawio_common import (
     style_string,
 )
 from .drawio_lines import add_divider, add_edge
+from .drawio_screen import add_node_chip, add_screen_parts, screen_style
 from .markup import esc, fmt
 from .model import KEY_FLAG_TONES, Frame, FrameVariant, Node, Row, Scene, Shape, Tone
 from .shapes import SUBPROCESS_BAR_INSET_PX
@@ -92,6 +93,7 @@ FRAGMENT_TAG_WIDTH_PX = 60
 FRAGMENT_TAG_HEIGHT_PX = 18
 FRAGMENT_FONT_SIZE_PX = 11
 FRAGMENT_GUARD_GAP_PX = 8
+FLAG_POINT_PX = 16
 
 
 def _pill_style(node: Node) -> dict[str, object]:
@@ -220,6 +222,11 @@ def _circle_style(node: Node) -> dict[str, object]:
     return {"ellipse": ""}
 
 
+def _flag_style(node: Node) -> dict[str, object]:
+    """Style pairs for a flag: a step shape with a notch on the left and a point on the right."""
+    return {"shape": "step", "perimeter": "stepPerimeter", "fixedSize": 1, "size": FLAG_POINT_PX}
+
+
 def _text_style(node: Node) -> dict[str, object]:
     """Style pairs for free text: no outline, no fill, left aligned."""
     return {"text": "", "align": "left", "verticalAlign": "middle", "spacingLeft": 0}
@@ -248,6 +255,8 @@ SHAPE_STYLES: dict[Shape, Callable[[Node], dict[str, object]]] = {
     Shape.INTERMEDIATE: _intermediate_style,
     Shape.ACTOR: _actor_style,
     Shape.ELLIPSE: _ellipse_style,
+    Shape.SCREEN: _box_style,
+    Shape.FLAG: _flag_style,
 }
 
 
@@ -263,6 +272,8 @@ def _theme_pairs(node: Node, theme: Theme) -> dict[str, object]:
 
 def _node_style(node: Node, theme: Theme) -> str:
     """Return the full style of a node cell: outline, colours and text."""
+    if node.screen is not None:
+        return screen_style(node, theme)
     colors = theme.shapes[node.shape]
     fill = theme.tones[node.tone].box if node.tone else colors.fill
     if node.shape is Shape.TABLE and node.card:
@@ -323,6 +334,8 @@ def _label_value(lines: tuple[str, ...]) -> str:
 
 def _node_value(node: Node, theme: Theme) -> str:
     """Return the label of a node: its caption, or its title followed by its detail lines."""
+    if node.screen is not None:
+        return ""
     if node.caption:
         return esc(node.caption)
     if node.shape is Shape.TABLE and node.card:
@@ -355,6 +368,10 @@ def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
     """Add a node, its icon (as a child cell) and its number badge."""
     cell = add_vertex(root, f"node-{node.id}", _node_value(node, theme), _node_style(node, theme))
     add_geometry(cell, (node.x, node.y, node.width, node.height))
+    if node.screen is not None:
+        add_screen_parts(root, node, theme)
+    if node.chip is not None:
+        add_node_chip(root, node, theme)
     if node.shape is Shape.TABLE:
         _add_table_rows(root, node, theme)
     if node.shape is Shape.TABLE and node.card:

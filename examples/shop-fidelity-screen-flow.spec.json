@@ -1,0 +1,104 @@
+{
+  "type": "screen",
+  "title": "Screen flow · Mixed fidelity",
+  "desc": "Each screen is drawn at the level its design has reached. Moving a screen up a level never moves an arrow: every level has the same width and the same centre line. A dashed arrow and a dashed card mark something still undecided.",
+  "screens": [
+    {
+      "id": "s01",
+      "code": "S01",
+      "label": "Welcome back",
+      "at": [
+        0,
+        0
+      ],
+      "device": "phone",
+      "fidelity": "L3",
+      "elements": [
+        {
+          "text": "Email",
+          "style": "field",
+          "hotspot": false
+        },
+        {
+          "text": "Password",
+          "style": "field",
+          "hotspot": false
+        },
+        "Login"
+      ]
+    },
+    {
+      "id": "s02",
+      "code": "S02",
+      "label": "Home",
+      "at": [
+        0,
+        1
+      ],
+      "device": "phone",
+      "fidelity": "L2",
+      "elements": [
+        {
+          "text": "Product card",
+          "style": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "s03",
+      "code": "S03",
+      "label": "Product",
+      "at": [
+        0,
+        2
+      ],
+      "device": "phone",
+      "fidelity": "L1"
+    },
+    {
+      "id": "s04",
+      "code": "S04",
+      "label": "Cart",
+      "at": [
+        0,
+        3
+      ],
+      "device": "phone",
+      "fidelity": "L0"
+    },
+    {
+      "id": "s05",
+      "code": "S05",
+      "label": "Done",
+      "at": [
+        0,
+        4
+      ],
+      "device": "phone",
+      "undecided": true
+    }
+  ],
+  "taps": [
+    {
+      "from": "s01",
+      "to": "s02",
+      "trigger": "tap Login",
+      "guard": "valid"
+    },
+    {
+      "from": "s02",
+      "to": "s03",
+      "trigger": "tap product"
+    },
+    {
+      "from": "s03",
+      "to": "s04",
+      "trigger": "add to cart"
+    },
+    {
+      "from": "s04",
+      "to": "s05",
+      "trigger": "tap Pay"
+    }
+  ]
+}

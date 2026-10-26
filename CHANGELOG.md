@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 (2026-10-26)
+
+Screen flow rebuilt from `docs/design/02-screen-flow.md`.
+
+- Device frames (phone, tablet, desktop with browser bar, watch, mini phone), id chips (`S01`, `W01`, `S31 · loading`, `S12 + modal`), fidelity L0 to L2 (L3 is drawn as L2), hotspots, undecided dashed cards.
+- Transitions as `trigger [guard] / effect`: dark chip for the user, slate chip with icon for the system, green and rose guards, codes C1/C2 with a conditions table, kinds forward, main, failure, back, retry.
+- Layout from rows, columns and zones: gap 130 or 96 px, upper and lower third for paired arrows, back arrows in a strip above, entry pills with flags, one tab-bar bus, overlays, states of one screen, web flow in its own zone.
+- Scene format, draw.io output and draw.io import round trip for screens; a `red` tone; check `label-too-long`. Import now keeps line ports and reads roles back from colours for all types.
+- Examples: the shop app (14 phone screens, 8 web screens) and seven pattern examples. Old plain-box screen specs still build.
+- Not done: L3 as a real wireframe; orientation pairs and the tablet board; arrows enter the top of a frame where the design enters the side; a strip arrow can cross a zone pill (seen: `tap Orders` over the zone label); real draw.io editor not used.
+
 ## 0.2.0 (2026-10-26)
 
 Foundations, from `docs/design/01-foundations.md`. First phase of closing the gaps listed in `docs/plugin/design-gaps.md`.

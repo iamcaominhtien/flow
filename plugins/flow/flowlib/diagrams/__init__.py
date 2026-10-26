@@ -13,6 +13,7 @@ from . import (
     er,
     flowchart,
     graph,
+    screenflow,
     sequence,
     state,
     timeline,
@@ -38,6 +39,7 @@ LAYOUTS: dict[str, Layout] = {
     "roadmap": timeline.layout_roadmap,
     "mindmap": tree.layout_mind_map,
     **{name: graph.layout_with(each) for name, each in catalog.TYPES.items()},
+    "screen": screenflow.layout_raw,
 }
 
 
