@@ -30,6 +30,9 @@ from .text_area import ICON_TEXT_RESERVE_PX
 from .theme import Theme, detailed_icon_svg, has_detailed_icon, icon_svg, load_theme
 
 ICON_SIZE_PX = 18
+CONNECTOR_NOTE_GAP_PX = 10  # the note beside an off-page connector, as in the HTML page
+CONNECTOR_NOTE_WIDTH_PX = 140
+CONNECTOR_NOTE_FONT_SIZE_PX = 11
 ICON_STROKE_WIDTH = 2
 ICON_LEFT_PX = 14
 CENTERED_ICON_SHAPES = (Shape.INTERMEDIATE, Shape.DECISION)  # the icon is a marker in the middle
@@ -149,6 +152,11 @@ def _bar_style(node: Node) -> dict[str, object]:
     return {"rounded": 0, "strokeWidth": BAR_STROKE_WIDTH_PX}
 
 
+def _fork_style(node: Node) -> dict[str, object]:
+    """Style pairs for the solid bar of a split or join; ``flowFork`` lets the importer know it."""
+    return {"rounded": 1, "arcSize": PILL_ARC_PERCENT, "flowFork": 1, "strokeWidth": 0}
+
+
 def _note_style(node: Node) -> dict[str, object]:
     """Style pairs for a rectangle with a folded corner and left-aligned text."""
     return {
@@ -243,6 +251,7 @@ SHAPE_STYLES: dict[Shape, Callable[[Node], dict[str, object]]] = {
     Shape.PREPARATION: _hexagon_style,
     Shape.CONNECTOR: _circle_style,
     Shape.BAR: _bar_style,
+    Shape.FORK: _fork_style,
     Shape.NOTE: _note_style,
     Shape.TEXT: _text_style,
     Shape.CROSS: _cross_style,
@@ -343,7 +352,7 @@ def _node_value(node: Node, theme: Theme) -> str:
     if node.card:
         return _label_value(node.detail)
     title = _label_value(node.text)
-    if not node.detail:
+    if not node.detail or node.shape is Shape.CONNECTOR:
         return title
     style = f"font-size:{DETAIL_FONT_SIZE_PX}px;font-weight:normal;color:{theme.slate}"
     return f'{title}<br><span style="{style}">{_label_value(node.detail)}</span>'
@@ -389,8 +398,36 @@ def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
         is_marker = node.shape in CENTERED_ICON_SHAPES and not node.text
         icon_left = (node.width - ICON_SIZE_PX) / 2 if is_marker else ICON_LEFT_PX
         add_geometry(icon, (icon_left, icon_top, ICON_SIZE_PX, ICON_SIZE_PX))
+    _add_badge_and_note(root, node, theme)
+
+
+def _add_badge_and_note(root: ET.Element, node: Node, theme: Theme) -> None:
+    """Add what hangs on the outside of a node: its number badge and a connector's note."""
     if node.number:
         _add_badge(root, node, theme)
+    if node.shape is Shape.CONNECTOR and node.detail:
+        _add_connector_note(root, node, theme)
+
+
+def _add_connector_note(root: ET.Element, node: Node, theme: Theme) -> None:
+    """Add the note that says where an off-page connector continues, beside its circle."""
+    style = style_string(
+        {
+            "text": "",
+            "html": 1,
+            "whiteSpace": "wrap",
+            "align": "left",
+            "verticalAlign": "middle",
+            "strokeColor": "none",
+            "fillColor": "none",
+            "fontSize": CONNECTOR_NOTE_FONT_SIZE_PX,
+            "fontColor": theme.slate,
+            "fontFamily": theme.fonts.sans,
+        }
+    )
+    cell = add_vertex(root, f"note-{node.id}", _label_value(node.detail), style)
+    left = node.x + node.width + CONNECTOR_NOTE_GAP_PX
+    add_geometry(cell, (left, node.y, CONNECTOR_NOTE_WIDTH_PX, node.height))
 
 
 def _add_card_disc(root: ET.Element, node: Node, theme: Theme) -> None:

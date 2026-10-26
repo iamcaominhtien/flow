@@ -53,6 +53,14 @@ class Code(StrEnum):
     CROSSES_BORDER = "crosses-border"
     ON_DIVIDER = "on-divider"
     LABEL_TOO_LONG = "label-too-long"
+    TEXT_TOO_LONG = "text-too-long"
+    DECISION_NOT_QUESTION = "decision-not-question"
+    DECISION_FEW_EXITS = "decision-few-exits"
+    DECISION_NO_ELSE = "decision-no-else"
+    CHART_TOO_BIG = "chart-too-big"
+    START_PLACEMENT = "start-placement"
+    END_PLACEMENT = "end-placement"
+    SEQUENCE_LABEL_LONG = "sequence-label-long"
 
 
 @dataclass(frozen=True)
@@ -439,9 +447,13 @@ def _straddles(part: Rect, frame: Rect) -> bool:
 def _parts(scene: Scene, rules: LayoutRules) -> list[tuple[str, Rect]]:
     """Return what a frame border or a divider must not cut: nodes and the chips of lines.
 
-    An activation bar is left out: it is long on purpose and may run past a fragment.
+    An activation bar and the bar of a split are left out: they are long on purpose.
     """
-    parts = [(node.id, node_rect(node)) for node in scene.nodes if node.shape is not Shape.BAR]
+    parts = [
+        (node.id, node_rect(node))
+        for node in scene.nodes
+        if node.shape not in (Shape.BAR, Shape.FORK)
+    ]
     for edge in scene.edges:
         rect = label_rect(edge, rules)
         if rect is not None:
@@ -494,8 +506,11 @@ def check_scene(scene: Scene) -> list[Finding]:
     Returns:
         All findings, errors first.
     """
+    from .lint import lint_scene
+
     rules = load_theme().layout
     findings = [
+        *lint_scene(scene),
         *check_nodes_overlap(scene),
         *check_lines_through_nodes(scene),
         *check_labels(scene, rules),

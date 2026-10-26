@@ -47,6 +47,10 @@
       "fill": "#DCEEFB",
       "stroke": "#334155"
     },
+    "fork": {
+      "fill": "#0F172A",
+      "stroke": "#0F172A"
+    },
     "note": {
       "fill": "#FFF1DD",
       "stroke": "#F59E3A"
@@ -368,6 +372,10 @@
         12,
         24
       ],
+      "fork": [
+        120,
+        8
+      ],
       "note": [
         160,
         48
@@ -436,7 +444,11 @@
     "card_pill_height": 26,
     "card_pill_padding": 12,
     "card_icon_fraction": 0.55,
-    "lane_tab": 44
+    "lane_tab": 44,
+    "fork_overhang": 30,
+    "fold_extent_lanes": 3400,
+    "lane_size_plain": 210,
+    "lane_size_card": 240
   },
   "sequence": {
     "participant_width": 135,
@@ -520,6 +532,7 @@
           "cross",
           "text",
           "bar",
+          "fork",
           "note",
           "start",
           "end"
@@ -602,6 +615,10 @@
         "bar": {
           "fill": "#12263F",
           "stroke": "#94A3B8"
+        },
+        "fork": {
+          "fill": "#E2E8F0",
+          "stroke": "#E2E8F0"
         },
         "decision": {
           "fill": "#2E2111",

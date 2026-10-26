@@ -3,12 +3,13 @@
 from dataclasses import replace
 from itertools import pairwise
 
-from .check import Rect, caption_rect, label_rect, node_rect
-from .model import Edge, EdgeLabel, Node, Point, Scene
+from .check import Rect, caption_rect, frame_rect, label_rect, node_rect
+from .model import Edge, EdgeLabel, Frame, Node, Point, Scene
 from .theme import LayoutRules, load_theme
 
 ALONG_FRACTIONS = (0.5, 0.3, 0.7, 0.15, 0.85)  # where on a segment a chip is tried
 SAME_LINE_TOLERANCE_PX = 1.0  # a segment shorter across than this counts as straight
+BORDER_STRIP_PX = 3.0  # a chip this close to a frame border or divider counts as on it
 
 
 def place_labels(scene: Scene) -> Scene:
@@ -24,7 +25,7 @@ def place_labels(scene: Scene) -> Scene:
         A new scene; the lines are not changed.
     """
     rules = load_theme().layout
-    fixed = _fixed_rects(scene.nodes, rules)
+    fixed = _fixed_rects(scene.nodes, rules) + _border_rects(scene.frames)
     taken: list[Rect] = []
     edges = []
     for edge in scene.edges:
@@ -41,6 +42,27 @@ def _fixed_rects(nodes: tuple[Node, ...], rules: LayoutRules) -> list[Rect]:
     rects = [node_rect(node) for node in nodes]
     rects.extend(rect for node in nodes if (rect := caption_rect(node, rules)) is not None)
     return rects
+
+
+def _border_rects(frames: tuple[Frame, ...]) -> list[Rect]:
+    """Return a thin strip along each border and divider of every frame, which a chip avoids."""
+    strips = []
+    half = BORDER_STRIP_PX
+    for frame in frames:
+        box = frame_rect(frame)
+        strips.extend(
+            [
+                Rect(box.left - half, box.top - half, box.right + half, box.top + half),
+                Rect(box.left - half, box.bottom - half, box.right + half, box.bottom + half),
+                Rect(box.left - half, box.top, box.left + half, box.bottom),
+                Rect(box.right - half, box.top, box.right + half, box.bottom),
+            ]
+        )
+        strips.extend(
+            Rect(box.left, divider.y - half, box.right, divider.y + half)
+            for divider in frame.dividers
+        )
+    return strips
 
 
 def _chip_rect(edge: Edge, label: EdgeLabel, rules: LayoutRules) -> Rect:

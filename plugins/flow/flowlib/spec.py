@@ -17,12 +17,13 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
-from .model import Direction, Head, Role, Row, Shape, Side, Tone
+from .model import Direction, Head, Role, Row, ScreenView, Shape, Side, Tone
 from .reader import Reader, SpecError, suggestion
 from .theme import icon_names
 
 SPEC_KEYS = {"type", "title", "desc", "direction", "lanes", "nodes", "edges", "style"}
-NODE_KEYS = {"id", "kind", "text", "icon", "tone", "number", "side", "lane", "detail"}
+NODE_KEYS = {"id", "kind", "text", "icon", "tone", "number", "side", "lane", "detail", "screen"}
+JOIN = "join"  # a second name for the bar of a parallel split: it is drawn the same way
 LANE_KEYS = {"id", "label", "tone"}
 EDGE_KEYS = {"from", "to", "role", "label"}
 FLOWCHART = "flowchart"
@@ -56,6 +57,7 @@ class SpecNode:
     zone: str | None = None
     card: bool = False
     dashed: bool = False
+    view: ScreenView | None = None  # what a screen card shows
 
 
 @dataclass(frozen=True)
@@ -96,6 +98,7 @@ class Spec:
     zones: tuple[SpecZone, ...] = ()
     illustrated: bool = False
     side_by_side: bool = False  # in a swimlane chart, branches of one lane sit side by side
+    is_flowchart: bool = False  # a real flowchart, which has the lane sizes of its own page
 
 
 def load(path: str | Path) -> Spec:
@@ -178,6 +181,7 @@ class _SpecParser:
             nodes=tuple(node for node in nodes if node is not None),
             edges=tuple(edge for edge in edges if edge is not None),
             illustrated=illustrated,
+            is_flowchart=True,
         )
 
     def _lane(self, raw: object, where: str) -> SpecLane | None:
@@ -205,17 +209,38 @@ class _SpecParser:
         icon = raw.get("icon")
         if icon is not None and icon not in self._icon_names:
             read.report(where, f"unknown icon '{icon}'; use one of: {', '.join(self._icon_names)}")
+        kind = self._kind(raw, where)
+        text = read.text(raw, "text", where) or ""
         return SpecNode(
             id=read.identifier(raw, where),
-            kind=read.enum(Shape, raw, "kind", where) or Shape.PROCESS,
-            text=read.text(raw, "text", where) or "",
+            kind=kind,
+            text=text,
             icon=icon,
             tone=read.enum(Tone, raw, "tone", where),
             number=read.text(raw, "number", where),
             side=read.enum(Side, raw, "side", where),
             lane=self._lane_of(raw, where, lane_ids),
             detail=read.text(raw, "detail", where) or "",
+            view=self._screen(raw, kind, text, where),
         )
+
+    def _kind(self, raw: dict[str, Any], where: str) -> Shape:
+        """Read the kind of a node; ``join`` is another name for ``fork``."""
+        if raw.get("kind") == JOIN:
+            return Shape.FORK
+        return self._read.enum(Shape, raw, "kind", where) or Shape.PROCESS
+
+    def _screen(self, raw: dict[str, Any], kind: Shape, name: str, where: str) -> ScreenView | None:
+        """Read the screen id of a screen card: required for ``screen``, forbidden elsewhere."""
+        code = raw.get("screen")
+        if kind is not Shape.SCREEN:
+            if code is not None:
+                self._read.report(where, "'screen' belongs to a node of kind 'screen'")
+            return None
+        if not isinstance(code, str) or not code:
+            self._read.report(where, "a 'screen' node needs 'screen': its id, such as \"S01\"")
+            return None
+        return ScreenView(code=code, title=name, is_mini=True)
 
     def _lane_of(self, raw: dict[str, Any], where: str, lane_ids: list[str]) -> str | None:
         """Read the lane of a node: required when lanes exist, forbidden when none do."""

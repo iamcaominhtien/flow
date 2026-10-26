@@ -165,6 +165,8 @@ def _bounds(cell: ET.Element) -> Box | None:
 
 def _shape_of(style: dict[str, str], width: float, height: float) -> Shape:
     """Guess the flowchart shape that looks most like a draw.io style."""
+    if style.get("flowFork") == "1":
+        return Shape.FORK
     if "rhombus" in style:
         return Shape.DECISION
     if "ellipse" in style:

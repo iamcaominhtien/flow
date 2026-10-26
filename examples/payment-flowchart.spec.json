@@ -1,0 +1,35 @@
+{
+  "type": "flowchart",
+  "title": "Online payment",
+  "desc": "All parts together: numbered steps, a subprocess, two decisions, a retry loop, an error branch, a document and the one animated main path from start to confirmation.",
+  "direction": "right",
+  "nodes": [
+    {"id": "start", "kind": "terminator", "text": "Cart ready"},
+    {"id": "load", "kind": "preparation", "text": "Load cart", "number": "1"},
+    {"id": "address", "kind": "subprocess", "text": "Validate address", "number": "2"},
+    {"id": "stock", "kind": "decision", "text": "In stock?", "number": "3"},
+    {"id": "authorize", "kind": "process", "text": "Authorize card", "number": "4"},
+    {"id": "approved", "kind": "decision", "text": "Approved?", "number": "5"},
+    {"id": "receipt", "kind": "document", "text": "Receipt", "number": "6"},
+    {"id": "done", "kind": "terminator", "text": "Order confirmed"},
+    {"id": "out", "kind": "process", "text": "Show out-of-stock", "number": "3a"},
+    {"id": "retry", "kind": "decision", "text": "Retry < 3?", "number": "5a"},
+    {"id": "cancel", "kind": "process", "text": "Cancel order"},
+    {"id": "failed", "kind": "fail", "text": "Payment failed"}
+  ],
+  "edges": [
+    {"from": "start", "to": "load", "role": "main"},
+    {"from": "load", "to": "address", "role": "main"},
+    {"from": "address", "to": "stock", "role": "main"},
+    {"from": "stock", "to": "authorize", "role": "main", "label": "Yes"},
+    {"from": "authorize", "to": "approved", "role": "main"},
+    {"from": "approved", "to": "receipt", "role": "main", "label": "Yes"},
+    {"from": "receipt", "to": "done", "role": "main"},
+    {"from": "stock", "to": "out", "role": "no", "label": "No"},
+    {"from": "out", "to": "load", "role": "back", "label": "Edit cart"},
+    {"from": "approved", "to": "retry", "role": "no", "label": "No"},
+    {"from": "retry", "to": "authorize", "role": "back", "label": "Yes"},
+    {"from": "retry", "to": "cancel", "role": "no", "label": "No"},
+    {"from": "cancel", "to": "failed"}
+  ]
+}

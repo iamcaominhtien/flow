@@ -26,6 +26,7 @@ class Shape(StrEnum):
     PREPARATION = "preparation"
     CONNECTOR = "connector"
     BAR = "bar"
+    FORK = "fork"  # the thick bar of a parallel split or join
     NOTE = "note"
     TEXT = "text"
     CROSS = "cross"
@@ -355,3 +356,4 @@ class Scene:
     nodes: tuple[Node, ...]
     edges: tuple[Edge, ...]
     theme: str = DEFAULT_THEME
+    diagram: str = ""  # the spec type it was drawn from; some checks apply to one type only

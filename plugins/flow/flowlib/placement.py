@@ -5,13 +5,22 @@ from dataclasses import dataclass, replace
 
 from .layered import Grid
 from .model import DEFAULT_FONT_SIZE_PX, Direction, Frame, FrameVariant, Node, Point, Shape
+from .screen_parts import screen_size
 from .sizing import FittedNode, NodeContent, fit_card, fit_node, fit_table, fit_table_card
 from .spec import Spec, SpecEdge, SpecNode
-from .theme import LayoutRules
+from .theme import LayoutRules, load_theme
 from .zones import zone_frames
 
 # Marks keep their own size: stretching a circle to the width of its column would make an ellipse.
-FIXED_WIDTH_SHAPES = {Shape.START, Shape.END, Shape.INTERMEDIATE, Shape.CONNECTOR, Shape.ACTOR}
+FIXED_WIDTH_SHAPES = {
+    Shape.START,
+    Shape.END,
+    Shape.INTERMEDIATE,
+    Shape.CONNECTOR,
+    Shape.ACTOR,
+    Shape.FORK,
+    Shape.SCREEN,
+}
 
 
 @dataclass(frozen=True)
@@ -127,6 +136,9 @@ def rules_for(spec: Spec, rules: LayoutRules) -> LayoutRules:
 def fit_content(node: SpecNode, rules: LayoutRules) -> FittedNode:
     """Fit one node to its content: a table to its rows, any other shape to its text."""
     has_icon = node.icon is not None
+    fixed = _fit_fixed(node, rules)
+    if fixed is not None:
+        return fixed
     if node.kind is Shape.TABLE:
         if node.card:
             return fit_table_card(node.text, node.sections, rules)
@@ -136,13 +148,32 @@ def fit_content(node: SpecNode, rules: LayoutRules) -> FittedNode:
     return fit_node(node.kind, NodeContent(node.text, node.detail, has_icon), rules)
 
 
+def _fit_fixed(node: SpecNode, rules: LayoutRules) -> FittedNode | None:
+    """Return the size of a node that does not grow with its text, or None for any other."""
+    if node.view is not None:
+        width, height = screen_size(node.view, load_theme())
+        return FittedNode(width, height, (node.text,))
+    if node.kind is Shape.FORK:
+        return FittedNode(*rules.min_sizes[Shape.FORK], ())
+    if node.kind is Shape.CONNECTOR:
+        return _fit_connector(node, rules)
+    return None
+
+
+def _fit_connector(node: SpecNode, rules: LayoutRules) -> FittedNode:
+    """Keep a connector a small circle: its letter is the text and its note hangs beside it."""
+    width, height = rules.min_sizes[Shape.CONNECTOR]
+    return FittedNode(width, height, (node.text,), (node.detail,) if node.detail else ())
+
+
 def _layout_sizes(spec: Spec, rules: LayoutRules) -> dict[str, FittedNode]:
     """Fit every node to its content and, for a left-to-right chart, swap width and height."""
     fitted = {node.id: fit_content(node, rules) for node in spec.nodes}
     if spec.direction is Direction.DOWN:
         return fitted
+    bars = {node.id for node in spec.nodes if node.kind is Shape.FORK}
     return {
-        node_id: replace(size, width=size.height, height=size.width)
+        node_id: size if node_id in bars else replace(size, width=size.height, height=size.width)
         for node_id, size in fitted.items()
     }
 
@@ -219,6 +250,7 @@ def make_node(node: SpecNode, size: FittedNode, center: Point, width: float) -> 
         sections=node.sections,
         card=node.card,
         dashed=node.dashed,
+        screen=node.view,
     )
 
 
@@ -244,7 +276,7 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
     if spec.lanes and not bands:
         bands = {
             index: (center_x[index] - size / 2, size)
-            for index, size in _lane_widths(widths, rules).items()
+            for index, size in _lane_widths(widths, spec, rules).items()
         }
     heights: dict[int, float] = defaultdict(float)
     for node_id, size in fitted.items():
@@ -291,12 +323,22 @@ def _node_center_y(node: SpecNode, size: FittedNode, row: tuple[float, float]) -
     return centre - height / 2 + size.height / 2
 
 
-def _lane_widths(widths: dict[int, float], rules: LayoutRules) -> dict[int, float]:
+def lane_floor(spec: Spec, rules: LayoutRules) -> float:
+    """Return the least size of a lane across the flow.
+
+    A flowchart follows its page: 210 px with plain nodes and 240 px when a card is drawn.
+    Other types that draw lanes keep the general minimum.
+    """
+    if not spec.is_flowchart:
+        return rules.lane_min_size
+    has_cards = any(node.card for node in spec.nodes)
+    return rules.lane_size_card if has_cards else rules.lane_size_plain
+
+
+def _lane_widths(widths: dict[int, float], spec: Spec, rules: LayoutRules) -> dict[int, float]:
     """Return the width of the lane of each column: the widest node plus padding, or a minimum."""
-    return {
-        index: max(rules.lane_min_size, width + 2 * rules.lane_padding)
-        for index, width in widths.items()
-    }
+    floor = lane_floor(spec, rules)
+    return {index: max(floor, width + 2 * rules.lane_padding) for index, width in widths.items()}
 
 
 def _column_centers(
@@ -305,7 +347,7 @@ def _column_centers(
     """Return the centre x of each column when the columns are not lane-owned."""
     widths = _column_widths(fitted, grid.column)
     if spec.lanes:
-        widths = _lane_widths(widths, rules)
+        widths = _lane_widths(widths, spec, rules)
     column_gaps = (
         (0.0, 0.0) if spec.lanes else (rules.gap_horizontal, rules.gap_horizontal_labelled)
     )
@@ -339,7 +381,7 @@ def _lane_positions(
     bands: dict[int, tuple[float, float]] = {}
     for lane, columns in grid.lane_columns.items():
         content = sum(column_width[c] for c in columns) + rules.gap_horizontal * (len(columns) - 1)
-        width = max(rules.lane_min_size, content + 2 * rules.lane_padding)
+        width = max(lane_floor(spec, rules), content + 2 * rules.lane_padding)
         edge = left + (width - content) / 2
         for column in columns:
             centers[column] = edge + column_width[column] / 2

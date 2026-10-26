@@ -56,6 +56,11 @@ CAPTION_WIDTH_PX = 150
 CAPTION_GAP_PX = 4
 CAPTION_FONT_SIZE_PX = 12
 
+# Note beside an off-page connector: where the flow continues
+CONNECTOR_NOTE_GAP_PX = 10
+CONNECTOR_NOTE_WIDTH_PX = 140
+CONNECTOR_NOTE_FONT_SIZE_PX = 11
+
 DASH_PATTERN = "6 4"  # the outline of a reference to a table drawn on another page
 ABSOLUTE = {"position": "absolute"}
 
@@ -108,7 +113,7 @@ def _label_html(node: Node, theme: Theme) -> str:
         "color": theme.slate if is_note else theme.ink,
     }
     title = "<br>".join(esc(line) for line in node.text)
-    if not node.detail:
+    if not node.detail or node.shape is Shape.CONNECTOR:
         return tag("div", style, title)
     style.update({"flex-direction": "column", "justify-content": "center"})
     detail_style = {
@@ -318,6 +323,25 @@ def _caption_html(node: Node, theme: Theme) -> str:
     return tag("div", style, esc(node.caption))
 
 
+def _connector_note_html(node: Node, theme: Theme) -> str:
+    """Draw the note that says where an off-page connector continues, beside its circle."""
+    if node.shape is not Shape.CONNECTOR or not node.detail:
+        return ""
+    style = {
+        **ABSOLUTE,
+        "left": px(node.x + node.width + CONNECTOR_NOTE_GAP_PX),
+        "top": px(node.y),
+        "width": px(CONNECTOR_NOTE_WIDTH_PX),
+        "height": px(node.height),
+        "display": "flex",
+        "align-items": "center",
+        "font-size": px(CONNECTOR_NOTE_FONT_SIZE_PX),
+        "line-height": px(theme.layout.detail_line_height),
+        "color": theme.slate,
+    }
+    return tag("div", style, esc(" ".join(node.detail)))
+
+
 def _card_html(node: Node, theme: Theme) -> str:
     """Draw the inside of an illustrated card: icon disc, name pill and detail text."""
     rules = theme.layout
@@ -428,4 +452,5 @@ def node_html(node: Node, theme: Theme) -> str:
         tag("div", box, inside, data_id=node.id)
         + _badge_html(node, theme)
         + _caption_html(node, theme)
+        + _connector_note_html(node, theme)
     )

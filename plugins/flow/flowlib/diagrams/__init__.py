@@ -61,7 +61,7 @@ def layout(raw: object) -> Scene:
         raise SpecError([f"spec: 'type' must be one of: {known}"])
     theme = _read_theme(raw)
     spec = {key: value for key, value in raw.items() if key != THEME_KEY}
-    return replace(LAYOUTS[kind](spec), theme=theme)
+    return replace(LAYOUTS[kind](spec), theme=theme, diagram=kind)
 
 
 def _read_theme(raw: dict[str, object]) -> str:

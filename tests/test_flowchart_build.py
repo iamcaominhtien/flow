@@ -149,10 +149,10 @@ def test_spec_rejects_a_lane_without_lanes_and_a_missing_lane() -> None:
 
 
 def test_left_to_right_flow_runs_along_x() -> None:
-    """In a left-to-right chart the steps of a path have increasing x."""
+    """In a left-to-right chart the steps of a path have increasing x, and a lane change stacks."""
     chart = laid_out(REFUND_SPEC)
-    by_id = {node.id: node for node in chart.nodes}
-    assert by_id["ask"].x < by_id["review"].x < by_id["eligible"].x < by_id["pay"].x
+    centre = {node.id: node.x + node.width / 2 for node in chart.nodes}
+    assert centre["ask"] == centre["review"] < centre["eligible"] == centre["pay"]
 
 
 def test_every_node_sits_inside_its_lane() -> None:

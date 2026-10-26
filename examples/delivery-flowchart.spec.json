@@ -1,0 +1,417 @@
+{
+  "type": "flowchart",
+  "title": "Food delivery, five actors",
+  "desc": "One order from tap to doorstep. It combines swimlanes, screen cards, icons, a payment subprocess, a parallel split and join, two retry loops, three failure paths, an off-page connector, the animated main path (blue) and a slower data stream (violet).",
+  "direction": "right",
+  "lanes": [
+    {
+      "id": "customer",
+      "label": "Customer",
+      "tone": "blue"
+    },
+    {
+      "id": "app",
+      "label": "App and server",
+      "tone": "violet"
+    },
+    {
+      "id": "payment",
+      "label": "Payment",
+      "tone": "amber"
+    },
+    {
+      "id": "restaurant",
+      "label": "Restaurant",
+      "tone": "green"
+    },
+    {
+      "id": "courier",
+      "label": "Courier",
+      "tone": "teal"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "open",
+      "kind": "terminator",
+      "text": "Open app",
+      "lane": "customer",
+      "icon": "phone"
+    },
+    {
+      "id": "browse",
+      "kind": "screen",
+      "text": "Browse",
+      "lane": "customer",
+      "screen": "S01"
+    },
+    {
+      "id": "menu",
+      "kind": "screen",
+      "text": "Menu",
+      "lane": "customer",
+      "screen": "S02"
+    },
+    {
+      "id": "checkout",
+      "kind": "screen",
+      "text": "Checkout",
+      "lane": "customer",
+      "screen": "S03"
+    },
+    {
+      "id": "create",
+      "kind": "process",
+      "text": "Create order",
+      "lane": "app",
+      "icon": "cart"
+    },
+    {
+      "id": "auth",
+      "kind": "subprocess",
+      "text": "Authorize card",
+      "lane": "payment",
+      "icon": "card"
+    },
+    {
+      "id": "approved",
+      "kind": "decision",
+      "text": "Approved?",
+      "lane": "payment"
+    },
+    {
+      "id": "error",
+      "kind": "process",
+      "text": "Show payment error",
+      "lane": "app",
+      "icon": "warn"
+    },
+    {
+      "id": "accepts",
+      "kind": "decision",
+      "text": "Accepts order?",
+      "lane": "restaurant"
+    },
+    {
+      "id": "cancel",
+      "kind": "process",
+      "text": "Cancel order",
+      "lane": "restaurant",
+      "icon": "warn"
+    },
+    {
+      "id": "refund",
+      "kind": "subprocess",
+      "text": "Refund customer",
+      "lane": "payment",
+      "icon": "refund"
+    },
+    {
+      "id": "returned",
+      "kind": "terminator",
+      "text": "Money returned",
+      "lane": "payment"
+    },
+    {
+      "id": "split",
+      "kind": "fork",
+      "text": "",
+      "lane": "courier"
+    },
+    {
+      "id": "prepare",
+      "kind": "preparation",
+      "text": "Prepare food",
+      "lane": "restaurant",
+      "icon": "pot"
+    },
+    {
+      "id": "ready",
+      "kind": "process",
+      "text": "Mark ready",
+      "lane": "restaurant",
+      "icon": "check"
+    },
+    {
+      "id": "find",
+      "kind": "process",
+      "text": "Find courier",
+      "lane": "courier",
+      "icon": "bike"
+    },
+    {
+      "id": "found",
+      "kind": "decision",
+      "text": "Found?",
+      "lane": "courier"
+    },
+    {
+      "id": "merge",
+      "kind": "join",
+      "text": "",
+      "lane": "courier"
+    },
+    {
+      "id": "push",
+      "kind": "io",
+      "text": "Push: order accepted",
+      "lane": "app",
+      "icon": "bell"
+    },
+    {
+      "id": "pick",
+      "kind": "process",
+      "text": "Pick up order",
+      "lane": "courier",
+      "icon": "box"
+    },
+    {
+      "id": "deliver",
+      "kind": "process",
+      "text": "Deliver to door",
+      "lane": "courier",
+      "icon": "pin"
+    },
+    {
+      "id": "track",
+      "kind": "process",
+      "text": "Update live tracking",
+      "lane": "app",
+      "icon": "pin"
+    },
+    {
+      "id": "tracking",
+      "kind": "screen",
+      "text": "Tracking",
+      "lane": "customer",
+      "screen": "S04"
+    },
+    {
+      "id": "confirm",
+      "kind": "process",
+      "text": "Confirm delivery",
+      "lane": "courier",
+      "icon": "check"
+    },
+    {
+      "id": "capture",
+      "kind": "process",
+      "text": "Capture payment",
+      "lane": "payment",
+      "icon": "card"
+    },
+    {
+      "id": "close",
+      "kind": "process",
+      "text": "Close order",
+      "lane": "app",
+      "icon": "doc"
+    },
+    {
+      "id": "rate",
+      "kind": "screen",
+      "text": "Rate order",
+      "lane": "customer",
+      "screen": "S05"
+    },
+    {
+      "id": "low",
+      "kind": "decision",
+      "text": "Rating below 3?",
+      "lane": "customer"
+    },
+    {
+      "id": "enjoy",
+      "kind": "terminator",
+      "text": "Enjoy meal",
+      "lane": "customer",
+      "icon": "star"
+    },
+    {
+      "id": "link",
+      "kind": "connector",
+      "text": "A",
+      "lane": "app",
+      "detail": "Continues in Support case flow"
+    }
+  ],
+  "edges": [
+    {
+      "from": "open",
+      "to": "browse",
+      "role": "main"
+    },
+    {
+      "from": "browse",
+      "to": "menu",
+      "role": "main",
+      "label": "tap shop"
+    },
+    {
+      "from": "menu",
+      "to": "checkout",
+      "role": "main",
+      "label": "checkout"
+    },
+    {
+      "from": "checkout",
+      "to": "create",
+      "role": "main"
+    },
+    {
+      "from": "create",
+      "to": "auth",
+      "role": "main"
+    },
+    {
+      "from": "auth",
+      "to": "approved",
+      "role": "main"
+    },
+    {
+      "from": "approved",
+      "to": "accepts",
+      "role": "main",
+      "label": "Yes"
+    },
+    {
+      "from": "approved",
+      "to": "error",
+      "role": "no",
+      "label": "No"
+    },
+    {
+      "from": "error",
+      "to": "checkout",
+      "role": "back",
+      "label": "Edit card"
+    },
+    {
+      "from": "accepts",
+      "to": "split",
+      "role": "main",
+      "label": "Yes"
+    },
+    {
+      "from": "accepts",
+      "to": "cancel",
+      "role": "no",
+      "label": "No"
+    },
+    {
+      "from": "cancel",
+      "to": "refund",
+      "role": "no"
+    },
+    {
+      "from": "refund",
+      "to": "returned",
+      "role": "next"
+    },
+    {
+      "from": "split",
+      "to": "prepare",
+      "role": "main"
+    },
+    {
+      "from": "prepare",
+      "to": "ready",
+      "role": "main"
+    },
+    {
+      "from": "ready",
+      "to": "merge",
+      "role": "main"
+    },
+    {
+      "from": "split",
+      "to": "find",
+      "role": "main"
+    },
+    {
+      "from": "find",
+      "to": "found",
+      "role": "main"
+    },
+    {
+      "from": "found",
+      "to": "merge",
+      "role": "main",
+      "label": "Yes"
+    },
+    {
+      "from": "found",
+      "to": "find",
+      "role": "back",
+      "label": "wait 30 s"
+    },
+    {
+      "from": "split",
+      "to": "push",
+      "role": "data"
+    },
+    {
+      "from": "push",
+      "to": "track",
+      "role": "data"
+    },
+    {
+      "from": "merge",
+      "to": "pick",
+      "role": "main"
+    },
+    {
+      "from": "pick",
+      "to": "deliver",
+      "role": "main"
+    },
+    {
+      "from": "deliver",
+      "to": "track",
+      "role": "data",
+      "label": "live location"
+    },
+    {
+      "from": "track",
+      "to": "tracking",
+      "role": "data"
+    },
+    {
+      "from": "deliver",
+      "to": "confirm",
+      "role": "main"
+    },
+    {
+      "from": "confirm",
+      "to": "capture",
+      "role": "main"
+    },
+    {
+      "from": "capture",
+      "to": "close",
+      "role": "main"
+    },
+    {
+      "from": "close",
+      "to": "rate",
+      "role": "main"
+    },
+    {
+      "from": "rate",
+      "to": "low",
+      "role": "main"
+    },
+    {
+      "from": "low",
+      "to": "enjoy",
+      "role": "main",
+      "label": "No"
+    },
+    {
+      "from": "low",
+      "to": "link",
+      "role": "yes",
+      "label": "Yes"
+    }
+  ]
+}
