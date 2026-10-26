@@ -19,23 +19,26 @@ Use it:
 
 If `python3` is not the right command on your machine (Windows often uses `python` or `py`), `doctor` will tell you; this has not been tested on Windows.
 
-## Other tools (Google Antigravity and similar): not tested
+## Google Antigravity: not tested
 
-Antigravity reads skills in the same format Flow uses (a folder with a `SKILL.md`, frontmatter with a `description`). So the skills may work there, but this has **not been tried**, and a few things are Claude Code specific:
+Antigravity has its own plugins. Its [plugin documentation](https://antigravity.google/docs/plugins/) says a plugin is a folder with a `plugin.json` at its root (only `name` and `description`) and optional `skills/<name>/SKILL.md`, `agents/`, `rules/`, `mcp_config.json` and `hooks.json`. Flow's plugin folder has that shape: `plugins/flow/` now holds a `plugin.json` next to its `skills/` and `scripts/`. Whether Antigravity accepts it has **not been tried**.
 
-- Flow's skills call the scripts through `${CLAUDE_PLUGIN_ROOT}`, a variable that only Claude Code sets. In another tool the agent has to be told the real path of the `plugins/flow` folder, and the variable replaced by it.
-- The `allowed-tools` line in the frontmatter is a Claude Code permission rule; other tools ignore it or may not run the commands without asking.
-- Skill names are `/flow:<skill>` in Claude Code; elsewhere the agent picks a skill from its description.
+To try it (Antigravity CLI):
 
-A manual try, if you want to test it:
+1. Clone the repository: `git clone https://github.com/iamcaominhtien/flow`.
+2. Install from the local folder: `agy plugin install /path/to/flow/plugins/flow`, or in the interactive CLI `/plugin install` and give the same path. In the desktop app or the IDE, copy `plugins/flow` into `.agents/plugins/` of your project, or into `~/.gemini/config/plugins/` for all projects.
+3. Installing from the repository address (`agy plugin install https://github.com/iamcaominhtien/flow`) may not find the plugin, because it sits in the `plugins/flow` subfolder and the repository root is a Claude Code marketplace. Not known.
 
-1. Clone this repository: `git clone https://github.com/iamcaominhtien/flow`.
-2. Copy the folders in `plugins/flow/skills/` into the tool's skills folder (for Antigravity, the guides name `.agents/skills/` in a workspace or `~/.gemini/config/skills/` globally; check Google's documentation, because the guides disagree).
-3. Tell the agent where `plugins/flow` is, for example: "The Flow scripts are in /path/to/flow/plugins/flow; wherever a skill says `${CLAUDE_PLUGIN_ROOT}`, use that path."
-4. Run `python3 /path/to/flow/plugins/flow/scripts/doctor.py` yourself to check Python and the scripts.
-5. Ask for a diagram.
+What may not work, because the documentation does not say:
 
-The scripts themselves (`flow.py`, `doctor.py`, the `flowlib` package) are plain Python and do not depend on Claude Code. Only the skill text and the way skills are found do.
+- Flow's skills run their scripts through `${CLAUDE_PLUGIN_ROOT}`, a variable Claude Code sets. The Antigravity page lists no variable for a plugin's own folder. If the agent cannot find the scripts, tell it the real path of `plugins/flow` and ask it to use that wherever a skill says `${CLAUDE_PLUGIN_ROOT}`.
+- The `allowed-tools` line in each skill is a Claude Code permission rule; the page does not mention it, so the agent may ask before running a command.
+- The page does not say how a skill is started (a slash command or from its description). In Claude Code it is `/flow:<skill>`.
+- Plugins can be listed in the official marketplace only through Google's interest form; there is no way found to add this repository as a marketplace.
+
+The scripts (`scripts/flow.py`, `scripts/doctor.py`, the `flowlib` package) are plain Python and do not depend on any tool. You can check them by hand: `python3 /path/to/flow/plugins/flow/scripts/doctor.py`.
+
+If you try it, please say what happened (installed or refused, skills found or not, scripts found or not), and this section will be corrected.
 
 ## Developing Flow
 
