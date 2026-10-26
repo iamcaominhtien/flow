@@ -267,6 +267,7 @@ class Canvas:
             source=source,
             target=target,
             head=route.head,
+            tail=route.tail,
             dashed=route.dashed,
         )
         self.edges.append(line)
@@ -331,6 +332,7 @@ class Route:
     label: str | None = None
     dashed: bool = False
     head: Head = Head.FILLED
+    tail: Head = Head.NONE
 
 
 def sentence_case(text: str) -> str:
