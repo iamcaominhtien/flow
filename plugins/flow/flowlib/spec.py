@@ -55,6 +55,7 @@ class SpecNode:
     at: tuple[int, int] | None = None  # (row, column) on an explicit grid
     zone: str | None = None
     card: bool = False
+    dashed: bool = False
 
 
 @dataclass(frozen=True)

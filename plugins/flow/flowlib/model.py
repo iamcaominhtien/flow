@@ -192,6 +192,7 @@ class Node:
     caption: str | None = None
     sections: tuple[tuple[Row, ...], ...] = ()
     card: bool = False  # drawn as an illustrated card: a large icon, a name pill, a detail line
+    dashed: bool = False  # a dashed outline: a reference to something drawn elsewhere
 
 
 @dataclass(frozen=True)

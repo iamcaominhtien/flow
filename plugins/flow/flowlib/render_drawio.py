@@ -23,7 +23,7 @@ from .drawio_lines import add_divider, add_edge
 from .markup import esc, fmt
 from .model import KEY_FLAG_TONES, Frame, FrameVariant, Node, Row, Scene, Shape, Tone
 from .shapes import BOX_CORNER_RADIUS_PX, STROKE_WIDTH_PX, SUBPROCESS_BAR_INSET_PX
-from .sizing import estimate_text_width
+from .sizing import estimate_text_width, key_room
 from .text_area import ICON_TEXT_RESERVE_PX
 from .theme import Theme, detailed_icon_svg, has_detailed_icon, icon_svg, load_theme
 
@@ -56,6 +56,7 @@ NOTE_FOLD_PX = 16
 TABLE_ARC_PERCENT = 6
 TABLE_TEXT_INSET_PX = 12
 ROW_PADDING_PX = 12
+DASH_PATTERN = "6 4"
 CHIP_FONT_SIZE_PX = 9
 TABLE_PILL_HEIGHT_PX = 28  # the name pill in the header of an illustrated table
 TABLE_CARD_ICON_PX = 52
@@ -249,6 +250,8 @@ def _node_style(node: Node, theme: Theme) -> str:
         "fontFamily": theme.fonts.sans,
     }
     style.update(SHAPE_STYLES[node.shape](node))
+    if node.dashed:
+        style.update({"dashed": 1, "dashPattern": DASH_PATTERN})
     if node.shape in (Shape.NOTE, Shape.TEXT):
         style.update({"fontStyle": 0, "fontColor": theme.slate})
     if node.shape is Shape.TABLE:
@@ -409,14 +412,20 @@ def _chip_value(flag: str, theme: Theme) -> str:
     return f'<span style="{style}">{esc(flag)}</span>'
 
 
-def _row_value(row: Row, theme: Theme) -> str:
-    """Return a table row as a one-line HTML table: chips and name on the left, type right."""
+def _row_value(row: Row, key_width: float, theme: Theme) -> str:
+    """Return a table row as a one-line HTML table: chips, name and type in three cells.
+
+    The first cell has the width of the key column of the table, so that the names of rows
+    with and without chips start at the same x.
+    """
     chips = "&nbsp;".join(_chip_value(flag, theme) for flag in row.flags)
     name = f"<b>{esc(row.left)}</b>" if "PK" in row.flags else esc(row.left)
-    left = f"{chips}&nbsp;&nbsp;{name}" if chips else name
+    key_cell = f'<td style="width:{key_width}px;padding-left:{ROW_PADDING_PX}px">{chips}</td>'
+    left = key_cell if key_width else ""
+    pad = "" if key_width else f"padding-left:{ROW_PADDING_PX}px"
     return (
-        '<table style="width:100%;border-collapse:collapse"><tr>'
-        f'<td style="padding-left:{ROW_PADDING_PX}px">{left}</td>'
+        f'<table style="width:100%;border-collapse:collapse"><tr>{left}'
+        f'<td style="{pad}">{name}</td>'
         f'<td align="right" style="padding-right:{ROW_PADDING_PX}px;color:{theme.slate};'
         f'font-family:{theme.fonts.mono};font-size:{DETAIL_FONT_SIZE_PX}px">'
         f"{esc(row.right)}</td></tr></table>"
@@ -489,13 +498,17 @@ def _add_table_rows(root: ET.Element, node: Node, theme: Theme) -> None:
             "fontFamily": theme.fonts.sans,
         }
     )
+    key_width = key_room(node.sections, rules)
     y = _table_header_height(node, theme)
     for section_index, section in enumerate(node.sections):
         if section_index:
             y += rules.table_section_gap
         for row_index, row in enumerate(section):
             cell = add_vertex(
-                root, f"row-{node.id}-{section_index}-{row_index}", _row_value(row, theme), style
+                root,
+                f"row-{node.id}-{section_index}-{row_index}",
+                _row_value(row, key_width, theme),
+                style,
             )
             cell.set("parent", f"node-{node.id}")
             add_geometry(cell, (0, y, node.width, rules.table_row_height))

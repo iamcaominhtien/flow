@@ -212,7 +212,8 @@ def _fit_table(
     )
     rows = sum(len(section) for section in sections)
     gaps = max(len(sections) - 1, 0) * rules.table_section_gap
-    height = header_height + rows * rules.table_row_height + gaps + rules.table_bottom_pad
+    bottom = rules.table_bottom_pad if rows else 0
+    height = header_height + rows * rules.table_row_height + gaps + bottom
     return FittedNode(
         width=min(width, rules.max_node_width + rules.table_extra_width),
         height=height,

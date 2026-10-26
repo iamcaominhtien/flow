@@ -1,5 +1,6 @@
 """Tests for ER tables: key chips, nullable types and the illustrated header."""
 
+import json
 import sys
 from pathlib import Path
 
@@ -7,9 +8,11 @@ PLUGIN_DIR = Path(__file__).resolve().parent.parent / "plugins" / "flow"
 
 sys.path.insert(0, str(PLUGIN_DIR))
 
-from flowlib import render_drawio, render_html  # noqa: E402
+import pytest  # noqa: E402
+from flowlib import er_split, render_drawio, render_html  # noqa: E402
+from flowlib import scene as scene_io  # noqa: E402
 from flowlib.diagrams import er  # noqa: E402
-from flowlib.model import Role  # noqa: E402
+from flowlib.model import Head, Role  # noqa: E402
 from flowlib.theme import load_theme  # noqa: E402
 
 SPEC = {
@@ -125,3 +128,90 @@ def test_a_table_that_points_at_itself_gets_a_loop_beside_it() -> None:
     assert len(points) == 4
     assert points[0][0] == points[-1][0] == orders.x + orders.width
     assert scene.edges[0].label.at[0] > points[1][0]
+
+
+DOMAIN_SPEC = {
+    "type": "er",
+    "title": "Shop",
+    "desc": "Two domains.",
+    "tables": [
+        {
+            "id": "customers",
+            "name": "Customer",
+            "domain": "People",
+            "tone": "blue",
+            "columns": [{"name": "id", "type": "uuid", "flags": ["pk"]}],
+        },
+        {
+            "id": "orders",
+            "name": "Order",
+            "domain": "Sales",
+            "tone": "violet",
+            "columns": [
+                {"name": "id", "type": "uuid", "flags": ["pk"]},
+                {"name": "customer_id", "type": "uuid", "flags": ["fk"]},
+                {"name": "note", "type": "text", "flags": ["null"]},
+            ],
+        },
+    ],
+    "relations": [
+        {"from": "customers", "to": "orders", "label": "places", "to_column": "customer_id"}
+    ],
+}
+
+
+def test_domain_frames_surround_the_tables_of_each_domain() -> None:
+    """With domain_frames a dashed area with the domain name goes around its tables."""
+    scene = er.layout_raw({**DOMAIN_SPEC, "domain_frames": True})
+    frames = {frame.label: frame for frame in scene.frames}
+    nodes = {node.id: node for node in scene.nodes}
+    assert set(frames) == {"People", "Sales"}
+    sales, order = frames["Sales"], nodes["orders"]
+    assert sales.x < order.x and order.x + order.width < sales.x + sales.width
+    assert sales.y < order.y and order.y + order.height < sales.y + sales.height
+
+
+def test_a_subtype_relation_marks_the_parent_with_a_hollow_triangle() -> None:
+    """The triangle is at the parent end (from) and the child end has no mark."""
+    scene = _scene_with([{"from": "customers", "to": "orders", "style": "subtype"}])
+    assert scene.edges[0].tail is Head.TRIANGLE
+    assert scene.edges[0].head is Head.NONE
+    assert not scene.edges[0].dashed
+
+
+def test_a_split_gives_an_overview_and_a_page_per_domain() -> None:
+    """The overview has a box per domain; a page has grey dashed copies of foreign tables."""
+    pages = er_split.split_by_domain(DOMAIN_SPEC)
+    assert list(pages) == ["overview", "people", "sales"]
+    overview = pages["overview"]
+    assert [table["name"] for table in overview["tables"]] == ["People", "Sales"]
+    assert overview["relations"][0]["label"] == "customer_id"
+    sales = {table["id"]: table for table in pages["sales"]["tables"]}
+    copy = sales["customers"]
+    assert copy["see"] == "See People page"
+    assert [column["name"] for column in copy["columns"]] == ["id"]
+    assert copy["tone"] == "gray"
+    assert "see" not in sales["orders"]
+
+
+def test_a_split_page_draws_the_copy_with_a_dashed_outline_and_a_tag() -> None:
+    """The copy is a dashed node whose caption names the page it belongs to."""
+    scene = er.layout_raw(er_split.split_by_domain(DOMAIN_SPEC)["sales"])
+    copy = next(node for node in scene.nodes if node.id == "customers")
+    assert copy.dashed
+    assert copy.caption == "See People page"
+
+
+def test_a_split_needs_a_domain_on_every_table() -> None:
+    """A table with no domain is reported by name."""
+    spec = {**DOMAIN_SPEC, "tables": [DOMAIN_SPEC["tables"][0], {"id": "x", "columns": []}]}
+    with pytest.raises(er_split.SplitError, match="x"):
+        er_split.split_by_domain(spec)
+
+
+def test_chips_survive_a_round_trip_through_scene_json() -> None:
+    """Writing a scene and reading it back keeps the key chips of every row."""
+    scene = er.layout_raw(SPEC)
+    again = scene_io.parse(json.loads(scene_io.dumps(scene, 1)))
+    orders = next(node for node in again.nodes if node.id == "orders")
+    assert orders.sections[0][1].flags == ("FK", "UQ")

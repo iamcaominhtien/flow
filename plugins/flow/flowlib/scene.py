@@ -45,8 +45,8 @@ SCENE_KEYS = {"size", "title", "desc", "frames", "nodes", "edges"}
 FRAME_KEYS = {"id", "x", "y", "width", "height", "label", "tone", "variant", "guard", "dividers"}
 DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
-NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections", "card"}
-ROW_KEYS = {"left", "right"}
+NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections", "card", "dashed"}
+ROW_KEYS = {"left", "right", "flags"}
 EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label", "extras"}
 LABEL_KEYS = {"text", "at", "kind", "number"}
 MIN_ROUTE_POINTS = 2
@@ -148,6 +148,14 @@ def _dump_frame(frame: Frame) -> dict[str, Any]:
     return written
 
 
+def _dump_row(row: Row) -> dict[str, Any]:
+    """Write one table row in the JSON format; the chips are left out when there are none."""
+    written: dict[str, Any] = {"left": row.left, "right": row.right}
+    if row.flags:
+        written["flags"] = list(row.flags)
+    return written
+
+
 def _dump_node(node: Node) -> dict[str, Any]:
     """Write one node in the JSON format, leaving out the fields it does not use."""
     written: dict[str, Any] = {
@@ -160,22 +168,17 @@ def _dump_node(node: Node) -> dict[str, Any]:
         "text": list(node.text),
         "font_size": node.font_size,
     }
-    if node.icon:
-        written["icon"] = node.icon
-    if node.tone:
-        written["tone"] = node.tone.value
-    if node.number:
-        written["number"] = node.number
-    if node.detail:
-        written["detail"] = list(node.detail)
-    if node.caption:
-        written["caption"] = node.caption
-    if node.card:
-        written["card"] = True
-    if node.sections:
-        written["sections"] = [
-            [{"left": row.left, "right": row.right} for row in section] for section in node.sections
-        ]
+    optional = {
+        "icon": node.icon,
+        "tone": node.tone.value if node.tone else None,
+        "number": node.number,
+        "detail": list(node.detail),
+        "caption": node.caption,
+        "card": node.card,
+        "dashed": node.dashed,
+        "sections": [[_dump_row(row) for row in section] for section in node.sections],
+    }
+    written.update({key: value for key, value in optional.items() if value})
     return written
 
 
@@ -343,6 +346,7 @@ class _SceneParser:
             caption=read.text(raw, "caption", where),
             sections=self._sections(raw.get("sections", []), where),
             card=raw.get("card") is True,
+            dashed=raw.get("dashed") is True,
         )
 
     def _sections(self, raw: object, where: str) -> tuple[tuple[Row, ...], ...]:
@@ -363,6 +367,7 @@ class _SceneParser:
                     Row(
                         left=self._read.text(item, "left", place) or "",
                         right=self._read.text(item, "right", place) or "",
+                        flags=tuple(f for f in item.get("flags", []) if isinstance(f, str)),
                     )
                 )
             sections.append(tuple(rows))

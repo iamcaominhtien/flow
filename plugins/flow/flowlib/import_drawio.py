@@ -66,6 +66,7 @@ TAG = re.compile(r"<[^>]+>")
 CHIP_SPAN = re.compile(r'<span style="background:[^"]*">([A-Z]{2})</span>')  # a key chip in a row
 TABLE_CELL = re.compile(r"<td[^>]*>(.*?)</td>", re.IGNORECASE | re.DOTALL)
 ROW_COLUMNS = 2
+KEYED_ROW_COLUMNS = 3  # a row of a table that has a key column starts with the chips
 
 
 @dataclass(frozen=True)
@@ -284,13 +285,16 @@ def _edge(cell: ET.Element, nodes: dict[str, Node], offset: Point) -> Edge | Non
 def _table_rows(cells: list[ET.Element]) -> tuple[Row, ...]:
     """Read the rows of a table node from its child cells.
 
-    A row holds key chips and a name on the left and a note on the right.
+    A row is a one-line table of two or three cells: the key chips (when the table has a key
+    column), the name, and the type on the right.
     """
     rows = []
     for cell in cells:
         value = cell.get("value", "")
         flags = tuple(CHIP_SPAN.findall(value))
         columns = [plain_lines(CHIP_SPAN.sub("", match)) for match in TABLE_CELL.findall(value)]
+        if len(columns) == KEYED_ROW_COLUMNS:
+            columns = columns[1:]
         if len(columns) == ROW_COLUMNS:
             rows.append(Row(" ".join(columns[0]).strip(), " ".join(columns[1]), flags))
         else:

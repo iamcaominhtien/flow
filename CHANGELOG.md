@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.5 (2026-10-26)
+
+The three ER features of the design that were missing, and two fixes found on the way.
+
+- **Split by domain:** `flow.py split spec.json` writes an overview (a box per domain, a line per foreign key that crosses a border, named after the column) and a page per domain, in which a table of another domain appears once as a grey dashed copy with its key and a tag ("See Orders page").
+- **Domain frames:** `"domain_frames": true` draws a dashed tinted frame with a name pill around the tables of each `domain`.
+- **Subtype:** a relation with `"style": "subtype"` draws a hollow triangle at the parent.
+- **Fix:** `scene.json` kept no key chips, so a scene written and read back lost them; it now keeps them.
+- **Fix:** in the `.drawio` file the names of rows with and without chips start at the same x, as in the HTML.
+- A table can be `dashed` (a reference drawn elsewhere); examples `delivery-er-domains.spec.json`.
+
 ## 0.1.4 (2026-10-26)
 
 Checked the ER output against every rule of `docs/design/05-er.md`.
