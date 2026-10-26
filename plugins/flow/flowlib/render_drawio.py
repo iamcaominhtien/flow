@@ -10,6 +10,7 @@ import base64
 import xml.etree.ElementTree as ET
 from collections.abc import Callable
 
+from .cards import card_parts
 from .drawio_common import (
     FONT_BOLD,
     FRAME_LABEL_PREFIX,
@@ -23,7 +24,7 @@ from .drawio_common import (
 from .drawio_lines import add_divider, add_edge
 from .drawio_screen import add_node_chip, add_screen_parts, screen_style
 from .markup import esc, fmt
-from .model import KEY_FLAG_TONES, Frame, FrameVariant, Node, Row, Scene, Shape, Tone
+from .model import KEY_FLAG_TONES, REF_FRAGMENT, Frame, FrameVariant, Node, Row, Scene, Shape, Tone
 from .shapes import SUBPROCESS_BAR_INSET_PX
 from .sizing import estimate_text_width, key_room
 from .text_area import ICON_TEXT_RESERVE_PX
@@ -252,6 +253,7 @@ SHAPE_STYLES: dict[Shape, Callable[[Node], dict[str, object]]] = {
     Shape.CONNECTOR: _circle_style,
     Shape.BAR: _bar_style,
     Shape.FORK: _fork_style,
+    Shape.HEADER: _box_style,
     Shape.NOTE: _note_style,
     Shape.TEXT: _text_style,
     Shape.CROSS: _cross_style,
@@ -439,13 +441,14 @@ def _add_card_disc(root: ET.Element, node: Node, theme: Theme) -> None:
     disc_style = style_string({"ellipse": "", "strokeColor": "none", "fillColor": tone.pill})
     disc = add_vertex(root, f"disc-{node.id}", "", disc_style)
     disc.set("parent", parent)
-    add_geometry(disc, (disc_left, rules.card_padding, rules.card_disc, rules.card_disc))
+    top = card_parts(node, theme).icon_top
+    add_geometry(disc, (disc_left, top, rules.card_disc, rules.card_disc))
     size = rules.card_disc * rules.card_icon_fraction
     inset = (rules.card_disc - size) / 2
     image = _icon_data_uri(node.icon or "", tone.stroke, size)
     icon = add_vertex(root, f"icon-{node.id}", "", style_string({"shape": "image", "image": image}))
     icon.set("parent", parent)
-    add_geometry(icon, (disc_left + inset, rules.card_padding + inset, size, size))
+    add_geometry(icon, (disc_left + inset, top + inset, size, size))
 
 
 def _add_detailed_icon(root: ET.Element, node: Node, theme: Theme) -> None:
@@ -456,7 +459,8 @@ def _add_detailed_icon(root: ET.Element, node: Node, theme: Theme) -> None:
     icon = add_vertex(root, f"icon-{node.id}", "", style_string({"shape": "image", "image": image}))
     icon.set("parent", f"node-{node.id}")
     left = (node.width - rules.card_disc) / 2
-    add_geometry(icon, (left, rules.card_padding, rules.card_disc, rules.card_disc))
+    top = card_parts(node, theme).icon_top
+    add_geometry(icon, (left, top, rules.card_disc, rules.card_disc))
 
 
 def _add_card_parts(root: ET.Element, node: Node, theme: Theme) -> None:
@@ -487,8 +491,10 @@ def _add_card_parts(root: ET.Element, node: Node, theme: Theme) -> None:
     )
     pill = add_vertex(root, f"pill-{node.id}", esc(" ".join(node.text)), pill_style)
     pill.set("parent", parent)
-    top = rules.card_padding + rules.card_disc + rules.card_gap
-    add_geometry(pill, ((node.width - pill_width) / 2, top, pill_width, rules.card_pill_height))
+    parts = card_parts(node, theme)
+    add_geometry(
+        pill, ((node.width - pill_width) / 2, parts.pill_top, pill_width, parts.pill_height)
+    )
 
 
 def _chip_value(flag: str, theme: Theme) -> str:
@@ -744,7 +750,7 @@ def _add_fragment(root: ET.Element, frame: Frame, theme: Theme) -> None:
             "pointerEvents": 0,
             "width": FRAGMENT_TAG_WIDTH_PX,
             "height": FRAGMENT_TAG_HEIGHT_PX,
-            "fillColor": tone.box,
+            "fillColor": tone.lane,
             "strokeColor": tone.stroke,
             "fontColor": theme.ink,
             "fontStyle": FONT_BOLD,
@@ -760,7 +766,9 @@ def _add_fragment(root: ET.Element, frame: Frame, theme: Theme) -> None:
         guard_cell = add_vertex(root, cell_id, esc(f"[{text}]"), _guard_style(theme))
         add_geometry(guard_cell, bounds)
 
-    if frame.guard:
+    if frame.guard and frame.label == REF_FRAGMENT:
+        _add_ref_name(root, frame, theme)
+    elif frame.guard:
         left = frame.x + FRAGMENT_TAG_WIDTH_PX + FRAGMENT_GUARD_GAP_PX
         width = frame.width - FRAGMENT_TAG_WIDTH_PX
         put_guard(f"guard-{frame.id}", frame.guard, (left, frame.y, width, FRAGMENT_TAG_HEIGHT_PX))
@@ -769,7 +777,28 @@ def _add_fragment(root: ET.Element, frame: Frame, theme: Theme) -> None:
         add_divider(root, f"divider-{frame.id}-{index}", ends, tone.stroke)
         left = frame.x + FRAGMENT_GUARD_GAP_PX
         bounds = (left, divider.y, frame.width, FRAGMENT_TAG_HEIGHT_PX)
-        put_guard(f"divider-guard-{frame.id}-{index}", divider.guard, bounds)
+        if divider.guard:
+            put_guard(f"divider-guard-{frame.id}-{index}", divider.guard, bounds)
+
+
+def _add_ref_name(root: ET.Element, frame: Frame, theme: Theme) -> None:
+    """Add the name of the diagram a ``ref`` frame points to, centred in the frame."""
+    style = style_string(
+        {
+            "text": "",
+            "html": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "strokeColor": "none",
+            "fillColor": "none",
+            "fontStyle": FONT_BOLD,
+            "fontSize": fmt(theme.type_scale.node.size),
+            "fontColor": theme.ink,
+            "fontFamily": theme.fonts.sans,
+        }
+    )
+    cell = add_vertex(root, f"ref-name-{frame.id}", esc(frame.guard or ""), style)
+    add_geometry(cell, (frame.x, frame.y, frame.width, frame.height))
 
 
 def _add_title(root: ET.Element, scene: Scene, theme: Theme) -> None:

@@ -43,7 +43,7 @@ def test_example_has_no_errors(path: Path) -> None:
 def test_each_participant_has_a_lifeline_below_its_box() -> None:
     """A lifeline starts at the bottom of its participant's box and runs down."""
     scene = laid_out(SIGNIN)
-    boxes = {node.id: node for node in scene.nodes if node.shape is Shape.PROCESS}
+    boxes = {node.id: node for node in scene.nodes if node.shape is Shape.HEADER}
     lifelines = {edge.id: edge for edge in scene.edges if edge.role is Role.LIFELINE}
     assert set(lifelines) == {f"life-{name}" for name in boxes}
     for name, box in boxes.items():
@@ -87,7 +87,7 @@ def test_message_kinds_choose_the_line() -> None:
 def test_a_created_participant_starts_at_its_create_message() -> None:
     """The box of a created participant sits lower than the boxes of the others."""
     scene = laid_out(PAYMENT)
-    tops = {node.id: node.y for node in scene.nodes if node.shape is Shape.PROCESS}
+    tops = {node.id: node.y for node in scene.nodes if node.shape is Shape.HEADER}
     assert tops["worker"] > tops["app"]
 
 

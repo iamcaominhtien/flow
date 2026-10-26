@@ -45,7 +45,11 @@
     },
     "bar": {
       "fill": "#DCEEFB",
-      "stroke": "#334155"
+      "stroke": "#0F172A"
+    },
+    "header": {
+      "fill": "#FFFFFF",
+      "stroke": "#0F172A"
     },
     "fork": {
       "fill": "#0F172A",
@@ -376,6 +380,10 @@
         120,
         8
       ],
+      "header": [
+        136,
+        44
+      ],
       "note": [
         160,
         48
@@ -451,21 +459,21 @@
     "lane_size_card": 240
   },
   "sequence": {
-    "participant_width": 135,
+    "participant_width": 136,
     "participant_height": 44,
-    "pitch": 270,
-    "min_gap_between_boxes": 60,
-    "first_message_gap": 44,
+    "pitch": 230,
+    "min_gap_between_boxes": 58,
+    "first_message_gap": 58,
     "row_height": 52,
     "self_row_extra": 22,
     "label_rise": 14,
     "bar_width": 12,
     "bar_overshoot": 6,
     "bar_step": 6,
-    "fragment_enter": 20,
-    "fragment_exit": 16,
-    "fragment_pad_x": 64,
-    "fragment_inset_x": 14,
+    "fragment_enter": 38,
+    "fragment_exit": 23,
+    "fragment_pad_x": 70,
+    "fragment_inset_x": 10,
     "divider_gap": 28,
     "max_fragment_depth": 2,
     "note_width": 160,
@@ -477,7 +485,15 @@
     "self_height": 24,
     "destroy_size": 24,
     "tail_gap": 40,
-    "bottom_gap": 48
+    "bottom_gap": 48,
+    "fragment_rise": 18,
+    "fragment_below_line": 41,
+    "header_card_width": 172,
+    "header_card_height": 116,
+    "header_pill_height": 24,
+    "header_pill_margin": 10,
+    "header_icon_top": 12,
+    "header_icon_size": 64
   },
   "paper": "#FFFFFF",
   "on_accent": "#FFFFFF",
@@ -618,6 +634,10 @@
         },
         "fork": {
           "fill": "#E2E8F0",
+          "stroke": "#E2E8F0"
+        },
+        "header": {
+          "fill": "#12263F",
           "stroke": "#E2E8F0"
         },
         "decision": {

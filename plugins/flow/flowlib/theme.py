@@ -194,6 +194,14 @@ class SequenceRules:
     destroy_size: float
     tail_gap: float
     bottom_gap: float
+    fragment_rise: float
+    fragment_below_line: float
+    header_card_width: float
+    header_card_height: float
+    header_pill_height: float
+    header_pill_margin: float
+    header_icon_top: float
+    header_icon_size: float
 
 
 @dataclass(frozen=True)

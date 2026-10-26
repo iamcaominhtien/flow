@@ -27,9 +27,9 @@ from ..reader import Reader, SpecError, suggestion
 from ..theme import icon_names, load_theme
 
 SEQUENCE = "sequence"
-SPEC_KEYS = {"type", "title", "desc", "participants", "items"}
+SPEC_KEYS = {"type", "title", "desc", "participants", "items", "style"}
 PARTICIPANT_KEYS = {"id", "label", "icon", "tone"}
-MESSAGE_KEYS = {"kind", "from", "to", "label", "role", "number"}
+MESSAGE_KEYS = {"kind", "from", "to", "label", "role", "number", "icon"}
 NOTE_KEYS = {"note", "over", "side"}
 DESTROY_KEYS = {"destroy"}
 FRAGMENT_KEYS = {"fragment", "sections"}
@@ -90,6 +90,7 @@ class Message:
     label: str
     role: MessageRole
     number: str | None
+    icon: str | None = None  # a flat 14 px icon left of the label, for the payload
 
 
 @dataclass(frozen=True)
@@ -135,6 +136,7 @@ class SequenceSpec:
     description: str | None
     participants: tuple[Participant, ...]
     items: tuple[Item, ...]
+    illustrated: bool = False  # headers are tinted cards with a large icon and a name pill
 
 
 def load(path: str | Path) -> SequenceSpec:
@@ -202,6 +204,7 @@ class _Parser:
             read.report("spec", "'participants' must list at least one participant")
         items = self._items(raw.get("items", []), "items", depth=0)
         title, description = read.text(raw, "title", "spec"), read.text(raw, "desc", "spec")
+        illustrated = read.illustrated(raw, "spec")
         if read.problems:
             raise SpecError(read.problems)
         return SequenceSpec(
@@ -209,6 +212,7 @@ class _Parser:
             description=description,
             participants=tuple(each for each in participants if each is not None),
             items=tuple(items),
+            illustrated=illustrated,
         )
 
     def _participant(self, raw: object, where: str) -> Participant | None:
@@ -288,7 +292,17 @@ class _Parser:
             label=read.text(raw, "label", where) or "",
             role=read.enum(MessageRole, raw, "role", where) or MessageRole.NEXT,
             number=read.text(raw, "number", where),
+            icon=self._icon(raw, where),
         )
+
+    def _icon(self, raw: dict[str, Any], where: str) -> str | None:
+        """Read the optional icon of a message, which must be a known icon name."""
+        icon = raw.get("icon")
+        if icon is not None and icon not in self._icon_names:
+            self._read.report(
+                where, f"unknown icon '{icon}'; use one of: {', '.join(self._icon_names)}"
+            )
+        return icon
 
     def _note(self, raw: dict[str, Any], where: str) -> Note:
         """Build one note."""

@@ -305,6 +305,7 @@ DRAWERS: dict[Shape, Drawer] = {
     Shape.CONNECTOR: _circle,
     Shape.BAR: _bar,
     Shape.FORK: _fork,
+    Shape.HEADER: _rounded_box,
     Shape.NOTE: _note,
     Shape.TEXT: _text,
     Shape.CROSS: _cross,

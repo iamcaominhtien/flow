@@ -7,6 +7,7 @@ from .html_nodes import node_html
 from .markup import esc, fmt, px, tag
 from .model import (
     MONO_LABEL_KINDS,
+    REF_FRAGMENT,
     Divider,
     EdgeLabel,
     Frame,
@@ -191,7 +192,7 @@ def _fragment_html(frame: Frame, theme: Theme) -> str:
         "width": px(frame.width),
         "height": px(frame.height),
         "box-sizing": "border-box",
-        "background": tone.box,
+        "background": tone.lane,
         "border": f"{px(FRAME_BORDER_PX)} solid {tone.stroke}",
         "border-radius": px(min(FRAGMENT_RADIUS_PX, theme.style.frame_radius)),
     }
@@ -221,12 +222,33 @@ def _fragment_html(frame: Frame, theme: Theme) -> str:
         "gap": px(FRAGMENT_GAP_PX),
     }
     inner = tag("div", tab, esc(frame.label or ""))
-    if frame.guard:
+    is_ref = frame.label == REF_FRAGMENT
+    if frame.guard and not is_ref:
         inner += tag("div", guard, esc(f"[{frame.guard}]"))
     html += tag("div", head, inner)
+    if frame.guard and is_ref:
+        html += _ref_name_html(frame, theme)
     for divider in frame.dividers:
         html += _divider_html(frame, divider, theme)
     return html
+
+
+def _ref_name_html(frame: Frame, theme: Theme) -> str:
+    """Draw the name of the diagram a ``ref`` frame points to, centred in the frame."""
+    style = {
+        **ABSOLUTE,
+        "left": px(frame.x),
+        "top": px(frame.y),
+        "width": px(frame.width),
+        "height": px(frame.height),
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "font-size": px(theme.type_scale.node.size),
+        "font-weight": "700",
+        "color": theme.ink,
+    }
+    return tag("div", style, esc(frame.guard or ""))
 
 
 def _divider_html(frame: Frame, divider: Divider, theme: Theme) -> str:
@@ -245,6 +267,8 @@ def _divider_html(frame: Frame, divider: Divider, theme: Theme) -> str:
         "font": _mono_font(theme),
         "color": theme.slate,
     }
+    if not divider.guard:
+        return tag("div", line)
     return tag("div", line) + tag("div", text, esc(f"[{divider.guard}]"))
 
 
