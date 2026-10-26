@@ -49,6 +49,7 @@ class Role(StrEnum):
     MAIN = "main"
     DATA = "data"
     LIFELINE = "lifeline"
+    LOGICAL = "logical"
 
 
 class LabelKind(StrEnum):

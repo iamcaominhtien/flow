@@ -16,12 +16,14 @@ stored as two relations and a junction table.
 
 from dataclasses import replace
 from enum import StrEnum
+from itertools import pairwise
 from typing import Any
 
-from ..model import Direction, Head, Role, Row, Scene, Shape, Tone
+from ..canvas import fit_canvas
+from ..model import Direction, Edge, EdgeLabel, Head, Node, Point, Role, Row, Scene, Shape, Tone
 from ..reader import Reader, SpecError, suggestion
 from ..spec import Spec, SpecEdge, SpecNode, check_explicit_cells
-from ..theme import icon_names, load_theme
+from ..theme import LayoutRules, icon_names, load_theme
 from . import flowchart
 
 ER = "er"
@@ -32,7 +34,11 @@ RELATION_KEYS = {
     "from", "to", "from_column", "to_column", "from_end", "to_end", "label", "style", "main",
 }  # fmt: skip
 AT_LENGTH = 2
-TABLE_GAP_PX = 150  # room for two cardinality marks and a label between two tables
+TABLE_GAP_PX = 160  # room for two cardinality marks and a label between two tables
+ROW_INSET_PX = 1  # the header border, between the header and the first row
+MIN_STRAIGHT_POINTS = 2
+SELF_LOOP_LABEL_GAP_PX = 6  # between a self reference and its label
+SELF_LOOP_PX = 48  # how far a self reference sticks out of its table
 NULLABLE_MARK = "?"
 TABLE_ICON = "table"  # the icon of an illustrated table that names none
 
@@ -124,6 +130,13 @@ def _table(raw: object, where: str, read: Reader, icons: set[str]) -> SpecNode |
     )
 
 
+def _relation_role(is_main: bool, style: RelationStyle) -> Role:
+    """Pick the line role: the animated main path, a dashed slate logical link, or a plain line."""
+    if is_main:
+        return Role.MAIN
+    return Role.LOGICAL if style is RelationStyle.LOGICAL else Role.NEXT
+
+
 def _relation(
     raw: object, where: str, read: Reader, tables: dict[str, SpecNode]
 ) -> SpecEdge | None:
@@ -152,7 +165,7 @@ def _relation(
     return SpecEdge(
         source=ends[0],
         target=ends[1],
-        role=Role.MAIN if raw.get("main") is True else Role.NEXT,
+        role=_relation_role(raw.get("main") is True, style),
         label=read.text(raw, "label", where),
         head=HEAD_OF_CARDINALITY[end],
         tail=HEAD_OF_CARDINALITY[start],
@@ -211,6 +224,89 @@ def to_spec(raw: object) -> Spec:
     )
 
 
+def _row_y(node: Node, column: str | None, rules: LayoutRules) -> float | None:
+    """Return the y of the middle of a column's row in a table, or None for an unknown column."""
+    header = rules.table_card_header_height if node.card else rules.table_header_height
+    for index, row in enumerate(node.sections[0] if node.sections else ()):
+        if row.left == column:
+            return node.y + header + ROW_INSET_PX + (index + 0.5) * rules.table_row_height
+    return None
+
+
+def _move_end(points: tuple[Point, ...], y: float, is_start: bool) -> tuple[Point, ...]:
+    """Move one end of a line to height ``y`` when the line meets a side of its table.
+
+    The points that run level with that end move with it, so the segment stays horizontal and the
+    first vertical segment of the route is simply longer or shorter. A line that is one level
+    run from end to end gets a jog in the middle.
+    """
+    ends = list(points if is_start else reversed(points))
+    level = ends[0][1]
+    run = 0
+    while run < len(ends) and ends[run][1] == level:
+        run += 1
+    if run < MIN_STRAIGHT_POINTS or ends[0][0] == ends[1][0]:
+        return points
+    if run == len(ends):
+        middle = (ends[0][0] + ends[-1][0]) / 2
+        ends = [(ends[0][0], y), (middle, y), (middle, level), ends[-1]]
+    else:
+        ends[:run] = [(x, y) for x, _ in ends[:run]]
+    return tuple(ends if is_start else reversed(ends))
+
+
+def _attach_to_rows(scene: Scene, raw: object) -> Scene:
+    """Make each line leave and enter a table at the row of the column it joins.
+
+    The design draws a relation from the row of its foreign key. A line that meets the top or
+    the bottom of a table is left as it is.
+    """
+    rules = load_theme().layout
+    nodes = {node.id: node for node in scene.nodes}
+    relations = raw.get("relations", []) if isinstance(raw, dict) else []
+    edges = []
+    for edge, relation in zip(scene.edges, relations, strict=True):
+        if edge.source == edge.target:
+            edges.append(_self_loop(edge, nodes[edge.source], relation, rules))
+            continue
+        points = edge.points
+        for key, is_start in (("from_column", True), ("to_column", False)):
+            node = nodes[edge.source if is_start else edge.target]
+            row_y = _row_y(node, relation.get(key), rules)
+            if row_y is not None:
+                points = _move_end(points, row_y, is_start)
+        edges.append(replace(edge, points=points, label=_relabelled(edge.label, points)))
+    return fit_canvas(replace(scene, edges=tuple(edges)))
+
+
+def _self_loop(edge: Edge, node: Node, relation: dict[str, Any], rules: LayoutRules) -> Edge:
+    """Draw a table that points at itself as a loop at its right side.
+
+    The loop leaves at the row of ``from_column`` and comes back at the row of ``to_column``;
+    without them it uses a third and two thirds of the table's height.
+    """
+    right = node.x + node.width
+    first = _row_y(node, relation.get("from_column"), rules) or node.y + node.height / 3
+    second = _row_y(node, relation.get("to_column"), rules) or node.y + 2 * node.height / 3
+    out = right + SELF_LOOP_PX
+    points = ((right, first), (out, first), (out, second), (right, second))
+    label = None
+    if edge.label:
+        chip = len(edge.label.text) * rules.chip_char_width_em * rules.chip_font_size
+        beside = out + SELF_LOOP_LABEL_GAP_PX + (chip + rules.chip_padding_x) / 2
+        label = replace(edge.label, at=(beside, (first + second) / 2))
+    return replace(edge, points=points, label=label)
+
+
+def _relabelled(label: EdgeLabel | None, points: tuple[Point, ...]) -> EdgeLabel | None:
+    """Put a label back on the middle of the longest segment of a line that was changed."""
+    if label is None:
+        return None
+    segments = list(pairwise(points))
+    start, end = max(segments, key=lambda s: abs(s[1][0] - s[0][0]) + abs(s[1][1] - s[0][1]))
+    return replace(label, at=((start[0] + end[0]) / 2, (start[1] + end[1]) / 2))
+
+
 def layout_raw(raw: object) -> Scene:
     """Lay out an ER diagram from a parsed JSON spec.
 
@@ -231,4 +327,5 @@ def layout_raw(raw: object) -> Scene:
         gap_horizontal=TABLE_GAP_PX,
         gap_horizontal_labelled=TABLE_GAP_PX,
     )
-    return flowchart.layout(to_spec(raw), wide)
+    scene = flowchart.layout(to_spec(raw), wide)
+    return _attach_to_rows(scene, raw)

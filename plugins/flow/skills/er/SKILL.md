@@ -41,11 +41,18 @@ You write a short **spec**: the tables, their columns and the relations. A scrip
 - **Relation**: `from`, `to`, optional `label`. `from_end` and `to_end` set the mark at each end: `one`, `zero_one`, `one_many`, `zero_many`. The default is `one` at `from` and `zero_many` at `to`. `style` is `solid` (a foreign key) or `logical` (dashed, no real key). `main: true` highlights and animates the relation to follow first. Mark one or two, not all.
 - Optional `from_column` and `to_column` name the columns the relation joins; they are not drawn yet.
 
-## Style and layout
+## Style and layout (from the design)
 
-- Add `"style": "illustrated"` at the top level for the design's illustrated tables: a tall header tinted by `tone`, the name in a pill and a large detailed icon (a table with no `icon` gets the `table` icon). The default is `plain`. Pick the icon by the noun (`user`, `store`, `card`, `cart`, `bike`, `box`...) and give each domain its own `tone`, as in the design.
-- Put each table in a grid cell with `at` for anything bigger than four tables: put the table most others point to in the middle, its neighbours around it, and keep the lines short and straight. The automatic placement is fine for a small chain, but a table with many relations gets crowded lines and label problems.
-- The gap between tables is wide on purpose (150 px), so that two cardinality marks and a label fit on a line.
+- **Style:** `"style": "illustrated"` at the top level gives tables with a 64 px header (a name pill and a large detailed icon); the default `plain` has a 40 px header with a small flat icon. Rows, keys, lines and marks are the same in both. A table with no `icon` gets the `table` icon when illustrated.
+- **Names:** a table name is a singular noun in PascalCase (`Order`, `OrderItem`); a column name is snake_case, and a foreign key is the name of what it points to plus `_id` (`customer_id`). Order the columns: primary key, foreign keys, then the rest. Show the keys and the columns that explain the relations, not the whole schema.
+- **Types:** generic names (`uuid`, `text`, `int`, `decimal`, `bool`, `timestamp`); a dialect is fine if the author uses it. `null` in `flags` adds a `?`.
+- **Tone by domain** (it groups, it never means anything alone): customer or user `blue`, order or document `violet`, payment or money `amber`, restaurant or catalogue `green`, courier or delivery `teal`, junction or lookup `gray`.
+- **Many to many** is never one line: add a junction table with two foreign keys that together are its primary key (`flags: ["pk", "fk"]` on both columns), and two relations from the outer tables (`one` to `zero_many`). The junction is `gray` unless it carries data of its own (a quantity, a grade); then it gets a domain tint and a real name (`OrderItem`).
+- **Relations:** name the columns with `from_column` and `to_column` (the foreign key on the "many" side), so the line leaves and enters level with those rows, as in the design. `style: "logical"` is a dashed slate link with no constraint (for example to another service); a solid line is an enforced foreign key. One relation may have `main: true`: it is the animated blue path a typical read follows (one per diagram). A verb names each link, in the active voice, read from the "one" side (`places`, `contains`). A table that points at itself (a manager, a parent) is a relation from the table to itself; it is drawn as a loop at the right side.
+- **Placement:** for more than four tables give every table a grid cell, `at: [row, column]`: parents above or to the left of their children, the table the story is about in the middle, the most connected table where it touches the most neighbours, lines short. Columns are 240 px wide with 160 px between them.
+- **Size:** about ten tables fit on a page. Past that, split the schema by domain, one diagram per domain plus an overview, and say so.
+
+Not built (the design has them): the automatic split of a large schema into an overview and domain pages with grey dashed copies of foreign tables, the subtype mark (a hollow triangle on the parent), and the optional dashed domain frame. Draw them by hand with the `author` skill, or say that they are missing.
 
 ## Icons
 
