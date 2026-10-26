@@ -1,3 +1,0 @@
-{"type":"dfd","title":"DFD level 0: order system","desc":"A customer's order flows through processing to the kitchen and the order store.",
- "elements":[{"id":"cust","label":"Customer","kind":"external"},{"id":"proc","label":"Process order"},{"id":"orders","label":"Orders","kind":"store"},{"id":"kitchen","label":"Kitchen","kind":"external"}],
- "flows":[{"from":"cust","to":"proc","label":"order"},{"from":"proc","to":"orders","label":"save"},{"from":"proc","to":"kitchen","label":"ticket"}]}

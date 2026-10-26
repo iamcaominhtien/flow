@@ -1,0 +1,231 @@
+{
+ "type": "bpmn",
+ "title": "BPMN beyond a flowchart: handling a refund request",
+ "desc": "The things BPMN can say and a flowchart cannot: a partner shown only by its name, work done in parallel, a task repeated for each item, deadlines that interrupt or only nudge, and stored data. Numbers point at each.",
+ "zones": [
+  {
+   "id": "customer",
+   "label": "Customer (black-box pool: only the messages it sends and receives are shown)",
+   "tone": "blue",
+   "black_box": true
+  },
+  {
+   "id": "refund",
+   "tone": "gray"
+  },
+  {
+   "id": "system",
+   "label": "System",
+   "tone": "violet",
+   "parent": "refund"
+  },
+  {
+   "id": "agent",
+   "label": "Agent",
+   "tone": "blue",
+   "parent": "refund"
+  },
+  {
+   "id": "manager",
+   "label": "Manager",
+   "tone": "amber",
+   "parent": "refund"
+  }
+ ],
+ "elements": [
+  {
+   "id": "requested",
+   "kind": "start",
+   "trigger": "message",
+   "label": "Refund requested",
+   "zone": "agent"
+  },
+  {
+   "id": "split",
+   "kind": "parallel",
+   "zone": "agent",
+   "number": "2"
+  },
+  {
+   "id": "check_pay",
+   "kind": "service",
+   "label": "Check payment",
+   "zone": "system"
+  },
+  {
+   "id": "check_log",
+   "kind": "service",
+   "label": "Check delivery log",
+   "zone": "system"
+  },
+  {
+   "id": "join",
+   "kind": "parallel",
+   "zone": "agent",
+   "number": "2"
+  },
+  {
+   "id": "over",
+   "kind": "exclusive",
+   "label": "Over $50?",
+   "zone": "agent",
+   "number": "3"
+  },
+  {
+   "id": "items",
+   "kind": "service",
+   "label": "Refund each item",
+   "repeat": "multi",
+   "zone": "agent",
+   "number": "4"
+  },
+  {
+   "id": "confirm",
+   "kind": "send",
+   "label": "Confirm to customer",
+   "zone": "agent"
+  },
+  {
+   "id": "done",
+   "kind": "end",
+   "label": "Done",
+   "zone": "agent"
+  },
+  {
+   "id": "db",
+   "kind": "store",
+   "label": "Payments DB",
+   "zone": "agent",
+   "number": "8"
+  },
+  {
+   "id": "approve",
+   "kind": "user",
+   "label": "Approve refund",
+   "zone": "manager"
+  },
+  {
+   "id": "nudge",
+   "kind": "timer",
+   "attached_to": "approve",
+   "interrupting": false,
+   "number": "5"
+  },
+  {
+   "id": "escalate",
+   "kind": "timer",
+   "attached_to": "approve",
+   "number": "6"
+  },
+  {
+   "id": "remind",
+   "kind": "send",
+   "label": "Remind manager",
+   "zone": "manager"
+  },
+  {
+   "id": "reminded",
+   "kind": "end",
+   "label": "Reminded",
+   "zone": "manager",
+   "column": 4
+  },
+  {
+   "id": "escalated",
+   "kind": "end",
+   "trigger": "error",
+   "label": "Escalated",
+   "zone": "manager"
+  }
+ ],
+ "flows": [
+  {
+   "from": "requested",
+   "to": "split",
+   "main": true
+  },
+  {
+   "from": "split",
+   "to": "check_pay",
+   "main": true
+  },
+  {
+   "from": "split",
+   "to": "check_log",
+   "main": true
+  },
+  {
+   "from": "check_pay",
+   "to": "join",
+   "main": true
+  },
+  {
+   "from": "check_log",
+   "to": "join",
+   "main": true
+  },
+  {
+   "from": "join",
+   "to": "over",
+   "main": true
+  },
+  {
+   "from": "over",
+   "to": "items",
+   "label": "no",
+   "main": true
+  },
+  {
+   "from": "over",
+   "to": "approve",
+   "label": "yes"
+  },
+  {
+   "from": "approve",
+   "to": "items",
+   "label": "approved"
+  },
+  {
+   "from": "items",
+   "to": "confirm",
+   "main": true
+  },
+  {
+   "from": "confirm",
+   "to": "done",
+   "main": true
+  },
+  {
+   "from": "items",
+   "to": "db",
+   "style": "data"
+  },
+  {
+   "from": "nudge",
+   "to": "remind",
+   "label": "after 24 h"
+  },
+  {
+   "from": "remind",
+   "to": "reminded"
+  },
+  {
+   "from": "escalate",
+   "to": "escalated",
+   "label": "after 72 h",
+   "failure": true
+  },
+  {
+   "from": "customer",
+   "to": "requested",
+   "style": "message",
+   "label": "request"
+  },
+  {
+   "from": "confirm",
+   "to": "customer",
+   "style": "message",
+   "label": "refund confirmed"
+  }
+ ]
+}

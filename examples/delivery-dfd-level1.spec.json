@@ -1,0 +1,153 @@
+{
+ "type": "dfd",
+ "title": "Level 1: inside the delivery system",
+ "desc": "The single process of level 0 opened into four. The steps hand work to each other through the Orders store, never directly. The four outside parties are the same as on level 0.",
+ "elements": [
+  {
+   "id": "customer",
+   "label": "Customer",
+   "kind": "external",
+   "tone": "blue",
+   "icon": "user"
+  },
+  {
+   "id": "restaurant",
+   "label": "Restaurant",
+   "kind": "external",
+   "tone": "green",
+   "icon": "store"
+  },
+  {
+   "id": "courier",
+   "label": "Courier",
+   "kind": "external",
+   "tone": "teal",
+   "icon": "courier"
+  },
+  {
+   "id": "payment",
+   "label": "Payment provider",
+   "kind": "external",
+   "tone": "gray",
+   "icon": "card"
+  },
+  {
+   "id": "take",
+   "label": "Take order",
+   "detail": "checks the basket, creates the order",
+   "icon": "cart"
+  },
+  {
+   "id": "pay",
+   "label": "Take payment",
+   "detail": "charges the card",
+   "icon": "money"
+  },
+  {
+   "id": "cook",
+   "label": "Prepare food",
+   "detail": "shows tickets, marks ready",
+   "icon": "pot"
+  },
+  {
+   "id": "deliver",
+   "label": "Deliver order",
+   "detail": "finds a courier, tracks the trip",
+   "icon": "package"
+  },
+  {
+   "id": "orders",
+   "label": "Orders",
+   "kind": "store",
+   "icon": "database"
+  }
+ ],
+ "flows": [
+  {
+   "from": "customer",
+   "to": "take",
+   "label": "Basket, card details",
+   "main": true
+  },
+  {
+   "from": "take",
+   "to": "customer",
+   "label": "Confirmation, tracking"
+  },
+  {
+   "from": "take",
+   "to": "pay",
+   "label": "Amount to pay",
+   "main": true
+  },
+  {
+   "from": "pay",
+   "to": "payment",
+   "label": "Charge request",
+   "main": true
+  },
+  {
+   "from": "payment",
+   "to": "pay",
+   "label": "Payment result"
+  },
+  {
+   "from": "take",
+   "to": "orders",
+   "label": "New order"
+  },
+  {
+   "from": "orders",
+   "to": "take",
+   "label": "Order status",
+   "status": true
+  },
+  {
+   "from": "pay",
+   "to": "orders",
+   "label": "Payment status"
+  },
+  {
+   "from": "orders",
+   "to": "cook",
+   "label": "Paid order"
+  },
+  {
+   "from": "cook",
+   "to": "restaurant",
+   "label": "Order ticket"
+  },
+  {
+   "from": "restaurant",
+   "to": "cook",
+   "label": "Ready signal"
+  },
+  {
+   "from": "cook",
+   "to": "orders",
+   "label": "Cooking status",
+   "status": true
+  },
+  {
+   "from": "orders",
+   "to": "deliver",
+   "label": "Ready order"
+  },
+  {
+   "from": "deliver",
+   "to": "courier",
+   "label": "Delivery job"
+  },
+  {
+   "from": "courier",
+   "to": "deliver",
+   "label": "Job reply, location, proof"
+  },
+  {
+   "from": "deliver",
+   "to": "orders",
+   "label": "Delivery status",
+   "status": true
+  }
+ ]
+}

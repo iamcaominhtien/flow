@@ -15,6 +15,7 @@ from .sizing import LINE_HEIGHT_FACTOR, estimate_text_width
 from .text_area import text_area_width
 from .theme import LayoutRules, load_theme
 
+CAPTION_TEXT_PAD_PX = 8  # a caption rectangle is this much wider than its text
 BORDER_TOLERANCE_PX = 1.0  # a part this close to a frame's border counts as inside or outside
 NODE_CLEARANCE_PX = 4.0  # nodes closer than this count as touching
 LINE_CLEARANCE_PX = 2.0
@@ -61,6 +62,11 @@ class Code(StrEnum):
     START_PLACEMENT = "start-placement"
     END_PLACEMENT = "end-placement"
     SEQUENCE_LABEL_LONG = "sequence-label-long"
+    DFD_PROCESS_COUNT = "dfd-process-count"
+    DFD_STORE_ONE_WAY = "dfd-store-one-way"
+    BPMN_TOO_MANY_ELEMENTS = "bpmn-too-many-elements"
+    BPMN_ROUTE_BENDS = "bpmn-route-bends"
+    BPMN_MAIN_PATH = "bpmn-main-path"
 
 
 @dataclass(frozen=True)
@@ -115,21 +121,31 @@ def label_rect(edge: Edge, rules: LayoutRules) -> Rect | None:
 
 
 def caption_rect(node: Node, rules: LayoutRules) -> Rect | None:
-    """Return the rectangle the caption under a node covers, or None without a caption."""
+    """Return the rectangle the caption of a node covers, or None without a caption.
+
+    The caption hangs under the node, or above it when ``caption_above`` is set. It is as wide
+    as its text, up to the width of the caption box.
+    """
     if not node.caption:
         return None
     text_width = estimate_text_width(node.caption, rules, CAPTION_FONT_SIZE_PX)
     lines = max(1, math.ceil(text_width / CAPTION_WIDTH_PX))
     height = lines * CAPTION_FONT_SIZE_PX * LINE_HEIGHT_FACTOR
+    half = min(text_width + CAPTION_TEXT_PAD_PX, CAPTION_WIDTH_PX) / 2
     centre = node.x + node.width / 2
+    if node.caption_above:
+        bottom = node.y - CAPTION_GAP_PX
+        return Rect(centre - half, bottom - height, centre + half, bottom)
     top = node.y + node.height + CAPTION_GAP_PX
-    return Rect(centre - CAPTION_WIDTH_PX / 2, top, centre + CAPTION_WIDTH_PX / 2, top + height)
+    return Rect(centre - half, top, centre + half, top + height)
 
 
 def check_nodes_overlap(scene: Scene) -> list[Finding]:
     """Report every pair of nodes that touch or overlap."""
     findings = []
     for first, second in combinations(scene.nodes, 2):
+        if first.id in (second.host,) or second.id == first.host:
+            continue
         if node_rect(first).overlaps(node_rect(second), NODE_CLEARANCE_PX):
             findings.append(
                 Finding(
@@ -506,6 +522,7 @@ def check_scene(scene: Scene) -> list[Finding]:
     Returns:
         All findings, errors first.
     """
+    from .check_notation import check_notation
     from .lint import lint_scene
 
     rules = load_theme().layout
@@ -521,6 +538,7 @@ def check_scene(scene: Scene) -> list[Finding]:
         *check_overlaps(scene),
         *check_borders(scene, rules),
         *check_label_length(scene),
+        *check_notation(scene),
     ]
     named = [_with_names(finding, scene) for finding in findings]
     return sorted(named, key=lambda finding: finding.severity is not Severity.ERROR)

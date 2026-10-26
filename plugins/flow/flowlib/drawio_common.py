@@ -52,3 +52,9 @@ def add_vertex(root: ET.Element, cell_id: str, value: str, style: str) -> ET.Ele
     attributes = {"id": cell_id, "value": value, "style": style, "vertex": "1"}
     attributes["parent"] = LAYER_CELL_ID
     return ET.SubElement(root, "mxCell", attributes)
+
+
+FLOW_SHAPE_KEY = "flowShape"  # a style key of ours: the Flow shape a cell was drawn from
+FLOW_MARKERS_KEY = "flowMarkers"  # a style key of ours: the BPMN marks of a node, comma-joined
+FLOW_FRAME_KEY = "flowFrame"  # a style key of ours: the frame variant a cell was drawn from
+FLOW_HOST_KEY = "flowHost"  # a style key of ours: the id of the task a boundary event sits on

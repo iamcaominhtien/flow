@@ -2,14 +2,17 @@
 
 from collections.abc import Callable
 from dataclasses import replace
+from pathlib import Path
 
 from ..model import DEFAULT_THEME, Scene
 from ..reader import Reader, SpecError
 from . import (
     architecture,
     boards,
+    bpmn,
     catalog,
     concept,
+    dfd,
     er,
     flowchart,
     graph,
@@ -21,6 +24,7 @@ from . import (
 )
 
 THEME_KEY = "theme"
+DFD = "dfd"  # the one type whose layout needs the folder of the spec
 
 Layout = Callable[[object], Scene]
 
@@ -40,14 +44,18 @@ LAYOUTS: dict[str, Layout] = {
     "mindmap": tree.layout_mind_map,
     **{name: graph.layout_with(each) for name, each in catalog.TYPES.items()},
     "screen": screenflow.layout_raw,
+    "bpmn": bpmn.layout_raw,
+    DFD: dfd.layout_raw,
 }
 
 
-def layout(raw: object) -> Scene:
+def layout(raw: object, source_dir: Path | None = None) -> Scene:
     """Lay out a diagram, choosing the type from the ``type`` field of the spec.
 
     Args:
         raw: The result of ``json.loads`` on a spec.
+        source_dir: The folder of the spec file; a data flow diagram that opens a process of
+            another spec looks for it here.
 
     Returns:
         The scene.
@@ -61,7 +69,8 @@ def layout(raw: object) -> Scene:
         raise SpecError([f"spec: 'type' must be one of: {known}"])
     theme = _read_theme(raw)
     spec = {key: value for key, value in raw.items() if key != THEME_KEY}
-    return replace(LAYOUTS[kind](spec), theme=theme, diagram=kind)
+    scene = dfd.layout_raw(spec, source_dir) if kind == DFD else LAYOUTS[kind](spec)
+    return replace(scene, theme=theme, diagram=kind)
 
 
 def _read_theme(raw: dict[str, object]) -> str:

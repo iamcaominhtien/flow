@@ -110,20 +110,21 @@ def test_a_message_and_a_flow_leaving_one_gateway_are_not_drawn_on_top_of_each_o
     assert Code.LINES_OVERLAP not in [finding.code for finding in findings]
 
 
-def test_bpmn_message_flows_are_animated_and_sequence_flows_are_not() -> None:
-    """A message flow moves slowly; a plain sequence flow stays still unless it is main."""
+def test_bpmn_message_flows_are_dashed_and_nothing_but_the_main_path_moves() -> None:
+    """A message flow is dashed ink with a hollow head; only the main path is animated."""
     spec = {
         "type": "bpmn",
-        "zones": [{"id": "a", "label": "A", "tone": "blue"}],
+        "zones": [{"id": "a", "label": "A", "tone": "blue"}, {"id": "b", "label": "B"}],
         "elements": [
             {"id": "s", "kind": "start", "label": "Go", "zone": "a"},
             {"id": "t", "label": "Do it", "zone": "a"},
-            {"id": "u", "label": "Ask", "zone": "a"},
+            {"id": "u", "label": "Ask", "zone": "b"},
         ],
         "flows": [
             {"from": "s", "to": "t"},
             {"from": "t", "to": "u", "style": "message"},
         ],
     }
-    roles = [edge.role for edge in diagrams.layout(spec).edges]
-    assert roles == [Role.NEXT, Role.DATA]
+    edges = diagrams.layout(spec).edges
+    assert [edge.role for edge in edges] == [Role.NEXT, Role.NEXT]
+    assert [edge.dashed for edge in edges] == [False, True]

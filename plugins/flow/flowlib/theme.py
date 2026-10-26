@@ -12,6 +12,16 @@ DATA_DIR = Path(__file__).parent
 THEMES_KEY = "themes"  # in ``theme.json``: the overrides of each theme other than the default
 SHAPE_PAINT_KEY = "shape_paint"  # an override that paints every shape the same way
 ICON_STROKE_WIDTH = 2  # line weight of a flat icon, in its 24 px grid
+DFD_SIZE_KEYS = (
+    "process_size",
+    "entity_size",
+    "store_size",
+    "card_process_size",
+    "card_entity_size",
+    "card_store_size",
+    "context_process_size",
+)  # the fields of ``DfdRules`` that are a (width, height) pair in ``theme.json``
+BPMN_SIZE_KEYS = ("task_size", "data_store_size")
 
 
 @dataclass(frozen=True)
@@ -205,6 +215,73 @@ class SequenceRules:
 
 
 @dataclass(frozen=True)
+class DfdRules:
+    """Sizes and gaps of a data flow diagram (design 14 sections 5 and 6). Lengths are in pixels."""
+
+    process_size: tuple[float, float]
+    entity_size: tuple[float, float]
+    store_size: tuple[float, float]
+    card_process_size: tuple[float, float]
+    card_entity_size: tuple[float, float]
+    card_store_size: tuple[float, float]
+    context_process_size: tuple[float, float]
+    column_pitch: float
+    row_pitch: float
+    card_column_pitch: float
+    card_row_pitch: float
+    strip_height: float
+    id_cell_width: float
+    pair_gap: float
+    label_room: float
+    frame_pad_x: float
+    frame_pad_top: float
+    frame_pad_bottom: float
+    channel_step: float
+    channel_clearance: float
+    id_font_size: float
+    entity_id_font_size: float
+    entity_icon: float
+    entity_text_left: float
+    store_text_left: float
+    card_strip_icon: float
+    frame_pill_height: float
+    frame_pill_inset: float
+    min_flow_length: float
+
+
+@dataclass(frozen=True)
+class BpmnRules:
+    """Sizes and gaps of a BPMN diagram (design 11 section 7). Lengths are in pixels."""
+
+    event_radius: float
+    task_size: tuple[float, float]
+    gateway_width: float
+    boundary_radius: float
+    boundary_inset: float
+    data_store_size: tuple[float, float]
+    gap_plain: float
+    gap_labelled: float
+    pool_left: float
+    band_width: float
+    lane_min_height: float
+    pool_gap: float
+    row_pitch: float
+    lane_pad: float
+    black_box_height: float
+    channel_step: float
+    channel_clearance: float
+    marker_extent: float
+    task_marker_inset: float
+    bottom_marker_gap: float
+    caption_room: float
+    label_gap: float
+    data_store_drop: float
+    stub: float
+    content_pad: float
+    pool_right_pad: float
+
+
+@dataclass(frozen=True)
 class ScreenRules:
     """Sizes, gaps and colours of a screen flow (design 02). Lengths are in pixels."""
 
@@ -284,6 +361,8 @@ class Theme:
     layout: LayoutRules
     sequence: SequenceRules
     screen: ScreenRules
+    dfd: DfdRules
+    bpmn: BpmnRules
 
 
 def _line_style(raw: dict[str, Any]) -> LineStyle:
@@ -334,6 +413,23 @@ def _screen_rules(raw: dict[str, Any]) -> ScreenRules:
     return ScreenRules(**{**raw, **tuples, "sizes": sizes})
 
 
+def _pair(raw: list[float]) -> tuple[float, float]:
+    """Turn a two-item JSON list into a ``(width, height)`` tuple."""
+    return (raw[0], raw[1])
+
+
+def _dfd_rules(raw: dict[str, Any]) -> DfdRules:
+    """Build the data flow diagram rules; each ``*_size`` becomes a ``(width, height)`` tuple."""
+    sizes = {key: _pair(raw[key]) for key in DFD_SIZE_KEYS}
+    return DfdRules(**{**raw, **sizes})
+
+
+def _bpmn_rules(raw: dict[str, Any]) -> BpmnRules:
+    """Build the BPMN rules; each ``*_size`` becomes a ``(width, height)`` tuple."""
+    sizes = {key: _pair(raw[key]) for key in BPMN_SIZE_KEYS}
+    return BpmnRules(**{**raw, **sizes})
+
+
 def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
     """Build a theme from the parsed ``theme.json``, with a theme's overrides already merged.
 
@@ -374,6 +470,8 @@ def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
         layout=_layout_rules(raw["layout"]),
         sequence=SequenceRules(**raw["sequence"]),
         screen=_screen_rules(raw["screen"]),
+        dfd=_dfd_rules(raw["dfd"]),
+        bpmn=_bpmn_rules(raw["bpmn"]),
     )
 
 

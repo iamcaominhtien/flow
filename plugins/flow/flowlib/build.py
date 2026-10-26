@@ -58,7 +58,7 @@ def build(spec_path: Path, out_dir: Path) -> BuildResult:
         OverridesError: If a ``<name>.overrides.json`` file beside the spec is not valid.
     """
     stem = output_stem(spec_path)
-    scene = diagrams.layout(json.loads(spec_path.read_text(encoding="utf-8")))
+    scene = diagrams.layout(json.loads(spec_path.read_text(encoding="utf-8")), spec_path.parent)
     overrides_path = spec_path.with_name(f"{stem}{OVERRIDES_SUFFIX}")
     if overrides_path.is_file():
         scene = fit_canvas(overrides_io.apply(scene, overrides_io.load(overrides_path)))

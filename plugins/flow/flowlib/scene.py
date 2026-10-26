@@ -29,6 +29,7 @@ from .model import (
     FrameVariant,
     Head,
     LabelKind,
+    Marker,
     Node,
     Point,
     Role,
@@ -48,7 +49,7 @@ FRAME_KEYS = {"id", "x", "y", "width", "height", "label", "tone", "variant", "gu
 DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
 NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections", "card", "dashed"}
-NODE_KEYS |= {"screen", "chip"}
+NODE_KEYS |= {"screen", "chip", "markers", "caption_above", "host"}
 ROW_KEYS = {"left", "right", "flags"}
 EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label", "extras"}
 LABEL_KEYS = {"text", "at", "kind", "number", "icon"}
@@ -182,11 +183,14 @@ def _dump_node(node: Node) -> dict[str, Any]:
         "number": node.number,
         "detail": list(node.detail),
         "caption": node.caption,
+        "caption_above": node.caption_above,
         "card": node.card,
         "dashed": node.dashed,
         "sections": [[_dump_row(row) for row in section] for section in node.sections],
         "screen": dump_screen(node.screen) if node.screen else None,
         "chip": _dump_label(node.chip) if node.chip else None,
+        "markers": [marker.value for marker in node.markers],
+        "host": node.host,
     }
     written.update({key: value for key, value in optional.items() if value})
     return written
@@ -357,6 +361,7 @@ class _SceneParser:
             font_size=raw.get("font_size", DEFAULT_FONT_SIZE_PX),
             detail=self._lines(raw.get("detail", []), where),
             caption=read.text(raw, "caption", where),
+            caption_above=raw.get("caption_above") is True,
             sections=self._sections(raw.get("sections", []), where),
             card=raw.get("card") is True,
             dashed=raw.get("dashed") is True,
@@ -364,7 +369,20 @@ class _SceneParser:
             if "screen" in raw
             else None,
             chip=self._label(raw.get("chip"), f"{where}.chip") if "chip" in raw else None,
+            markers=self._markers(raw.get("markers", []), where),
+            host=read.text(raw, "host", where),
         )
+
+    def _markers(self, raw: object, where: str) -> tuple[Marker, ...]:
+        """Read the BPMN marks of a node."""
+        if not isinstance(raw, list):
+            self._read.report(where, "'markers' must be a list")
+            return ()
+        found = [
+            self._read.enum(Marker, {"markers": item}, "markers", f"{where}.markers[{index}]")
+            for index, item in enumerate(raw)
+        ]
+        return tuple(marker for marker in found if marker is not None)
 
     def _sections(self, raw: object, where: str) -> tuple[tuple[Row, ...], ...]:
         """Read the row groups of a table node."""

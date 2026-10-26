@@ -1,0 +1,98 @@
+{
+ "type": "dfd",
+ "title": "Level 2: inside process 4.0, Deliver order, illustrated",
+ "desc": "Process 4.0 of level 1 opened into three. Everything that entered or left 4.0 on level 1 still enters or leaves here, from the same neighbours. The dashed store belongs to level 1 and is shown for reference.",
+ "opens": {
+  "spec": "delivery-dfd-level1.spec.json",
+  "process": "deliver"
+ },
+ "elements": [
+  {
+   "id": "courier"
+  },
+  {
+   "id": "orders"
+  },
+  {
+   "id": "match",
+   "label": "Match courier",
+   "detail": "picks the nearest free courier",
+   "icon": "target"
+  },
+  {
+   "id": "offer",
+   "label": "Offer job",
+   "detail": "sends the job, waits for accept",
+   "icon": "bell"
+  },
+  {
+   "id": "confirm",
+   "label": "Confirm drop-off",
+   "detail": "checks proof, closes the order",
+   "icon": "check"
+  },
+  {
+   "id": "positions",
+   "label": "Courier positions",
+   "kind": "store",
+   "number": "D3",
+   "icon": "database"
+  }
+ ],
+ "flows": [
+  {
+   "from": "orders",
+   "to": "match",
+   "label": "Ready order",
+   "main": true
+  },
+  {
+   "from": "match",
+   "to": "offer",
+   "label": "Chosen courier",
+   "main": true
+  },
+  {
+   "from": "offer",
+   "to": "confirm",
+   "label": "Accepted job",
+   "main": true
+  },
+  {
+   "from": "offer",
+   "to": "courier",
+   "label": "Delivery job"
+  },
+  {
+   "from": "courier",
+   "to": "offer",
+   "label": "Job reply, location",
+   "of": "Job reply, location, proof"
+  },
+  {
+   "from": "courier",
+   "to": "confirm",
+   "label": "Drop-off proof",
+   "of": "Job reply, location, proof"
+  },
+  {
+   "from": "offer",
+   "to": "positions",
+   "label": "Latest position",
+   "status": true
+  },
+  {
+   "from": "positions",
+   "to": "match",
+   "label": "Nearby couriers",
+   "status": true
+  },
+  {
+   "from": "confirm",
+   "to": "orders",
+   "label": "Delivery status",
+   "status": true
+  }
+ ],
+ "style": "illustrated"
+}

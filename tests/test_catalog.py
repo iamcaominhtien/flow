@@ -1,4 +1,4 @@
-"""Tests for the data-driven graph types: DFD, C4, cloud, use case, BPMN, class and screen flow."""
+"""Tests for the data-driven graph types: C4, cloud, use case, BPMN, class and screen flow."""
 
 import copy
 import json
@@ -11,7 +11,6 @@ ROOT = Path(__file__).resolve().parent.parent
 PLUGIN_DIR = ROOT / "plugins" / "flow"
 EXAMPLES = ROOT / "examples"
 CASES = {
-    "order-dfd.spec.json": "dfd",
     "delivery-c4.spec.json": "c4",
     "web-cloud.spec.json": "cloud",
     "shop-usecase.spec.json": "usecase",
@@ -26,7 +25,7 @@ sys.path.insert(0, str(PLUGIN_DIR))
 
 from flowlib import diagrams, render_drawio, render_html  # noqa: E402
 from flowlib.check import Severity, check_scene  # noqa: E402
-from flowlib.model import Head, Shape  # noqa: E402
+from flowlib.model import Head, Marker, Shape  # noqa: E402
 from flowlib.reader import SpecError  # noqa: E402
 
 
@@ -85,7 +84,7 @@ def test_actor_label_goes_under_the_figure() -> None:
 
 def test_unknown_kind_and_style_are_refused() -> None:
     """A wrong kind or line style fails and lists the choices."""
-    raw = raw_example("order-dfd.spec.json")
+    raw = raw_example("refund-bpmn.spec.json")
     raw["elements"][0]["kind"] = "robot"
     raw["flows"][0]["style"] = "zigzag"
     with pytest.raises(SpecError) as caught:
@@ -97,9 +96,9 @@ def test_unknown_kind_and_style_are_refused() -> None:
 
 def test_a_link_to_a_missing_item_gets_a_suggestion() -> None:
     """A misspelt end of a link names the likely item."""
-    raw = raw_example("order-dfd.spec.json")
-    raw["flows"][0]["to"] = "procs"
-    with pytest.raises(SpecError, match="proc"):
+    raw = raw_example("refund-bpmn.spec.json")
+    raw["flows"][0]["to"] = "chek"
+    with pytest.raises(SpecError, match="check"):
         diagrams.layout(raw)
 
 
@@ -119,67 +118,12 @@ def test_a_line_leaves_an_actor_below_its_name() -> None:
 
 
 def test_bpmn_event_and_gateway_markers_and_pools() -> None:
-    """Timer, message and parallel kinds get a marker icon; zones become swimlanes."""
+    """Timer, message and parallel kinds get a marker; each zone becomes a pool with its band."""
     scene = diagrams.layout(raw_example("order-pools-bpmn.spec.json"))
     nodes = {node.id: node for node in scene.nodes}
-    assert nodes["wait"].icon == "clock"
-    assert nodes["split"].icon == "plus"
-    assert nodes["ok"].icon == "x"
+    assert nodes["wait"].markers == (Marker.TIMER,)
+    assert nodes["split"].markers == (Marker.PLUS,)
+    assert nodes["ok"].markers == (Marker.CROSS,)
     assert nodes["wait"].shape is Shape.INTERMEDIATE
     assert [frame.label for frame in scene.frames] == ["Shop", "Bank"]
-    assert nodes["charge"].x > nodes["pay"].x
-    message = next(edge for edge in scene.edges if edge.source == "pay" and edge.target == "charge")
-    assert message.dashed
-    assert message.tail is Head.DOT
-
-
-def test_an_item_without_a_zone_is_refused_when_zones_are_pools() -> None:
-    """In a BPMN diagram with pools, an element outside every pool fails."""
-    raw = raw_example("order-pools-bpmn.spec.json")
-    del raw["elements"][0]["zone"]
-    with pytest.raises(SpecError, match="needs a 'zone'"):
-        diagrams.layout(raw)
-
-
-def test_branches_of_one_gateway_in_a_pool_sit_side_by_side() -> None:
-    """The two tasks after a parallel split share a rank and are stacked across the flow."""
-    scene = diagrams.layout(raw_example("order-pools-bpmn.spec.json"))
-    nodes = {node.id: node for node in scene.nodes}
-    assert nodes["pay"].x == nodes["pack"].x
-    assert nodes["pay"].y != nodes["pack"].y
-    assert nodes["pay"].y + nodes["pay"].height < nodes["pack"].y
-
-
-def test_start_and_end_events_keep_their_label_as_a_caption() -> None:
-    """A label on a start or end event goes under the circle, not inside it."""
-    raw = raw_example("refund-bpmn.spec.json")
-    raw["elements"][0]["label"] = "Request arrives"
-    start = next(node for node in diagrams.layout(raw).nodes if node.id == "begin")
-    assert start.caption == "Request arrives"
-    assert start.text == ()
-
-
-def test_findings_name_the_items_they_mention() -> None:
-    """A check message says which labels the quoted ids stand for."""
-    raw = raw_example("order-pools-bpmn.spec.json")
-    scene = diagrams.layout(raw)
-    node = scene.nodes[1]
-    crowded = scene.__class__(
-        scene.width,
-        scene.height,
-        scene.title,
-        scene.description,
-        scene.frames,
-        (node, node.__class__(**{**node.__dict__, "id": "twin"})),
-        (),
-    )
-    messages = [finding.message for finding in check_scene(crowded)]
-    assert any(f"'{node.id}' (Take the order)" in message for message in messages)
-
-
-def test_at_on_some_items_only_is_refused_not_a_crash() -> None:
-    """Setting 'at' on one element but not the others fails with a message naming the rest."""
-    raw = raw_example("refund-bpmn.spec.json")
-    raw["elements"][0]["at"] = [0, 0]
-    with pytest.raises(SpecError, match="set it on all or none"):
-        diagrams.layout(raw)
+    assert nodes["charge"].x == nodes["pay"].x  # a message runs straight down

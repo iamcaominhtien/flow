@@ -17,6 +17,12 @@ from xml.etree import ElementTree as ET
 from .canvas import fit_canvas
 from .drawio_common import FRAME_LABEL_PREFIX
 from .geometry import border_point, center_of
+from .import_notation import (
+    is_notation_frame,
+    is_notation_part,
+    notation_frame,
+    notation_node,
+)
 from .import_screen import (
     CHIP_PREFIX,
     attach_words,
@@ -374,6 +380,9 @@ class _Import:
         if "swimlane" in style and rows:
             node = _node(cell, style, self.box(cell))
             self.nodes[node.id] = replace(node, shape=Shape.TABLE, sections=(_table_rows(rows),))
+        elif is_notation_frame(style):
+            plain = _frame(cell, style, self.box(cell))
+            self.frames.append(notation_frame(plain, style, self.cells))
         elif "swimlane" in style or style.get("container") == "1":
             self.frames.append(_frame(cell, style, self.box(cell)))
             pill = _frame_label_cell(cell, self.cells)
@@ -386,7 +395,7 @@ class _Import:
             self.notes.append(f"skipped the free text '{cell.get('value', '')[:30]}'")
         else:
             node = screen_node(_node(cell, style, self.box(cell)), style)
-            self.nodes[node.id] = node
+            self.nodes[node.id] = notation_node(node, cell, self.cells)
 
 
 def _is_table_row(cell: ET.Element, cells: dict[str, ET.Element]) -> bool:
@@ -467,6 +476,7 @@ def convert(path: Path) -> ImportResult:
         and not _is_frame_label(c, cells)
         and not is_screen_part(c, cells, parse_style)
         and not is_edge_words(c)
+        and not is_notation_part(c, cells)
     ]
     top_level = [c for c in drawn if c.get("parent") in LAYER_IDS]
     texts = {name: plain_lines(cells[name].get("value", "")) for name in text_ids if name in cells}

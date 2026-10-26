@@ -1,0 +1,432 @@
+{
+ "type": "bpmn",
+ "title": "BPMN, complex: from order to delivered parcel",
+ "desc": "Four participants and a customer: the shop (three lanes), the payment provider, the courier company and the customer as a black box. It combines splits and joins, a task per item, a loop, a payment deadline, a delivery deadline, a retry loop and six message flows. Blue is the shop's happy path.",
+ "zones": [
+  {
+   "id": "customer",
+   "label": "Customer (black box)",
+   "tone": "blue",
+   "black_box": true
+  },
+  {
+   "id": "shop"
+  },
+  {
+   "id": "orders",
+   "label": "Orders",
+   "tone": "blue",
+   "parent": "shop"
+  },
+  {
+   "id": "warehouse",
+   "label": "Warehouse",
+   "tone": "violet",
+   "parent": "shop"
+  },
+  {
+   "id": "finance",
+   "label": "Finance",
+   "tone": "amber",
+   "parent": "shop"
+  },
+  {
+   "id": "provider",
+   "label": "Payment provider",
+   "tone": "amber"
+  },
+  {
+   "id": "courier",
+   "label": "Courier company",
+   "tone": "teal"
+  }
+ ],
+ "elements": [
+  {
+   "id": "placed",
+   "kind": "start",
+   "trigger": "message",
+   "label": "Order placed",
+   "zone": "orders"
+  },
+  {
+   "id": "validate",
+   "kind": "service",
+   "label": "Validate order",
+   "zone": "orders"
+  },
+  {
+   "id": "valid",
+   "kind": "exclusive",
+   "label": "Valid?",
+   "zone": "orders"
+  },
+  {
+   "id": "reject",
+   "kind": "send",
+   "label": "Reject order",
+   "zone": "orders",
+   "column": 4
+  },
+  {
+   "id": "rejected",
+   "kind": "end",
+   "zone": "orders"
+  },
+  {
+   "id": "split",
+   "kind": "parallel",
+   "zone": "orders"
+  },
+  {
+   "id": "join",
+   "kind": "parallel",
+   "zone": "orders"
+  },
+  {
+   "id": "hand",
+   "kind": "send",
+   "label": "Hand to courier",
+   "zone": "orders"
+  },
+  {
+   "id": "wait_delivery",
+   "kind": "receive",
+   "label": "Wait for delivery",
+   "zone": "orders"
+  },
+  {
+   "id": "late",
+   "kind": "timer",
+   "attached_to": "wait_delivery"
+  },
+  {
+   "id": "capture",
+   "kind": "send",
+   "label": "Capture payment",
+   "zone": "orders"
+  },
+  {
+   "id": "done",
+   "kind": "end",
+   "label": "Done",
+   "zone": "orders"
+  },
+  {
+   "id": "reserve",
+   "kind": "service",
+   "label": "Reserve stock",
+   "repeat": "multi",
+   "zone": "warehouse"
+  },
+  {
+   "id": "pick",
+   "kind": "manual",
+   "label": "Pick and pack",
+   "repeat": "loop",
+   "zone": "warehouse"
+  },
+  {
+   "id": "investigate",
+   "kind": "user",
+   "label": "Open investigation",
+   "zone": "warehouse"
+  },
+  {
+   "id": "lost",
+   "kind": "end",
+   "trigger": "error",
+   "label": "Lost parcel",
+   "zone": "warehouse"
+  },
+  {
+   "id": "request",
+   "kind": "send",
+   "label": "Request payment",
+   "zone": "finance"
+  },
+  {
+   "id": "wait_pay",
+   "kind": "receive",
+   "label": "Wait for payment result",
+   "zone": "finance"
+  },
+  {
+   "id": "deadline",
+   "kind": "timer",
+   "attached_to": "wait_pay"
+  },
+  {
+   "id": "paid",
+   "kind": "exclusive",
+   "label": "Paid?",
+   "zone": "finance"
+  },
+  {
+   "id": "cancel",
+   "kind": "send",
+   "label": "Cancel order",
+   "zone": "finance"
+  },
+  {
+   "id": "cancelled",
+   "kind": "end",
+   "label": "Cancelled",
+   "zone": "finance",
+   "column": 10
+  },
+  {
+   "id": "requested",
+   "kind": "start",
+   "trigger": "message",
+   "label": "Payment requested",
+   "zone": "provider"
+  },
+  {
+   "id": "authorise",
+   "kind": "service",
+   "label": "Authorise card",
+   "zone": "provider"
+  },
+  {
+   "id": "return",
+   "kind": "send",
+   "label": "Return result",
+   "zone": "provider"
+  },
+  {
+   "id": "returned",
+   "kind": "end",
+   "zone": "provider"
+  },
+  {
+   "id": "booked",
+   "kind": "start",
+   "trigger": "message",
+   "label": "Pickup booked",
+   "zone": "courier"
+  },
+  {
+   "id": "collect",
+   "kind": "manual",
+   "label": "Collect parcel",
+   "zone": "courier"
+  },
+  {
+   "id": "deliver",
+   "kind": "manual",
+   "label": "Deliver",
+   "zone": "courier"
+  },
+  {
+   "id": "delivered",
+   "kind": "exclusive",
+   "label": "Delivered?",
+   "zone": "courier"
+  },
+  {
+   "id": "wait_day",
+   "kind": "timer",
+   "label": "Wait a day",
+   "zone": "courier"
+  },
+  {
+   "id": "confirm",
+   "kind": "send",
+   "label": "Confirm delivery",
+   "zone": "courier"
+  },
+  {
+   "id": "courier_end",
+   "kind": "end",
+   "zone": "courier"
+  }
+ ],
+ "flows": [
+  {
+   "from": "placed",
+   "to": "validate",
+   "main": true
+  },
+  {
+   "from": "validate",
+   "to": "valid",
+   "main": true
+  },
+  {
+   "from": "valid",
+   "to": "split",
+   "label": "yes",
+   "main": true
+  },
+  {
+   "from": "valid",
+   "to": "reject",
+   "label": "no",
+   "failure": true
+  },
+  {
+   "from": "reject",
+   "to": "rejected"
+  },
+  {
+   "from": "split",
+   "to": "reserve",
+   "main": true
+  },
+  {
+   "from": "split",
+   "to": "request",
+   "main": true
+  },
+  {
+   "from": "reserve",
+   "to": "pick",
+   "main": true
+  },
+  {
+   "from": "pick",
+   "to": "join",
+   "main": true
+  },
+  {
+   "from": "request",
+   "to": "wait_pay",
+   "main": true
+  },
+  {
+   "from": "wait_pay",
+   "to": "paid",
+   "main": true
+  },
+  {
+   "from": "paid",
+   "to": "join",
+   "label": "yes",
+   "main": true
+  },
+  {
+   "from": "paid",
+   "to": "cancel",
+   "label": "no",
+   "failure": true
+  },
+  {
+   "from": "deadline",
+   "to": "cancel",
+   "failure": true
+  },
+  {
+   "from": "cancel",
+   "to": "cancelled"
+  },
+  {
+   "from": "join",
+   "to": "hand",
+   "main": true
+  },
+  {
+   "from": "hand",
+   "to": "wait_delivery",
+   "main": true
+  },
+  {
+   "from": "wait_delivery",
+   "to": "capture",
+   "main": true
+  },
+  {
+   "from": "capture",
+   "to": "done",
+   "main": true
+  },
+  {
+   "from": "late",
+   "to": "investigate",
+   "failure": true
+  },
+  {
+   "from": "investigate",
+   "to": "lost"
+  },
+  {
+   "from": "requested",
+   "to": "authorise"
+  },
+  {
+   "from": "authorise",
+   "to": "return"
+  },
+  {
+   "from": "return",
+   "to": "returned"
+  },
+  {
+   "from": "booked",
+   "to": "collect"
+  },
+  {
+   "from": "collect",
+   "to": "deliver"
+  },
+  {
+   "from": "deliver",
+   "to": "delivered"
+  },
+  {
+   "from": "delivered",
+   "to": "confirm",
+   "label": "yes"
+  },
+  {
+   "from": "delivered",
+   "to": "wait_day",
+   "label": "no"
+  },
+  {
+   "from": "wait_day",
+   "to": "deliver",
+   "style": "return"
+  },
+  {
+   "from": "confirm",
+   "to": "courier_end"
+  },
+  {
+   "from": "customer",
+   "to": "placed",
+   "style": "message",
+   "label": "order"
+  },
+  {
+   "from": "reject",
+   "to": "customer",
+   "style": "message",
+   "label": "rejection"
+  },
+  {
+   "from": "request",
+   "to": "requested",
+   "style": "message",
+   "label": "payment request"
+  },
+  {
+   "from": "return",
+   "to": "wait_pay",
+   "style": "message",
+   "label": "payment result"
+  },
+  {
+   "from": "hand",
+   "to": "booked",
+   "style": "message",
+   "label": "pickup"
+  },
+  {
+   "from": "confirm",
+   "to": "wait_delivery",
+   "style": "message",
+   "label": "delivery confirmed"
+  }
+ ]
+}

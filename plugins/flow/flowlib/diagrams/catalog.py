@@ -1,8 +1,8 @@
-"""The graph-family types that are only data: DFD, C4, cloud, use case, BPMN, class, screen flow."""
+"""The graph-family types that are only data: C4, cloud, use case, class, screen flow."""
 
 from typing import Any
 
-from ..model import Head, Role, Shape
+from ..model import Head, Shape
 from ..reader import Reader
 from .graph import GraphType, LineKind, rows_from
 
@@ -19,16 +19,6 @@ def _class_sections(raw: dict[str, Any], where: str, read: Reader) -> dict[str, 
     return {"sections": tuple(section for section in (attributes, methods) if section)}
 
 
-DFD = GraphType(
-    name="DFD",
-    nodes_key="elements",
-    links_key="flows",
-    kinds={"process": Shape.ELLIPSE, "external": Shape.ENTITY, "store": Shape.STORE},
-    default_kind="process",
-    line_kinds={"flow": FLOW},
-    default_line="flow",
-    default_role=Role.DATA,
-)
 C4 = GraphType(
     name="C4",
     nodes_key="elements",
@@ -79,44 +69,6 @@ USE_CASE = GraphType(
     default_line="association",
     has_zones=True,
 )
-BPMN = GraphType(
-    name="BPMN",
-    nodes_key="elements",
-    links_key="flows",
-    kinds={
-        "start": Shape.START,
-        "end": Shape.END,
-        "event": Shape.INTERMEDIATE,
-        "timer": Shape.INTERMEDIATE,
-        "message": Shape.INTERMEDIATE,
-        "error": Shape.INTERMEDIATE,
-        "task": Shape.PROCESS,
-        "subprocess": Shape.SUBPROCESS,
-        "gateway": Shape.DECISION,
-        "exclusive": Shape.DECISION,
-        "parallel": Shape.DECISION,
-        "document": Shape.DOCUMENT,
-    },
-    default_kind="task",
-    line_kinds={
-        "sequence": FLOW,
-        "message": LineKind(dashed=True, head=Head.OPEN, tail=Head.DOT, role=Role.DATA),
-    },
-    default_line="sequence",
-    unlabelled_kinds=frozenset(
-        {"start", "end", "event", "timer", "message", "error", "gateway", "exclusive", "parallel"}
-    ),
-    has_zones=True,
-    zones_are_lanes=True,
-    side_by_side=True,
-    kind_icons={
-        "timer": "clock",
-        "message": "mail",
-        "error": "warn",
-        "exclusive": "x",
-        "parallel": "plus",
-    },
-)
 CLASS = GraphType(
     name="class",
     nodes_key="classes",
@@ -153,11 +105,9 @@ SCREEN = GraphType(
 )
 
 TYPES: dict[str, GraphType] = {
-    "dfd": DFD,
     "c4": C4,
     "cloud": CLOUD,
     "usecase": USE_CASE,
-    "bpmn": BPMN,
     "class": CLASS,
     "screen": SCREEN,
 }

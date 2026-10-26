@@ -22,7 +22,17 @@ from .drawio_common import (
     style_string,
 )
 from .drawio_lines import add_divider, add_edge
+from .drawio_notation import (
+    add_band_frame,
+    add_dfd_parts,
+    add_marks,
+    dfd_style,
+    dfd_value,
+    marks_style,
+)
 from .drawio_screen import add_node_chip, add_screen_parts, screen_style
+from .html_dfd import is_dfd_node
+from .html_frames import BAND_VARIANTS
 from .markup import esc, fmt
 from .model import KEY_FLAG_TONES, REF_FRAGMENT, Frame, FrameVariant, Node, Row, Scene, Shape, Tone
 from .shapes import SUBPROCESS_BAR_INSET_PX
@@ -57,11 +67,16 @@ FRAME_PILL_LEFT_PX = 16
 FRAME_PILL_TOP_PX = 12
 FRAME_PILL_HEIGHT_PX = 22
 FRAME_PILL_PADDING_PX = 12
-ROUNDED_SHAPES = (Shape.PROCESS,)  # boxes whose corner radius is in pixels
+ROUNDED_SHAPES = (
+    Shape.PROCESS,
+    Shape.TASK,
+    Shape.DFD_PROCESS,
+)  # boxes whose corner radius is in pixels
 SHADOW_SHAPES = (  # the rounded boxes of design 01 section 3 carry ``shadow=1``
     Shape.TERMINATOR,
     Shape.FAIL,
     Shape.PROCESS,
+    Shape.TASK,
     Shape.SUBPROCESS,
     Shape.IO,
     Shape.DOCUMENT,
@@ -92,6 +107,10 @@ BELOW = {
     "verticalLabelPosition": "bottom",
     "verticalAlign": "top",
 }  # the label sits under the shape
+ABOVE = {
+    "verticalLabelPosition": "top",
+    "verticalAlign": "bottom",
+}  # the label sits over the shape
 BAR_STROKE_WIDTH_PX = 1.5
 FRAGMENT_TAG_WIDTH_PX = 60
 FRAGMENT_TAG_HEIGHT_PX = 18
@@ -268,6 +287,9 @@ SHAPE_STYLES: dict[Shape, Callable[[Node], dict[str, object]]] = {
     Shape.ELLIPSE: _ellipse_style,
     Shape.SCREEN: _box_style,
     Shape.FLAG: _flag_style,
+    Shape.TASK: _box_style,
+    Shape.DFD_PROCESS: _box_style,
+    Shape.DFD_STORE: _store_style,
 }
 
 
@@ -281,15 +303,13 @@ def _theme_pairs(node: Node, theme: Theme) -> dict[str, object]:
     return pairs
 
 
-def _node_style(node: Node, theme: Theme) -> str:
-    """Return the full style of a node cell: outline, colours and text."""
-    if node.screen is not None:
-        return screen_style(node, theme)
+def _base_pairs(node: Node, theme: Theme) -> dict[str, object]:
+    """Return the style pairs every node has: its colours, its outline and its text."""
     colors = theme.shapes[node.shape]
     fill = theme.tones[node.tone].box if node.tone else colors.fill
     if node.shape is Shape.TABLE and node.card:
         fill = theme.tones[node.tone or Tone.GRAY].pill
-    style = {
+    return {
         "html": 1,
         "whiteSpace": "wrap",
         "fillColor": fill,
@@ -300,25 +320,42 @@ def _node_style(node: Node, theme: Theme) -> str:
         "fontStyle": FONT_BOLD,
         "fontFamily": theme.fonts.sans,
     }
+
+
+def _kind_pairs(node: Node, theme: Theme) -> dict[str, object]:
+    """Return the style pairs of a note, a table, a card or a node with an icon."""
+    if node.shape in (Shape.NOTE, Shape.TEXT):
+        return {"fontStyle": 0, "fontColor": theme.slate}
+    if node.shape is Shape.TABLE:
+        icon_room = ICON_LEFT_PX + ICON_SIZE_PX if node.icon else 0
+        return {
+            "startSize": _table_header_height(node, theme),
+            "swimlaneFillColor": theme.paper,
+            "spacingLeft": TABLE_TEXT_INSET_PX + icon_room,
+        }
+    if node.card:
+        return _card_text_style(node, theme)
+    if node.icon:
+        return {"spacingLeft": ICON_TEXT_RESERVE_PX}
+    return {}
+
+
+def _node_style(node: Node, theme: Theme) -> str:
+    """Return the full style of a node cell: outline, colours and text."""
+    if node.screen is not None:
+        return screen_style(node, theme)
+    style = _base_pairs(node, theme)
     style.update(SHAPE_STYLES[node.shape](node))
     style.update(_theme_pairs(node, theme))
     if node.dashed:
         style.update({"dashed": 1, "dashPattern": DASH_PATTERN})
-    if node.shape in (Shape.NOTE, Shape.TEXT):
-        style.update({"fontStyle": 0, "fontColor": theme.slate})
-    if node.shape is Shape.TABLE:
-        icon_room = ICON_LEFT_PX + ICON_SIZE_PX if node.icon else 0
-        style.update(
-            {
-                "startSize": _table_header_height(node, theme),
-                "swimlaneFillColor": theme.paper,
-                "spacingLeft": TABLE_TEXT_INSET_PX + icon_room,
-            }
-        )
-    if node.card and node.shape is not Shape.TABLE:
-        style.update(_card_text_style(node, theme))
-    elif node.icon and node.shape is not Shape.TABLE:
-        style["spacingLeft"] = ICON_TEXT_RESERVE_PX
+    if node.caption:
+        style.update(ABOVE if node.caption_above else BELOW)
+    style.update(marks_style(node))
+    if is_dfd_node(node):
+        style.update(dfd_style(node, theme))
+    else:
+        style.update(_kind_pairs(node, theme))
     return style_string(style)
 
 
@@ -345,12 +382,12 @@ def _label_value(lines: tuple[str, ...]) -> str:
 
 def _node_value(node: Node, theme: Theme) -> str:
     """Return the label of a node: its caption, or its title followed by its detail lines."""
-    if node.screen is not None:
+    if node.screen is not None or (node.shape is Shape.TABLE and node.card):
         return ""
+    if is_dfd_node(node):
+        return dfd_value(node, theme)
     if node.caption:
         return esc(node.caption)
-    if node.shape is Shape.TABLE and node.card:
-        return ""
     if node.card:
         return _label_value(node.detail)
     title = _label_value(node.text)
@@ -385,7 +422,9 @@ def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
         add_node_chip(root, node, theme)
     if node.shape is Shape.TABLE:
         _add_table_rows(root, node, theme)
-    if node.shape is Shape.TABLE and node.card:
+    if is_dfd_node(node):
+        add_dfd_parts(root, node, theme)
+    elif node.shape is Shape.TABLE and node.card:
         _add_table_card_parts(root, node, theme)
     elif node.card:
         _add_card_parts(root, node, theme)
@@ -400,12 +439,13 @@ def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
         is_marker = node.shape in CENTERED_ICON_SHAPES and not node.text
         icon_left = (node.width - ICON_SIZE_PX) / 2 if is_marker else ICON_LEFT_PX
         add_geometry(icon, (icon_left, icon_top, ICON_SIZE_PX, ICON_SIZE_PX))
+    add_marks(root, node, theme)
     _add_badge_and_note(root, node, theme)
 
 
 def _add_badge_and_note(root: ET.Element, node: Node, theme: Theme) -> None:
     """Add what hangs on the outside of a node: its number badge and a connector's note."""
-    if node.number:
+    if node.number and not is_dfd_node(node):
         _add_badge(root, node, theme)
     if node.shape is Shape.CONNECTOR and node.detail:
         _add_connector_note(root, node, theme)
@@ -637,6 +677,9 @@ def _add_frame(root: ET.Element, frame: Frame, theme: Theme) -> None:
         return
     if frame.variant is FrameVariant.LANE:
         _add_lane(root, frame, theme)
+        return
+    if frame.variant in BAND_VARIANTS:
+        add_band_frame(root, frame, theme)
         return
     tone = theme.tones[frame.tone]
     style = style_string(

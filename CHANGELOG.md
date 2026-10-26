@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0 (2026-10-26)
+
+DFD and BPMN brought up to `docs/design/14-dfd.md` and `11-bpmn.md`.
+
+- **DFD:** Gane-Sarson shapes (numbered header strip, store open on the right with an id cell, square-cornered entity); auto-numbered ids (E1, D1, 1.0, 4.1) never reused; illustrated cards at all three levels; 640x400 grid with two-way flows 60 px apart; `opens` draws a dashed frame around the opened process and checks that flows balance between levels. Refuses entity to entity, store to store, entity to store, black holes and miracle processes; warns on process counts per level and one-way stores. Examples `delivery-dfd-*` replace `order-dfd`.
+- **BPMN:** pools and lanes (band 38 px, lanes >= 200 px), black-box pools, message flows with open circle and hollow head that run straight, boundary events (dashed = non-interrupting), event markers, task types, multi-instance, loop and sub-process marks, gateway marks, data stores with dotted association. New spec keys `trigger`, `repeat`, `attached_to`, `interrupting`, `column`, `row`, `failure`; `at`, `illustrated` and `icon` are no longer accepted. Examples `delivery-bpmn`, `order-bpmn`, `refund-advanced-bpmn`.
+- **Checks:** BPMN element count, route bends, main path in one pool, message inside one pool and sequence flow between pools are refused.
+- draw.io import reads back DFD shapes, BPMN marks, pool frames and boundary hosts; scene JSON gains `markers`, `host`, `caption_above`.
+- Not done: numbered legend and callout badge of the Advanced board; expanded sub-processes, data objects, conditional/link/compensation events; a few `lines-cross` warnings; `order-bpmn` marks a main path in more than one pool and warns; real draw.io editor not used.
+
 ## 0.4.0 (2026-10-26)
 
 Flowchart and sequence brought up to `docs/design/03-flowchart.md` and `04-sequence.md`.

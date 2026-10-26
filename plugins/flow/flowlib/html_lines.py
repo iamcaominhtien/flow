@@ -21,6 +21,7 @@ ONE_BAR = f'<path d="M-9 1V23" {LINE}/>'
 DIAMOND_PATH = "M0 12L-8 6L-16 12L-8 18Z"
 SYMBOL_SHAPES: dict[Head, str] = {
     Head.TRIANGLE: f'<path d="M0 12L-14 5V19Z" fill="{{w}}" {LINE}/>',
+    Head.CIRCLE: f'<circle cx="-5" cy="12" r="5" fill="{{w}}" {LINE}/>',
     Head.DIAMOND: f'<path d="{DIAMOND_PATH}" fill="{{w}}" {LINE}/>',
     Head.DIAMOND_FILLED: f'<path d="{DIAMOND_PATH}" fill="{{c}}" {LINE}/>',
     Head.ONE: ONE_BAR,

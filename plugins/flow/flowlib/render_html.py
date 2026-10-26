@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 
+from .html_frames import BAND_VARIANTS, frame_with_band_html
 from .html_lines import lines_layer
 from .html_nodes import node_html
 from .markup import esc, fmt, px, tag
@@ -99,6 +100,8 @@ def _frame_html(frame: Frame, theme: Theme) -> str:
         return _fragment_html(frame, theme)
     if frame.variant is FrameVariant.LANE:
         return _lane_html(frame, theme)
+    if frame.variant in BAND_VARIANTS:
+        return frame_with_band_html(frame, theme)
     tone = theme.tones[frame.tone]
     area = {
         **ABSOLUTE,

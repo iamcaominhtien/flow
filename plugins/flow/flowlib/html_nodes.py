@@ -3,7 +3,9 @@
 from dataclasses import replace
 
 from .cards import card_parts
+from .html_dfd import dfd_html, is_dfd_node
 from .html_screen import screen_html
+from .marks import mark_slots, mark_svg
 from .markup import esc, px, tag
 from .model import KEY_FLAG_TONES, Node, Row, Shape, Tone
 from .shapes import outline_svg, table_radius
@@ -306,14 +308,28 @@ def _row_html(row: Row, place: tuple[float, float, float, bool], theme: Theme) -
     return tag("div", style, (key_cell if key_width else "") + name + kind)
 
 
+def _marks_html(node: Node, theme: Theme) -> str:
+    """Draw the BPMN marks of a node: the trigger of an event, the kind of a task, a repeat."""
+    rules = theme.bpmn
+    stroke = theme.shapes[node.shape].stroke if node.shape is not Shape.TASK else theme.ink
+    slots = mark_slots(node, rules.marker_extent, rules.task_marker_inset, rules.bottom_marker_gap)
+    html = ""
+    for slot in slots:
+        place = f'style="position:absolute;left:{px(slot.x)};top:{px(slot.y)}"'
+        html += mark_svg(slot.marker, slot.size, (stroke, theme.paper), place)
+    return html
+
+
 def _caption_html(node: Node, theme: Theme) -> str:
-    """Draw the caption under a node (an event, an actor), or return nothing."""
+    """Draw the caption of a node (an event, a gateway, an actor), under it or above it."""
     if not node.caption:
         return ""
     style = {
         **ABSOLUTE,
         "left": px(node.x + node.width / 2 - CAPTION_WIDTH_PX / 2),
-        "top": px(node.y + node.height + CAPTION_GAP_PX),
+        "top": px(
+            node.y - CAPTION_GAP_PX if node.caption_above else node.y + node.height + CAPTION_GAP_PX
+        ),
         "width": px(CAPTION_WIDTH_PX),
         "text-align": "center",
         "font-size": px(CAPTION_FONT_SIZE_PX),
@@ -321,6 +337,8 @@ def _caption_html(node: Node, theme: Theme) -> str:
         "color": theme.ink,
         "line-height": px(int(CAPTION_FONT_SIZE_PX * LINE_HEIGHT_FACTOR)),
     }
+    if node.caption_above:
+        style["transform"] = "translateY(-100%)"
     return tag("div", style, esc(node.caption))
 
 
@@ -435,7 +453,9 @@ def node_html(node: Node, theme: Theme) -> str:
     if node.dashed:
         colors = replace(colors, dash=DASH_PATTERN)
     inside = outline_svg(node.shape, node.width, node.height, colors)
-    if node.card and node.shape is not Shape.TABLE:
+    if is_dfd_node(node):
+        inside += dfd_html(node, theme)
+    elif node.card and node.shape is not Shape.TABLE:
         inside += _card_html(node, theme)
     elif node.shape is Shape.TABLE:
         inside += _table_html(node, theme)
@@ -443,6 +463,7 @@ def node_html(node: Node, theme: Theme) -> str:
             inside += _icon_html(node, colors.stroke, _header_height(node, theme))
     else:
         inside += _icon_html(node, colors.stroke) + _label_html(node, theme)
+    inside += _marks_html(node, theme)
     box = {
         **ABSOLUTE,
         "left": px(node.x),
@@ -452,7 +473,7 @@ def node_html(node: Node, theme: Theme) -> str:
     }
     return (
         tag("div", box, inside, data_id=node.id)
-        + _badge_html(node, theme)
+        + (_badge_html(node, theme) if not is_dfd_node(node) else "")
         + _caption_html(node, theme)
         + _connector_note_html(node, theme)
     )
