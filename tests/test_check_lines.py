@@ -8,6 +8,7 @@ PLUGIN_DIR = Path(__file__).resolve().parent.parent / "plugins" / "flow"
 
 sys.path.insert(0, str(PLUGIN_DIR))
 
+from flowlib import diagrams  # noqa: E402
 from flowlib.check import Code, check_scene  # noqa: E402
 from flowlib.labels import place_labels  # noqa: E402
 from flowlib.model import Edge, EdgeLabel, LabelKind, Node, Role, Scene, Shape  # noqa: E402
@@ -82,3 +83,28 @@ def test_a_label_over_a_caption_is_moved_off_it() -> None:
     assert scene.edges[0].label.at != (119, 160)
     messages = [finding.message for finding in check_scene(scene)]
     assert not any("label of" in message for message in messages)
+
+
+def test_a_message_and_a_flow_leaving_one_gateway_are_not_drawn_on_top_of_each_other() -> None:
+    """The message line takes the side of the gateway, so it shares no stretch with the flow."""
+    spec = {
+        "type": "bpmn",
+        "zones": [
+            {"id": "a", "label": "A", "tone": "blue"},
+            {"id": "b", "label": "B", "tone": "green"},
+        ],
+        "elements": [
+            {"id": "g", "label": "Choose", "kind": "exclusive", "zone": "a"},
+            {"id": "t", "label": "Do it", "zone": "a"},
+            {"id": "m", "label": "Ask", "zone": "b"},
+            {"id": "x", "label": "Stop", "kind": "end", "zone": "a"},
+        ],
+        "flows": [
+            {"from": "g", "to": "t"},
+            {"from": "t", "to": "x"},
+            {"from": "g", "to": "m", "style": "message"},
+        ],
+        "direction": "right",
+    }
+    findings = check_scene(diagrams.layout(spec))
+    assert Code.LINES_OVERLAP not in [finding.code for finding in findings]

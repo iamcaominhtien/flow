@@ -184,6 +184,20 @@ def _centered(positions: list[tuple[SpecEdge, float]], node: Node) -> dict[SpecE
     return {edge: _center(node)[0] for edge, _ in positions}
 
 
+def _leaves_by_side(edge: SpecEdge, down: list[SpecEdge], nodes: dict[str, Node]) -> bool:
+    """Tell whether a dashed line should leave the side of its source, not share the bottom.
+
+    A dashed line (a message) that would share the bottom of a node with a solid line goes to
+    the side instead, so that the two kinds are not drawn on top of each other.
+    """
+    if not edge.dashed:
+        return False
+    source_x, target_x = _center(nodes[edge.source])[0], _center(nodes[edge.target])[0]
+    if abs(source_x - target_x) < SAME_LINE_TOLERANCE_PX:
+        return False
+    return any(other.source == edge.source and not other.dashed for other in down)
+
+
 def _slots(edges: list[SpecEdge], nodes: dict[str, Node]) -> dict[SpecEdge, tuple[float, float]]:
     """Choose where each downward line leaves its source and where it enters its target.
 
@@ -195,6 +209,7 @@ def _slots(edges: list[SpecEdge], nodes: dict[str, Node]) -> dict[SpecEdge, tupl
         Edge to ``(exit x, entry x)``, only for lines that run to a lower row.
     """
     down = [e for e in edges if _goes_down(nodes[e.source], nodes[e.target])]
+    down = [e for e in down if not _leaves_by_side(e, down, nodes)]
     leaving: dict[str, list[tuple[SpecEdge, float]]] = {}
     arriving: dict[str, list[tuple[SpecEdge, float]]] = {}
     for edge in down:
@@ -285,29 +300,33 @@ def _channel_route(source: Node, target: Node, side: Port, context: _Context) ->
     return _Route(points, leaves=side, arrives=side, channel=side)
 
 
-def _arc_route(source: Node, target: Node, context: _Context) -> _Route:
-    """Build a route that leaves the top of the source, arcs over the flow, and enters the target.
+def _arc_route(source: Node, target: Node, side: Port, context: _Context) -> _Route:
+    """Build a route that leaves one side of the source, arcs over or under the flow, and enters.
 
     Args:
         source: Where the line starts.
         target: Where the line ends.
+        side: ``TOP`` to arc over the flow, ``BOTTOM`` to arc under it; both ends attach there.
         context: The router state.
 
     Returns:
         The route; it needs no channel.
     """
-    start, end = _attach(source, Port.TOP, context.caption_port), _attach(target, Port.TOP)
-    ridge = min(start[1], end[1]) - context.rules.channel_offset
+    start = _attach(source, side, context.caption_port)
+    end = _attach(target, side, context.caption_port)
+    offset = context.rules.channel_offset
+    ridge = min(start[1], end[1]) - offset if side is Port.TOP else max(start[1], end[1]) + offset
     points = [start, (start[0], ridge), (end[0], ridge), end]
-    return _Route(points, leaves=Port.TOP, arrives=Port.TOP, channel=None)
+    return _Route(points, leaves=side, arrives=side, channel=None)
 
 
 def _returning_route(source: Node, target: Node, context: _Context) -> _Route:
     """Choose the route of a line that loops back to an earlier step.
 
-    The candidates are tried in order: a channel on the right, a channel on the left, and an
-    arc over the top. The first one that is clear of other nodes and uses ports that are still
-    free wins; failing that, the first clear one; failing that, the first.
+    The candidates are tried in order: a channel on the right, a channel on the left, an arc
+    over the top, and an arc under the bottom. The first one that is clear of other nodes and
+    uses ports that are still free wins; failing that, the first clear one; failing that, the
+    first.
 
     Args:
         source: Where the line starts.
@@ -320,7 +339,8 @@ def _returning_route(source: Node, target: Node, context: _Context) -> _Route:
     candidates = [
         _channel_route(source, target, Port.RIGHT, context),
         _channel_route(source, target, Port.LEFT, context),
-        _arc_route(source, target, context),
+        _arc_route(source, target, Port.TOP, context),
+        _arc_route(source, target, Port.BOTTOM, context),
     ]
     ends = (source.id, target.id)
     clear = [route for route in candidates if _is_clear(route.points, context, ends)]

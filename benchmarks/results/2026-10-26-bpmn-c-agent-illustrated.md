@@ -71,8 +71,12 @@ Done in the commit after this run:
 - Skill: the tone list, how to choose an event or gateway type from its name, and
   when to use cards.
 
-Rebuilt result for the same agent spec: 0 errors; 3 `lines-cross` and 3 `lines-overlap`
-warnings. The captions and the "More time" label are clear in the picture. Still there:
-the gateway's message lines share a trunk with its solid line (the three `lines-overlap`),
-and the "Standard" bus is shared by three lines. Long message lines still cross the page.
-Not done: moving a message line to another side of the gateway, and shortening long lines.
+Second round (after the user asked for the rest): a message line that would share the
+bottom of a node with a solid line now leaves the side instead, and a returning line can
+arc under a node as well as over it. Rebuilt result for the same agent spec: 0 errors,
+3 `lines-cross` warnings, no `lines-overlap`. The captions and the "More time" label are clear
+in the picture. The three lines labelled "Standard" still share one vertical stretch (a bus
+from one gateway, allowed up to 240 px). The long lines are long because the elements are far
+apart (the page is about 6200 px wide); only the "Further inquiry" line makes a real detour
+(about 1000 px more than the straight distance). One example (`order-fulfilment-bpmn`) keeps
+one `lines-overlap` warning: two returning lines from one box share their first 62 px.
