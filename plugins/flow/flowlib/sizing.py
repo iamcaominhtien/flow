@@ -177,10 +177,11 @@ def key_room(sections: tuple[tuple[Row, ...], ...], rules: LayoutRules) -> float
     Returns:
         Zero when no row has a chip; otherwise room for the most chips on one row.
     """
-    most = max((len(row.flags) for section in sections for row in section), default=0)
-    if not most:
+    has_chips = any(row.flags for section in sections for row in section)
+    if not has_chips:
         return 0
-    return most * rules.table_chip_width + (most - 1) * 2 + rules.table_chip_gap
+    columns = rules.table_key_columns
+    return columns * rules.table_chip_width + (columns - 1) * 2 + rules.table_chip_gap
 
 
 def _fit_table(
@@ -193,7 +194,9 @@ def _fit_table(
     mono_width = rules.char_width_em * rules.detail_font_size
     widest_row = max(
         (
-            (len(row.left) + len(row.right)) * mono_width + rules.table_row_gap
+            estimate_text_width(row.left, rules, rules.table_name_font_size)
+            + len(row.right) * mono_width
+            + rules.table_row_gap
             for section in sections
             for row in section
         ),

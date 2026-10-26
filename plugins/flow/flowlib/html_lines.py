@@ -14,9 +14,9 @@ HEAD_MARKERS = (Head.FILLED, Head.OPEN, Head.DOT)
 # ends at x = 0 and y = 12. ``{c}`` stands for the line colour and ``{w}`` for white.
 SYMBOL_BOX_PX = 24
 SYMBOL_MIDDLE_PX = 12
-LINE = 'stroke="{c}" stroke-width="1.5"'
-CROWS_FOOT = f'<path d="M-14 12L0 4M-14 12H0M-14 12L0 20" fill="none" {LINE}/>'
-ONE_BAR = f'<path d="M-9 4V20" {LINE}/>'
+LINE = 'stroke="{c}" stroke-width="2"'
+CROWS_FOOT = f'<path d="M-18 12L0 2M-18 12H0M-18 12L0 22" fill="none" {LINE}/>'
+ONE_BAR = f'<path d="M-9 1V23" {LINE}/>'
 DIAMOND_PATH = "M0 12L-8 6L-16 12L-8 18Z"
 SYMBOL_SHAPES: dict[Head, str] = {
     Head.TRIANGLE: f'<path d="M0 12L-14 5V19Z" fill="{{w}}" {LINE}/>',
@@ -24,10 +24,10 @@ SYMBOL_SHAPES: dict[Head, str] = {
     Head.DIAMOND_FILLED: f'<path d="{DIAMOND_PATH}" fill="{{c}}" {LINE}/>',
     Head.ONE: ONE_BAR,
     Head.MANY: CROWS_FOOT,
-    Head.ONE_ONLY: f'<path d="M-8 4V20M-13 4V20" {LINE}/>',
-    Head.ZERO_ONE: f'<circle cx="-17" cy="12" r="4" fill="{{w}}" {LINE}/>{ONE_BAR}',
-    Head.ZERO_MANY: f'<circle cx="-20" cy="12" r="4" fill="{{w}}" {LINE}/>{CROWS_FOOT}',
-    Head.ONE_MANY: f'<path d="M-18 4V20" {LINE}/>{CROWS_FOOT}',
+    Head.ONE_ONLY: f'<path d="M-8 1V23M-15 1V23" {LINE}/>',
+    Head.ZERO_ONE: f'<circle cx="-21" cy="12" r="5" fill="{{w}}" {LINE}/>{ONE_BAR}',
+    Head.ZERO_MANY: f'<circle cx="-24" cy="12" r="5" fill="{{w}}" {LINE}/>{CROWS_FOOT}',
+    Head.ONE_MANY: f'<path d="M-22 1V23" {LINE}/>{CROWS_FOOT}',
 }
 WHITE = "#FFFFFF"
 

@@ -256,12 +256,38 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
         node.id: make_node(
             node,
             fitted[node.id],
-            (center_x[grid.column[node.id]], center_y[grid.rank[node.id]]),
+            (
+                center_x[grid.column[node.id]],
+                _node_center_y(
+                    node,
+                    fitted[node.id],
+                    (center_y[grid.rank[node.id]], heights[grid.rank[node.id]]),
+                ),
+            ),
             _node_width(node, fitted[node.id], widths[grid.column[node.id]], spec),
         )
         for node in spec.nodes
     }
     return _with_frames(spec, nodes, bands, rules)
+
+
+def _node_center_y(node: SpecNode, size: FittedNode, row: tuple[float, float]) -> float:
+    """Return the centre y of a node: the row's centre, or for a table a top-aligned centre.
+
+    Tables of different heights in one row line up at their tops, as in the design's ER pages.
+
+    Args:
+        node: The node.
+        size: Its fitted size.
+        row: The centre y and the height of the row the node is in.
+
+    Returns:
+        The y of the middle of the node.
+    """
+    centre, height = row
+    if node.kind is not Shape.TABLE:
+        return centre
+    return centre - height / 2 + size.height / 2
 
 
 def _lane_widths(widths: dict[int, float], rules: LayoutRules) -> dict[int, float]:

@@ -417,7 +417,8 @@ def _row_value(row: Row, theme: Theme) -> str:
     return (
         '<table style="width:100%;border-collapse:collapse"><tr>'
         f'<td style="padding-left:{ROW_PADDING_PX}px">{left}</td>'
-        f'<td align="right" style="padding-right:{ROW_PADDING_PX}px;color:{theme.slate}">'
+        f'<td align="right" style="padding-right:{ROW_PADDING_PX}px;color:{theme.slate};'
+        f'font-family:{theme.fonts.mono};font-size:{DETAIL_FONT_SIZE_PX}px">'
         f"{esc(row.right)}</td></tr></table>"
     )
 
@@ -445,7 +446,8 @@ def _add_table_card_parts(root: ET.Element, node: Node, theme: Theme) -> None:
             "html": 1,
             "strokeColor": theme.shapes[node.shape].stroke,
             "strokeWidth": STROKE_WIDTH_PX,
-            "fillColor": "#FFFFFF",
+            "fillColor": tone.box,
+            "shadow": 1,
             "fontColor": theme.ink,
             "fontSize": fmt(node.font_size),
             "fontStyle": FONT_BOLD,
@@ -482,9 +484,9 @@ def _add_table_rows(root: ET.Element, node: Node, theme: Theme) -> None:
             "spacingRight": 8,
             "strokeColor": "none",
             "fillColor": "none",
-            "fontSize": DETAIL_FONT_SIZE_PX,
+            "fontSize": fmt(rules.table_name_font_size),
             "fontColor": theme.ink,
-            "fontFamily": theme.fonts.mono,
+            "fontFamily": theme.fonts.sans,
         }
     )
     y = _table_header_height(node, theme)
