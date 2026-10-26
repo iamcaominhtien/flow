@@ -122,3 +122,16 @@ def test_a_gateway_with_a_mark_shows_its_name_as_a_caption() -> None:
     )
     assert gate.node.caption == "Verified?"
     assert gate.node.text == ()
+
+
+def test_an_event_is_a_circle_whatever_its_caption() -> None:
+    """Start, end and timer events keep their fixed round size whatever the caption."""
+    canvas = Canvas()
+    for index, shape in enumerate((Shape.START, Shape.END, Shape.INTERMEDIATE)):
+        box = canvas.node(
+            f"e{index}",
+            shape,
+            "A very long caption for an event",
+            NodeOptions((100, 100 + index * 80)),
+        )
+        assert box.node.width == box.node.height == 38

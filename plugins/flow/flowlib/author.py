@@ -37,6 +37,7 @@ from .theme import load_theme
 CAPTIONED_SHAPES = {Shape.START, Shape.END, Shape.INTERMEDIATE, Shape.ACTOR}  # the text goes under
 LABEL_KIND_OF_ROLE = {Role.YES: LabelKind.YES, Role.NO: LabelKind.NO, Role.BACK: LabelKind.BACK}
 MIDDLE = 0.5
+GATEWAY_SIZE_PX = 56  # a BPMN gateway is a small diamond; its name goes under it
 GATEWAY_ICONS = {"x", "plus"}  # a diamond with one of these marks is a BPMN gateway
 TEXT_SLACK_PX = 48  # room added to the estimated width of free text, so it stays on one line
 TEXT_HEIGHT_PX = 24
@@ -163,8 +164,14 @@ class Canvas:
         if name in self.boxes:
             raise ValueError(f"the id '{name}' is used twice")
         rules = load_theme().layout
+        is_gateway = shape is Shape.DECISION and options.icon in GATEWAY_ICONS
+        captioned = shape in CAPTIONED_SHAPES or is_gateway
         content = NodeContent(text, options.detail or "", options.icon is not None)
         fitted = fit_card(content, rules) if options.card else fit_node(shape, content, rules)
+        if captioned:
+            fitted = replace(
+                fitted, width=rules.min_sizes[shape][0], height=rules.min_sizes[shape][1]
+            )
         width = options.width or fitted.width
         height = options.height or fitted.height
         if options.width:
@@ -172,8 +179,6 @@ class Canvas:
             fitted = replace(
                 fitted, lines=tuple(wrap_text(text, rules, area, DEFAULT_FONT_SIZE_PX))
             )
-        is_gateway = shape is Shape.DECISION and options.icon in GATEWAY_ICONS
-        captioned = shape in CAPTIONED_SHAPES or is_gateway
         placed = Node(
             id=name,
             shape=shape,
