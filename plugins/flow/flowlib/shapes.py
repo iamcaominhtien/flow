@@ -142,6 +142,11 @@ def _note(width: float, height: float, colors: ShapeColors) -> str:
     return outline + crease
 
 
+def _text(width: float, height: float, colors: ShapeColors) -> str:
+    """Draw nothing: a text node is only its words."""
+    return ""
+
+
 def _cross(width: float, height: float, colors: ShapeColors) -> str:
     """Draw an X, which ends the lifeline of a destroyed participant."""
     low_x, high_x = CROSS_INSET_PX, width - CROSS_INSET_PX
@@ -272,6 +277,7 @@ DRAWERS: dict[Shape, Drawer] = {
     Shape.CONNECTOR: _circle,
     Shape.BAR: _bar,
     Shape.NOTE: _note,
+    Shape.TEXT: _text,
     Shape.CROSS: _cross,
     Shape.TABLE: _table,
     Shape.CYLINDER: _cylinder,

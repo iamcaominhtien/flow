@@ -82,7 +82,7 @@ def _label_html(node: Node, theme: Theme) -> str:
     width = text_area_width(node.shape, node.width, has_icon)
     shift = ICON_TEXT_SHIFT_PX if has_icon else 0.0
     height = node.height - (DOCUMENT_LABEL_TRIM_PX if node.shape is Shape.DOCUMENT else 0)
-    is_note = node.shape is Shape.NOTE
+    is_note = node.shape in (Shape.NOTE, Shape.TEXT)
     style = {
         **ABSOLUTE,
         "left": px((node.width - width) / 2 + shift),

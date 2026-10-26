@@ -90,6 +90,10 @@
     "ellipse": {
       "fill": "#DCEEFB",
       "stroke": "#1E5AA8"
+    },
+    "text": {
+      "fill": "none",
+      "stroke": "none"
     }
   },
   "tones": {
@@ -314,6 +318,10 @@
       "cross": [
         24,
         24
+      ],
+      "text": [
+        60,
+        20
       ]
     },
     "max_node_width": 320,

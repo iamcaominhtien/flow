@@ -92,3 +92,13 @@ def test_a_port_can_be_anywhere_along_a_side_except_on_a_diamond() -> None:
 def test_sentence_case_keeps_names_with_capitals_inside() -> None:
     """Names such as Adj-RIB-In stay as written."""
     assert sentence_case("Store Adj-RIB-In") == "Store Adj-RIB-In"
+
+
+def test_a_legend_adds_a_heading_and_one_line_per_role(tmp_path: Path) -> None:
+    """The legend is a heading plus a sample line and words for each role, and checks clean."""
+    canvas = _small_canvas()
+    canvas.legend((60, 420), (Role.MAIN, Role.NO, Role.BACK))
+    assert {"legend-title", "legend-text-0", "legend-text-2"} <= set(canvas.boxes)
+    assert len([edge for edge in canvas.edges if edge.id.startswith("legend-line")]) == 3
+    findings = canvas.write(tmp_path, "legend")
+    assert not [finding for finding in findings if finding.severity is Severity.ERROR]

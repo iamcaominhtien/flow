@@ -7,7 +7,7 @@ way a line runs, how groups are arranged. A script calls ``node``, ``edge``, ``l
 ``zone`` and then ``write``, which draws the HTML and draw.io files and runs the checks.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from itertools import pairwise
 from pathlib import Path
@@ -30,12 +30,26 @@ from .model import (
     Shape,
     Tone,
 )
-from .sizing import NodeContent, fit_node
+from .sizing import NodeContent, estimate_text_width, fit_node, wrap_text
+from .text_area import text_area_width
 from .theme import load_theme
 
 CAPTIONED_SHAPES = {Shape.START, Shape.END, Shape.INTERMEDIATE, Shape.ACTOR}  # the text goes under
 LABEL_KIND_OF_ROLE = {Role.YES: LabelKind.YES, Role.NO: LabelKind.NO, Role.BACK: LabelKind.BACK}
 MIDDLE = 0.5
+TEXT_SLACK_PX = 48  # room added to the estimated width of free text, so it stays on one line
+TEXT_HEIGHT_PX = 24
+LEGEND_ROW_PX = 28  # the height of one legend line
+LEGEND_SAMPLE_PX = 50  # the length of the sample line
+LEGEND_TEXT_OFFSET_PX = 90  # where the words start, to the right of the sample line
+LEGEND_WORDS = {
+    Role.MAIN: "Main path, animated fast: the route a normal case takes",
+    Role.DATA: "Data stream, animated slowly",
+    Role.YES: "Yes exit of a decision",
+    Role.NO: "No exit, or a failure",
+    Role.BACK: "Retry or return",
+    Role.NEXT: "Next step",
+}
 
 
 class Side(StrEnum):
@@ -152,6 +166,11 @@ class Canvas:
         fitted = fit_node(shape, content, rules)
         width = options.width or fitted.width
         height = options.height or fitted.height
+        if options.width:
+            area = text_area_width(shape, width, options.icon is not None)
+            fitted = replace(
+                fitted, lines=tuple(wrap_text(text, rules, area, DEFAULT_FONT_SIZE_PX))
+            )
         captioned = shape in CAPTIONED_SHAPES
         placed = Node(
             id=name,
@@ -172,6 +191,41 @@ class Canvas:
         box = Box(placed)
         self.boxes[name] = box
         return box
+
+    def text(self, name: str, words: str, anchor: Point) -> Box:
+        """Add free text with no outline, for a heading, a note or a legend line.
+
+        Args:
+            name: The id of the text.
+            words: The text.
+            anchor: Where the left end of the text goes, at the middle of its height.
+
+        Returns:
+            The placed box.
+        """
+        rules = load_theme().layout
+        width = estimate_text_width(words, rules, DEFAULT_FONT_SIZE_PX) + TEXT_SLACK_PX
+        centre = (anchor[0] + width / 2, anchor[1])
+        return self.node(
+            name, Shape.TEXT, words, NodeOptions(centre, width=width, height=TEXT_HEIGHT_PX)
+        )
+
+    def legend(self, corner: Point, roles: tuple[Role, ...]) -> None:
+        """Add a "Reading the chart" legend: a heading, then a sample line and words per role.
+
+        Args:
+            corner: The top-left corner of the legend.
+            roles: The line roles the diagram uses, in the order to list them.
+        """
+        left, top = corner
+        self.text("legend-title", "Reading the chart", (left, top))
+        for index, role in enumerate(roles):
+            row = top + LEGEND_ROW_PX * (index + 1)
+            style = Route(role=role, dashed=role is Role.BACK)
+            sample = [(left, row), (left + LEGEND_SAMPLE_PX, row)]
+            self.edges.append(_sample_edge(f"legend-line-{index}", sample, style))
+            anchor = (left + LEGEND_TEXT_OFFSET_PX, row)
+            self.text(f"legend-text-{index}", LEGEND_WORDS[role], anchor)
 
     def edge(
         self,
@@ -313,6 +367,20 @@ def _frame(
     """Build a frame from its id, its label and tone, its bounds and its variant."""
     left, top, width, height = bounds
     return Frame(name, left, top, width, height, words[0], words[1], variant)
+
+
+def _sample_edge(name: str, points: list[Point], route: Route) -> Edge:
+    """Build a short line that belongs to no node, for the legend."""
+    return Edge(
+        id=name,
+        role=route.role,
+        points=tuple(points),
+        label=None,
+        source=None,
+        target=None,
+        head=route.head,
+        dashed=route.dashed,
+    )
 
 
 def _facing_side(box: Box, other: Box) -> str:

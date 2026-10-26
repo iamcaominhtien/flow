@@ -26,6 +26,7 @@ class Shape(StrEnum):
     CONNECTOR = "connector"
     BAR = "bar"
     NOTE = "note"
+    TEXT = "text"
     CROSS = "cross"
     TABLE = "table"
     CYLINDER = "cylinder"

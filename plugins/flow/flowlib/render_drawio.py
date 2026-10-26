@@ -197,6 +197,11 @@ def _circle_style(node: Node) -> dict[str, object]:
     return {"ellipse": ""}
 
 
+def _text_style(node: Node) -> dict[str, object]:
+    """Style pairs for free text: no outline, no fill, left aligned."""
+    return {"text": "", "align": "left", "verticalAlign": "middle", "spacingLeft": 0}
+
+
 SHAPE_STYLES: dict[Shape, Callable[[Node], dict[str, object]]] = {
     Shape.TERMINATOR: _pill_style,
     Shape.FAIL: _pill_style,
@@ -209,6 +214,7 @@ SHAPE_STYLES: dict[Shape, Callable[[Node], dict[str, object]]] = {
     Shape.CONNECTOR: _circle_style,
     Shape.BAR: _bar_style,
     Shape.NOTE: _note_style,
+    Shape.TEXT: _text_style,
     Shape.CROSS: _cross_style,
     Shape.TABLE: _table_style,
     Shape.CYLINDER: _cylinder_style,
@@ -238,7 +244,7 @@ def _node_style(node: Node, theme: Theme) -> str:
         "fontFamily": theme.fonts.sans,
     }
     style.update(SHAPE_STYLES[node.shape](node))
-    if node.shape is Shape.NOTE:
+    if node.shape in (Shape.NOTE, Shape.TEXT):
         style.update({"fontStyle": 0, "fontColor": theme.slate})
     if node.shape is Shape.TABLE:
         icon_room = ICON_LEFT_PX + ICON_SIZE_PX if node.icon else 0
