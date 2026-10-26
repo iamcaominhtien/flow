@@ -86,3 +86,5 @@ You write a short **spec**: screens, each with its elements from top to bottom. 
 - It is a stack of boxes in one column: no side-by-side elements, no tabs, no desktop layout, no annotations or arrows between screens (use the screen flow skill for that).
 - Elements are boxes with text, not drawn controls.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
+
+For a large or dense diagram (more than about 15 elements, many groups, or a hub with many lines) the automatic layout gives long pages and bundled lines; use the `author` skill (`/flow:author`) instead, which lays the diagram out by hand and looks at the result.

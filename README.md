@@ -74,7 +74,7 @@ Flow installs as a Claude Code plugin from this repository. Flow writes `.drawio
 /plugin install flow@flow
 ```
 
-To export to PNG, SVG or PDF, also run `/plugin marketplace add jgraph/drawio-mcp` and `/plugin install drawio@drawio`. Then run the `doctor` skill (`/flow:doctor`) to check the install. Then ask for a flowchart, for example `/flow:flowchart how a customer pays and gets an order delivered`. Claude writes a short spec; a script places the boxes, routes the lines, checks the result and writes an animated HTML page and a `.drawio` file next to the spec. Today the plugin has these skills, all in the plain style:
+To export to PNG, SVG or PDF, also run `/plugin marketplace add jgraph/drawio-mcp` and `/plugin install drawio@drawio`. Then run the `doctor` skill (`/flow:doctor`) to check the install. Then ask for a flowchart, for example `/flow:flowchart how a customer pays and gets an order delivered`. Claude writes a short spec; a script places the boxes, routes the lines, checks the result and writes an animated HTML page and a `.drawio` file next to the spec. There are two ways to get a diagram. The type skills below take a short spec and an automatic layout places everything: quick, good for small diagrams. For a large or dense diagram use `/flow:author`, where Claude lays the diagram out itself in a script it writes, using a small kit that keeps the design, and looks at its own picture and improves it. In a measured test on a 43-step flowchart the automatic layout gave a page about 10000 px wide, and the hand layout about 2500 x 2100. Today the plugin has these skills, all in the plain style unless you ask for illustrated:
 
 | Skill | Draws |
 | --- | --- |
@@ -112,7 +112,7 @@ The icon library is 40 flat line icons plus 97 detailed icons (23 of them are th
 
 ## Benchmarks
 
-`benchmarks/` holds 24 test briefs (8 diagram types, 3 sizes each) taken from public subjects, and a checker for them. See [benchmarks/README.md](benchmarks/README.md). None of them has been run through the plugin yet.
+`benchmarks/` holds 25 test briefs (8 diagram types, 3 sizes each, and a second level C BPMN brief) taken from public subjects, and a checker for them. See [benchmarks/README.md](benchmarks/README.md). A few level C briefs have been run by blind agents; the results, including what is still weak, are in `benchmarks/results/2026-10-26-author-path.md`.
 
 ## Contributing
 

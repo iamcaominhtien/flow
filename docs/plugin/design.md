@@ -175,7 +175,7 @@ Output is a short list with the ids involved, so Claude can edit the spec (`"ran
 ```
 plugins/flow/
 ├── .claude-plugin/plugin.json
-├── skills/                       # doctor, flowchart, sequence, er, architecture, state, import-drawio
+├── skills/                       # doctor, author, flowchart, sequence, er, architecture, state, and the other types
 ├── scripts/
 │   ├── flow.py                   # CLI: build | check | render | import
 │   └── doctor.py
@@ -188,6 +188,8 @@ plugins/flow/
     ├── overrides.py, canvas.py, check.py, build.py
     ├── shapes.py, markup.py, render_html.py, html_nodes.py, html_lines.py
     ├── render_drawio.py, drawio_common.py, drawio_lines.py
+    ├── author.py, labels.py      # the author kit (Canvas) and label placement
+    ├── fold.py, pathfind.py      # folding a long layout into bands; the route search
     ├── icon_check.py             # custom icon validation
     └── import_drawio.py          # .drawio to scene
 tests/                            # development only, not part of the plugin
@@ -206,7 +208,7 @@ Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build 
 
 ## 10. Risks and open questions
 
-1. **Layout quality is the project.** A home-made layered layout will not match a good hand layout on large graphs. Mitigation: start with small and medium graphs, expose hints, report honestly when the result is poor. Not planned: calling Graphviz, because it is not guaranteed to be installed.
+1. **Layout quality is the project.** A home-made layered layout does not match a good hand layout on large graphs; this was measured (see decision 15). Mitigation: the automatic layout is kept for small diagrams, and large or dense ones are laid out by Claude itself with the author kit (§13). Not planned: calling Graphviz, because it is not guaranteed to be installed.
 2. **Python is a requirement.** Claude Code does not ship it. `doctor` checks and says what to install if it is missing. (Not verified: on Windows the command may be `python` or `py`.)
 3. **Text measurement** is an approximation; wide scripts and long labels will sometimes overflow.
 4. **Line weights:** the same numbers in both outputs (§6); confirmed by eye in the draw.io viewer.
@@ -245,3 +247,15 @@ Types that fit the layered engine are declared as data in `diagrams/catalog.py` 
 12. **Edits are operations, not a prompt to a layout engine.** `flow.py edit` takes a checked list; one wrong operation refuses the whole list and the file is untouched. The default output is a new file; `--in-place` keeps a `.bak` copy.
 13. **A blocked line is searched, not guessed.** When the straight or bus route of a forward line runs through a box, `pathfind.py` searches a grid made of box edges and corridors for the cheapest right-angled route (bends, crossings and stretches along other lines cost extra). Lines that loop back keep the channel routes.
 14. **Branches share a rank in a swimlane chart when the type asks for it.** BPMN lays the branches of one lane side by side (`side_by_side`); the flowchart keeps stacking them.
+15. **Two paths, chosen by size.** The spec-and-`build` path (one automatic layout, §4) stays for small diagrams. For large or dense diagrams Claude lays the diagram out itself, in a script it writes for that diagram (`/flow:author`, §13). Reason, measured on the level C briefs: the automatic layout gave pages 6000 to 10000 px wide, bundles of near-parallel lines and long detours, and the AI could not change any of it; the same AI, given the freedom to place nodes and routes and to look at its own picture, produced compact diagrams in the design's style in three to five rounds.
+16. **The kit keeps the design; the author keeps the arrangement.** `flowlib/author.py` (`Canvas`) holds what must not vary: shape sizes, text fitting, circles that stay circles, ports on a diamond or along a side, line roles and their animation, lanes and zones, a legend, labels moved off boxes, the check and the two outputs. It decides nothing about position. The design rules a diagram has to follow (shapes by meaning, tones, line roles, text rules, BPMN notation, the illustrated style) are written into the author skill, because a blind agent applied them only when they were there.
+17. **A long chart is folded, not left as one row.** For the build path, a layout longer than `fold_extent` (2400 px along the flow) is cut between rows into bands that sit side by side in layout space (rows stacked on the page for a left-to-right chart); empty lanes are dropped from each band and lines that cross a cut are searched again (`fold.py`). It shortens the page; it does not make a dense graph pleasant, which is why decision 15 exists.
+18. **Swimlanes are drawn as in the design:** a dark tab with the name, a lightly tinted band, at least `lane_min_size` thick (`FrameVariant.LANE`). Zones keep the dashed tinted area with a name pill.
+
+## 13. The authoring path
+
+Skill `author` tells Claude to: list every step and connection of the brief; choose an arrangement; write `make.py` beside the output using `Canvas` (nodes at centre points, lines with optional sides and waypoints, lanes, zones, text, legend); build; read the check; **look at the picture** (a headless browser if there is one; if not, say so and keep the arrangement simple); change the script and repeat. The script stays with the diagram so it can be changed later. `build` is not used for such a diagram.
+
+What the kit checks, besides the original codes: `lines-overlap` (two lines of different kinds on one stretch, or one kind sharing a trunk longer than 240 px) and `caption-covered` (a line or a label on the name under an event). What it cannot check, and only a look can: wasted space, an unreadable arrangement, a hub that bunches its lines, lines as long as the page.
+
+Measured so far (one blind agent per row, level C briefs; see `benchmarks/results/2026-10-26-author-path.md`): flowchart BGP 43 steps 51 lines at 2500 x 2074 and 2864 x 2334 (plain, illustrated), against 9930 x 980 from `build`; BPMN order fulfilment 46 elements 55 lines at 4384 x 2112. Not verified: the draw.io files in the editor, runs on other models, and the other types.

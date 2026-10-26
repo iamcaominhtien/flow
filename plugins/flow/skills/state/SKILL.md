@@ -51,3 +51,5 @@ Built-in icon names: `user phone cart card bell clock pin pot check box bike ref
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
 
 Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.
+
+For a large or dense diagram (more than about 15 elements, many groups, or a hub with many lines) the automatic layout gives long pages and bundled lines; use the `author` skill (`/flow:author`) instead, which lays the diagram out by hand and looks at the result.

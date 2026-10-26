@@ -178,3 +178,5 @@ The check also reports `lines-overlap` (two lines run on top of each other, so t
 Give every gateway a `label` that is a short question ("Serious?", "Data valid?"). Without a `label` the diamond is drawn empty and the reader cannot tell which decision it is.
 
 Animation: a flow with `"main": true` is drawn thick and animated, so mark the flows of the main path, the route most cases follow from the start event to an end event (a connected chain of flows, not the whole diagram). Message flows are animated slowly by default. A diagram with no `main` flow shows only the message flows moving.
+
+For a large or dense diagram (more than about 15 elements, many groups, or a hub with many lines) the automatic layout gives long pages and bundled lines; use the `author` skill (`/flow:author`) instead, which lays the diagram out by hand and looks at the result.

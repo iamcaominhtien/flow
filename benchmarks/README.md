@@ -1,8 +1,8 @@
 # Benchmarks: diagram briefs
 
-A set of 24 briefs for testing the Flow plugin on harder, realistic subjects than the examples in `examples/`. Each brief is a plain-language request, as a user would write it. The plugin is run on the brief, and the picture it produces is compared with what the brief says.
+A set of 25 briefs for testing the Flow plugin on harder, realistic subjects than the examples in `examples/`. Each brief is a plain-language request, as a user would write it. The plugin is run on the brief, and the picture it produces is compared with what the brief says.
 
-- `briefs/<type>.md`: three briefs per type, at levels A (8-12 elements), B (20-30) and C (40-60). Types: flowchart, sequence, er, architecture, bpmn, state, orgchart, gantt.
+- `briefs/<type>.md`: three briefs per type (BPMN has a second level C brief), at levels A (8-12 elements), B (20-30) and C (40-60). Types: flowchart, sequence, er, architecture, bpmn, state, orgchart, gantt.
 - `briefs/index.md`: the list, with the element and connection counts (exact for level C, the research tool's claims for A and B).
 - `briefs/CHECKS.md`: what `check_briefs.py` measured, and what a person found when reading. **Read it before trusting the counts.**
 - `briefs/research-notes.md`: the research tool's own notes and its works-cited list. Not verified.
@@ -14,7 +14,7 @@ A heading `## <type>-<level>-<nn> — title`, a list of fields (`type`, `level`,
 
 ## How to run a brief
 
-1. Give a fresh agent **only the text under `Brief`**, and the plugin skill for the type (for example `flow:bpmn`). Do not show `Must show`, `Traps` or `Structure`: the agent would fit its answer to them.
+1. Give a fresh agent **only the text under `Brief`**, and the plugin skill: `flow:author` for large or dense diagrams (level B and C), or the skill for the type (for example `flow:bpmn`) for the quick build path. Do not show `Must show`, `Traps` or `Structure`: the agent would fit its answer to them.
 2. The agent writes the spec, builds, fixes errors by changing the spec (at most three rounds as the skill says), and looks at the HTML and draw.io pictures. Use an absolute path with `node /tmp/shot.js` and a viewport as wide as the diagram.
 3. Compare the picture with `Must show`, one point at a time, and count the elements and lines that are drawn against the `Structure` (level C) or the brief's text (levels A and B).
 4. Record the result in `benchmarks/results/<date>-<id>.md`: the spec, the build output, the number of rounds, what the check reported, what a person saw that the check did not, and the unclear parts of the skill.
@@ -24,4 +24,4 @@ A heading `## <type>-<level>-<nn> — title`, a list of fields (`type`, `level`,
 - Levels A and B were not recounted: their element and connection counts are the research tool's claims. Level C briefs have an exact `Structure`; six of them were rewritten here (see `briefs/CHECKS.md`).
 - The brief text was cleaned of citation numbers that the research tool left glued to words. The cleaning was reviewed by reading every change.
 - Several briefs cite a book or standard and no URL. No source was opened. The domain details of the rewritten level C briefs were not checked against their sources.
-- `results/2026-10-26-translated-specs.md` is the only run so far, and it is a script translation of the level C structures, not an agent run. No agent has been run on a brief.
+- `results/2026-10-26-translated-specs.md` is a script translation of the level C structures, not an agent run. `results/2026-10-26-author-path.md` records the first blind agent runs (one per row, level C flowchart and BPMN only); the other types and levels have not been run.

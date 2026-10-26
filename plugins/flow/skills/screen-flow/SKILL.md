@@ -97,3 +97,5 @@ Add `"style": "illustrated"` at the top level to draw each box that has an `icon
 - Fixes beyond the spec: see the flowchart skill (overrides file).
 
 Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.
+
+For a large or dense diagram (more than about 15 elements, many groups, or a hub with many lines) the automatic layout gives long pages and bundled lines; use the `author` skill (`/flow:author`) instead, which lays the diagram out by hand and looks at the result.
