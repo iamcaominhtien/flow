@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 (2026-10-26)
+
+- **Author skill:** in the illustrated style every work step (process, subprocess, document) is now a card, tinted by its lane, with an icon chosen by the noun and one detail line, as in the design's Food delivery example. Before, the skill asked for cards on a few steps only, so illustrated charts looked like plain ones.
+- **Author skill:** how to fold a long chain inside one lane, and how to order several return lines into one node (channel rows, arrival points, connectors for very long lines).
+
 ## 0.1.0 (2026-10-26)
 
 First release.
