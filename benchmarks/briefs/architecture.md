@@ -80,31 +80,97 @@ Two feedback loops maintain state: TelemetryAdjustmentLoop streams connection ke
 
 * **type:** architecture
 * **level:** C
-* **elements:** 45
-* **connections:** 54
+* **elements:** 41
+* **connections:** 52
 * **groups:** Edge Fleet Perimeter, Ingestion Bridge Zone, Real-Time Compute Mesh, Analytics Data Lake
 
 ### Brief
 
-The telematics infrastructure coordinates forty-five components across Edge Fleet Perimeter, Ingestion Bridge Zone, Real-Time Compute Mesh, and Analytics Data Lake.
-In Edge Fleet Perimeter, AutonomousVehiclePod streams sensor frames from LidarSensorArray, RadarSensorArray, and CameraSensorCluster into OnboardPerceptionEngine. OnboardPerceptionEngine feeds VehicleSafetyController, which communicates externally with EdgeGatewayBroker inside Ingestion Bridge Zone.
-EdgeGatewayBroker passes sensor feeds to EdgeMqttIngress and high-throughput streams to WebSocketIngress. SecurityAuthenticator validates certificates against VaultSecretStore.
-EdgeMqttIngress passes valid streams to StreamDistributionRouter in Real-Time Compute Mesh. StreamDistributionRouter fans out four ways: sending point clouds to PerceptionFeatureExtractor, safety triggers to AnomalyDetectionWorker, temporal metrics to TimeSeriesAggregator, and raw blobs directly to S3ColdStorageArchive in Analytics Data Lake.
-PerceptionFeatureExtractor queries ModelInferenceCluster, which pulls weights from MlflowRegistryStore. AnomalyDetectionWorker flags critical alerts directly to SafetyOperationsDashboard, skipping stream pipelines. TimeSeriesAggregator streams aggregated events into KafkaEventBackbone.
-FlinkStreamAnalytics consumes KafkaEventBackbone and updates RedisSpatialCache. GeospatialIndexingWorker consumes KafkaEventBackbone and writes spatial coordinates into ScyllaDbCluster. DriveDiagnosticsService processes vehicle health events, saving diagnostic snapshots into CassandraHealthStore.
-BatchEtlService extracts daily logs from ScyllaDbCluster and loads transformed records into SnowflakeDataWarehouse. TrinoQueryEngine queries SnowflakeDataWarehouse, serving analytical feeds to GrafanaVisualizationHub.
-Two feedback loops preserve synchronization: CalibrationLoop sends sensor correction offsets from AnomalyDetectionWorker through EdgeGatewayBroker back to OnboardPerceptionEngine; FirmwareLoop delivers OTA updates from S3ColdStorageArchive through EdgeGatewayBroker to AutonomousVehiclePod.
+The model has 41 components in 4 groups: Edge Fleet Perimeter, Ingestion Bridge Zone, Real-Time Compute Mesh, Analytics Data Lake. Every name below is one component to draw, and every sentence describes connections to draw.
+
+In Edge Fleet Perimeter: OnboardPerceptionEngine calls VehicleSafetyController. VehicleSafetyController calls TlsTerminationProxy (opens a TLS session and sends telemetry). FirmwareUpdateAgent calls AutonomousVehiclePod (installs updates). AutonomousVehiclePod calls LidarSensorArray (powers), RadarSensorArray (powers), and CameraSensorCluster (powers). LidarSensorArray calls OnboardPerceptionEngine (streams point clouds). RadarSensorArray calls OnboardPerceptionEngine (streams radar returns). CameraSensorCluster calls OnboardPerceptionEngine (streams image frames).
+
+In Ingestion Bridge Zone: EdgeGatewayBroker calls RateLimitGuard, OnboardPerceptionEngine (calibration loop: delivers the correction offsets), and FirmwareUpdateAgent (firmware loop: delivers the over-the-air update). RateLimitGuard calls EdgeMqttIngress (forwards sensor feeds), and WebSocketIngress (forwards high-throughput streams). EdgeMqttIngress calls SecurityAuthenticator (asks to validate a device), and StreamDistributionRouter (passes valid streams). SecurityAuthenticator calls DeviceCertificateRegistry (looks up certificates), and VaultSecretStore (reads signing keys). WebSocketIngress calls StreamDistributionRouter (passes valid streams). TlsTerminationProxy calls EdgeGatewayBroker (forwards decrypted traffic).
+
+In Real-Time Compute Mesh: ConfigDistributionService calls EdgeGatewayBroker (pushes fleet configuration), and FleetDirectoryService (reads fleet assignments). StreamDistributionRouter calls PerceptionFeatureExtractor (sends point clouds), AnomalyDetectionWorker (sends safety triggers), TimeSeriesAggregator (sends temporal metrics), S3ColdStorageArchive (writes raw blobs), SchemaRegistry (validates message schemas), and ObservabilityCollector (emits pipeline metrics). PerceptionFeatureExtractor calls ModelInferenceCluster (queries). ModelInferenceCluster calls MlflowRegistryStore (pulls model weights). AnomalyDetectionWorker calls AlertRoutingService (raises critical alerts), and EdgeGatewayBroker (calibration loop: sends sensor correction offsets). AlertRoutingService calls SafetyOperationsDashboard (pushes alerts, skipping the stream pipeline). TimeSeriesAggregator calls KafkaEventBackbone (publishes aggregated events). KafkaEventBackbone calls FlinkStreamAnalytics (feeds), GeospatialIndexingWorker (feeds), DriveDiagnosticsService (feeds), and SchemaRegistry (validates message schemas). FlinkStreamAnalytics calls RedisSpatialCache (updates). RedisSpatialCache calls StreamDistributionRouter (hot cache lookup for routing). GeospatialIndexingWorker calls ScyllaDbCluster (writes spatial coordinates). DriveDiagnosticsService calls CassandraHealthStore (saves diagnostic snapshots). ObservabilityCollector calls GrafanaVisualizationHub (exports metrics).
+
+In Analytics Data Lake: S3ColdStorageArchive calls BatchEtlService (provides raw logs), and FirmwareArtifactRepository (firmware loop: archives release candidates). BatchEtlService calls ScyllaDbCluster (extracts daily logs), CassandraHealthStore (extracts health records), and SnowflakeDataWarehouse (loads transformed records). FirmwareArtifactRepository calls EdgeGatewayBroker (firmware loop: serves signed builds). TrinoQueryEngine calls SnowflakeDataWarehouse (queries), and GrafanaVisualizationHub (serves analytical feeds). DataRetentionScheduler calls S3ColdStorageArchive (expires old objects).
 
 ### Must show
 
-* Four enterprise zones: Edge Fleet Perimeter, Ingestion Bridge Zone, Real-Time Compute Mesh, and Analytics Data Lake.
-* StreamDistributionRouter fanning out four concurrent streams to PerceptionFeatureExtractor, AnomalyDetectionWorker, TimeSeriesAggregator, and S3ColdStorageArchive.
-* AnomalyDetectionWorker bypassing pipeline layers to link directly to SafetyOperationsDashboard.
-* Two feedback cycles: CalibrationLoop and FirmwareLoop traversing from deep cloud processing back to vehicle hardware.
+* The 4 groups (Edge Fleet Perimeter, Ingestion Bridge Zone, Real-Time Compute Mesh, Analytics Data Lake) contain exactly the elements listed under Structure.
+* Fan-out of three or more: StreamDistributionRouter (6), KafkaEventBackbone (4), AutonomousVehiclePod (3), EdgeGatewayBroker (3), BatchEtlService (3).
+* 4 connections return to an earlier element: AnomalyDetectionWorker to EdgeGatewayBroker, RedisSpatialCache to StreamDistributionRouter, FirmwareArtifactRepository to EdgeGatewayBroker, TlsTerminationProxy to EdgeGatewayBroker.
+* 14 connections cross between groups, for example VehicleSafetyController to TlsTerminationProxy, EdgeMqttIngress to StreamDistributionRouter, WebSocketIngress to StreamDistributionRouter.
 
 ### Traps
 
-* Complex bidirectional feedback channels bridging deep cloud analytical nodes back to mobile physical edge devices force layout engines to route reverse edges around nested containment boxes.
+* Two feedback paths run from the data lake back to the vehicle through the same gateway, against the flow of the layers.
+* A bypass (AnomalyDetectionWorker to the dashboard) skips two layers.
+
+### Structure
+
+**Elements**
+
+- Edge Fleet Perimeter: OnboardPerceptionEngine, VehicleSafetyController, FirmwareUpdateAgent, AutonomousVehiclePod, LidarSensorArray, RadarSensorArray, CameraSensorCluster
+- Ingestion Bridge Zone: EdgeGatewayBroker, RateLimitGuard, EdgeMqttIngress, SecurityAuthenticator, DeviceCertificateRegistry, VaultSecretStore, WebSocketIngress, TlsTerminationProxy
+- Real-Time Compute Mesh: ConfigDistributionService, StreamDistributionRouter, PerceptionFeatureExtractor, ModelInferenceCluster, MlflowRegistryStore, AnomalyDetectionWorker, AlertRoutingService, TimeSeriesAggregator, KafkaEventBackbone, FlinkStreamAnalytics, RedisSpatialCache, GeospatialIndexingWorker, DriveDiagnosticsService, SchemaRegistry, ObservabilityCollector
+- Analytics Data Lake: SafetyOperationsDashboard, ScyllaDbCluster, CassandraHealthStore, S3ColdStorageArchive, BatchEtlService, SnowflakeDataWarehouse, FirmwareArtifactRepository, GrafanaVisualizationHub, FleetDirectoryService, TrinoQueryEngine, DataRetentionScheduler
+
+**Connections**
+
+- LidarSensorArray -> OnboardPerceptionEngine (streams point clouds)
+- RadarSensorArray -> OnboardPerceptionEngine (streams radar returns)
+- CameraSensorCluster -> OnboardPerceptionEngine (streams image frames)
+- OnboardPerceptionEngine -> VehicleSafetyController
+- AutonomousVehiclePod -> LidarSensorArray (powers)
+- AutonomousVehiclePod -> RadarSensorArray (powers)
+- AutonomousVehiclePod -> CameraSensorCluster (powers)
+- VehicleSafetyController -> TlsTerminationProxy (opens a TLS session and sends telemetry)
+- TlsTerminationProxy -> EdgeGatewayBroker (forwards decrypted traffic)
+- FirmwareUpdateAgent -> AutonomousVehiclePod (installs updates)
+- EdgeGatewayBroker -> RateLimitGuard
+- RateLimitGuard -> EdgeMqttIngress (forwards sensor feeds)
+- RateLimitGuard -> WebSocketIngress (forwards high-throughput streams)
+- SecurityAuthenticator -> DeviceCertificateRegistry (looks up certificates)
+- SecurityAuthenticator -> VaultSecretStore (reads signing keys)
+- EdgeMqttIngress -> SecurityAuthenticator (asks to validate a device)
+- EdgeMqttIngress -> StreamDistributionRouter (passes valid streams)
+- WebSocketIngress -> StreamDistributionRouter (passes valid streams)
+- StreamDistributionRouter -> PerceptionFeatureExtractor (sends point clouds)
+- StreamDistributionRouter -> AnomalyDetectionWorker (sends safety triggers)
+- StreamDistributionRouter -> TimeSeriesAggregator (sends temporal metrics)
+- StreamDistributionRouter -> S3ColdStorageArchive (writes raw blobs)
+- PerceptionFeatureExtractor -> ModelInferenceCluster (queries)
+- ModelInferenceCluster -> MlflowRegistryStore (pulls model weights)
+- AnomalyDetectionWorker -> AlertRoutingService (raises critical alerts)
+- AlertRoutingService -> SafetyOperationsDashboard (pushes alerts, skipping the stream pipeline)
+- TimeSeriesAggregator -> KafkaEventBackbone (publishes aggregated events)
+- KafkaEventBackbone -> FlinkStreamAnalytics (feeds)
+- KafkaEventBackbone -> GeospatialIndexingWorker (feeds)
+- KafkaEventBackbone -> DriveDiagnosticsService (feeds)
+- FlinkStreamAnalytics -> RedisSpatialCache (updates)
+- GeospatialIndexingWorker -> ScyllaDbCluster (writes spatial coordinates)
+- DriveDiagnosticsService -> CassandraHealthStore (saves diagnostic snapshots)
+- BatchEtlService -> ScyllaDbCluster (extracts daily logs)
+- BatchEtlService -> CassandraHealthStore (extracts health records)
+- BatchEtlService -> SnowflakeDataWarehouse (loads transformed records)
+- S3ColdStorageArchive -> BatchEtlService (provides raw logs)
+- TrinoQueryEngine -> SnowflakeDataWarehouse (queries)
+- TrinoQueryEngine -> GrafanaVisualizationHub (serves analytical feeds)
+- DataRetentionScheduler -> S3ColdStorageArchive (expires old objects)
+- AnomalyDetectionWorker -> EdgeGatewayBroker (calibration loop: sends sensor correction offsets)
+- EdgeGatewayBroker -> OnboardPerceptionEngine (calibration loop: delivers the correction offsets)
+- FirmwareArtifactRepository -> EdgeGatewayBroker (firmware loop: serves signed builds)
+- EdgeGatewayBroker -> FirmwareUpdateAgent (firmware loop: delivers the over-the-air update)
+- S3ColdStorageArchive -> FirmwareArtifactRepository (firmware loop: archives release candidates)
+- RedisSpatialCache -> StreamDistributionRouter (hot cache lookup for routing)
+- StreamDistributionRouter -> SchemaRegistry (validates message schemas)
+- KafkaEventBackbone -> SchemaRegistry (validates message schemas)
+- ConfigDistributionService -> EdgeGatewayBroker (pushes fleet configuration)
+- ConfigDistributionService -> FleetDirectoryService (reads fleet assignments)
+- StreamDistributionRouter -> ObservabilityCollector (emits pipeline metrics)
+- ObservabilityCollector -> GrafanaVisualizationHub (exports metrics)
 
 ### Sources
 
@@ -113,4 +179,4 @@ Two feedback loops preserve synchronization: CalibrationLoop sends sensor correc
 
 ### Uncertain
 
-* none
+* The domain details were written to give the diagram a realistic shape; they were not checked against the cited sources.

@@ -78,14 +78,14 @@ When code verification succeeds, VerifierValidator issues TokenSignRequest to Cr
 
 * **type:** sequence
 * **level:** C
-* **elements:** 44
-* **connections:** 52
+* **elements:** 14
+* **connections:** 43
 * **groups:** Radio Access Network, Core Control Plane, Core User Plane
 
 ### Brief
 
-Initial access coordinates forty-four participants across Radio Access Network, Core Control Plane, and Core User Plane.
-UserEquipment sends RachPreamble to PhyTransceiver, which notifies MacScheduler. MacScheduler issues RarGrant to UserEquipment. UserEquipment sends RrcSetupRequest to RrcController, which returns RrcSetup. UserEquipment sends RrcSetupComplete with embedded NasRegistrationRequest to GNodeB. If transmission errors occur, GNodeB triggers HarqRetryLoop back to UserEquipment.
+Initial access coordinates fourteen participants exchanging forty-three messages across Radio Access Network, Core Control Plane, and Core User Plane.
+UserEquipment sends RachPreamble to PhyTransceiver, which forwards RachNotification to MacScheduler. MacScheduler issues RarGrant to UserEquipment. UserEquipment sends RrcSetupRequest to RrcController, which returns RrcSetup. UserEquipment sends RrcSetupComplete with embedded NasRegistrationRequest to GNodeB. If transmission errors occur, GNodeB triggers HarqRetryLoop back to UserEquipment.
 GNodeB sends InitialUeMessage to AmfRouter. AmfRouter sends NausfAuthInitiate to AusfServer, which routes NudmAuthGenerate to UdmServer. UdmServer returns VectorData to AusfServer, which sends AuthChallenge to AmfRouter. AmfRouter forwards NasAuthRequest to UserEquipment. UserEquipment returns NasAuthResponse to AmfRouter. If authentication fails, AmfRouter triggers EapRetryLoop back to UserEquipment. If valid, AmfRouter sends AuthConfirm to AusfServer, which returns AuthSuccess.
 AmfRouter queries SeirRegistry via CheckImei, receiving DeviceStatus. For immediate emergency routing, AmfRouter sends EmergencyBypass directly to UpfGateway, skipping policy bindings. In standard flow, AmfRouter updates UdmServer via NudmRegister, receiving SubscriptionProfile. AmfRouter issues PolicyControlCreate to PcfServer, receiving PolicyDecision.
 AmfRouter fans out three messages simultaneously: PduSessionCreate to SmfController, RegistrationAccept to GNodeB, and AnalyticsLog to NrfDiscovery. SmfController queries UdmServer via NudmSmfData, receiving SmData. SmfController applies policy via NpcfSmfPolicy to PcfServer, receiving SmPolicy. SmfController establishes user plane sessions via N4SessionRequest to UpfGateway, which returns N4SessionResponse. SmfController returns NamfNsmfResponse to AmfRouter.
@@ -101,6 +101,60 @@ AmfRouter sends InitialContextSetup to GNodeB, which sends RrcReconfiguration to
 ### Traps
 
 * Coordinating forty-four distinct participants across radio and core domains causes severe horizontal crowding and lifeline elongation.
+
+### Structure
+
+**Elements**
+
+- Radio Access Network: UserEquipment, PhyTransceiver, MacScheduler, RrcController, GNodeB
+- Core Control Plane: AmfRouter, AusfServer, UdmServer, SeirRegistry, PcfServer, SmfController, NrfDiscovery
+- Core User Plane: UpfGateway, ExternalDataNetwork
+
+**Connections**
+
+- UserEquipment -> PhyTransceiver (RachPreamble)
+- PhyTransceiver -> MacScheduler (RachNotification)
+- MacScheduler -> UserEquipment (RarGrant)
+- UserEquipment -> RrcController (RrcSetupRequest)
+- RrcController -> UserEquipment (RrcSetup)
+- UserEquipment -> GNodeB (RrcSetupComplete)
+- GNodeB -> UserEquipment (HarqRetryLoop)
+- GNodeB -> AmfRouter (InitialUeMessage)
+- AmfRouter -> AusfServer (NausfAuthInitiate)
+- AusfServer -> UdmServer (NudmAuthGenerate)
+- UdmServer -> AusfServer (VectorData)
+- AusfServer -> AmfRouter (AuthChallenge)
+- AmfRouter -> UserEquipment (NasAuthRequest)
+- UserEquipment -> AmfRouter (NasAuthResponse)
+- AmfRouter -> UserEquipment (EapRetryLoop)
+- AmfRouter -> AusfServer (AuthConfirm)
+- AusfServer -> AmfRouter (AuthSuccess)
+- AmfRouter -> SeirRegistry (CheckImei)
+- SeirRegistry -> AmfRouter (DeviceStatus)
+- AmfRouter -> UpfGateway (EmergencyBypass)
+- AmfRouter -> UdmServer (NudmRegister)
+- UdmServer -> AmfRouter (SubscriptionProfile)
+- AmfRouter -> PcfServer (PolicyControlCreate)
+- PcfServer -> AmfRouter (PolicyDecision)
+- AmfRouter -> SmfController (PduSessionCreate)
+- AmfRouter -> GNodeB (RegistrationAccept)
+- AmfRouter -> NrfDiscovery (AnalyticsLog)
+- SmfController -> UdmServer (NudmSmfData)
+- UdmServer -> SmfController (SmData)
+- SmfController -> PcfServer (NpcfSmfPolicy)
+- PcfServer -> SmfController (SmPolicy)
+- SmfController -> UpfGateway (N4SessionRequest)
+- UpfGateway -> SmfController (N4SessionResponse)
+- SmfController -> AmfRouter (NamfNsmfResponse)
+- AmfRouter -> GNodeB (InitialContextSetup)
+- GNodeB -> UserEquipment (RrcReconfiguration)
+- UserEquipment -> GNodeB (RrcReconfigurationComplete)
+- GNodeB -> AmfRouter (InitialContextSetupResponse)
+- GNodeB -> UpfGateway (GtpuTunnel)
+- UserEquipment -> UpfGateway (DataPacket)
+- UpfGateway -> ExternalDataNetwork (DataPacket)
+- ExternalDataNetwork -> UpfGateway (DataAck)
+- UpfGateway -> UserEquipment (DataAck)
 
 ### Sources
 

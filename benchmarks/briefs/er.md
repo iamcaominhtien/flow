@@ -76,31 +76,95 @@ In Metering Analytics, TenantDomain links one-to-many to MeteredUsageEvent. Mete
 
 * **type:** er
 * **level:** C
-* **elements:** 42
+* **elements:** 41
 * **connections:** 50
 * **groups:** Procurement Core, Facility Topology, Inventory Tracking, Fulfillment Fleet
 
 ### Brief
 
-The schema coordinates global distribution across forty-two entities grouped into Procurement Core, Facility Topology, Inventory Tracking, and Fulfillment Fleet.
-In Procurement Core, GlobalVendor maintains a one-to-many relationship with MasterVendorContract, and a one-to-many relationship with PurchaseOrderRecord. PurchaseOrderRecord links one-to-many to PurchaseOrderLineItem. ProductMasterSKU links one-to-many to PurchaseOrderLineItem, and one-to-many to ProductBillOfMaterials.
-In Facility Topology, DistributionCenter links one-to-many to WarehouseBuilding, which links one-to-many to FacilityStorageZone. FacilityStorageZone links one-to-many to StorageAisle, which links one-to-many to RackBay. RackBay links one-to-many to StorageBinLocation.
-In Inventory Tracking, ProductMasterSKU fans out four relationships: one-to-many to StorageBinAllocation, one-to-many to StockKeepingUnitBatch, one-to-many to TariffClassificationCode, and one-to-many to ReplenishmentRule. StockKeepingUnitBatch links one-to-many to SerializedUnitInventory, and one-to-many to QualityInspectionLot. StorageBinLocation links one-to-many to SerializedUnitInventory.
-Two relational audit loops enforce data integrity: SerializedUnitInventory links one-to-many to CycleCountAuditRecord, which links one-to-many to StockDiscrepancyLog, which links back one-to-many to SerializedUnitInventory. In parallel, StorageBinAllocation links one-to-many to InternalBayTransfer, which links to PalletUnitConsolidation, which links back to StorageBinAllocation.
-In Fulfillment Fleet, CustomerSalesOrder links one-to-many to SalesOrderFulfillmentLine. ProductMasterSKU links one-to-many to SalesOrderFulfillmentLine. SalesOrderFulfillmentLine links one-to-many to WarehouseWavePickingTask. WarehouseWavePickingTask links one-to-many to PackingConsignmentContainer. PackingConsignmentContainer links one-to-many to ShippingDispatchManifest.
-FreightLogisticsCarrier links one-to-many to ShippingDispatchManifest, and one-to-many to FleetTransportVehicle. FleetTransportVehicle links one-to-many to DriverDeliveryAssignment, which links one-to-many to ProofOfDeliveryRecord.
-ExpressEmergencyDrop skips intermediate warehouse picking by linking PurchaseOrderRecord directly to ShippingDispatchManifest. Across groups, DistributionCenter links one-to-many to ShippingDispatchManifest, and SerializedUnitInventory links one-to-many to PackingConsignmentContainer.
+The model has 41 entities in 4 groups: Procurement Core, Facility Topology, Inventory Tracking, Fulfillment Fleet. Every name below is one entity to draw, and every sentence describes connections to draw.
+
+In Procurement Core: GlobalVendor links one-to-many to MasterVendorContract, one-to-many to PurchaseOrderRecord, and one-to-many to SupplierQualityScorecard. MasterVendorContract links one-to-many to ContractPriceTier. PurchaseOrderRecord links one-to-many to PurchaseOrderLineItem, one-to-many to GoodsReceiptNote, and one-to-one to ShippingDispatchManifest. GoodsReceiptNote links one-to-many to PutawayTask. ProductMasterSKU links one-to-many to PurchaseOrderLineItem, one-to-many to ProductBillOfMaterials, one-to-many to ContractPriceTier, one-to-many to StorageBinAllocation, one-to-many to StockKeepingUnitBatch, many-to-many to TariffClassificationCode, one-to-many to ReplenishmentRule, one-to-many to DemandForecastPlan, and one-to-many to SalesOrderFulfillmentLine.
+
+In Facility Topology: DistributionCenter links one-to-many to WarehouseBuilding, one-to-many to StockTransferOrder, and one-to-many to ShippingDispatchManifest. WarehouseBuilding links one-to-many to FacilityStorageZone. FacilityStorageZone links one-to-many to StorageAisle. StorageAisle links one-to-many to RackBay. RackBay links one-to-many to StorageBinLocation. StorageBinLocation links one-to-many to PutawayTask, one-to-many to SerializedUnitInventory, and one-to-many to StorageBinAllocation.
+
+In Inventory Tracking: StorageBinAllocation links one-to-many to InternalBayTransfer. InternalBayTransfer links one-to-many to PalletUnitConsolidation. PalletUnitConsolidation links one-to-many to StorageBinAllocation. StockKeepingUnitBatch links one-to-many to SerializedUnitInventory, and one-to-many to QualityInspectionLot. SerializedUnitInventory links one-to-many to CycleCountAuditRecord, and one-to-many to PackingConsignmentContainer. CycleCountAuditRecord links one-to-many to StockDiscrepancyLog. StockDiscrepancyLog links one-to-many to SerializedUnitInventory. StockTransferOrder links one-to-many to InternalBayTransfer.
+
+In Fulfillment Fleet: ShippingDispatchManifest links one-to-many to CustomsDeclaration. PackingConsignmentContainer links one-to-many to ShippingDispatchManifest. SalesOrderFulfillmentLine links one-to-many to WarehouseWavePickingTask. WarehouseWavePickingTask links one-to-many to PackingConsignmentContainer. CustomerSalesOrder links one-to-many to SalesOrderFulfillmentLine, and one-to-many to ReturnAuthorization. ReturnAuthorization links one-to-many to ReturnInspectionRecord. ReturnInspectionRecord links one-to-many to SerializedUnitInventory. FreightLogisticsCarrier links one-to-many to ShippingDispatchManifest, one-to-many to FleetTransportVehicle, and one-to-many to CarrierRateCard. FleetTransportVehicle links one-to-many to DriverDeliveryAssignment. DriverDeliveryAssignment links one-to-many to ProofOfDeliveryRecord.
 
 ### Must show
 
-* Enterprise grouping across Procurement Core, Facility Topology, Inventory Tracking, and Fulfillment Fleet.
-* ProductMasterSKU fanning out four distinct relationship links to StorageBinAllocation, StockKeepingUnitBatch, TariffClassificationCode, and ReplenishmentRule.
-* The two cyclic relational loops involving CycleCountAuditRecord and InternalBayTransfer.
-* ExpressEmergencyDrop jumping from Procurement Core directly to Fulfillment Fleet, skipping inventory and warehouse picking entities.
+* The 4 groups (Procurement Core, Facility Topology, Inventory Tracking, Fulfillment Fleet) contain exactly the elements listed under Structure.
+* Fan-out of three or more: ProductMasterSKU (9), GlobalVendor (3), PurchaseOrderRecord (3), DistributionCenter (3), StorageBinLocation (3).
+* 2 connections return to an earlier element: PalletUnitConsolidation to StorageBinAllocation, StockDiscrepancyLog to SerializedUnitInventory.
+* 14 connections cross between groups, for example GoodsReceiptNote to PutawayTask, ProductMasterSKU to StorageBinAllocation, ProductMasterSKU to StockKeepingUnitBatch.
 
 ### Traps
 
-* Combining deep six-tier vertical nesting in Facility Topology with cyclic audit loops and cross-domain order fulfillment links challenges planar relational graph embedding.
+* Two three-entity cycles (audit and consolidation) inside a deep six-tier facility hierarchy.
+* ProductMasterSKU is referenced from five groups, so its relationships cross every other group.
+
+### Structure
+
+**Elements**
+
+- Procurement Core: GlobalVendor, MasterVendorContract, ContractPriceTier, PurchaseOrderRecord, PurchaseOrderLineItem, GoodsReceiptNote, SupplierQualityScorecard, ProductMasterSKU, ProductBillOfMaterials
+- Facility Topology: PutawayTask, DistributionCenter, WarehouseBuilding, FacilityStorageZone, StorageAisle, RackBay, StorageBinLocation
+- Inventory Tracking: StorageBinAllocation, InternalBayTransfer, PalletUnitConsolidation, StockKeepingUnitBatch, SerializedUnitInventory, CycleCountAuditRecord, StockDiscrepancyLog, QualityInspectionLot, TariffClassificationCode, ReplenishmentRule, DemandForecastPlan, StockTransferOrder
+- Fulfillment Fleet: ShippingDispatchManifest, CustomsDeclaration, PackingConsignmentContainer, SalesOrderFulfillmentLine, WarehouseWavePickingTask, CustomerSalesOrder, ReturnAuthorization, ReturnInspectionRecord, FreightLogisticsCarrier, FleetTransportVehicle, DriverDeliveryAssignment, ProofOfDeliveryRecord, CarrierRateCard
+
+**Connections**
+
+- GlobalVendor -> MasterVendorContract
+- GlobalVendor -> PurchaseOrderRecord
+- GlobalVendor -> SupplierQualityScorecard
+- MasterVendorContract -> ContractPriceTier
+- PurchaseOrderRecord -> PurchaseOrderLineItem
+- PurchaseOrderRecord -> GoodsReceiptNote
+- ProductMasterSKU -> PurchaseOrderLineItem
+- ProductMasterSKU -> ProductBillOfMaterials
+- ProductMasterSKU -> ContractPriceTier
+- GoodsReceiptNote -> PutawayTask
+- DistributionCenter -> WarehouseBuilding
+- WarehouseBuilding -> FacilityStorageZone
+- FacilityStorageZone -> StorageAisle
+- StorageAisle -> RackBay
+- RackBay -> StorageBinLocation
+- StorageBinLocation -> PutawayTask
+- ProductMasterSKU -> StorageBinAllocation
+- ProductMasterSKU -> StockKeepingUnitBatch
+- ProductMasterSKU -> TariffClassificationCode (many-to-many)
+- ProductMasterSKU -> ReplenishmentRule
+- ProductMasterSKU -> DemandForecastPlan
+- StockKeepingUnitBatch -> SerializedUnitInventory
+- StockKeepingUnitBatch -> QualityInspectionLot
+- StorageBinLocation -> SerializedUnitInventory
+- StorageBinLocation -> StorageBinAllocation
+- SerializedUnitInventory -> CycleCountAuditRecord
+- CycleCountAuditRecord -> StockDiscrepancyLog
+- StockDiscrepancyLog -> SerializedUnitInventory
+- StorageBinAllocation -> InternalBayTransfer
+- InternalBayTransfer -> PalletUnitConsolidation
+- PalletUnitConsolidation -> StorageBinAllocation
+- DistributionCenter -> StockTransferOrder
+- StockTransferOrder -> InternalBayTransfer
+- CustomerSalesOrder -> SalesOrderFulfillmentLine
+- ProductMasterSKU -> SalesOrderFulfillmentLine
+- SalesOrderFulfillmentLine -> WarehouseWavePickingTask
+- WarehouseWavePickingTask -> PackingConsignmentContainer
+- PackingConsignmentContainer -> ShippingDispatchManifest
+- FreightLogisticsCarrier -> ShippingDispatchManifest
+- FreightLogisticsCarrier -> FleetTransportVehicle
+- FreightLogisticsCarrier -> CarrierRateCard
+- FleetTransportVehicle -> DriverDeliveryAssignment
+- DriverDeliveryAssignment -> ProofOfDeliveryRecord
+- ShippingDispatchManifest -> CustomsDeclaration
+- CustomerSalesOrder -> ReturnAuthorization
+- ReturnAuthorization -> ReturnInspectionRecord
+- ReturnInspectionRecord -> SerializedUnitInventory
+- PurchaseOrderRecord -> ShippingDispatchManifest (one-to-one)
+- DistributionCenter -> ShippingDispatchManifest
+- SerializedUnitInventory -> PackingConsignmentContainer
 
 ### Sources
 
@@ -109,4 +173,4 @@ ExpressEmergencyDrop skips intermediate warehouse picking by linking PurchaseOrd
 
 ### Uncertain
 
-* none
+* The domain details were written to give the diagram a realistic shape; they were not checked against the cited sources.

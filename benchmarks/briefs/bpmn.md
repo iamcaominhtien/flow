@@ -80,31 +80,93 @@ If covenants pass audit, UnderwriterAuditGateway advances to PrepareSyndicationP
 
 * **type:** bpmn
 * **level:** C
-* **elements:** 46
-* **connections:** 55
+* **elements:** 41
+* **connections:** 48
 * **groups:** Clinical Trial Site, Safety Management CRO, Data Safety Monitoring Board, Regulatory Oversight Authority
 
 ### Brief
 
-The safety protocol manages drug event monitoring across Clinical Trial Site, Safety Management CRO, Data Safety Monitoring Board, and Regulatory Oversight Authority.
-The protocol triggers at AdverseEventDetected inside Clinical Trial Site. The site physician enters case details via DocumentAdverseEventTask and passes to AssessSeriousnessTask. AssessSeriousnessTask routes to SeriousAdverseEventGateway. If non-serious, SeriousAdverseEventGateway routes to LogStandardRegistryTask, terminating at RoutineCaseArchivedEnd.
-If serious, SeriousAdverseEventGateway routes to TransmitE2BReportTask, which crosses into Safety Management CRO. IngestionValidationTask reviews transmission formatting and advances to TriagingTriageGateway. If data errors exist, TriagingTriageGateway routes back to ClarificationRequestTask, which loops back to DocumentAdverseEventTask.
-If data is valid, TriagingTriageGateway advances to MedicalCausalityAssessmentTask, which routes to CausalityEvaluationGateway. If causality is unconfirmed, CausalityEvaluationGateway routes to StandardSafetyDatabaseTask, leading to PeriodicSafetyUpdateReportTask and terminating at PeriodicReportLoggedEnd.
-If causality is confirmed, CausalityEvaluationGateway evaluates event novelty at SuspectedUnexpectedReactionGateway. For life-threatening emergencies, SuspectedUnexpectedReactionGateway activates FastTrackSafetyNoticeTask, skipping intermediate committee deliberations to notify Regulatory Oversight Authority directly.
-In standard tracks, SuspectedUnexpectedReactionGateway splits three ways: into ConveneEmergencySessionTask in Data Safety Monitoring Board, UnblindTrialArmTask in Safety Management CRO, and IssueInvestigationalSiteHoldTask in Clinical Trial Site. ConveneEmergencySessionTask and UnblindTrialArmTask synchronize at SafetyReviewConsensusGateway, which leads to AdjudicateBenefitRiskRatioTask.
-AdjudicateBenefitRiskRatioTask passes to BenefitRiskGateway. If further inquiry is demanded, BenefitRiskGateway loops back to MedicalCausalityAssessmentTask. If the safety ratio is acceptable, BenefitRiskGateway advances to DraftRegulatorySubmissionTask in Regulatory Oversight Authority.
-DraftRegulatorySubmissionTask triggers FinalComplianceValidationTask, which leads to SubmitSafetyAdvisoryTask. SubmitSafetyAdvisoryTask advances to PublishEudraVigilanceAlertTask, concluding at RegulatoryTrialInterventionEnd.
+The model has 41 elements in 4 groups: Clinical Trial Site, Safety Management CRO, Data Safety Monitoring Board, Regulatory Oversight Authority. Every name below is one element to draw, and every sentence describes connections to draw.
+
+In Clinical Trial Site: AdverseEventDetected flows to DocumentAdverseEventTask. DocumentAdverseEventTask flows to SafetyNarrativeDraftingTask. SafetyNarrativeDraftingTask flows to AssessSeriousnessTask. AssessSeriousnessTask flows to SeriousAdverseEventGateway. SeriousAdverseEventGateway flows to LogStandardRegistryTask if the event is not serious; flows to TransmitE2BReportTask if the event is serious. LogStandardRegistryTask flows to RoutineCaseArchivedEnd. TransmitE2BReportTask sends a message to IngestionValidationTask (sends the safety report). SiteFollowUpVisitTask flows to FollowUpDeadlineTimer. FollowUpDeadlineTimer sends a message to SafetyReviewJoinGateway (the follow-up deadline passes). IssueInvestigationalSiteHoldTask flows to NotifyEthicsCommitteeTask. NotifyEthicsCommitteeTask flows to SiteFollowUpVisitTask.
+
+In Safety Management CRO: IngestionValidationTask flows to TriagingGateway. TriagingGateway flows to ClarificationRequestTask if the data has errors; flows to MeddraCodingTask if the data is valid. ClarificationRequestTask sends a message to DocumentAdverseEventTask (requests a corrected report). MeddraCodingTask flows to SignalDetectionTask. SignalDetectionTask flows to LiteratureReviewTask. LiteratureReviewTask flows to MedicalCausalityAssessmentTask. MedicalCausalityAssessmentTask flows to CausalityEvaluationGateway. CausalityEvaluationGateway flows to StandardSafetyDatabaseTask if causality is unconfirmed; flows to SuspectedUnexpectedReactionGateway if causality is confirmed. StandardSafetyDatabaseTask flows to PeriodicSafetyUpdateReportTask. PeriodicSafetyUpdateReportTask flows to PeriodicReportLoggedEnd. SuspectedUnexpectedReactionGateway sends a message to FastTrackSafetyNoticeTask (the event is life-threatening); sends a message to ConveneEmergencySessionTask (standard track); flows to UnblindTrialArmTask if standard track; sends a message to IssueInvestigationalSiteHoldTask (standard track). SafetyReviewJoinGateway flows to AdjudicateBenefitRiskTask. UnblindTrialArmTask sends a message to ReviewUnblindedDataTask (delivers unblinded data).
+
+In Data Safety Monitoring Board: AdjudicateBenefitRiskTask flows to BenefitRiskGateway. BenefitRiskGateway sends a message to MedicalCausalityAssessmentTask (further inquiry is demanded); flows to ExtendedReviewTimer if the board needs more time; flows to RecommendationIssuedEvent if the safety ratio is acceptable. ExtendedReviewTimer flows to AdjudicateBenefitRiskTask if the review period ends. RecommendationIssuedEvent sends a message to DraftRegulatorySubmissionTask (sends the recommendation). ConveneEmergencySessionTask flows to ReviewUnblindedDataTask. ReviewUnblindedDataTask flows to MinutesApprovalTask. MinutesApprovalTask flows to SafetyReviewJoinGateway.
+
+In Regulatory Oversight Authority: FastTrackSafetyNoticeTask flows to AcknowledgeNoticeTask. AcknowledgeNoticeTask flows to DraftRegulatorySubmissionTask. DraftRegulatorySubmissionTask flows to FinalComplianceValidationTask. FinalComplianceValidationTask flows to SubmitSafetyAdvisoryTask; flows to SubmissionRejectedErrorEvent if validation fails. SubmitSafetyAdvisoryTask flows to PublishEudraVigilanceAlertTask. PublishEudraVigilanceAlertTask flows to RegulatoryTrialInterventionEnd; sends a message to SiteFollowUpVisitTask (informs the site of the alert). SubmissionRejectedErrorEvent flows to DraftRegulatorySubmissionTask if the draft is reworked.
 
 ### Must show
 
-* Four distinct organizational pools: Clinical Trial Site, Safety Management CRO, Data Safety Monitoring Board, and Regulatory Oversight Authority.
-* SuspectedUnexpectedReactionGateway fanning out three concurrent paths across three different pools.
-* FastTrackSafetyNoticeTask skipping internal review stages to jump directly to Regulatory Oversight Authority.
-* Two feedback loops: ClarificationRequestTask returning to DocumentAdverseEventTask, and BenefitRiskGateway returning to MedicalCausalityAssessmentTask.
+* The 4 groups (Clinical Trial Site, Safety Management CRO, Data Safety Monitoring Board, Regulatory Oversight Authority) contain exactly the elements listed under Structure.
+* Fan-out of three or more: SuspectedUnexpectedReactionGateway (4), BenefitRiskGateway (3).
+* 5 connections return to an earlier element: ClarificationRequestTask to DocumentAdverseEventTask, BenefitRiskGateway to MedicalCausalityAssessmentTask, ExtendedReviewTimer to AdjudicateBenefitRiskTask, RecommendationIssuedEvent to DraftRegulatorySubmissionTask, SubmissionRejectedErrorEvent to DraftRegulatorySubmissionTask.
+* 12 connections cross between groups, for example TransmitE2BReportTask to IngestionValidationTask, ClarificationRequestTask to DocumentAdverseEventTask, SuspectedUnexpectedReactionGateway to FastTrackSafetyNoticeTask.
 
 ### Traps
 
-* Concurrently routing message and sequence flows across four interactive swimlanes while maintaining a multi-step emergency bypass creates complex edge routing constraints.
+* Message flows return to tasks in other pools, creating cycles that cross pool boundaries.
+* A timer loop, an error loop and a clarification loop all sit near one join gateway.
+
+### Structure
+
+**Elements**
+
+- Clinical Trial Site: AdverseEventDetected, DocumentAdverseEventTask, SafetyNarrativeDraftingTask, AssessSeriousnessTask, SeriousAdverseEventGateway, LogStandardRegistryTask, RoutineCaseArchivedEnd, TransmitE2BReportTask, SiteFollowUpVisitTask, FollowUpDeadlineTimer, IssueInvestigationalSiteHoldTask, NotifyEthicsCommitteeTask
+- Safety Management CRO: IngestionValidationTask, TriagingGateway, ClarificationRequestTask, MeddraCodingTask, SignalDetectionTask, LiteratureReviewTask, MedicalCausalityAssessmentTask, CausalityEvaluationGateway, StandardSafetyDatabaseTask, PeriodicSafetyUpdateReportTask, PeriodicReportLoggedEnd, SuspectedUnexpectedReactionGateway, SafetyReviewJoinGateway, UnblindTrialArmTask
+- Data Safety Monitoring Board: AdjudicateBenefitRiskTask, BenefitRiskGateway, ExtendedReviewTimer, RecommendationIssuedEvent, ConveneEmergencySessionTask, ReviewUnblindedDataTask, MinutesApprovalTask
+- Regulatory Oversight Authority: FastTrackSafetyNoticeTask, AcknowledgeNoticeTask, DraftRegulatorySubmissionTask, FinalComplianceValidationTask, SubmitSafetyAdvisoryTask, PublishEudraVigilanceAlertTask, RegulatoryTrialInterventionEnd, SubmissionRejectedErrorEvent
+
+**Connections**
+
+- AdverseEventDetected -> DocumentAdverseEventTask
+- DocumentAdverseEventTask -> SafetyNarrativeDraftingTask
+- SafetyNarrativeDraftingTask -> AssessSeriousnessTask
+- AssessSeriousnessTask -> SeriousAdverseEventGateway
+- SeriousAdverseEventGateway -> LogStandardRegistryTask (the event is not serious)
+- LogStandardRegistryTask -> RoutineCaseArchivedEnd
+- SeriousAdverseEventGateway -> TransmitE2BReportTask (the event is serious)
+- TransmitE2BReportTask -> IngestionValidationTask (sends the safety report; message)
+- IngestionValidationTask -> TriagingGateway
+- TriagingGateway -> ClarificationRequestTask (the data has errors)
+- ClarificationRequestTask -> DocumentAdverseEventTask (requests a corrected report; message)
+- TriagingGateway -> MeddraCodingTask (the data is valid)
+- MeddraCodingTask -> SignalDetectionTask
+- SignalDetectionTask -> LiteratureReviewTask
+- LiteratureReviewTask -> MedicalCausalityAssessmentTask
+- MedicalCausalityAssessmentTask -> CausalityEvaluationGateway
+- CausalityEvaluationGateway -> StandardSafetyDatabaseTask (causality is unconfirmed)
+- StandardSafetyDatabaseTask -> PeriodicSafetyUpdateReportTask
+- PeriodicSafetyUpdateReportTask -> PeriodicReportLoggedEnd
+- CausalityEvaluationGateway -> SuspectedUnexpectedReactionGateway (causality is confirmed)
+- SuspectedUnexpectedReactionGateway -> FastTrackSafetyNoticeTask (the event is life-threatening; message)
+- FastTrackSafetyNoticeTask -> AcknowledgeNoticeTask
+- AcknowledgeNoticeTask -> DraftRegulatorySubmissionTask
+- SuspectedUnexpectedReactionGateway -> ConveneEmergencySessionTask (standard track; message)
+- SuspectedUnexpectedReactionGateway -> UnblindTrialArmTask (standard track)
+- SuspectedUnexpectedReactionGateway -> IssueInvestigationalSiteHoldTask (standard track; message)
+- IssueInvestigationalSiteHoldTask -> NotifyEthicsCommitteeTask
+- NotifyEthicsCommitteeTask -> SiteFollowUpVisitTask
+- SiteFollowUpVisitTask -> FollowUpDeadlineTimer
+- FollowUpDeadlineTimer -> SafetyReviewJoinGateway (the follow-up deadline passes; message)
+- ConveneEmergencySessionTask -> ReviewUnblindedDataTask
+- UnblindTrialArmTask -> ReviewUnblindedDataTask (delivers unblinded data; message)
+- ReviewUnblindedDataTask -> MinutesApprovalTask
+- MinutesApprovalTask -> SafetyReviewJoinGateway
+- SafetyReviewJoinGateway -> AdjudicateBenefitRiskTask
+- AdjudicateBenefitRiskTask -> BenefitRiskGateway
+- BenefitRiskGateway -> MedicalCausalityAssessmentTask (further inquiry is demanded; message)
+- BenefitRiskGateway -> ExtendedReviewTimer (the board needs more time)
+- ExtendedReviewTimer -> AdjudicateBenefitRiskTask (the review period ends)
+- BenefitRiskGateway -> RecommendationIssuedEvent (the safety ratio is acceptable)
+- RecommendationIssuedEvent -> DraftRegulatorySubmissionTask (sends the recommendation; message)
+- DraftRegulatorySubmissionTask -> FinalComplianceValidationTask
+- FinalComplianceValidationTask -> SubmitSafetyAdvisoryTask
+- FinalComplianceValidationTask -> SubmissionRejectedErrorEvent (validation fails)
+- SubmissionRejectedErrorEvent -> DraftRegulatorySubmissionTask (the draft is reworked)
+- SubmitSafetyAdvisoryTask -> PublishEudraVigilanceAlertTask
+- PublishEudraVigilanceAlertTask -> RegulatoryTrialInterventionEnd
+- PublishEudraVigilanceAlertTask -> SiteFollowUpVisitTask (informs the site of the alert; message)
 
 ### Sources
 
@@ -113,4 +175,4 @@ DraftRegulatorySubmissionTask triggers FinalComplianceValidationTask, which lead
 
 ### Uncertain
 
-* none
+* The domain details were written to give the diagram a realistic shape; they were not checked against the cited sources.

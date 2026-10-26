@@ -85,8 +85,8 @@ ChiefPeopleOfficer supervises TalentAcquisitionDirector and CultureDiversityDire
 
 * **type:** org chart
 * **level:** C
-* **elements:** 45
-* **connections:** 44
+* **elements:** 44
+* **connections:** 43
 * **groups:** Council Governance, Executive Directorate, Operational Departments
 
 ### Brief
@@ -110,6 +110,60 @@ Under DirectorInternationalRelations report MemberStatesRelationsOffice, NonMemb
 ### Traps
 
 * Extreme vertical depth combined with broad horizontal branch density (e.g., across Experimental Physics and Accelerator Technology) causes layout overlap if subtree bounding boxes are not calculated dynamically.
+
+### Structure
+
+**Elements**
+
+- Council Governance: CernCouncil, ScientificPolicyCommittee, FinanceCommittee, TripartiteEmploymentForum, DirectorGeneral
+- Executive Directorate: LegalServicesOffice, InternalAuditService, OmbudsOffice, DirectorResearchComputing, DirectorAcceleratorsTechnology, DirectorFinanceHumanResources, DirectorInternationalRelations, MemberStatesRelationsOffice, NonMemberStatesRelationsOffice, ProtocolOffice, ScienceCommunicationEducationGroup
+- Operational Departments: ExperimentalPhysicsDepartment, TheoreticalPhysicsDepartment, InformationTechnologyDepartment, AtlasSpokesperson, CmsSpokesperson, AliceSpokesperson, LhcbSpokesperson, HighPerformanceComputingGroup, GridInfrastructureGroup, DataStorageGroup, BeamsDepartment, TechnologyDepartment, EngineeringDepartment, BeamInstrumentationGroup, RadioFrequencyGroup, SuperconductingMagnetsGroup, CryogenicsSystemsGroup, MechanicalEngineeringGroup, CoolingVentilationGroup, FinanceDepartment, HumanResourcesDepartment, SiteManagementDepartment, ProcurementGroup, AccountingGroup, TalentAcquisitionGroup, PersonnelAdministrationGroup, InfrastructureMaintenanceGroup, LogisticsServicesGroup
+
+**Connections**
+
+- CernCouncil -> ScientificPolicyCommittee
+- CernCouncil -> FinanceCommittee
+- CernCouncil -> TripartiteEmploymentForum
+- CernCouncil -> DirectorGeneral
+- DirectorGeneral -> LegalServicesOffice
+- DirectorGeneral -> InternalAuditService
+- DirectorGeneral -> OmbudsOffice
+- DirectorGeneral -> DirectorResearchComputing
+- DirectorGeneral -> DirectorAcceleratorsTechnology
+- DirectorGeneral -> DirectorFinanceHumanResources
+- DirectorGeneral -> DirectorInternationalRelations
+- DirectorResearchComputing -> ExperimentalPhysicsDepartment
+- DirectorResearchComputing -> TheoreticalPhysicsDepartment
+- DirectorResearchComputing -> InformationTechnologyDepartment
+- ExperimentalPhysicsDepartment -> AtlasSpokesperson
+- ExperimentalPhysicsDepartment -> CmsSpokesperson
+- ExperimentalPhysicsDepartment -> AliceSpokesperson
+- ExperimentalPhysicsDepartment -> LhcbSpokesperson
+- InformationTechnologyDepartment -> HighPerformanceComputingGroup
+- InformationTechnologyDepartment -> GridInfrastructureGroup
+- InformationTechnologyDepartment -> DataStorageGroup
+- DirectorAcceleratorsTechnology -> BeamsDepartment
+- DirectorAcceleratorsTechnology -> TechnologyDepartment
+- DirectorAcceleratorsTechnology -> EngineeringDepartment
+- BeamsDepartment -> BeamInstrumentationGroup
+- BeamsDepartment -> RadioFrequencyGroup
+- TechnologyDepartment -> SuperconductingMagnetsGroup
+- TechnologyDepartment -> CryogenicsSystemsGroup
+- EngineeringDepartment -> MechanicalEngineeringGroup
+- EngineeringDepartment -> CoolingVentilationGroup
+- DirectorFinanceHumanResources -> FinanceDepartment
+- DirectorFinanceHumanResources -> HumanResourcesDepartment
+- DirectorFinanceHumanResources -> SiteManagementDepartment
+- FinanceDepartment -> ProcurementGroup
+- FinanceDepartment -> AccountingGroup
+- HumanResourcesDepartment -> TalentAcquisitionGroup
+- HumanResourcesDepartment -> PersonnelAdministrationGroup
+- SiteManagementDepartment -> InfrastructureMaintenanceGroup
+- SiteManagementDepartment -> LogisticsServicesGroup
+- DirectorInternationalRelations -> MemberStatesRelationsOffice
+- DirectorInternationalRelations -> NonMemberStatesRelationsOffice
+- DirectorInternationalRelations -> ProtocolOffice
+- DirectorInternationalRelations -> ScienceCommunicationEducationGroup
 
 ### Sources
 

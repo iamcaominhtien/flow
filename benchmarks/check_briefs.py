@@ -19,10 +19,13 @@ BRIEFS_DIR = Path(__file__).resolve().parent / "briefs"
 TYPES = ("flowchart", "sequence", "er", "architecture", "bpmn", "state", "orgchart", "gantt")
 LEVELS = ("A", "B", "C")
 SECTIONS = ("Brief", "Must show", "Traps", "Sources", "Uncertain")
+STRUCTURE = "Structure"  # optional: the exact elements and connections, checked against the text
 FIELDS = ("type", "level", "elements", "connections", "groups")
 ELEMENT_RANGE = {"A": (8, 12), "B": (20, 30), "C": (40, 60)}
 WORD_MIN, WORD_MAX = 80, 250
+WORD_MAX_LEVEL_C = 700  # a level C brief names dozens of elements and needs more words
 NAME_TOLERANCE = 0.25  # a measured name count more than this fraction off the claim is flagged
+FAN_OUT_MINIMUM = 3  # a level C brief with a structure needs a node with at least this many exits
 BACK_EDGE_MINIMUM = 2  # a level C brief of a type with loops must state at least this many
 LOOP_TYPES = ("flowchart", "sequence", "architecture", "bpmn", "state")
 UNSUPPORTED = (
@@ -38,6 +41,9 @@ BACK_PATTERN = re.compile(r"\b(?:loops? back|returns? to|routes? back|back to|re
 HEADING_PATTERN = re.compile(r"^## (?P<id>[a-z]+-[ABC]-\d\d) — (?P<title>.+)$", re.M)
 FIELD_PATTERN = re.compile(r"^\* \*\*(?P<key>[a-z]+):\*\* ?(?P<value>.*)$", re.M)
 DATE_PATTERN = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+ELEMENT_LINE = re.compile(r"^- (?P<group>[^:]+): (?P<names>.+)$", re.M)
+CONNECTION_LINE = re.compile(r"^- (?P<source>\w+) -> (?P<target>\w+)(?: \((?P<label>.*)\))?$", re.M)
+PLACEMENT = re.compile(r"^(?P<name>\w+)@(?P<start>\d+)\+(?P<length>\d+)$")
 GLUED_NUMBER = re.compile(r"[a-z]\d{2}[.,;]?(?:\s|$)")  # a two-digit mark; names end in 1-9
 
 
@@ -72,9 +78,30 @@ class Brief:
         return set(NAME_PATTERN.findall(self.sections.get("Brief", "")))
 
     @property
+    def structure(self) -> "Structure | None":
+        """Return the parsed Structure section, or None when the brief has none."""
+        text = self.sections.get(STRUCTURE)
+        return parse_structure(text) if text else None
+
+    @property
     def words(self) -> int:
         """Return the number of words in the brief text."""
         return len(self.sections.get("Brief", "").split())
+
+
+@dataclass
+class Structure:
+    """The exact content of a brief: its elements by group, and its connections."""
+
+    groups: dict[str, list[str]]
+    placements: dict[str, tuple[int, int]]
+    connections: list[tuple[str, str]]
+    labels: set[str]  # single-word labels of connections, such as the name of a message
+
+    @property
+    def elements(self) -> list[str]:
+        """Return every element name, in the order written."""
+        return [name for names in self.groups.values() for name in names]
 
 
 @dataclass
@@ -83,6 +110,34 @@ class Report:
 
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+
+
+def parse_structure(text: str) -> Structure:
+    """Read the Structure section of a brief.
+
+    Args:
+        text: The text under the ``Structure`` heading.
+
+    Returns:
+        The groups with their element names, the start and length of timed elements, and the
+        connections as (source, target) pairs.
+    """
+    elements_text, _, connections_text = text.partition("**Connections**")
+    groups: dict[str, list[str]] = {}
+    placements: dict[str, tuple[int, int]] = {}
+    for line in ELEMENT_LINE.finditer(elements_text):
+        names = []
+        for token in line["names"].split(", "):
+            placed = PLACEMENT.match(token.strip())
+            name = placed["name"] if placed else token.strip()
+            if placed:
+                placements[name] = (int(placed["start"]), int(placed["length"]))
+            names.append(name)
+        groups[line["group"].strip()] = names
+    found = list(CONNECTION_LINE.finditer(connections_text))
+    connections = [(m["source"], m["target"]) for m in found]
+    labels = {m["label"] for m in found if m["label"] and NAME_PATTERN.fullmatch(m["label"])}
+    return Structure(groups, placements, connections, labels)
 
 
 def _split_sections(text: str) -> dict[str, str]:
@@ -154,16 +209,19 @@ def _check_size(brief: Brief, report: Report) -> None:
     if elements is None or brief.level not in ELEMENT_RANGE:
         return
     low, high = ELEMENT_RANGE[brief.level]
+    if brief.kind == "sequence" and brief.structure is not None:
+        elements = brief.claimed("connections") or 0  # a sequence is sized by its messages
     if not low <= elements <= high:
         report.warnings.append(
             f"{where}: claims {elements} elements, level {brief.level} is {low}-{high}"
         )
-    if not WORD_MIN <= brief.words <= WORD_MAX:
+    word_max = WORD_MAX_LEVEL_C if brief.level == "C" else WORD_MAX
+    if not WORD_MIN <= brief.words <= word_max:
         report.warnings.append(
-            f"{where}: the brief has {brief.words} words, the range is {WORD_MIN}-{WORD_MAX}"
+            f"{where}: the brief has {brief.words} words, the range is {WORD_MIN}-{word_max}"
         )
     measured = len(brief.names)
-    if abs(measured - elements) > NAME_TOLERANCE * elements:
+    if brief.structure is None and abs(measured - elements) > NAME_TOLERANCE * elements:
         report.warnings.append(
             f"{where}: claims {elements} elements, the text names {measured} CamelCase identifiers"
         )
@@ -184,10 +242,84 @@ def _check_content(brief: Brief, report: Report) -> None:
             f"{where}: a number is glued to a word, perhaps a leftover citation mark"
         )
     returns = len(BACK_PATTERN.findall(text))
-    if brief.level == "C" and brief.kind in LOOP_TYPES and returns < BACK_EDGE_MINIMUM:
+    needs_returns = brief.level == "C" and brief.kind in LOOP_TYPES and brief.structure is None
+    if needs_returns and returns < BACK_EDGE_MINIMUM:
         report.warnings.append(
             f"{where}: level C but only {returns} phrases about a return or loop"
         )
+
+
+def _check_counts(brief: Brief, structure: Structure, report: Report) -> None:
+    """Report claimed counts that differ from the Structure, and connections to unknown elements."""
+    where = brief.identifier
+    elements = structure.elements
+    if len(elements) != brief.claimed("elements") or len(set(elements)) != len(elements):
+        report.errors.append(
+            f"{where}: Structure lists {len(elements)} elements, "
+            f"the field says {brief.fields.get('elements')}"
+        )
+    if len(structure.connections) != brief.claimed("connections"):
+        report.errors.append(
+            f"{where}: Structure lists {len(structure.connections)} connections, "
+            f"the field says {brief.fields.get('connections')}"
+        )
+    known = set(elements)
+    for source, target in structure.connections:
+        if source not in known or target not in known:
+            report.errors.append(
+                f"{where}: the connection {source} -> {target} names an unknown element"
+            )
+
+
+def _check_names(brief: Brief, structure: Structure, report: Report) -> None:
+    """Report Structure names that the Brief does not use, and Brief names the Structure lacks."""
+    where = brief.identifier
+    text = brief.sections.get("Brief", "")
+    missing = [name for name in (*structure.elements, *structure.labels) if name not in text]
+    if missing:
+        report.errors.append(f"{where}: names not used in the Brief: {', '.join(missing[:5])}")
+    extra = sorted(brief.names - set(structure.elements) - structure.labels)
+    if extra:
+        report.warnings.append(
+            f"{where}: the Brief names identifiers not in Structure: {', '.join(extra[:5])}"
+        )
+
+
+def _check_structure(brief: Brief, report: Report) -> None:
+    """Check a Structure section against the claimed counts, the text and the level."""
+    structure = brief.structure
+    if structure is None:
+        return
+    _check_counts(brief, structure, report)
+    _check_names(brief, structure, report)
+    _check_level_rules(brief, structure, report)
+
+
+def _check_timing(brief: Brief, structure: Structure, report: Report) -> None:
+    """Report a timed element that starts before one of its predecessors ends."""
+    for source, target in structure.connections:
+        if source in structure.placements and target in structure.placements:
+            start, length = structure.placements[source]
+            if structure.placements[target][0] < start + length:
+                report.errors.append(f"{brief.identifier}: {target} starts before {source} ends")
+
+
+def _check_level_rules(brief: Brief, structure: Structure, report: Report) -> None:
+    """Check the level C rules that can be measured on a structure: fan-out and crossings."""
+    _check_timing(brief, structure, report)
+    if brief.level != "C":
+        return
+    where = brief.identifier
+    exits: dict[str, int] = {}
+    for source, _ in structure.connections:
+        exits[source] = exits.get(source, 0) + 1
+    if max(exits.values(), default=0) < FAN_OUT_MINIMUM:
+        report.warnings.append(
+            f"{where}: level C but no element has {FAN_OUT_MINIMUM} or more exits"
+        )
+    group_of = {name: group for group, names in structure.groups.items() for name in names}
+    if not any(group_of.get(s) != group_of.get(t) for s, t in structure.connections):
+        report.warnings.append(f"{where}: level C but no connection crosses between groups")
 
 
 def _check_index(briefs: list[Brief], directory: Path, report: Report) -> None:
@@ -225,6 +357,7 @@ def check(directory: Path = BRIEFS_DIR) -> tuple[list[Brief], Report]:
         _check_format(brief, report)
         _check_size(brief, report)
         _check_content(brief, report)
+        _check_structure(brief, report)
     _check_index(briefs, directory, report)
     seen = [brief.identifier for brief in briefs]
     for name in {name for name in seen if seen.count(name) > 1}:

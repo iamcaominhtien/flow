@@ -74,27 +74,96 @@ Patients in UrgentCare undergo LabTesting, which leads to ImagingOrder, followed
 
 * **type:** flowchart
 * **level:** C
-* **elements:** 42
-* **connections:** 48
-* **groups:** Inbound Route Filter, Policy Decision Pipeline, Rib Installation Engine
+* **elements:** 43
+* **connections:** 51
+* **groups:** Inbound Route Filter, Policy Decision Pipeline, Rib Installation Engine, Export Pipeline
 
 ### Brief
 
-The engine initiates at AdjRibIn within Inbound Route Filter. AdjRibIn sends candidate routes to FlapFilter. If route flapping exceeds limits, FlapFilter routes to DampeningHold, which loops back to FlapFilter once decay timers expire. If accepted, FlapFilter advances to PrefixFilter, which routes to AsPathFilter, followed by CommunityFilter. CommunityFilter advances to NextHopCheck inside Policy Decision Pipeline. If the next hop is unreachable, NextHopCheck drops to DropUnreachable. If reachable, NextHopCheck advances to WeightEvaluator.
-If Cisco weight differs, WeightEvaluator skips subsequent policies and transfers directly to LocRibCandidate within Rib Installation Engine. If weights are identical, WeightEvaluator advances to LocalPrefCheck. If local preferences differ, LocalPrefCheck resolves to LocRibCandidate; otherwise, it proceeds to LocallyOriginatedCheck. LocallyOriginatedCheck resolves local generation to LocRibCandidate, or proceeds to AsPathCheck. AsPathCheck routes shortest AS sequences to LocRibCandidate, or advances to OriginCheck. OriginCheck prioritizes IGP over EGP and passes ties to MedCheck. MedCheck evaluates Multi-Exit Discriminators, passing ties to PeerTypeCheck. PeerTypeCheck prefers external eBGP over internal iBGP, passing unresolved ties to IgpCostCheck.
-IgpCostCheck prefers the lowest interior gateway metric to next hop, passing ties to MultipathGateway. MultipathGateway splits three ways: into EcmpGroup for parallel forwarding, into RouterIdCheck for deterministic tie-breaking, and directly into LocRibCandidate. RouterIdCheck routes lowest ID to ClusterListCheck, which resolves shortest cluster lists to PeerAddressCheck. PeerAddressCheck routes lowest IP to LocRibCandidate. EcmpGroup routes to EcmpInstall, which advances to LocRibCandidate.
-LocRibCandidate initiates RibValidation. If validation fails, RibValidation loops back to AdjRibIn. If validation succeeds, RibValidation advances to RibTableInstall, leading to ForwardingInformationBase, BfdMonitor, and PrefixExport. PrefixExport routes to PolicyOutFilter, CommunityTagging, AsPathPrepender, and MedSetter. MedSetter routes to ExportEvaluationGateway. If rejected, ExportEvaluationGateway drops to DropExportRoute. If accepted, ExportEvaluationGateway routes to AdjRibOut, which notifies PeerSyncNotification and AuditLogSink.
+The model has 43 steps in 4 groups: Inbound Route Filter, Policy Decision Pipeline, Rib Installation Engine, Export Pipeline. Every name below is one step to draw, and every sentence describes connections to draw.
+
+In Inbound Route Filter: RouteRefreshRequest routes to AdjRibIn. AdjRibIn splits 2 ways: to FlapFilter; if route refresh is configured, to SoftReconfigStore. FlapFilter splits 2 ways: if flapping exceeds the limit, to DampeningHold; if the route is stable, to PrefixFilter. If decay timers expire, DampeningHold routes to FlapFilter. PrefixFilter routes to AsPathFilter. AsPathFilter routes to CommunityFilter. CommunityFilter routes to NextHopCheck.
+
+In Policy Decision Pipeline: NextHopCheck splits 2 ways: if the next hop is unreachable, to DropUnreachable; if the next hop is reachable, to WeightEvaluator. WeightEvaluator splits 2 ways: if the Cisco weights differ, to LocRibCandidate; if the weights are identical, to LocalPrefCheck. LocalPrefCheck splits 2 ways: if the local preferences differ, to LocRibCandidate; if the local preferences are equal, to LocallyOriginatedCheck. LocallyOriginatedCheck splits 2 ways: if the route was originated locally, to LocRibCandidate; if the route was learned from a peer, to AsPathCheck. AsPathCheck splits 2 ways: if one AS path is shorter, to LocRibCandidate; if the AS path lengths tie, to OriginCheck. If the origin codes tie, OriginCheck routes to MedCheck. If the MED values tie, MedCheck routes to PeerTypeCheck. If the peer types tie, PeerTypeCheck routes to AigpMetricCheck. If the AIGP metrics tie, AigpMetricCheck routes to IgpCostCheck. If the IGP costs tie, IgpCostCheck routes to MultipathGateway. MultipathGateway splits 3 ways: if multipath is enabled, to EcmpGroup; to RouterIdCheck; if one path is clearly best, to LocRibCandidate. EcmpGroup routes to EcmpInstall. EcmpInstall routes to LocRibCandidate. If the router IDs differ, RouterIdCheck routes to OriginatorIdCheck. OriginatorIdCheck routes to ClusterListCheck. ClusterListCheck routes to PeerAddressCheck. PeerAddressCheck routes to LocRibCandidate.
+
+In Rib Installation Engine: LocRibCandidate routes to AdminDistanceCheck. AdminDistanceCheck routes to RibValidation. RibValidation splits 2 ways: if validation fails, to AdjRibIn; if validation succeeds, to RibTableInstall. RibTableInstall splits 4 ways: to ForwardingInformationBase; to BfdMonitor; to ConvergenceTimer; to PrefixExport. If the timer expires before convergence, ConvergenceTimer routes to RibTableInstall.
+
+In Export Pipeline: PrefixExport routes to PolicyOutFilter. PolicyOutFilter routes to CommunityTagging. CommunityTagging routes to AsPathPrepender. AsPathPrepender routes to MedSetter. MedSetter routes to ExportEvaluationGateway. ExportEvaluationGateway splits 2 ways: if the export is rejected, to DropExportRoute; if the export is accepted, to AdjRibOut. AdjRibOut splits 2 ways: to PeerSyncNotification; to AuditLogSink.
 
 ### Must show
 
-* Cisco weight skipping intermediate policy decision nodes to leap directly from Policy Decision Pipeline to LocRibCandidate.
-* MultipathGateway fanning out three distinct branches to EcmpGroup, RouterIdCheck, and LocRibCandidate.
-* Two cyclic back-edges: DampeningHold looping back to FlapFilter, and RibValidation looping back across groups to AdjRibIn.
-* Clean containment of logical routing tables across Inbound Route Filter, Policy Decision Pipeline, and Rib Installation Engine.
+* The 4 groups (Inbound Route Filter, Policy Decision Pipeline, Rib Installation Engine, Export Pipeline) contain exactly the elements listed under Structure.
+* Fan-out of three or more: RibTableInstall (4), MultipathGateway (3).
+* 3 connections return to an earlier element: DampeningHold to FlapFilter, RibValidation to AdjRibIn, ConvergenceTimer to RibTableInstall.
+* 10 connections cross between groups, for example CommunityFilter to NextHopCheck, WeightEvaluator to LocRibCandidate, LocalPrefCheck to LocRibCandidate.
 
 ### Traps
 
-* The long transitive skip from WeightEvaluator to LocRibCandidate spans across 6 sequential decision ranks, causing severe edge overlap if not routed around intermediate nodes.
+* A long skip edge (WeightEvaluator to LocRibCandidate) passes many ranks, and one validation loop returns across two groups.
+* Two small loops sit inside a main path with a four-way fan-out near its end.
+
+### Structure
+
+**Elements**
+
+- Inbound Route Filter: RouteRefreshRequest, AdjRibIn, FlapFilter, DampeningHold, PrefixFilter, AsPathFilter, CommunityFilter, SoftReconfigStore
+- Policy Decision Pipeline: NextHopCheck, DropUnreachable, WeightEvaluator, LocalPrefCheck, LocallyOriginatedCheck, AsPathCheck, OriginCheck, MedCheck, PeerTypeCheck, AigpMetricCheck, IgpCostCheck, MultipathGateway, EcmpGroup, EcmpInstall, RouterIdCheck, OriginatorIdCheck, ClusterListCheck, PeerAddressCheck
+- Rib Installation Engine: LocRibCandidate, AdminDistanceCheck, RibValidation, RibTableInstall, ForwardingInformationBase, BfdMonitor, ConvergenceTimer
+- Export Pipeline: PrefixExport, PolicyOutFilter, CommunityTagging, AsPathPrepender, MedSetter, ExportEvaluationGateway, DropExportRoute, AdjRibOut, PeerSyncNotification, AuditLogSink
+
+**Connections**
+
+- AdjRibIn -> FlapFilter
+- AdjRibIn -> SoftReconfigStore (route refresh is configured)
+- RouteRefreshRequest -> AdjRibIn
+- FlapFilter -> DampeningHold (flapping exceeds the limit)
+- DampeningHold -> FlapFilter (decay timers expire)
+- FlapFilter -> PrefixFilter (the route is stable)
+- PrefixFilter -> AsPathFilter
+- AsPathFilter -> CommunityFilter
+- CommunityFilter -> NextHopCheck
+- NextHopCheck -> DropUnreachable (the next hop is unreachable)
+- NextHopCheck -> WeightEvaluator (the next hop is reachable)
+- WeightEvaluator -> LocRibCandidate (the Cisco weights differ)
+- WeightEvaluator -> LocalPrefCheck (the weights are identical)
+- LocalPrefCheck -> LocRibCandidate (the local preferences differ)
+- LocalPrefCheck -> LocallyOriginatedCheck (the local preferences are equal)
+- LocallyOriginatedCheck -> LocRibCandidate (the route was originated locally)
+- LocallyOriginatedCheck -> AsPathCheck (the route was learned from a peer)
+- AsPathCheck -> LocRibCandidate (one AS path is shorter)
+- AsPathCheck -> OriginCheck (the AS path lengths tie)
+- OriginCheck -> MedCheck (the origin codes tie)
+- MedCheck -> PeerTypeCheck (the MED values tie)
+- PeerTypeCheck -> AigpMetricCheck (the peer types tie)
+- AigpMetricCheck -> IgpCostCheck (the AIGP metrics tie)
+- IgpCostCheck -> MultipathGateway (the IGP costs tie)
+- MultipathGateway -> EcmpGroup (multipath is enabled)
+- MultipathGateway -> RouterIdCheck
+- MultipathGateway -> LocRibCandidate (one path is clearly best)
+- EcmpGroup -> EcmpInstall
+- EcmpInstall -> LocRibCandidate
+- RouterIdCheck -> OriginatorIdCheck (the router IDs differ)
+- OriginatorIdCheck -> ClusterListCheck
+- ClusterListCheck -> PeerAddressCheck
+- PeerAddressCheck -> LocRibCandidate
+- LocRibCandidate -> AdminDistanceCheck
+- AdminDistanceCheck -> RibValidation
+- RibValidation -> AdjRibIn (validation fails)
+- RibValidation -> RibTableInstall (validation succeeds)
+- RibTableInstall -> ForwardingInformationBase
+- RibTableInstall -> BfdMonitor
+- RibTableInstall -> ConvergenceTimer
+- RibTableInstall -> PrefixExport
+- ConvergenceTimer -> RibTableInstall (the timer expires before convergence)
+- PrefixExport -> PolicyOutFilter
+- PolicyOutFilter -> CommunityTagging
+- CommunityTagging -> AsPathPrepender
+- AsPathPrepender -> MedSetter
+- MedSetter -> ExportEvaluationGateway
+- ExportEvaluationGateway -> DropExportRoute (the export is rejected)
+- ExportEvaluationGateway -> AdjRibOut (the export is accepted)
+- AdjRibOut -> PeerSyncNotification
+- AdjRibOut -> AuditLogSink
 
 ### Sources
 
@@ -103,4 +172,4 @@ LocRibCandidate initiates RibValidation. If validation fails, RibValidation loop
 
 ### Uncertain
 
-* none
+* The domain details were written to give the diagram a realistic shape; they were not checked against the cited sources.

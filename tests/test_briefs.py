@@ -45,3 +45,37 @@ def test_checker_flags_a_missing_section(tmp_path: Path) -> None:
     _, report = check_briefs.check(folder)
     assert any("Traps" in error for error in report.errors)
     assert any("not in index.md" in error for error in report.errors)
+
+
+def test_level_c_briefs_have_a_structure_that_matches_their_counts() -> None:
+    """Every level C brief lists its elements and connections, and the counts are exact."""
+    briefs, report = check_briefs.check()
+    level_c = [brief for brief in briefs if brief.level == "C"]
+    assert all(brief.structure is not None for brief in level_c)
+    for brief in level_c:
+        structure = brief.structure
+        assert structure is not None
+        assert len(structure.elements) == brief.claimed("elements")
+        assert len(structure.connections) == brief.claimed("connections")
+    assert not [e for e in report.errors if "Structure" in e]
+
+
+def test_checker_catches_a_wrong_count_and_a_timing_error(tmp_path: Path) -> None:
+    """A Structure whose count is wrong, or whose task starts before its predecessor ends, fails."""
+    folder = tmp_path / "briefs"
+    folder.mkdir()
+    text = (
+        "## gantt-C-01 — T\n\n* **type:** gantt\n* **level:** C\n* **elements:** 3\n"
+        "* **connections:** 1\n* **groups:** G\n\n### Brief\n\nTaskOne then TaskTwo.\n\n"
+        "### Must show\n\n* x\n\n### Traps\n\n* x\n\n### Structure\n\n**Elements**\n\n"
+        "- G: TaskOne@0+3, TaskTwo@2+1\n\n**Connections**\n\n- TaskOne -> TaskTwo\n\n"
+        "### Sources\n\n* https://example.com\n\n### Uncertain\n\n* none\n"
+    )
+    (folder / "gantt.md").write_text(text)
+    (folder / "index.md").write_text(
+        "| id | type | level | subject | elements | connections |\n"
+        "| gantt-C-01 | gantt | C | T | 3 | 1 |\n"
+    )
+    _, report = check_briefs.check(folder)
+    assert any("lists 2 elements" in error for error in report.errors)
+    assert any("starts before TaskOne ends" in error for error in report.errors)

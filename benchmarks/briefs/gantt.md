@@ -80,31 +80,105 @@ In Telemetry Commissioning, BasebandProcessorCalibration starts after Downconver
 * **type:** gantt
 * **level:** C
 * **elements:** 44
-* **connections:** 52
+* **connections:** 60
 * **groups:** Discovery Assessment, Cloud Foundation, Platform Modernization, Cutover Assurance
 
 ### Brief
 
-The migration program governs migration of core applications to the cloud across four program phases.
-In Discovery Assessment, InfrastructureAssetInventory starts in Month 1. ApplicationDependencyMapping starts after InfrastructureAssetInventory finishes. SecurityComplianceAudit starts after InfrastructureAssetInventory finishes. TechnicalDebtEvaluation starts after ApplicationDependencyMapping finishes. MigrationWaveBundlingStrategy starts after SecurityComplianceAudit and TechnicalDebtEvaluation finish.
-In Cloud Foundation, DedicatedDirectConnectLinkProvisioning starts after MigrationWaveBundlingStrategy finishes. SoftwareDefinedVirtualPrivateCloudSetup starts after DedicatedDirectConnectLinkProvisioning finishes. IdentityAccessManagementFederation starts after SoftwareDefinedVirtualPrivateCloudSetup finishes. TransitGatewayRoutingMeshConfiguration starts after SoftwareDefinedVirtualPrivateCloudSetup finishes. SecurityKeyVaultDeployment starts after IdentityAccessManagementFederation finishes. CentralizedLoggingCollectorSetup starts after TransitGatewayRoutingMeshConfiguration finishes.
-In Platform Modernization, ContainerRegistryProvisioning starts after CentralizedLoggingCollectorSetup finishes. KubernetesClusterBootstrapping starts after ContainerRegistryProvisioning and SecurityKeyVaultDeployment finish. RelationalDatabaseClusterProvisioning starts after SecurityKeyVaultDeployment and TransitGatewayRoutingMeshConfiguration finish. DistributedCacheClusterConfiguration starts after TransitGatewayRoutingMeshConfiguration finishes. ObjectStorageDataReplicationPipeline starts after SoftwareDefinedVirtualPrivateCloudSetup finishes. CoreMicroservicesRefactoring starts after KubernetesClusterBootstrapping finishes. DatabaseSchemaMigrationConversion starts after RelationalDatabaseClusterProvisioning finishes. ContinuousIntegrationDeliveryPipelineUpdate starts after ContainerRegistryProvisioning finishes.
-In Cutover Assurance, Wave1DryRunDataSynchronization starts after DatabaseSchemaMigrationConversion and ObjectStorageDataReplicationPipeline finish. MockCutoverExecutionDryRun starts after Wave1DryRunDataSynchronization and CoreMicroservicesRefactoring finish. OperationalSmokeTestingValidation starts after MockCutoverExecutionDryRun finishes.
-RemediationFixCycle1 starts if dry-run errors occur, looping from OperationalSmokeTestingValidation back into Wave1DryRunDataSynchronization.
-ProductionFreezeWindowDeclaration starts after OperationalSmokeTestingValidation finishes. FinalDeltaDataSynchronization starts after ProductionFreezeWindowDeclaration finishes. DnsRoutingCutoverExecution starts after FinalDeltaDataSynchronization finishes. LiveTrafficVerificationValidation starts after DnsRoutingCutoverExecution finishes.
-RemediationFixCycle2 starts if live discrepancies arise, looping from LiveTrafficVerificationValidation back into FinalDeltaDataSynchronization.
-LegacyServerDecommissioning starts after LiveTrafficVerificationValidation finishes. DisasterRecoveryTestingVerification starts after LiveTrafficVerificationValidation finishes. FormalStakeholderSignoffAcceptance starts after LegacyServerDecommissioning and DisasterRecoveryTestingVerification finish.
+The program has 44 tasks in 4 groups: Discovery Assessment, Cloud Foundation, Platform Modernization, Cutover Assurance. Time is counted in weeks; week 1 is the first week. Each task lists its start week, its length and the tasks it waits for.
+
+In Discovery Assessment: InfrastructureAssetInventory starts in week 1 and lasts 3 weeks, with no predecessor. ApplicationDependencyMapping starts in week 4 and lasts 3 weeks after InfrastructureAssetInventory finishes. TechnicalDebtEvaluation starts in week 7 and lasts 2 weeks after ApplicationDependencyMapping finishes. LicenseConsolidationReview starts in week 9 and lasts 2 weeks after TechnicalDebtEvaluation finishes. MigrationWaveBundlingStrategy starts in week 9 and lasts 2 weeks after SecurityComplianceAudit, TechnicalDebtEvaluation and BusinessImpactAnalysis finish. CloudCostModeling starts in week 9 and lasts 2 weeks after BusinessImpactAnalysis and TechnicalDebtEvaluation finish. SecurityComplianceAudit starts in week 4 and lasts 4 weeks after InfrastructureAssetInventory finishes. BusinessImpactAnalysis starts in week 4 and lasts 3 weeks after InfrastructureAssetInventory finishes.
+
+In Cloud Foundation: DedicatedDirectConnectLinkProvisioning starts in week 11 and lasts 4 weeks after MigrationWaveBundlingStrategy finishes. TransitGatewayRoutingMeshConfiguration starts in week 15 and lasts 3 weeks after SoftwareDefinedVirtualPrivateCloudSetup and DedicatedDirectConnectLinkProvisioning finish. CentralizedLoggingCollectorSetup starts in week 18 and lasts 2 weeks after TransitGatewayRoutingMeshConfiguration finishes. SoftwareDefinedVirtualPrivateCloudSetup starts in week 11 and lasts 3 weeks after MigrationWaveBundlingStrategy finishes. IdentityAccessManagementFederation starts in week 14 and lasts 3 weeks after SoftwareDefinedVirtualPrivateCloudSetup finishes. SecurityKeyVaultDeployment starts in week 17 and lasts 2 weeks after IdentityAccessManagementFederation finishes. LandingZoneGuardrailPolicies starts in week 14 and lasts 3 weeks after SoftwareDefinedVirtualPrivateCloudSetup and CloudCostModeling finish.
+
+In Platform Modernization: ContainerRegistryProvisioning starts in week 20 and lasts 2 weeks after CentralizedLoggingCollectorSetup finishes. ContinuousIntegrationDeliveryPipelineUpdate starts in week 22 and lasts 4 weeks after ContainerRegistryProvisioning finishes. ObservabilityStackRollout starts in week 22 and lasts 3 weeks after ContainerRegistryProvisioning and LandingZoneGuardrailPolicies finish. KubernetesClusterBootstrapping starts in week 22 and lasts 3 weeks after ContainerRegistryProvisioning and SecurityKeyVaultDeployment finish. CoreMicroservicesRefactoring starts in week 25 and lasts 6 weeks after KubernetesClusterBootstrapping finishes. PerformanceBaselineTesting starts in week 31 and lasts 3 weeks after CoreMicroservicesRefactoring and SecurityPenetrationTesting finish. ServiceMeshAdoption starts in week 25 and lasts 3 weeks after KubernetesClusterBootstrapping finishes. SecurityPenetrationTesting starts in week 28 and lasts 3 weeks after ServiceMeshAdoption finishes. DistributedCacheClusterConfiguration starts in week 18 and lasts 2 weeks after TransitGatewayRoutingMeshConfiguration finishes. RelationalDatabaseClusterProvisioning starts in week 19 and lasts 4 weeks after SecurityKeyVaultDeployment and TransitGatewayRoutingMeshConfiguration finish. DatabaseSchemaMigrationConversion starts in week 23 and lasts 4 weeks after RelationalDatabaseClusterProvisioning finishes. ObjectStorageDataReplicationPipeline starts in week 14 and lasts 5 weeks after SoftwareDefinedVirtualPrivateCloudSetup finishes.
+
+In Cutover Assurance: TrainingAndHandoverWorkshops starts in week 34 and lasts 4 weeks after PerformanceBaselineTesting finishes. FormalStakeholderSignoffAcceptance starts in week 50 and lasts 1 week after LegacyServerDecommissioning, DisasterRecoveryTestingVerification, TrainingAndHandoverWorkshops and ComplianceEvidencePackage finish. MockCutoverExecutionDryRun starts in week 31 and lasts 2 weeks after Wave1DryRunDataSynchronization and CoreMicroservicesRefactoring finish. RollbackRunbookRehearsal starts in week 33 and lasts 2 weeks after MockCutoverExecutionDryRun finishes. SecondDryRunRehearsal starts in week 37 and lasts 1 week after RemediationFixRoundOne and RollbackRunbookRehearsal finish. CustomerCommunicationPlan starts in week 38 and lasts 3 weeks after SecondDryRunRehearsal finishes. DnsRoutingCutoverExecution starts in week 41 and lasts 1 week after FinalDeltaDataSynchronization and CustomerCommunicationPlan finish. LiveTrafficVerificationValidation starts in week 42 and lasts 2 weeks after DnsRoutingCutoverExecution finishes. RemediationFixRoundTwo starts in week 44 and lasts 2 weeks after LiveTrafficVerificationValidation finishes. LegacyServerDecommissioning starts in week 46 and lasts 4 weeks after RemediationFixRoundTwo finishes. DisasterRecoveryTestingVerification starts in week 46 and lasts 3 weeks after RemediationFixRoundTwo finishes. ProductionFreezeWindowDeclaration starts in week 38 and lasts 1 week after SecondDryRunRehearsal finishes. FinalDeltaDataSynchronization starts in week 39 and lasts 2 weeks after ProductionFreezeWindowDeclaration finishes. OperationalSmokeTestingValidation starts in week 33 and lasts 2 weeks after MockCutoverExecutionDryRun finishes. ComplianceEvidencePackage starts in week 35 and lasts 3 weeks after OperationalSmokeTestingValidation and SecurityPenetrationTesting finish. RemediationFixRoundOne starts in week 35 and lasts 2 weeks after OperationalSmokeTestingValidation finishes. Wave1DryRunDataSynchronization starts in week 27 and lasts 2 weeks after DatabaseSchemaMigrationConversion and ObjectStorageDataReplicationPipeline finish.
 
 ### Must show
 
-* Four program groups: Discovery Assessment, Cloud Foundation, Platform Modernization, and Cutover Assurance.
-* SoftwareDefinedVirtualPrivateCloudSetup fanning out three concurrent dependencies: IdentityAccessManagementFederation, TransitGatewayRoutingMeshConfiguration, and ObjectStorageDataReplicationPipeline.
-* Direct-skip dependency: DedicatedDirectConnectLinkProvisioning establishing long-distance dependencies that jump over intermediate tasks to feed Cutover Assurance testing.
-* Two iterative remediation cycles: RemediationFixCycle1 and RemediationFixCycle2 modeling mock cutover and live cutover retry loops.
+* All 44 tasks appear, each in its own group and at its start week and length.
+* Every dependency line goes from the end of one task to the start of a later one (60 lines).
+* Fan-out of three or more: SoftwareDefinedVirtualPrivateCloudSetup (4), InfrastructureAssetInventory (3), TechnicalDebtEvaluation (3), TransitGatewayRoutingMeshConfiguration (3), ContainerRegistryProvisioning (3).
+* 15 dependencies cross between groups, for example MigrationWaveBundlingStrategy to DedicatedDirectConnectLinkProvisioning, MigrationWaveBundlingStrategy to SoftwareDefinedVirtualPrivateCloudSetup, CloudCostModeling to LandingZoneGuardrailPolicies.
+* FormalStakeholderSignoffAcceptance waits for four predecessors and is the last task.
 
 ### Traps
 
-* Multi-predecessor dependencies spanning across distant phases combined with iterative rollback-remediation loops can break standard acyclic waterfall Gantt renderers.
+* Many tasks have two to four predecessors from different groups, so dependency lines cross.
+* One task (FormalStakeholderSignoffAcceptance) depends on four tasks that end in different weeks.
+
+### Structure
+
+**Elements**
+
+- Discovery Assessment: InfrastructureAssetInventory@0+3, ApplicationDependencyMapping@3+3, TechnicalDebtEvaluation@6+2, LicenseConsolidationReview@8+2, MigrationWaveBundlingStrategy@8+2, CloudCostModeling@8+2, SecurityComplianceAudit@3+4, BusinessImpactAnalysis@3+3
+- Cloud Foundation: DedicatedDirectConnectLinkProvisioning@10+4, TransitGatewayRoutingMeshConfiguration@14+3, CentralizedLoggingCollectorSetup@17+2, SoftwareDefinedVirtualPrivateCloudSetup@10+3, IdentityAccessManagementFederation@13+3, SecurityKeyVaultDeployment@16+2, LandingZoneGuardrailPolicies@13+3
+- Platform Modernization: ContainerRegistryProvisioning@19+2, ContinuousIntegrationDeliveryPipelineUpdate@21+4, ObservabilityStackRollout@21+3, KubernetesClusterBootstrapping@21+3, CoreMicroservicesRefactoring@24+6, PerformanceBaselineTesting@30+3, ServiceMeshAdoption@24+3, SecurityPenetrationTesting@27+3, DistributedCacheClusterConfiguration@17+2, RelationalDatabaseClusterProvisioning@18+4, DatabaseSchemaMigrationConversion@22+4, ObjectStorageDataReplicationPipeline@13+5
+- Cutover Assurance: TrainingAndHandoverWorkshops@33+4, FormalStakeholderSignoffAcceptance@49+1, MockCutoverExecutionDryRun@30+2, RollbackRunbookRehearsal@32+2, SecondDryRunRehearsal@36+1, CustomerCommunicationPlan@37+3, DnsRoutingCutoverExecution@40+1, LiveTrafficVerificationValidation@41+2, RemediationFixRoundTwo@43+2, LegacyServerDecommissioning@45+4, DisasterRecoveryTestingVerification@45+3, ProductionFreezeWindowDeclaration@37+1, FinalDeltaDataSynchronization@38+2, OperationalSmokeTestingValidation@32+2, ComplianceEvidencePackage@34+3, RemediationFixRoundOne@34+2, Wave1DryRunDataSynchronization@26+2
+
+**Connections**
+
+- InfrastructureAssetInventory -> ApplicationDependencyMapping
+- InfrastructureAssetInventory -> SecurityComplianceAudit
+- InfrastructureAssetInventory -> BusinessImpactAnalysis
+- ApplicationDependencyMapping -> TechnicalDebtEvaluation
+- TechnicalDebtEvaluation -> LicenseConsolidationReview
+- SecurityComplianceAudit -> MigrationWaveBundlingStrategy
+- TechnicalDebtEvaluation -> MigrationWaveBundlingStrategy
+- BusinessImpactAnalysis -> MigrationWaveBundlingStrategy
+- BusinessImpactAnalysis -> CloudCostModeling
+- TechnicalDebtEvaluation -> CloudCostModeling
+- MigrationWaveBundlingStrategy -> DedicatedDirectConnectLinkProvisioning
+- MigrationWaveBundlingStrategy -> SoftwareDefinedVirtualPrivateCloudSetup
+- SoftwareDefinedVirtualPrivateCloudSetup -> IdentityAccessManagementFederation
+- SoftwareDefinedVirtualPrivateCloudSetup -> TransitGatewayRoutingMeshConfiguration
+- DedicatedDirectConnectLinkProvisioning -> TransitGatewayRoutingMeshConfiguration
+- SoftwareDefinedVirtualPrivateCloudSetup -> LandingZoneGuardrailPolicies
+- CloudCostModeling -> LandingZoneGuardrailPolicies
+- IdentityAccessManagementFederation -> SecurityKeyVaultDeployment
+- TransitGatewayRoutingMeshConfiguration -> CentralizedLoggingCollectorSetup
+- SoftwareDefinedVirtualPrivateCloudSetup -> ObjectStorageDataReplicationPipeline
+- TransitGatewayRoutingMeshConfiguration -> DistributedCacheClusterConfiguration
+- SecurityKeyVaultDeployment -> RelationalDatabaseClusterProvisioning
+- TransitGatewayRoutingMeshConfiguration -> RelationalDatabaseClusterProvisioning
+- CentralizedLoggingCollectorSetup -> ContainerRegistryProvisioning
+- ContainerRegistryProvisioning -> ContinuousIntegrationDeliveryPipelineUpdate
+- ContainerRegistryProvisioning -> ObservabilityStackRollout
+- LandingZoneGuardrailPolicies -> ObservabilityStackRollout
+- ContainerRegistryProvisioning -> KubernetesClusterBootstrapping
+- SecurityKeyVaultDeployment -> KubernetesClusterBootstrapping
+- RelationalDatabaseClusterProvisioning -> DatabaseSchemaMigrationConversion
+- KubernetesClusterBootstrapping -> CoreMicroservicesRefactoring
+- KubernetesClusterBootstrapping -> ServiceMeshAdoption
+- ServiceMeshAdoption -> SecurityPenetrationTesting
+- CoreMicroservicesRefactoring -> PerformanceBaselineTesting
+- SecurityPenetrationTesting -> PerformanceBaselineTesting
+- DatabaseSchemaMigrationConversion -> Wave1DryRunDataSynchronization
+- ObjectStorageDataReplicationPipeline -> Wave1DryRunDataSynchronization
+- Wave1DryRunDataSynchronization -> MockCutoverExecutionDryRun
+- CoreMicroservicesRefactoring -> MockCutoverExecutionDryRun
+- MockCutoverExecutionDryRun -> RollbackRunbookRehearsal
+- MockCutoverExecutionDryRun -> OperationalSmokeTestingValidation
+- PerformanceBaselineTesting -> TrainingAndHandoverWorkshops
+- OperationalSmokeTestingValidation -> ComplianceEvidencePackage
+- SecurityPenetrationTesting -> ComplianceEvidencePackage
+- OperationalSmokeTestingValidation -> RemediationFixRoundOne
+- RemediationFixRoundOne -> SecondDryRunRehearsal
+- RollbackRunbookRehearsal -> SecondDryRunRehearsal
+- SecondDryRunRehearsal -> CustomerCommunicationPlan
+- SecondDryRunRehearsal -> ProductionFreezeWindowDeclaration
+- ProductionFreezeWindowDeclaration -> FinalDeltaDataSynchronization
+- FinalDeltaDataSynchronization -> DnsRoutingCutoverExecution
+- CustomerCommunicationPlan -> DnsRoutingCutoverExecution
+- DnsRoutingCutoverExecution -> LiveTrafficVerificationValidation
+- LiveTrafficVerificationValidation -> RemediationFixRoundTwo
+- RemediationFixRoundTwo -> LegacyServerDecommissioning
+- RemediationFixRoundTwo -> DisasterRecoveryTestingVerification
+- LegacyServerDecommissioning -> FormalStakeholderSignoffAcceptance
+- DisasterRecoveryTestingVerification -> FormalStakeholderSignoffAcceptance
+- TrainingAndHandoverWorkshops -> FormalStakeholderSignoffAcceptance
+- ComplianceEvidencePackage -> FormalStakeholderSignoffAcceptance
 
 ### Sources
 
@@ -113,4 +187,4 @@ LegacyServerDecommissioning starts after LiveTrafficVerificationValidation finis
 
 ### Uncertain
 
-* none
+* The domain details were written to give the diagram a realistic shape; they were not checked against the cited sources.
