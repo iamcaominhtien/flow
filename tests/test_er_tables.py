@@ -63,3 +63,17 @@ def test_both_outputs_draw_the_chips() -> None:
     drawio = render_drawio.render(scene)
     assert ">PK<" in html and ">FK<" in html
     assert "PK" in drawio and "FK" in drawio
+
+
+def test_tables_in_one_row_line_up_at_their_tops() -> None:
+    """A short table and a tall one in the same grid row start at the same y."""
+    spec = {
+        **SPEC,
+        "tables": [
+            {**SPEC["tables"][0], "at": [0, 0]},
+            {**SPEC["tables"][1], "at": [0, 1]},
+        ],
+    }
+    nodes = {node.id: node for node in er.layout_raw(spec).nodes}
+    assert nodes["customers"].height != nodes["orders"].height
+    assert nodes["customers"].y == nodes["orders"].y

@@ -42,6 +42,7 @@ PILL_RADIUS_PX = 999
 TABLE_TEXT_PADDING_PX = 14
 TABLE_ROW_FONT_SIZE_PX = 11
 TABLE_RULE_COLOR = "#CBD5E1"
+TABLE_ROW_RULE_COLOR = "#E2E8F0"
 TABLE_HEADER_RADIUS_PX = 7
 TABLE_PILL_HEIGHT_PX = 28  # the name pill in the header of an illustrated table
 TABLE_CARD_ICON_PX = 52
@@ -190,7 +191,8 @@ def _table_title_html(node: Node, theme: Theme) -> str:
         "padding": f"0 {px(theme.layout.card_pill_padding)}",
         "border": f"2px solid {stroke}",
         "border-radius": px(PILL_RADIUS_PX),
-        "background": "#FFFFFF",
+        "background": theme.tones[node.tone or Tone.GRAY].box,
+        "box-shadow": f"0 3px 0 {stroke}",
         "box-sizing": "border-box",
         "font-size": px(node.font_size),
         "font-weight": str(NODE_TEXT_WEIGHT),
@@ -236,8 +238,8 @@ def _table_html(node: Node, theme: Theme) -> str:
             }
             html += tag("div", rule)
             y += rules.table_section_gap
-        for row in section:
-            html += _row_html(row, (node.width, y, key_width), theme)
+        for position, row in enumerate(section):
+            html += _row_html(row, (node.width, y, key_width, position > 0), theme)
             y += rules.table_row_height
     return html
 
@@ -262,28 +264,34 @@ def _chip_html(flag: str, theme: Theme) -> str:
     return tag("span", chip, esc(flag))
 
 
-def _row_html(row: Row, place: tuple[float, float, float], theme: Theme) -> str:
+def _row_html(row: Row, place: tuple[float, float, float, bool], theme: Theme) -> str:
     """Draw one row of a table: key chips and a name on the left, a type on the right.
 
-    A column that is a primary key is drawn in bold.
+    The name is in the sans font, bold for a primary key; the type is in the mono font and
+    grey. A thin rule separates a row from the one above it.
     """
-    width, top, key_width = place
+    width, top, key_width, has_rule = place
+    rules = theme.layout
     style = {
         **ABSOLUTE,
-        "left": px(TABLE_TEXT_PADDING_PX),
+        "left": "1px",
         "top": px(top),
-        "width": px(width - 2 * TABLE_TEXT_PADDING_PX),
-        "height": px(theme.layout.table_row_height),
+        "width": px(width - 2),
+        "height": px(rules.table_row_height),
+        "box-sizing": "border-box",
+        "padding": f"0 {px(TABLE_TEXT_PADDING_PX)}",
         "display": "flex",
         "align-items": "center",
-        "font": f"500 {px(TABLE_ROW_FONT_SIZE_PX)}/1 '{theme.fonts.mono}',monospace",
+        "border-top": f"1px solid {TABLE_ROW_RULE_COLOR}" if has_rule else "0",
+        "font-size": px(rules.table_name_font_size),
         "color": theme.ink,
     }
     chips = "".join(_chip_html(flag, theme) for flag in row.flags)
     key_cell = tag("span", {"display": "inline-block", "width": px(key_width)}, chips)
     weight = "700" if "PK" in row.flags else "500"
     name = tag("span", {"font-weight": weight, "flex": "1"}, esc(row.left))
-    kind = tag("span", {"color": theme.slate}, esc(row.right))
+    kind_font = f"500 {px(TABLE_ROW_FONT_SIZE_PX)}/1 '{theme.fonts.mono}',monospace"
+    kind = tag("span", {"color": theme.slate, "font": kind_font}, esc(row.right))
     return tag("div", style, (key_cell if key_width else "") + name + kind)
 
 

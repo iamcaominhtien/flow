@@ -1,0 +1,383 @@
+{
+ "type": "er",
+ "style": "illustrated",
+ "title": "Complete schema: food delivery, illustrated",
+ "desc": "The tables behind one order: who orders, what is in it, who cooks it, who pays and who delivers.",
+ "tables": [
+  {
+   "id": "customers",
+   "name": "Customer",
+   "icon": "user",
+   "tone": "blue",
+   "at": [
+    0,
+    0
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "flags": []
+    },
+    {
+     "name": "email",
+     "type": "text",
+     "flags": [
+      "uq"
+     ]
+    },
+    {
+     "name": "phone",
+     "type": "text",
+     "flags": [
+      "null"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "orders",
+   "name": "Order",
+   "icon": "cart",
+   "tone": "violet",
+   "at": [
+    0,
+    1
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "customer_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "restaurant_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "status",
+     "type": "text",
+     "flags": []
+    },
+    {
+     "name": "total",
+     "type": "decimal",
+     "flags": []
+    },
+    {
+     "name": "placed_at",
+     "type": "timestamp",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "id": "restaurants",
+   "name": "Restaurant",
+   "icon": "store",
+   "tone": "green",
+   "at": [
+    0,
+    2
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "flags": []
+    },
+    {
+     "name": "rating",
+     "type": "float",
+     "flags": []
+    },
+    {
+     "name": "city",
+     "type": "text",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "id": "couriers",
+   "name": "Courier",
+   "icon": "bike",
+   "tone": "teal",
+   "at": [
+    0,
+    3
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "flags": []
+    },
+    {
+     "name": "vehicle",
+     "type": "text",
+     "flags": []
+    },
+    {
+     "name": "status",
+     "type": "text",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "id": "payments",
+   "name": "Payment",
+   "icon": "card",
+   "tone": "amber",
+   "at": [
+    1,
+    0
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "order_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "method",
+     "type": "text",
+     "flags": []
+    },
+    {
+     "name": "amount",
+     "type": "decimal",
+     "flags": []
+    },
+    {
+     "name": "status",
+     "type": "text",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "id": "items",
+   "name": "OrderItem",
+   "icon": "table",
+   "tone": "violet",
+   "at": [
+    1,
+    1
+   ],
+   "columns": [
+    {
+     "name": "order_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    },
+    {
+     "name": "dish_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    },
+    {
+     "name": "quantity",
+     "type": "int",
+     "flags": []
+    },
+    {
+     "name": "unit_price",
+     "type": "decimal",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "id": "dishes",
+   "name": "Dish",
+   "icon": "pot",
+   "tone": "green",
+   "at": [
+    1,
+    2
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "restaurant_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "name",
+     "type": "text",
+     "flags": []
+    },
+    {
+     "name": "price",
+     "type": "decimal",
+     "flags": []
+    },
+    {
+     "name": "available",
+     "type": "bool",
+     "flags": []
+    }
+   ]
+  },
+  {
+   "id": "deliveries",
+   "name": "Delivery",
+   "icon": "box",
+   "tone": "teal",
+   "at": [
+    1,
+    3
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "order_id",
+     "type": "uuid",
+     "flags": [
+      "fk",
+      "uq"
+     ]
+    },
+    {
+     "name": "courier_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "picked_up_at",
+     "type": "timestamp",
+     "flags": [
+      "null"
+     ]
+    },
+    {
+     "name": "delivered_at",
+     "type": "timestamp",
+     "flags": [
+      "null"
+     ]
+    }
+   ]
+  }
+ ],
+ "relations": [
+  {
+   "from": "customers",
+   "to": "orders",
+   "label": "places",
+   "main": true,
+   "from_end": "one",
+   "to_end": "zero_many"
+  },
+  {
+   "from": "restaurants",
+   "to": "orders",
+   "label": "receives",
+   "to_end": "zero_many"
+  },
+  {
+   "from": "restaurants",
+   "to": "dishes",
+   "label": "offers",
+   "to_end": "zero_many"
+  },
+  {
+   "from": "couriers",
+   "to": "deliveries",
+   "label": "carries",
+   "to_end": "zero_many"
+  },
+  {
+   "from": "orders",
+   "to": "payments",
+   "label": "paid by",
+   "to_end": "zero_many"
+  },
+  {
+   "from": "orders",
+   "to": "items",
+   "label": "contains",
+   "main": true,
+   "to_end": "one_many"
+  },
+  {
+   "from": "dishes",
+   "to": "items",
+   "label": "sold as",
+   "to_end": "zero_many"
+  },
+  {
+   "from": "orders",
+   "to": "deliveries",
+   "label": "delivered by",
+   "to_end": "zero_one"
+  }
+ ]
+}

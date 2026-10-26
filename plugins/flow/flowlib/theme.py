@@ -89,6 +89,8 @@ class LayoutRules:
     table_card_header_height: float
     table_chip_width: float
     table_chip_gap: float
+    table_key_columns: int
+    table_name_font_size: float
     detail_font_size: float
     detail_line_height: float
     caption_height: float
