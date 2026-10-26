@@ -135,6 +135,14 @@ def _bar(width: float, height: float, colors: ShapeColors) -> str:
     )
 
 
+def _fork(width: float, height: float, colors: ShapeColors) -> str:
+    """Draw the solid bar of a parallel split or join, with softly rounded ends."""
+    return (
+        f'<rect x="0" y="0" width="{fmt(width)}" height="{fmt(height)}" '
+        f'rx="{fmt(min(width, height) / 2)}" fill="{colors.fill}"/>'
+    )
+
+
 def _note(width: float, height: float, colors: ShapeColors) -> str:
     """Draw a rectangle with a folded top-right corner."""
     paint = _paint(colors)
@@ -296,6 +304,8 @@ DRAWERS: dict[Shape, Drawer] = {
     Shape.PREPARATION: _hexagon,
     Shape.CONNECTOR: _circle,
     Shape.BAR: _bar,
+    Shape.FORK: _fork,
+    Shape.HEADER: _rounded_box,
     Shape.NOTE: _note,
     Shape.TEXT: _text,
     Shape.CROSS: _cross,

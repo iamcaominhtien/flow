@@ -10,6 +10,7 @@ from enum import StrEnum
 Point = tuple[float, float]
 
 DEFAULT_FONT_SIZE_PX = 12.0
+REF_FRAGMENT = "ref"  # the label of a frame that points to another diagram, whose name it shows
 DEFAULT_THEME = "pastel"  # the look of every diagram that does not ask for another
 
 
@@ -26,6 +27,8 @@ class Shape(StrEnum):
     PREPARATION = "preparation"
     CONNECTOR = "connector"
     BAR = "bar"
+    HEADER = "header"  # the box or card at the top of a sequence lifeline
+    FORK = "fork"  # the thick bar of a parallel split or join
     NOTE = "note"
     TEXT = "text"
     CROSS = "cross"
@@ -355,3 +358,4 @@ class Scene:
     nodes: tuple[Node, ...]
     edges: tuple[Edge, ...]
     theme: str = DEFAULT_THEME
+    diagram: str = ""  # the spec type it was drawn from; some checks apply to one type only

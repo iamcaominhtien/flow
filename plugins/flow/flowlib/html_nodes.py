@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 
+from .cards import card_parts
 from .html_screen import screen_html
 from .markup import esc, px, tag
 from .model import KEY_FLAG_TONES, Node, Row, Shape, Tone
@@ -56,6 +57,11 @@ CAPTION_WIDTH_PX = 150
 CAPTION_GAP_PX = 4
 CAPTION_FONT_SIZE_PX = 12
 
+# Note beside an off-page connector: where the flow continues
+CONNECTOR_NOTE_GAP_PX = 10
+CONNECTOR_NOTE_WIDTH_PX = 140
+CONNECTOR_NOTE_FONT_SIZE_PX = 11
+
 DASH_PATTERN = "6 4"  # the outline of a reference to a table drawn on another page
 ABSOLUTE = {"position": "absolute"}
 
@@ -108,7 +114,7 @@ def _label_html(node: Node, theme: Theme) -> str:
         "color": theme.slate if is_note else theme.ink,
     }
     title = "<br>".join(esc(line) for line in node.text)
-    if not node.detail:
+    if not node.detail or node.shape is Shape.CONNECTOR:
         return tag("div", style, title)
     style.update({"flex-direction": "column", "justify-content": "center"})
     detail_style = {
@@ -318,9 +324,29 @@ def _caption_html(node: Node, theme: Theme) -> str:
     return tag("div", style, esc(node.caption))
 
 
+def _connector_note_html(node: Node, theme: Theme) -> str:
+    """Draw the note that says where an off-page connector continues, beside its circle."""
+    if node.shape is not Shape.CONNECTOR or not node.detail:
+        return ""
+    style = {
+        **ABSOLUTE,
+        "left": px(node.x + node.width + CONNECTOR_NOTE_GAP_PX),
+        "top": px(node.y),
+        "width": px(CONNECTOR_NOTE_WIDTH_PX),
+        "height": px(node.height),
+        "display": "flex",
+        "align-items": "center",
+        "font-size": px(CONNECTOR_NOTE_FONT_SIZE_PX),
+        "line-height": px(theme.layout.detail_line_height),
+        "color": theme.slate,
+    }
+    return tag("div", style, esc(" ".join(node.detail)))
+
+
 def _card_html(node: Node, theme: Theme) -> str:
     """Draw the inside of an illustrated card: icon disc, name pill and detail text."""
     rules = theme.layout
+    parts = card_parts(node, theme)
     tone = theme.tones[node.tone or Tone.BLUE]
     disc = rules.card_disc
     icon_size = disc * rules.card_icon_fraction
@@ -328,7 +354,7 @@ def _card_html(node: Node, theme: Theme) -> str:
     disc_style = {
         **ABSOLUTE,
         "left": px((node.width - disc) / 2),
-        "top": px(rules.card_padding),
+        "top": px(parts.icon_top),
         "width": px(disc),
         "height": px(disc),
         "border-radius": "50%",
@@ -337,19 +363,19 @@ def _card_html(node: Node, theme: Theme) -> str:
     html = ""
     if has_detailed_icon(node.icon or ""):
         left = px((node.width - disc) / 2)
-        place = f'style="position:absolute;left:{left};top:{px(rules.card_padding)}"'
+        place = f'style="position:absolute;left:{left};top:{px(parts.icon_top)}"'
         html = detailed_icon_svg(node.icon or "", disc, tone.stroke, place)
     else:
         place = f'style="position:absolute;left:{px(inset)};top:{px(inset)}"'
         icon = icon_svg(node.icon or "", icon_size, tone.stroke, place)
         html = tag("div", disc_style, icon)
-    pill_top = rules.card_padding + disc + rules.card_gap
+    pill_top = parts.pill_top
     pill_row = {
         **ABSOLUTE,
         "left": px(rules.card_padding),
         "top": px(pill_top),
         "width": px(node.width - 2 * rules.card_padding),
-        "height": px(rules.card_pill_height),
+        "height": px(parts.pill_height),
         "display": "flex",
         "justify-content": "center",
     }
@@ -359,7 +385,7 @@ def _card_html(node: Node, theme: Theme) -> str:
         "background": tone.pill,
         "font-size": px(node.font_size),
         "font-weight": str(theme.type_scale.pill.weight),
-        "line-height": px(rules.card_pill_height),
+        "line-height": px(parts.pill_height),
         "color": theme.ink,
         "white-space": "nowrap",
     }
@@ -368,7 +394,7 @@ def _card_html(node: Node, theme: Theme) -> str:
         detail = {
             **ABSOLUTE,
             "left": px(rules.card_padding),
-            "top": px(pill_top + rules.card_pill_height + rules.card_gap),
+            "top": px(pill_top + parts.pill_height + rules.card_gap),
             "width": px(node.width - 2 * rules.card_padding),
             "text-align": "center",
             "font-size": px(rules.detail_font_size),
@@ -428,4 +454,5 @@ def node_html(node: Node, theme: Theme) -> str:
         tag("div", box, inside, data_id=node.id)
         + _badge_html(node, theme)
         + _caption_html(node, theme)
+        + _connector_note_html(node, theme)
     )

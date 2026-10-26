@@ -7,7 +7,7 @@ allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py *)
 
 You write a short **spec**: the participants and the messages in order. A script spaces the lifelines, derives the activation bars, wraps fragments around the rows they hold, checks the result and writes the files. Never write coordinates or HTML yourself.
 
-Use it when the *order of messages* is the point. For structure use an architecture diagram; for one actor's steps and decisions use the flowchart skill (neither architecture nor other types are built yet: say so if asked).
+Use it when the *order of messages* is the point. For structure use an architecture diagram; for one actor's steps and decisions use the flowchart skill.
 
 ## Steps
 
@@ -36,20 +36,21 @@ Use it when the *order of messages* is the point. For structure use an architect
 ```
 
 - `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `style` (optional): `plain` (default: a 136 x 44 header box with a small icon) or `illustrated` (a 172 x 116 tinted card with a 64 px icon and a name pill; icons that have a detailed twin, such as `user phone server card store courier`, show it). Only the headers change; every y position moves down by the extra header height. Lifelines are 230 px apart in both styles.
 Items run top to bottom in the order written. An item is one of:
 
-- **A message**: `kind`, `from`, `to`, `label`, optional `role`, optional `number`.
+- **A message**: `kind`, `from`, `to`, `label`, optional `role`, optional `number`, optional `icon` (a flat 14 px icon left of the label, for the payload: `card`, `doc`, `pin`).
   - `sync`: the caller waits (solid line, filled head). `return`: the answer, drawn only when the value matters (dashed, open head). `async`: the caller carries on (solid, open head). `self`: the participant calls itself (a loop; `to` is ignored). `lost`: sent but nobody receives it (ends in a dot; give `from`). `found`: comes from outside the diagram (starts from a dot; give `to`). `create`: makes a participant appear lower (dashed, into its box).
   - `role`: `next` (default, ink), `main` (the one path the diagram is about: blue, thick, animated), `fail` (rose, with a rose label), `event` (violet, thin, slowly animated). A return on the main path keeps its own head and takes the main colour.
 - **A note**: `{"note": "text", "over": "<participant>", "side": "right"}`. Use it for a reason that no arrow can carry.
 - **A destroy**: `{"destroy": "<participant>"}` ends a lifeline with a cross.
-- **A fragment**: `{"fragment": "alt", "sections": [{"guard": "password matches", "items": [...]}, {"guard": "else", "items": [...]}]}`. Kinds: `alt` (alternatives, one section per branch), `opt`, `loop`, `par`, `break`, `critical`, `ref`. The guard says under which condition the section happens. Fragments nest at most two levels.
+- **A fragment**: `{"fragment": "alt", "sections": [{"guard": "password matches", "items": [...]}, {"guard": "else", "items": [...]}]}`. Kinds: `alt` (alternatives, one section per branch, the last guard `else`), `opt`, `loop`, `par` (sections without a guard), `break` (the calls it answers stay open for the rest of the flow), `critical`, `ref` (one section whose `guard` is the name of the other diagram and no items; the frame shows that name). A frame takes its colour from its kind. Fragments nest at most two levels, each inset 10 px.
 
 Participants: `id` (used in messages), `label`, optional `icon` (`user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`) and `tone` (`blue violet amber green teal gray`, an owner or domain, never a meaning).
 
 ## Writing good content
 
-- A label is one short phrase, about 24 characters at most: a call is code (`POST /orders`) or a verb phrase (*Charge card*); a return is the value (*Token*, *402*).
+- A label is one short phrase, about 24 characters at most (longer is a `sequence-label-long` warning): a call is code (`POST /orders`) or a verb phrase (*Charge card*); a return is the value (*Token*, *402*).
 - Draw a `return` only when the value matters. Activation bars come from a `sync` call and the `return` that answers it, so pair them: a call that is never answered makes no bar.
 - Numbers are optional. Use them when other text refers to steps; a branch adds a letter (`6a`, `6b`).
 - Put at most one path on `main`. Show failures with `fail`, not with a different kind.
@@ -57,7 +58,7 @@ Participants: `id` (used in messages), `label`, optional `icon` (`user phone car
 
 ## Reading the report
 
-`line-through-node`, `nodes-overlap`, `label-covers` and `outside-canvas` are errors; `text-may-not-fit` and `lines-cross` are warnings. A label that covers a lifeline's bar usually means a long label across a short span: shorten it or reorder the participants so that the two that talk most are neighbours. If an error remains, fix it by hand with an overrides file next to the spec (`<name>.overrides.json`, see the flowchart skill) or report it; do not edit the HTML or the `.drawio` file.
+`line-through-node`, `nodes-overlap`, `label-covers` and `outside-canvas` are errors; `text-may-not-fit`, `lines-cross`, `crosses-border`, `on-divider` and `sequence-label-long` are warnings. A label that covers a lifeline's bar usually means a long label across a short span: shorten it or reorder the participants so that the two that talk most are neighbours. If an error remains, fix it by hand with an overrides file next to the spec (`<name>.overrides.json`, see the flowchart skill) or report it; do not edit the HTML or the `.drawio` file.
 
 ## Known limits
 

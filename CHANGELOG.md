@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 (2026-10-26)
+
+Flowchart and sequence brought up to `docs/design/03-flowchart.md` and `04-sequence.md`.
+
+- **Flowchart:** `fork` / `join` bars for parallel work (HTML, draw.io, import); multi-way decisions fan out over three sides; off-page connector note; `screen` cards; Yes/No chips keep their colour on any line; lanes 210/240 px with a straight lane change; lane charts fold later; new warnings (`text-too-long`, `decision-not-question`, `decision-few-exits`, `decision-no-else`, `chart-too-big`, `start-placement`, `end-placement`). Examples `payment-flowchart`, `delivery-flowchart`.
+- **Sequence:** `"style": "illustrated"` (172x116 header cards with a 64 px icon and a name pill); header shape; 230 px pitch; 58 px under the header; frame inset 10 px and 34 px after a frame; frames coloured by kind; `ref` frames show a name; `break` keeps calls open; message `icon`; warning for labels over 24 characters. Examples `delivery-sequence`, `delivery-sequence-illustrated`.
+- **Fixed:** a created participant crossing its fragment; labels on lane borders and frame borders in every type.
+- Not done: a leftward failure branch in layout (Delivery routes around it); equal widths across lane rows; long activation bars of the design picture (ours come from call and return pairs); a header imported from draw.io becomes a plain box; real draw.io editor not used. Delivery flowchart still warns `chart-too-big` and one `lines-cross`.
+
 ## 0.3.0 (2026-10-26)
 
 Screen flow rebuilt from `docs/design/02-screen-flow.md`.

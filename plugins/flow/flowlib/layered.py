@@ -8,10 +8,11 @@ are routed around the flow later.
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, field
 
-from .model import Role, Side
+from .model import Role, Shape, Side
 from .spec import Spec, SpecEdge
 
 CONTINUATION_ORDER = {Role.MAIN: 0, Role.YES: 0, Role.NEXT: 0, Role.DATA: 1, Role.NO: 2}
+MULTIWAY_EXITS = 3  # a decision with this many exits spreads them over columns, the middle straight
 LATE_ORDER = 3  # roles not listed above are placed after the others
 SIDEWAYS_ROLES = (Role.NO,)  # a "no" exit stays on the row of its decision ...
 CONTINUING_ROLES = (Role.YES, Role.NEXT, Role.MAIN)  # ... when another exit continues the flow
@@ -142,6 +143,7 @@ def assign_columns(
         Node id to column; columns may be negative when a branch asks for the left side.
     """
     sides = {node.id: node.side for node in spec.nodes}
+    fans = {node.id for node in spec.nodes if node.kind is Shape.DECISION}
     has_parent = {edge.target for edge in forward}
     column: dict[str, int] = {}
     taken: set[tuple[int, int]] = set()
@@ -160,9 +162,12 @@ def assign_columns(
     pending = deque(roots)
     while pending:
         node_id = pending.popleft()
-        for index, edge in enumerate(_children_in_order(node_id, forward)):
+        children = _children_in_order(node_id, forward)
+        for index, edge in enumerate(children):
             step = -1 if sides[edge.target] is Side.LEFT else 1
             offset = 0 if index == 0 and edge not in sideways else step
+            if node_id in fans and len(children) >= MULTIWAY_EXITS:
+                offset = index - (len(children) - 1) // 2
             wants[edge.target].append(column[node_id] + offset)
             waiting[edge.target] -= 1
             if waiting[edge.target] == 0:
@@ -180,7 +185,9 @@ def separate_lane_cells(
     """Give every node its own row within its lane, pushing later nodes down.
 
     Two nodes of one lane may reach the same row by different paths; the one that comes later
-    in the spec moves down a row, and what follows it moves with it.
+    in the spec moves down a row, and what follows it moves with it. In a flowchart, a line that
+    changes lane stays on the row of its source, so that it runs straight across the lanes
+    between; a stacked line that a node in an inner lane would block goes back to the next row.
 
     Args:
         spec: The flowchart description.
@@ -190,20 +197,75 @@ def separate_lane_cells(
     Returns:
         Node id to row, with at most one node per lane and row.
     """
-    minimum: dict[str, int] = {}
+    stacked = _stackable(spec, forward, column) if spec.is_flowchart else set()
     while True:
-        rank = assign_ranks(spec, forward, set(), minimum)
-        taken: dict[tuple[int, int], str] = {}
-        clash = None
-        for node in spec.nodes:
-            cell = (rank[node.id], column[node.id])
-            if cell in taken:
-                clash = node.id
-                break
-            taken[cell] = node.id
+        rank = _spread_rows(spec, forward, column, stacked)
+        blocked = {edge for edge in stacked if _is_blocked(edge, rank, column)}
+        if not blocked:
+            return rank
+        stacked -= blocked
+
+
+def _spread_rows(
+    spec: Spec, forward: list[SpecEdge], column: dict[str, int], stacked: set[SpecEdge]
+) -> dict[str, int]:
+    """Rank the nodes so that no two share a lane and a row; ``stacked`` lines add no row."""
+    minimum: dict[str, int] = {}
+    bars = {node.id for node in spec.nodes if node.kind is Shape.FORK}
+    while True:
+        rank = assign_ranks(spec, forward, stacked, minimum)
+        clash = _first_clash(spec, rank, column, bars)
         if clash is None:
             return rank
         minimum[clash] = rank[clash] + 1
+
+
+def _first_clash(
+    spec: Spec, rank: dict[str, int], column: dict[str, int], bars: set[str]
+) -> str | None:
+    """Return the first node that shares its lane and row with an earlier one, else None.
+
+    A bar of a split or join reaches across lanes, so it shares its row with no other node.
+    """
+    taken: dict[tuple[int, int], str] = {}
+    row_of_bar: dict[int, str] = {}
+    rows_in_use: set[int] = set()
+    for node in spec.nodes:
+        cell = (rank[node.id], column[node.id])
+        is_bar = node.id in bars
+        meets_bar = rank[node.id] in row_of_bar or (is_bar and rank[node.id] in rows_in_use)
+        if cell in taken or meets_bar:
+            return node.id
+        taken[cell] = node.id
+        rows_in_use.add(rank[node.id])
+        if is_bar:
+            row_of_bar[rank[node.id]] = node.id
+    return None
+
+
+def _stackable(spec: Spec, forward: list[SpecEdge], column: dict[str, int]) -> set[SpecEdge]:
+    """Pick the lines that change lane and may run straight across on the row of their source.
+
+    A source keeps one such line towards each side (up and down the lanes), so that two lines
+    never leave one node along the same stretch. A bar of a split or join keeps a row of its own.
+    """
+    bars = {node.id for node in spec.nodes if node.kind is Shape.FORK}
+    towards: dict[tuple[str, bool], list[SpecEdge]] = defaultdict(list)
+    for edge in forward:
+        change = column[edge.target] - column[edge.source]
+        if change and not {edge.source, edge.target} & bars:
+            towards[(edge.source, change > 0)].append(edge)
+    return {group[0] for group in towards.values() if len(group) == 1}
+
+
+def _is_blocked(edge: SpecEdge, rank: dict[str, int], column: dict[str, int]) -> bool:
+    """Tell whether a node of an inner lane sits on the row a stacked line runs along."""
+    low, high = sorted((column[edge.source], column[edge.target]))
+    row = rank[edge.source]
+    return (
+        any(rank[name] == row and low < column[name] < high for name in rank)
+        or rank[edge.target] != row
+    )
 
 
 def assign_lane_columns(spec: Spec) -> dict[str, int]:

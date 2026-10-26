@@ -31,6 +31,7 @@ from . import sequence_spec as spec_io
 from .sequence_spec import (
     Destroy,
     Fragment,
+    FragmentKind,
     Item,
     Message,
     MessageKind,
@@ -55,6 +56,15 @@ HEAD_OF_KIND = {
     MessageKind.CREATE: Head.OPEN,
 }
 DASHED_KINDS = (MessageKind.RETURN, MessageKind.CREATE)
+FRAGMENT_TONES = {
+    FragmentKind.ALT: Tone.AMBER,
+    FragmentKind.OPT: Tone.BLUE,
+    FragmentKind.LOOP: Tone.VIOLET,
+    FragmentKind.PAR: Tone.TEAL,
+    FragmentKind.BREAK: Tone.RED,
+    FragmentKind.CRITICAL: Tone.RED,
+    FragmentKind.REF: Tone.GRAY,
+}  # the colour of a frame follows its kind, as on the fragments board
 LABEL_ABOVE_LINE_PX = 30  # room a message row needs above its line, for the label
 ROW_BELOW_LINE_PX = 22  # room a message row needs below its line
 PARTICIPANT_TEXT_EXTRA_PX = 24
@@ -119,13 +129,16 @@ class _Builder:
         self.spec = spec
         self.theme = theme
         self.rules = theme.sequence
+        self.header_height = (
+            self.rules.header_card_height if spec.illustrated else self.rules.participant_height
+        )
         self.box_width = {
             each.id: self._box_width(each.label, each.icon) for each in spec.participants
         }
         self.x = self._lifeline_positions()
         title = theme.layout.title_block_height if spec.title else 0
         self.box_top = theme.layout.margin + title
-        self.cursor = self.box_top + self.rules.participant_height + self.rules.first_message_gap
+        self.cursor = self.box_top + self.header_height + self.rules.first_message_gap
         self.rows: list[_Row] = []
         self.bars: list[_Bar] = []
         self.calls: list[_Call] = []
@@ -141,6 +154,9 @@ class _Builder:
         """Return the width of a participant box: the standard width, or more for a long label."""
         layout = self.theme.layout
         text = estimate_text_width(label, layout, DEFAULT_FONT_SIZE_PX)
+        if self.spec.illustrated:
+            pill = text + 2 * layout.card_pill_padding + 2 * layout.card_padding
+            return max(self.rules.header_card_width, pill)
         extra = PARTICIPANT_TEXT_EXTRA_PX + (PARTICIPANT_ICON_EXTRA_PX if icon else 0)
         return max(self.rules.participant_width, text + extra)
 
@@ -215,10 +231,12 @@ class _Builder:
         self._frame_count += 1
         record = _FragmentRecord(
             fragment,
-            top=self.cursor - ROW_BELOW_LINE_PX - rules.fragment_enter / 3,
+            top=self.cursor - rules.fragment_rise,
             order=self._frame_count,
         )
         self.cursor += rules.fragment_enter
+        if fragment.kind is FragmentKind.REF:
+            self.cursor += rules.row_height
         open_before, closed_before = list(self.calls), set(self.closed)
         for index, section in enumerate(fragment.sections):
             self.calls = list(open_before)
@@ -227,23 +245,26 @@ class _Builder:
                 record.dividers.append(Divider(y=divider_y, guard=section.guard or ""))
                 self.cursor += rules.divider_gap
             self.walk(section.items, record.touched, record)
-        answered = self.closed - closed_before
+        answered = set() if fragment.kind is FragmentKind.BREAK else self.closed - closed_before
         self.calls = [call for call in open_before if call.ident not in answered]
-        record.bottom = self.cursor - ROW_BELOW_LINE_PX
+        record.bottom = self.cursor - (rules.row_height - rules.fragment_below_line)
         self.cursor += rules.fragment_exit
         touched.update(record.touched)
         frame = self._close(record)
         if parent is not None:
             parent.children.append(frame)
 
+    def _reach(self, name: str) -> float:
+        """Return how far a frame goes past a lifeline: the padding, or the header if wider."""
+        header_reach = self.box_width[name] / 2 + self.rules.fragment_inset_x
+        return max(self.rules.fragment_pad_x, header_reach)
+
     def _close(self, record: _FragmentRecord) -> Frame:
         """Turn a finished fragment record into a frame, wide enough for what it holds."""
         rules = self.rules
-        columns = [self.x[name] for name in record.touched] or [
-            self.x[self.spec.participants[0].id]
-        ]
-        left = min(columns) - rules.fragment_pad_x
-        right = max(columns) + rules.fragment_pad_x
+        names = list(record.touched) or list(self.x)
+        left = min(self.x[name] - self._reach(name) for name in names)
+        right = max(self.x[name] + self._reach(name) for name in names)
         for child in record.children:
             left = min(left, child.x - rules.fragment_inset_x)
             right = max(right, child.x + child.width + rules.fragment_inset_x)
@@ -255,7 +276,7 @@ class _Builder:
             width=right - left,
             height=record.bottom - record.top,
             label=record.fragment.kind.value,
-            tone=Tone.AMBER,
+            tone=FRAGMENT_TONES[record.fragment.kind],
             variant=FrameVariant.FRAGMENT,
             guard=first.guard,
             dividers=tuple(record.dividers),
@@ -316,7 +337,7 @@ def _label(message: Message, at: Point) -> EdgeLabel | None:
     if not message.label and not message.number:
         return None
     kind = LabelKind.TEXT_FAIL if message.role is MessageRole.FAIL else LabelKind.TEXT
-    return EdgeLabel(text=message.label, at=at, kind=kind, number=message.number)
+    return EdgeLabel(text=message.label, at=at, kind=kind, number=message.number, icon=message.icon)
 
 
 def _message_points(builder: _Builder, row: _Row) -> list[Point]:
@@ -374,26 +395,26 @@ def _message_edge(builder: _Builder, row: _Row, index: int) -> Edge:
 
 def _participant_nodes(builder: _Builder) -> list[Node]:
     """Build the header box of each participant; a created one sits at its create message."""
-    rules = builder.rules
     nodes = []
     for each in builder.spec.participants:
         top = builder.box_top
         if each.id in builder.created:
-            top = builder.created[each.id] - rules.participant_height / 2
+            top = builder.created[each.id] - builder.header_height / 2
         width = builder.box_width[each.id]
         nodes.append(
             Node(
                 id=each.id,
-                shape=Shape.PROCESS,
+                shape=Shape.HEADER,
                 x=builder.x[each.id] - width / 2,
                 y=top,
                 width=width,
-                height=rules.participant_height,
+                height=builder.header_height,
                 text=(each.label,),
                 icon=each.icon,
                 tone=each.tone,
                 number=None,
                 font_size=DEFAULT_FONT_SIZE_PX,
+                card=builder.spec.illustrated and each.icon is not None,
             )
         )
     return nodes

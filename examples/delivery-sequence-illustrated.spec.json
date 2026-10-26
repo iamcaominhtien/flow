@@ -1,0 +1,277 @@
+{
+  "type": "sequence",
+  "title": "Food delivery, illustrated",
+  "desc": "Six participants and every kind of message and frame: sync and return, async events, a break, a par, a loop, a critical frame, a self call and a note. Blue is the happy path; rose is the failure.",
+  "participants": [
+    {
+      "id": "customer",
+      "label": "Customer",
+      "icon": "user",
+      "tone": "blue"
+    },
+    {
+      "id": "app",
+      "label": "App",
+      "icon": "phone",
+      "tone": "violet"
+    },
+    {
+      "id": "api",
+      "label": "Order API",
+      "icon": "server",
+      "tone": "gray"
+    },
+    {
+      "id": "pay",
+      "label": "Payment",
+      "icon": "card",
+      "tone": "amber"
+    },
+    {
+      "id": "restaurant",
+      "label": "Restaurant",
+      "icon": "store",
+      "tone": "green"
+    },
+    {
+      "id": "courier",
+      "label": "Courier",
+      "icon": "courier",
+      "tone": "teal"
+    }
+  ],
+  "items": [
+    {
+      "kind": "sync",
+      "from": "customer",
+      "to": "app",
+      "label": "Place order",
+      "role": "main",
+      "number": "1",
+      "icon": "cart"
+    },
+    {
+      "kind": "sync",
+      "from": "app",
+      "to": "api",
+      "label": "POST /orders",
+      "role": "main",
+      "number": "2"
+    },
+    {
+      "kind": "sync",
+      "from": "api",
+      "to": "pay",
+      "label": "Charge card",
+      "role": "main",
+      "number": "3",
+      "icon": "card"
+    },
+    {
+      "fragment": "break",
+      "sections": [
+        {
+          "guard": "card declined",
+          "items": [
+            {
+              "kind": "return",
+              "from": "pay",
+              "to": "api",
+              "label": "Declined",
+              "role": "fail",
+              "number": "4a"
+            },
+            {
+              "kind": "return",
+              "from": "api",
+              "to": "app",
+              "label": "402",
+              "role": "fail",
+              "number": "5a"
+            },
+            {
+              "kind": "sync",
+              "from": "app",
+              "to": "customer",
+              "label": "Try another card",
+              "role": "fail",
+              "number": "6a"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "return",
+      "from": "pay",
+      "to": "api",
+      "label": "Authorised",
+      "role": "main",
+      "number": "4"
+    },
+    {
+      "kind": "return",
+      "from": "api",
+      "to": "app",
+      "label": "Order confirmed",
+      "role": "main",
+      "number": "5"
+    },
+    {
+      "kind": "sync",
+      "from": "app",
+      "to": "customer",
+      "label": "Show confirmation",
+      "number": "6",
+      "icon": "check"
+    },
+    {
+      "fragment": "par",
+      "sections": [
+        {
+          "items": [
+            {
+              "kind": "sync",
+              "from": "api",
+              "to": "restaurant",
+              "label": "New order",
+              "role": "main",
+              "number": "7a",
+              "icon": "doc"
+            },
+            {
+              "kind": "self",
+              "from": "restaurant",
+              "to": "restaurant",
+              "label": "Cook",
+              "number": "8a"
+            },
+            {
+              "kind": "return",
+              "from": "restaurant",
+              "to": "api",
+              "label": "Ready",
+              "number": "9a"
+            }
+          ]
+        },
+        {
+          "items": [
+            {
+              "kind": "sync",
+              "from": "api",
+              "to": "courier",
+              "label": "Find a courier",
+              "role": "main",
+              "number": "7b",
+              "icon": "bike"
+            },
+            {
+              "kind": "return",
+              "from": "courier",
+              "to": "api",
+              "label": "Accepted",
+              "number": "8b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "async",
+      "from": "api",
+      "to": "app",
+      "label": "Courier on the way",
+      "role": "event",
+      "number": "10",
+      "icon": "bike"
+    },
+    {
+      "fragment": "loop",
+      "sections": [
+        {
+          "guard": "every 10 s while delivering",
+          "items": [
+            {
+              "kind": "async",
+              "from": "courier",
+              "to": "api",
+              "label": "Location",
+              "role": "event",
+              "number": "11"
+            },
+            {
+              "kind": "async",
+              "from": "api",
+              "to": "app",
+              "label": "Update map",
+              "role": "event",
+              "number": "12",
+              "icon": "pin"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "async",
+      "from": "courier",
+      "to": "customer",
+      "label": "Hand over order",
+      "role": "main",
+      "number": "13",
+      "icon": "box"
+    },
+    {
+      "destroy": "courier"
+    },
+    {
+      "note": "The courier leaves the diagram once the order is handed over",
+      "over": "courier",
+      "side": "right"
+    },
+    {
+      "fragment": "critical",
+      "sections": [
+        {
+          "guard": "capture once",
+          "items": [
+            {
+              "kind": "sync",
+              "from": "api",
+              "to": "pay",
+              "label": "Capture payment",
+              "role": "main",
+              "number": "14",
+              "icon": "card"
+            },
+            {
+              "kind": "return",
+              "from": "pay",
+              "to": "api",
+              "label": "Captured",
+              "number": "15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "return",
+      "from": "api",
+      "to": "app",
+      "label": "Order delivered",
+      "role": "main",
+      "number": "16"
+    },
+    {
+      "kind": "sync",
+      "from": "app",
+      "to": "customer",
+      "label": "Rate your meal",
+      "number": "17",
+      "icon": "star"
+    }
+  ],
+  "style": "illustrated"
+}

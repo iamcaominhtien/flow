@@ -43,7 +43,7 @@ from .theme import icon_names
 
 Built = TypeVar("Built")
 
-SCENE_KEYS = {"size", "title", "desc", "frames", "nodes", "edges", "theme"}
+SCENE_KEYS = {"size", "title", "desc", "frames", "nodes", "edges", "theme", "diagram"}
 FRAME_KEYS = {"id", "x", "y", "width", "height", "label", "tone", "variant", "guard", "dividers"}
 DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
@@ -117,6 +117,8 @@ def dump(scene: Scene) -> dict[str, Any]:
     }
     if scene.theme != DEFAULT_THEME:
         written["theme"] = scene.theme
+    if scene.diagram:
+        written["diagram"] = scene.diagram
     return written
 
 
@@ -260,6 +262,7 @@ class _SceneParser:
             nodes=nodes,
             edges=edges,
             theme=self._read.theme(raw),
+            diagram=raw.get("diagram", "") if isinstance(raw.get("diagram"), str) else "",
         )
 
     def _each(

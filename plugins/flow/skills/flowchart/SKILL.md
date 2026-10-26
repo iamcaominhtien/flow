@@ -7,7 +7,7 @@ allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py *)
 
 You write a short **spec** (the steps and how they connect). A script places every box, routes the lines, checks the result and writes the HTML. Never write coordinates or HTML yourself.
 
-Scope today: flowcharts in the plain style, top to bottom or left to right, with or without swimlanes. For anything else (illustrated, other diagram types such as ER or architecture), say that it is not built yet. For the order of messages between systems, use the sequence skill.
+Scope: flowcharts in the plain or the illustrated style, top to bottom or left to right, with or without swimlanes. For the order of messages between systems, use the sequence skill.
 
 ## Steps
 
@@ -38,16 +38,17 @@ Scope today: flowcharts in the plain style, top to bottom or left to right, with
 }
 ```
 
-- `kind`: `terminator` (start or end, green), `process` (one action, blue), `decision` (a question, amber), `io` (data in or out, violet), `document` (a readable output), `subprocess` (a step with its own chart), `preparation` (setup, teal), `fail` (a failed end, rose), `connector` (off-page link, one letter).
-- `role` of an edge: `next` (default, a normal step), `yes`, `no`, `back` (returns to an earlier step), `main` (the one most important path, drawn thick and animated), `data` (an event or data flow, drawn violet and animated slowly). Use `main` on at most one connected path.
+- `kind`: `terminator` (start or end, green), `process` (one action, blue), `decision` (a question, amber), `io` (data in or out, violet), `document` (a readable output), `subprocess` (a step with its own chart), `preparation` (setup, teal), `fail` (a failed end, rose), `connector` (off-page link, one letter; its `detail` is the note beside it that says where the flow continues, such as `Continues in Support case flow`), `fork` or `join` (the thick bar of a parallel split or join; it has no text and is stretched over the steps it joins), `screen` (a small phone card for a step that is a screen; give `"screen": "S01"`, the id used in the screen-flow diagram, and the name in `text`).
+- `role` of an edge: `next` (default, a normal step), `yes`, `no`, `back` (returns to an earlier step), `main` (the one most important path, drawn thick and animated), `data` (messages and live data, not steps: thin violet, animated slowly; it does not count as the main path). Use `main` on at most one connected path.
 - Optional on a node: `detail` (a small second line under the text), `icon` (one of `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`), `tone` (`blue violet amber green teal gray`, marks the owner or domain, never a meaning), `number` (a short chip such as `3`), `side` (`left` or `right`, asks for a branch on that side).
-- Edge `label`: short; `Yes` and `No` for decision exits.
+- Edge `label`: short; `Yes` and `No` for decision exits (they get their green or rose chip on any line). A decision with three or more exits fans them out, the middle one straight on: label each with its value and the last with `else`.
+- Parallel steps: a `fork` node after the step that splits, one edge from it to each parallel step, and a `join` node that each parallel path ends in. The bar needs a `lane` in a chart with lanes (give it the lane of one of the branches that has no other step at that row).
 - `direction`: `down` (default) for up to about ten steps, `right` for pipelines and timelines. Never mix them.
-- Swimlanes: add `"lanes": [{"id": "support", "label": "Support", "tone": "violet"}, ...]` and give every node a `"lane"`. One lane per actor (person, team or system); the actor who starts goes first. Swimlanes read best with `"direction": "right"`. A step sits in exactly one lane, and with lanes the `side` hint is ignored.
+- Swimlanes: add `"lanes": [{"id": "support", "label": "Support", "tone": "violet"}, ...]` and give every node a `"lane"`. One lane per actor (person, team or system); the actor who starts goes first. Swimlanes read best with `"direction": "right"`. A lane is at least 210 px across (240 px when cards are drawn), the name sits on a solid band at its start, and a line that changes lane runs straight across at a right angle when the next step can stack in the same column. A step sits in exactly one lane, and with lanes the `side` hint is ignored.
 
 ## Writing good content
 
-- A process starts with a verb (*Check stock*). A terminator names a state (*Order placed*). Four words or fewer, sentence case. Do not break lines yourself; the script wraps and widens boxes.
+- A process starts with a verb (*Check stock*). A terminator names a state (*Order placed*). Four words or fewer, sentence case. Do not break lines yourself; the script wraps and widens boxes. Start in the top left and end at the bottom or the right.
 - A decision is a question that ends with `?`. It has at least two exits, labelled `Yes` and `No`. Give the exit that continues the happy path the role `yes` so it stays straight; the other exit leaves sideways. A decision with one exit is a process.
 - A line that returns to an earlier step has the role `back`. Never draw a loop with a normal edge.
 - Every step except the first has an incoming edge, and every step except an end has an outgoing one. About ten steps fit one chart; split a larger process with a `subprocess` step.
@@ -55,7 +56,7 @@ Scope today: flowcharts in the plain style, top to bottom or left to right, with
 
 ## Reading the report
 
-`line-through-node`, `nodes-overlap`, `label-covers` and `outside-canvas` are errors. `text-may-not-fit` and `lines-cross` are warnings. Fix an error by:
+`line-through-node`, `nodes-overlap`, `label-covers` and `outside-canvas` are errors. `text-may-not-fit` and `lines-cross` are warnings, and so are the writing rules: `text-too-long` (more than four words), `decision-not-question`, `decision-few-exits`, `decision-no-else` (three or more exits and the last is not `else`), `chart-too-big` (more than about 15 steps), `start-placement` and `end-placement`. Fix an error by:
 
 1. Shortening the text of the nodes involved.
 2. Moving a branch with `side`, or changing which exit has the role `yes`.

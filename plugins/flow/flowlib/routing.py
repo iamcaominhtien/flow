@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from itertools import pairwise
 
+from .forks import is_inside
 from .html_nodes import CAPTION_WIDTH_PX
 from .layered import Grid
 from .model import SYMBOL_HEADS, Direction, Edge, EdgeLabel, LabelKind, Node, Point, Role, Shape
@@ -25,6 +26,7 @@ BUS_BELOW_SOURCE_PX = 12.0  # but never closer than this to the bottom of its so
 SAME_LINE_TOLERANCE_PX = 1.0  # two centres closer than this count as on one line
 CLEARANCE_PX = 4.0  # how far a line must stay from a node it passes
 SEARCH_MARGIN_PX = 12.0  # how far a searched route keeps from every box
+MULTIWAY_EXITS = 3  # a decision with this many exits fans them out
 STUB_PX = 16.0  # a searched route leaves a box straight for this far before it may turn
 PORT_REUSE_COST_PX = 60.0  # a searched route prefers a side of a box that is still free
 
@@ -38,6 +40,7 @@ class Port(StrEnum):
     RIGHT = "right"
 
 
+ANSWER_KINDS = {"yes": LabelKind.YES, "no": LabelKind.NO}  # a Yes or No chip keeps its colour
 LABEL_KIND_OF_ROLE = {Role.YES: LabelKind.YES, Role.NO: LabelKind.NO, Role.BACK: LabelKind.BACK}
 
 
@@ -198,6 +201,26 @@ def _leaves_by_side(edge: SpecEdge, down: list[SpecEdge], nodes: dict[str, Node]
     return any(other.source == edge.source and not other.dashed for other in down)
 
 
+def _fanned(edges: list[SpecEdge], nodes: dict[str, Node]) -> set[SpecEdge]:
+    """Pick the exits of a multi-way decision that leave by a side of the diamond.
+
+    A decision with three or more exits fans them out: the middle one leaves the bottom and the
+    others leave the left and the right, each by its own corner of the diamond.
+    """
+    exits: dict[str, list[SpecEdge]] = {}
+    for edge in edges:
+        if nodes[edge.source].shape is Shape.DECISION:
+            exits.setdefault(edge.source, []).append(edge)
+    return {
+        edge
+        for group in exits.values()
+        if len(group) >= MULTIWAY_EXITS
+        for edge in group
+        if abs(_center(nodes[edge.target])[0] - _center(nodes[edge.source])[0])
+        > SAME_LINE_TOLERANCE_PX
+    }
+
+
 def _slots(edges: list[SpecEdge], nodes: dict[str, Node]) -> dict[SpecEdge, tuple[float, float]]:
     """Choose where each downward line leaves its source and where it enters its target.
 
@@ -210,6 +233,7 @@ def _slots(edges: list[SpecEdge], nodes: dict[str, Node]) -> dict[SpecEdge, tupl
     """
     down = [e for e in edges if _goes_down(nodes[e.source], nodes[e.target])]
     down = [e for e in down if not _leaves_by_side(e, down, nodes)]
+    down = [e for e in down if e not in _fanned(edges, nodes)]
     leaving: dict[str, list[tuple[SpecEdge, float]]] = {}
     arriving: dict[str, list[tuple[SpecEdge, float]]] = {}
     for edge in down:
@@ -223,7 +247,42 @@ def _slots(edges: list[SpecEdge], nodes: dict[str, Node]) -> dict[SpecEdge, tupl
     for name, group in arriving.items():
         needs_room = any(edge.head in SYMBOL_HEADS for edge, _ in group)
         entry_x.update(_spread(group, nodes[name]) if needs_room else _centered(group, nodes[name]))
-    return {edge: (exit_x[edge], entry_x[edge]) for edge in down}
+    return _pin_to_bars(down, nodes, exit_x, entry_x)
+
+
+def _pin_to_bars(
+    down: list[SpecEdge],
+    nodes: dict[str, Node],
+    exit_x: dict[SpecEdge, float],
+    entry_x: dict[SpecEdge, float],
+) -> dict[SpecEdge, tuple[float, float]]:
+    """Make each line that meets a split or join bar drop straight from, or onto, the bar.
+
+    A line at the far end of the bar's reach has no place on it; it leaves by the end of the bar
+    and is routed without a slot.
+
+    Args:
+        down: The lines that run to a lower row.
+        nodes: The placed nodes.
+        exit_x: Where each line leaves its source, by default.
+        entry_x: Where each line enters its target, by default.
+
+    Returns:
+        Edge to ``(exit x, entry x)``.
+    """
+    slots = {}
+    for edge in down:
+        source, target = nodes[edge.source], nodes[edge.target]
+        leave, enter = exit_x[edge], entry_x[edge]
+        if source.shape is Shape.FORK:
+            leave = enter = _center(target)[0]
+        elif target.shape is Shape.FORK:
+            leave = enter = _center(source)[0]
+        bar = source if source.shape is Shape.FORK else target
+        if bar.shape is Shape.FORK and not is_inside(bar, leave):
+            continue
+        slots[edge] = (leave, enter)
+    return slots
 
 
 def _forward_points(
@@ -380,6 +439,15 @@ def _label_at(points: list[Point], role: Role, rules: LayoutRules) -> Point:
     if is_vertical and role is not Role.BACK:
         return middle[0] + rules.label_offset, middle[1]
     return middle
+
+
+def _label_kind(spec_edge: SpecEdge) -> LabelKind:
+    """Choose the colour of a label: by the role of its line, else by a Yes or No it says."""
+    named = LABEL_KIND_OF_ROLE.get(spec_edge.role)
+    if named is not None:
+        return named
+    answer = (spec_edge.label or "").strip().lower()
+    return ANSWER_KINDS.get(answer, LabelKind.PLAIN)
 
 
 def _end_labels(spec_edge: SpecEdge, points: list[Point]) -> tuple[EdgeLabel, ...]:
@@ -585,7 +653,7 @@ def route_edges(spec: Spec, grid: Grid, placement: Placement, rules: LayoutRules
         label = None
         if spec_edge.label:
             at = _label_at(points, spec_edge.role, rules)
-            kind = LABEL_KIND_OF_ROLE.get(spec_edge.role, LabelKind.PLAIN)
+            kind = _label_kind(spec_edge)
             label = EdgeLabel(text=spec_edge.label, at=at, kind=kind)
         edges.append(
             Edge(

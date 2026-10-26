@@ -157,6 +157,10 @@ class LayoutRules:
     card_pill_height: float
     card_pill_padding: float
     card_icon_fraction: float
+    fork_overhang: float
+    fold_extent_lanes: float
+    lane_size_plain: float
+    lane_size_card: float
 
 
 @dataclass(frozen=True)
@@ -190,6 +194,14 @@ class SequenceRules:
     destroy_size: float
     tail_gap: float
     bottom_gap: float
+    fragment_rise: float
+    fragment_below_line: float
+    header_card_width: float
+    header_card_height: float
+    header_pill_height: float
+    header_pill_margin: float
+    header_icon_top: float
+    header_icon_size: float
 
 
 @dataclass(frozen=True)
