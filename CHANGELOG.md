@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0 (2026-10-26)
+
+C4, cloud and architecture brought up to `docs/design/12-c4.md`, `13-cloud.md` and `06-architecture.md`.
+
+- **C4:** boxes with icon, bold name, mono `[Kind: technology]` line and one sentence (280x132; the system at level 1 is 360x150); kinds person, system, external (grey dashed), container, database, component; levels 1 to 3 with `opens` (neighbours inherit from the level above, the opened box becomes a dashed frame labelled `Name [Kind]` on its bottom edge); 520x270 grid; protocol required on container lines; at most 15 boxes. Spec keys are now `technology`, `description`, `protocol`. Examples: three levels.
+- **Cloud:** nine frame kinds with fixed colour and line, VPC range in the label, nesting 30 px and 40 px to parts, same subnets in every zone, managed services in the region outside the VPC, sites on the left. Refuses a database in a public subnet or DMZ and a line that skips two trust levels. Spec keys are now `frames` and `parts`. Examples: basic, delivery (two zones), network.
+- **Architecture:** layers as rows (260 px plain, 240 px illustrated), `beside` third-party frames, lines to and from a frame, line kinds call, main, event, copy, 232x96 illustrated cards, the six patterns documented in the skill. Old keys `kind` on components, `style: async` and `direction` are gone. Examples: delivery (plain and illustrated), streaming (plain and illustrated).
+- Shared: the DFD grid router is now `diagrams/grid_routes.py` and serves four types; new shapes `c4_box`, `c4_person`, `wide_card`; frame variants `network` and `layer`; HTML, draw.io, scene.json and import support.
+- Not done: C4 frame pill colour (design draws it dark) and a pill that can sit on a line; cloud 40 px grid and 90 px label room check; architecture entry side and two lines between one pair; frame-edge lines end mid-side; Streaming warns `lines-cross` twice and `crosses-border` once; real draw.io editor not used.
+
 ## 0.5.0 (2026-10-26)
 
 DFD and BPMN brought up to `docs/design/14-dfd.md` and `11-bpmn.md`.
