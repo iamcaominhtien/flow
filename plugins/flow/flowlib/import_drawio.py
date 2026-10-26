@@ -63,6 +63,7 @@ SHAPE_NAMES = {
 Box = tuple[float, float, float, float]  # x, y, width, height
 LINE_BREAK = re.compile(r"<br\s*/?>|</div>|</p>", re.IGNORECASE)
 TAG = re.compile(r"<[^>]+>")
+CHIP_SPAN = re.compile(r'<span style="background:[^"]*">([A-Z]{2})</span>')  # a key chip in a row
 TABLE_CELL = re.compile(r"<td[^>]*>(.*?)</td>", re.IGNORECASE | re.DOTALL)
 ROW_COLUMNS = 2
 
@@ -281,14 +282,19 @@ def _edge(cell: ET.Element, nodes: dict[str, Node], offset: Point) -> Edge | Non
 
 
 def _table_rows(cells: list[ET.Element]) -> tuple[Row, ...]:
-    """Read the rows of a table node from its child cells (a name, and a note on the right)."""
+    """Read the rows of a table node from its child cells.
+
+    A row holds key chips and a name on the left and a note on the right.
+    """
     rows = []
     for cell in cells:
-        columns = [plain_lines(match) for match in TABLE_CELL.findall(cell.get("value", ""))]
+        value = cell.get("value", "")
+        flags = tuple(CHIP_SPAN.findall(value))
+        columns = [plain_lines(CHIP_SPAN.sub("", match)) for match in TABLE_CELL.findall(value)]
         if len(columns) == ROW_COLUMNS:
-            rows.append(Row(" ".join(columns[0]), " ".join(columns[1])))
+            rows.append(Row(" ".join(columns[0]).strip(), " ".join(columns[1]), flags))
         else:
-            rows.append(Row(" ".join(plain_lines(cell.get("value", "")))))
+            rows.append(Row(" ".join(plain_lines(CHIP_SPAN.sub("", value))).strip(), flags=flags))
     return tuple(rows)
 
 

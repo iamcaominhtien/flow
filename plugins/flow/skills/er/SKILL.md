@@ -36,10 +36,16 @@ You write a short **spec**: the tables, their columns and the relations. A scrip
 }
 ```
 
-- **Table**: `id`, `name`, `columns`, optional `icon` and `tone`.
-- **Column**: `name`, optional `type`, optional `flags` from `pk`, `fk`, `uq`, `null`.
+- **Table**: `id`, `name`, `columns`, optional `icon` and `tone`, and `at: [row, column]` to put it in a grid cell (give `at` to every table or to none).
+- **Column**: `name`, optional `type`, optional `flags` from `pk`, `fk`, `uq`, `null`. The keys are drawn as chips before the name (`PK` amber, `FK` blue, `UQ` violet); `null` adds a `?` to the type. Keys first, then the columns that explain the relations.
 - **Relation**: `from`, `to`, optional `label`. `from_end` and `to_end` set the mark at each end: `one`, `zero_one`, `one_many`, `zero_many`. The default is `one` at `from` and `zero_many` at `to`. `style` is `solid` (a foreign key) or `logical` (dashed, no real key). `main: true` highlights and animates the relation to follow first. Mark one or two, not all.
 - Optional `from_column` and `to_column` name the columns the relation joins; they are not drawn yet.
+
+## Style and layout
+
+- Add `"style": "illustrated"` at the top level for the design's illustrated tables: a tall header tinted by `tone`, the name in a pill and a large detailed icon (a table with no `icon` gets the `table` icon). The default is `plain`. Pick the icon by the noun (`user`, `store`, `card`, `cart`, `bike`, `box`...) and give each domain its own `tone`, as in the design.
+- Put each table in a grid cell with `at` for anything bigger than four tables: put the table most others point to in the middle, its neighbours around it, and keep the lines short and straight. The automatic placement is fine for a small chain, but a table with many relations gets crowded lines and label problems.
+- The gap between tables is wide on purpose (150 px), so that two cardinality marks and a label fit on a line.
 
 ## Icons
 

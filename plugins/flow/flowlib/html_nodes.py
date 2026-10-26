@@ -1,8 +1,9 @@
 """Draw the nodes of a scene as HTML: outline, icon, text, table rows, badge and caption."""
 
 from .markup import esc, px, tag
-from .model import Node, Shape, Tone
+from .model import KEY_FLAG_TONES, Node, Row, Shape, Tone
 from .shapes import outline_svg
+from .sizing import key_room
 from .text_area import text_area_width
 from .theme import ShapeColors, Theme, detailed_icon_svg, has_detailed_icon, icon_svg
 
@@ -42,6 +43,11 @@ TABLE_TEXT_PADDING_PX = 14
 TABLE_ROW_FONT_SIZE_PX = 11
 TABLE_RULE_COLOR = "#CBD5E1"
 TABLE_HEADER_RADIUS_PX = 7
+TABLE_PILL_HEIGHT_PX = 28  # the name pill in the header of an illustrated table
+TABLE_CARD_ICON_PX = 52
+TABLE_CHIP_HEIGHT_PX = 16
+TABLE_CHIP_FONT_SIZE_PX = 9
+TABLE_CHIP_RADIUS_PX = 4
 
 # Caption under a node
 CAPTION_WIDTH_PX = 150
@@ -135,37 +141,90 @@ def _badge_html(node: Node, theme: Theme) -> str:
     return tag("div", style, esc(node.number))
 
 
-def _header_height(theme: Theme) -> float:
-    """Return the height of the header band of a table."""
+def _header_height(node: Node, theme: Theme) -> float:
+    """Return the height of the header band of a table: tall when it is illustrated."""
+    if node.card:
+        return theme.layout.table_card_header_height
     return theme.layout.table_header_height
+
+
+def _header_box(node: Node, theme: Theme) -> dict[str, str]:
+    """Return the style of the coloured band at the top of a table."""
+    tone = theme.tones[node.tone or Tone.GRAY]
+    stroke = theme.shapes[node.shape].stroke
+    radius = f"{px(TABLE_HEADER_RADIUS_PX)} {px(TABLE_HEADER_RADIUS_PX)} 0 0"
+    return {
+        **ABSOLUTE,
+        "left": "1px",
+        "top": "1px",
+        "width": px(node.width - 2),
+        "height": px(_header_height(node, theme)),
+        "box-sizing": "border-box",
+        "background": tone.pill if node.card else tone.box,
+        "border-bottom": f"2px solid {stroke}",
+        "border-radius": radius,
+    }
+
+
+def _table_title_html(node: Node, theme: Theme) -> str:
+    """Draw the name of a table: plain text in a band, or a pill beside a large icon."""
+    name = esc(" ".join(node.text))
+    if not node.card:
+        shift = ICON_TEXT_SHIFT_PX * 2 if node.icon else 0
+        title = {
+            **_header_box(node, theme),
+            "padding": f"0 {px(TABLE_TEXT_PADDING_PX)} 0 {px(TABLE_TEXT_PADDING_PX + shift)}",
+            "display": "flex",
+            "align-items": "center",
+            "font-size": px(node.font_size),
+            "font-weight": str(NODE_TEXT_WEIGHT),
+            "color": theme.ink,
+        }
+        return tag("div", title, name)
+    stroke = theme.shapes[node.shape].stroke
+    pill = {
+        **ABSOLUTE,
+        "left": px(TABLE_TEXT_PADDING_PX),
+        "top": px((theme.layout.table_card_header_height - TABLE_PILL_HEIGHT_PX) / 2),
+        "height": px(TABLE_PILL_HEIGHT_PX),
+        "padding": f"0 {px(theme.layout.card_pill_padding)}",
+        "border": f"2px solid {stroke}",
+        "border-radius": px(PILL_RADIUS_PX),
+        "background": "#FFFFFF",
+        "box-sizing": "border-box",
+        "font-size": px(node.font_size),
+        "font-weight": str(NODE_TEXT_WEIGHT),
+        "line-height": px(TABLE_PILL_HEIGHT_PX - 4),
+        "color": theme.ink,
+        "white-space": "nowrap",
+    }
+    return (
+        tag("div", _header_box(node, theme))
+        + tag("div", pill, name)
+        + _table_icon_html(node, theme)
+    )
+
+
+def _table_icon_html(node: Node, theme: Theme) -> str:
+    """Draw the large icon at the right of an illustrated table header."""
+    if node.icon is None:
+        return ""
+    size = TABLE_CARD_ICON_PX
+    left = node.width - TABLE_TEXT_PADDING_PX - size
+    top = (theme.layout.table_card_header_height - size) / 2
+    place = f'style="position:absolute;left:{px(left)};top:{px(top)}"'
+    stroke = theme.tones[node.tone or Tone.GRAY].stroke
+    if has_detailed_icon(node.icon):
+        return detailed_icon_svg(node.icon, size, stroke, place)
+    return icon_svg(node.icon, size, stroke, place)
 
 
 def _table_html(node: Node, theme: Theme) -> str:
     """Draw the header band and the rows of a table node."""
     rules = theme.layout
-    tone = theme.tones[node.tone or Tone.GRAY]
-    stroke = theme.shapes[node.shape].stroke
-    header_height = _header_height(theme)
-    shift = ICON_TEXT_SHIFT_PX * 2 if node.icon else 0
-    header = {
-        **ABSOLUTE,
-        "left": "1px",
-        "top": "1px",
-        "width": px(node.width - 2),
-        "height": px(header_height),
-        "box-sizing": "border-box",
-        "background": tone.box,
-        "border-bottom": f"2px solid {stroke}",
-        "border-radius": f"{px(TABLE_HEADER_RADIUS_PX)} {px(TABLE_HEADER_RADIUS_PX)} 0 0",
-        "padding": f"0 {px(TABLE_TEXT_PADDING_PX)} 0 {px(TABLE_TEXT_PADDING_PX + shift)}",
-        "display": "flex",
-        "align-items": "center",
-        "font-size": px(node.font_size),
-        "font-weight": str(NODE_TEXT_WEIGHT),
-        "color": theme.ink,
-    }
-    html = tag("div", header, esc(" ".join(node.text)))
-    y = header_height + 2
+    html = _table_title_html(node, theme)
+    key_width = key_room(node.sections, rules)
+    y = _header_height(node, theme) + 2
     for index, section in enumerate(node.sections):
         if index:
             rule = {
@@ -178,15 +237,38 @@ def _table_html(node: Node, theme: Theme) -> str:
             html += tag("div", rule)
             y += rules.table_section_gap
         for row in section:
-            html += _row_html(row.left, row.right, (node.width, y), theme)
+            html += _row_html(row, (node.width, y, key_width), theme)
             y += rules.table_row_height
     return html
 
 
-def _row_html(left: str, right: str, place: tuple[float, float], theme: Theme) -> str:
-    """Draw one row of a table: a name on the left and a note on the right."""
-    width, top = place
-    row = {
+def _chip_html(flag: str, theme: Theme) -> str:
+    """Draw one key chip (``PK``, ``FK``, ``UQ``) in the tone of its kind."""
+    tone = theme.tones[KEY_FLAG_TONES.get(flag, Tone.GRAY)]
+    chip = {
+        "display": "inline-block",
+        "width": px(theme.layout.table_chip_width),
+        "box-sizing": "border-box",
+        "text-align": "center",
+        "margin-right": "2px",
+        "border-radius": px(TABLE_CHIP_RADIUS_PX),
+        "background": tone.pill,
+        "color": tone.accent,
+        "font": (
+            f"700 {px(TABLE_CHIP_FONT_SIZE_PX)}/{px(TABLE_CHIP_HEIGHT_PX)} "
+            f"'{theme.fonts.sans}',sans-serif"
+        ),
+    }
+    return tag("span", chip, esc(flag))
+
+
+def _row_html(row: Row, place: tuple[float, float, float], theme: Theme) -> str:
+    """Draw one row of a table: key chips and a name on the left, a type on the right.
+
+    A column that is a primary key is drawn in bold.
+    """
+    width, top, key_width = place
+    style = {
         **ABSOLUTE,
         "left": px(TABLE_TEXT_PADDING_PX),
         "top": px(top),
@@ -194,12 +276,15 @@ def _row_html(left: str, right: str, place: tuple[float, float], theme: Theme) -
         "height": px(theme.layout.table_row_height),
         "display": "flex",
         "align-items": "center",
-        "justify-content": "space-between",
         "font": f"500 {px(TABLE_ROW_FONT_SIZE_PX)}/1 '{theme.fonts.mono}',monospace",
         "color": theme.ink,
     }
-    muted = tag("span", {"color": theme.slate}, esc(right))
-    return tag("div", row, tag("span", {}, esc(left)) + muted)
+    chips = "".join(_chip_html(flag, theme) for flag in row.flags)
+    key_cell = tag("span", {"display": "inline-block", "width": px(key_width)}, chips)
+    weight = "700" if "PK" in row.flags else "500"
+    name = tag("span", {"font-weight": weight, "flex": "1"}, esc(row.left))
+    kind = tag("span", {"color": theme.slate}, esc(row.right))
+    return tag("div", style, (key_cell if key_width else "") + name + kind)
 
 
 def _caption_html(node: Node, theme: Theme) -> str:
@@ -295,11 +380,12 @@ def node_html(node: Node, theme: Theme) -> str:
     if node.tone is not None and node.shape is not Shape.TABLE:
         colors = ShapeColors(fill=theme.tones[node.tone].box, stroke=colors.stroke)
     inside = outline_svg(node.shape, node.width, node.height, colors)
-    if node.card:
+    if node.card and node.shape is not Shape.TABLE:
         inside += _card_html(node, theme)
     elif node.shape is Shape.TABLE:
         inside += _table_html(node, theme)
-        inside += _icon_html(node, colors.stroke, _header_height(theme))
+        if not node.card:
+            inside += _icon_html(node, colors.stroke, _header_height(node, theme))
     else:
         inside += _icon_html(node, colors.stroke) + _label_html(node, theme)
     box = {

@@ -86,6 +86,9 @@ class LayoutRules:
     table_padding_x: float
     table_bottom_pad: float
     table_extra_width: float
+    table_card_header_height: float
+    table_chip_width: float
+    table_chip_gap: float
     detail_font_size: float
     detail_line_height: float
     caption_height: float

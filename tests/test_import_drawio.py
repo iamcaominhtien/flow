@@ -90,7 +90,8 @@ def test_tables_keep_their_rows(tmp_path: Path) -> None:
     orders = next(node for node in result.scene.nodes if node.id == "node-orders")
     assert orders.shape is Shape.TABLE
     assert orders.sections[0][1].left == "customer_id"
-    assert orders.sections[0][1].right == "bigint FK"
+    assert orders.sections[0][1].right == "bigint"
+    assert orders.sections[0][1].flags == ("FK",)
 
 
 @pytest.mark.parametrize("compressed", [False, True])

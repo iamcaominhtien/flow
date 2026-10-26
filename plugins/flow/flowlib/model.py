@@ -73,6 +73,9 @@ class Tone(StrEnum):
     GRAY = "gray"
 
 
+KEY_FLAG_TONES: dict[str, Tone] = {"PK": Tone.AMBER, "FK": Tone.BLUE, "UQ": Tone.VIOLET}
+
+
 class Head(StrEnum):
     """What a line has at one end."""
 
@@ -159,10 +162,14 @@ class Frame:
 
 @dataclass(frozen=True)
 class Row:
-    """One row of a table node: a name on the left and, optionally, a note on the right."""
+    """One row of a table node: key chips and a name on the left, a note on the right.
+
+    ``flags`` are the short marks drawn as chips before the name, such as ``PK`` or ``FK``.
+    """
 
     left: str
     right: str = ""
+    flags: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
