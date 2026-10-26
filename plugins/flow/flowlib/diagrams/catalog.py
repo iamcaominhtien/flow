@@ -98,7 +98,10 @@ BPMN = GraphType(
         "document": Shape.DOCUMENT,
     },
     default_kind="task",
-    line_kinds={"sequence": FLOW, "message": LineKind(dashed=True, head=Head.OPEN, tail=Head.DOT)},
+    line_kinds={
+        "sequence": FLOW,
+        "message": LineKind(dashed=True, head=Head.OPEN, tail=Head.DOT, role=Role.DATA),
+    },
     default_line="sequence",
     unlabelled_kinds=frozenset(
         {"start", "end", "event", "timer", "message", "error", "gateway", "exclusive", "parallel"}

@@ -43,6 +43,7 @@ class LineKind:
     dashed: bool = False
     head: Head = Head.FILLED
     tail: Head = Head.NONE
+    role: Role | None = None  # the line role this style implies, when it is not the type's default
 
 
 @dataclass(frozen=True)
@@ -181,7 +182,7 @@ def _link(raw: object, where: str, context: _Context) -> SpecEdge | None:
     return SpecEdge(
         source=ends[0],
         target=ends[1],
-        role=Role.MAIN if raw.get("main") is True else graph.default_role,
+        role=Role.MAIN if raw.get("main") is True else line.role or graph.default_role,
         label=read.text(raw, "label", where),
         head=line.head,
         tail=line.tail,

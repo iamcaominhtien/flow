@@ -108,3 +108,22 @@ def test_a_message_and_a_flow_leaving_one_gateway_are_not_drawn_on_top_of_each_o
     }
     findings = check_scene(diagrams.layout(spec))
     assert Code.LINES_OVERLAP not in [finding.code for finding in findings]
+
+
+def test_bpmn_message_flows_are_animated_and_sequence_flows_are_not() -> None:
+    """A message flow moves slowly; a plain sequence flow stays still unless it is main."""
+    spec = {
+        "type": "bpmn",
+        "zones": [{"id": "a", "label": "A", "tone": "blue"}],
+        "elements": [
+            {"id": "s", "kind": "start", "label": "Go", "zone": "a"},
+            {"id": "t", "label": "Do it", "zone": "a"},
+            {"id": "u", "label": "Ask", "zone": "a"},
+        ],
+        "flows": [
+            {"from": "s", "to": "t"},
+            {"from": "t", "to": "u", "style": "message"},
+        ],
+    }
+    roles = [edge.role for edge in diagrams.layout(spec).edges]
+    assert roles == [Role.NEXT, Role.DATA]

@@ -174,3 +174,7 @@ When the brief names an event without saying its type, choose from its name: "Ti
 With many elements, give a card (`icon`, `tone`, `detail`) to the few that matter and leave the rest plain, or leave `style` out. Do not shorten a flow label to make the check pass when the build reports `label-covers`: the build moves a label along its line to find a clear spot, so shorten it only when it still covers something.
 
 The check also reports `lines-overlap` (two lines run on top of each other, so they cannot be told apart) and `caption-covered` (a line or a label sits on the name under an event). `lines-overlap` is a warning: mention it. `caption-covered` is an error: fix the spec.
+
+Give every gateway a `label` that is a short question ("Serious?", "Data valid?"). Without a `label` the diamond is drawn empty and the reader cannot tell which decision it is.
+
+Animation: a flow with `"main": true` is drawn thick and animated, so mark the flows of the main path, the route most cases follow from the start event to an end event (a connected chain of flows, not the whole diagram). Message flows are animated slowly by default. A diagram with no `main` flow shows only the message flows moving.
