@@ -6,57 +6,20 @@ go straight is tried on every pair of sides and on a few channel positions; the 
 crosses the fewest lines and passes through no box wins.
 """
 
-from dataclasses import dataclass, replace
-from itertools import product
+from dataclasses import replace
 
 from ..check import Rect, node_rect
 from ..model import Node, Point
 from ..orthogonal import (
     HORIZONTAL,
-    Anchor,
     Facing,
-    anchor_on,
-    bend_count,
-    count_crossings,
-    is_clear,
-    path_between,
-    route_length,
-    shared_length,
-    simplify,
 )
+from ..route_search import Plan, Search, best_route
 from ..theme import DfdRules
 from .dfd_spec import Flow
 
-CHANNEL_STEPS = (0, 1, -1, 2, -2)  # in units of ``channel_step``
 SAME_ROW_FRACTION = 0.25  # boxes whose centres are this close, in rows, are in one row
-BLOCKED_COST = 1000.0
-OVERLAP_COST = 500.0
-CROSSING_COST = 10.0
-BEND_COST = 4.0
-OTHER_SIDES_COST = 6.0
-LENGTH_COST_PER_PX = 0.005
 SIDE_MARGIN_PX = 8  # a line keeps this far from the corners of a box side
-
-
-@dataclass(frozen=True)
-class _Search:
-    """What a route is scored against: the boxes in its way and the routes already drawn."""
-
-    obstacles: list[Rect]
-    taken: list[list[Point]]
-    bounds: Rect
-    rules: DfdRules
-
-
-@dataclass(frozen=True)
-class _Plan:
-    """The sides a flow is first tried on and where along them it attaches."""
-
-    source: Node
-    target: Node
-    sides: tuple[Facing, Facing]
-    start_offset: float = 0.0
-    end_offset: float = 0.0
 
 
 def route_flows(
@@ -80,7 +43,7 @@ def route_flows(
     return _route_all(settled, nodes, rules)
 
 
-def _route_all(plans: list[_Plan], nodes: dict[str, Node], rules: DfdRules) -> list[list[Point]]:
+def _route_all(plans: list[Plan], nodes: dict[str, Node], rules: DfdRules) -> list[list[Point]]:
     """Route the flows one after the other, each avoiding the lines drawn before it."""
     bounds = _bounds(list(nodes.values()))
     routes: list[list[Point]] = []
@@ -90,11 +53,12 @@ def _route_all(plans: list[_Plan], nodes: dict[str, Node], rules: DfdRules) -> l
             for node in nodes.values()
             if node.id not in (plan.source.id, plan.target.id)
         ]
-        routes.append(_best(plan, _Search(obstacles, routes, bounds, rules)))
+        search = Search(obstacles, routes, bounds, rules.channel_step, rules.channel_clearance)
+        routes.append(best_route(plan, search))
     return routes
 
 
-def _sides_of(route: list[Point], plan: _Plan) -> tuple[Facing, Facing]:
+def _sides_of(route: list[Point], plan: Plan) -> tuple[Facing, Facing]:
     """Return the sides of its two boxes that a routed flow really uses."""
     return (_side_at(plan.source, route[0]), _side_at(plan.target, route[-1]))
 
@@ -110,7 +74,7 @@ def _side_at(node: Node, point: Point) -> Facing:
     return min(distances, key=lambda side: distances[side])
 
 
-def _plan(flow: Flow, nodes: dict[str, Node], rules: DfdRules) -> _Plan:
+def _plan(flow: Flow, nodes: dict[str, Node], rules: DfdRules) -> Plan:
     """Choose the first-choice sides of a flow from where its two boxes are."""
     source, target = nodes[flow.source], nodes[flow.target]
     delta_x = (target.x + target.width / 2) - (source.x + source.width / 2)
@@ -121,10 +85,10 @@ def _plan(flow: Flow, nodes: dict[str, Node], rules: DfdRules) -> _Plan:
         sides = (Facing.SOUTH, Facing.NORTH) if delta_y > 0 else (Facing.NORTH, Facing.SOUTH)
     else:
         sides = (Facing.SOUTH, Facing.NORTH) if delta_y > 0 else (Facing.NORTH, Facing.SOUTH)
-    return _Plan(source, target, sides)
+    return Plan(source, target, sides)
 
 
-def _spread(plans: list[_Plan], rules: DfdRules) -> list[_Plan]:
+def _spread(plans: list[Plan], rules: DfdRules) -> list[Plan]:
     """Spread the flows that use the same side of a box along that side, 60 px apart."""
     groups: dict[tuple[str, Facing], list[tuple[int, bool, float]]] = {}
     for index, plan in enumerate(plans):
@@ -139,7 +103,7 @@ def _spread(plans: list[_Plan], rules: DfdRules) -> list[_Plan]:
         for rank, (index, is_start, _) in enumerate(sorted(members, key=lambda m: (m[2], m[0]))):
             offsets[(index, is_start)] = _slot(nodes[node_id], facing, (rank, len(members)), rules)
     return [
-        _Plan(p.source, p.target, p.sides, offsets[(i, True)], offsets[(i, False)])
+        Plan(p.source, p.target, p.sides, offsets[(i, True)], offsets[(i, False)])
         for i, p in enumerate(plans)
     ]
 
@@ -168,57 +132,3 @@ def _bounds(nodes: list[Node]) -> Rect:
         max(r.right for r in rects),
         max(r.bottom for r in rects),
     )
-
-
-def _best(plan: _Plan, search: _Search) -> list[Point]:
-    """Return the cheapest route of a flow over every pair of sides, reach and channel position."""
-    best: tuple[float, list[Point]] | None = None
-    for sides, step, is_far in product(product(Facing, Facing), CHANNEL_STEPS, (False, True)):
-        route = _try(plan, sides, step * search.rules.channel_step, (search, is_far))
-        if route is None:
-            continue
-        cost = _cost(route, search, sides != plan.sides)
-        if best is None or cost < best[0]:
-            best = (cost, route)
-    if best is None:
-        return [
-            anchor_on(plan.source, plan.sides[0]).point,
-            anchor_on(plan.target, plan.sides[1]).point,
-        ]
-    return best[1]
-
-
-def _try(
-    plan: _Plan, sides: tuple[Facing, Facing], shift: float, how: tuple[_Search, bool]
-) -> list[Point] | None:
-    """Return the route of a flow on a pair of sides with its channel moved by ``shift``."""
-    search, is_far = how
-    is_first_choice = sides == plan.sides
-    start = anchor_on(plan.source, sides[0], plan.start_offset if is_first_choice else 0.0)
-    end = anchor_on(plan.target, sides[1], plan.end_offset if is_first_choice else 0.0)
-    reach = _reach(start, end, search) if is_far else search.rules.channel_clearance
-    route = path_between(start, end, shift, reach)
-    return simplify(route) if route else None
-
-
-def _reach(start: Anchor, end: Anchor, search: _Search) -> float:
-    """Return how far a U must go to pass every box: past the farthest edge of the diagram."""
-    bounds, clearance = search.bounds, search.rules.channel_clearance
-    (start_x, start_y), (end_x, end_y) = start.point, end.point
-    past = {
-        Facing.SOUTH: bounds.bottom - max(start_y, end_y),
-        Facing.NORTH: min(start_y, end_y) - bounds.top,
-        Facing.EAST: bounds.right - max(start_x, end_x),
-        Facing.WEST: min(start_x, end_x) - bounds.left,
-    }[start.facing]
-    return max(past, 0.0) + clearance
-
-
-def _cost(route: list[Point], search: _Search, is_other_side: bool) -> float:
-    """Score a route: a lower score is better."""
-    cost = 0.0 if is_clear(route, search.obstacles) else BLOCKED_COST
-    cost += OVERLAP_COST * (shared_length(route, search.taken) > 0)
-    cost += CROSSING_COST * count_crossings(route, search.taken)
-    cost += BEND_COST * bend_count(route)
-    cost += OTHER_SIDES_COST * is_other_side
-    return cost + LENGTH_COST_PER_PX * route_length(route)

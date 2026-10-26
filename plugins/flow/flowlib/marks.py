@@ -32,7 +32,9 @@ RING_PENTAGON = (
 )
 SHAPES: dict[Marker, str] = {
     Marker.MESSAGE: ENVELOPE,
-    Marker.MESSAGE_FILLED: ENVELOPE,
+    Marker.MESSAGE_FILLED: (
+        '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 8l9 6 9-6" stroke="{paper}"/>'
+    ),
     Marker.TIMER: (
         '<circle cx="12" cy="12" r="9"/><path d="M12 6.5V12l3.5 2.5"/>'
         '<path d="M12 3v2M12 19v2M3 12h2M19 12h2"/>'
@@ -73,25 +75,27 @@ class MarkSlot:
     size: float
 
 
-def mark_svg(marker: Marker, size: float, stroke: str, attrs: str = "") -> str:
+def mark_svg(marker: Marker, size: float, colors: tuple[str, str], attrs: str = "") -> str:
     """Draw one mark as an ``svg`` element.
 
     Args:
         marker: Which mark.
         size: The drawn width and height in pixels.
-        stroke: The line colour, also the fill of a solid mark.
+        colors: The line colour, also the fill of a solid mark, and the colour of the lines
+            drawn on a solid mark.
         attrs: Extra attributes for the element, such as a ``style`` or ``xmlns``.
 
     Returns:
         The ``svg`` element.
     """
+    stroke, paper = colors
     width = BOLD_STROKE_WIDTH if marker in BOLD_MARKERS else MARK_STROKE_WIDTH
     fill = stroke if marker in FILLED_MARKERS else "none"
     return (
         f'<svg width="{fmt(size)}" height="{fmt(size)}" viewBox="0 0 {MARK_GRID} {MARK_GRID}" '
         f'{attrs} fill="{fill}" stroke="{stroke}" stroke-width="{width}" '
         f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-        f"{SHAPES[marker]}</svg>"
+        f"{SHAPES[marker].replace('{paper}', paper)}</svg>"
     )
 
 

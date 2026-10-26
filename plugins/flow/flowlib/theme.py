@@ -277,8 +277,8 @@ class BpmnRules:
     label_gap: float
     data_store_drop: float
     stub: float
-    pool_title_gap: float
-    extra_row_clearance: float
+    content_pad: float
+    pool_right_pad: float
 
 
 @dataclass(frozen=True)

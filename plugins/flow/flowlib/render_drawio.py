@@ -107,6 +107,10 @@ BELOW = {
     "verticalLabelPosition": "bottom",
     "verticalAlign": "top",
 }  # the label sits under the shape
+ABOVE = {
+    "verticalLabelPosition": "top",
+    "verticalAlign": "bottom",
+}  # the label sits over the shape
 BAR_STROKE_WIDTH_PX = 1.5
 FRAGMENT_TAG_WIDTH_PX = 60
 FRAGMENT_TAG_HEIGHT_PX = 18
@@ -345,6 +349,8 @@ def _node_style(node: Node, theme: Theme) -> str:
     style.update(_theme_pairs(node, theme))
     if node.dashed:
         style.update({"dashed": 1, "dashPattern": DASH_PATTERN})
+    if node.caption:
+        style.update(ABOVE if node.caption_above else BELOW)
     style.update(marks_style(node))
     if is_dfd_node(node):
         style.update(dfd_style(node, theme))

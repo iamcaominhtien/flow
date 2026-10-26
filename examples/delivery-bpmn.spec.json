@@ -1,0 +1,291 @@
+{
+ "type": "bpmn",
+ "title": "BPMN: ordering and delivering a meal",
+ "desc": "Three participants, each in its own pool. Solid arrows are the order of work inside a pool. Dashed arrows are messages between pools. Circles are events, diamonds are decisions. Blue is the customer's happy path.",
+ "zones": [
+  {
+   "id": "customer",
+   "label": "Customer",
+   "tone": "blue"
+  },
+  {
+   "id": "restaurant",
+   "label": "Restaurant",
+   "tone": "green"
+  },
+  {
+   "id": "courier",
+   "label": "Courier",
+   "tone": "teal"
+  }
+ ],
+ "elements": [
+  {
+   "id": "hungry",
+   "kind": "start",
+   "label": "Hungry",
+   "zone": "customer"
+  },
+  {
+   "id": "place",
+   "kind": "user",
+   "label": "Place order",
+   "zone": "customer"
+  },
+  {
+   "id": "wait",
+   "kind": "event_based",
+   "zone": "customer"
+  },
+  {
+   "id": "confirmed",
+   "kind": "message",
+   "label": "Confirmed",
+   "zone": "customer"
+  },
+  {
+   "id": "rejected",
+   "kind": "message",
+   "label": "Rejected",
+   "zone": "customer"
+  },
+  {
+   "id": "notserved",
+   "kind": "end",
+   "trigger": "error",
+   "label": "Not served",
+   "zone": "customer"
+  },
+  {
+   "id": "track",
+   "kind": "user",
+   "label": "Track order",
+   "zone": "customer"
+  },
+  {
+   "id": "arrives",
+   "kind": "message",
+   "label": "Food arrives",
+   "zone": "customer"
+  },
+  {
+   "id": "eat",
+   "kind": "manual",
+   "label": "Eat and rate",
+   "zone": "customer"
+  },
+  {
+   "id": "done",
+   "kind": "end",
+   "label": "Done",
+   "zone": "customer"
+  },
+  {
+   "id": "received",
+   "kind": "start",
+   "trigger": "message",
+   "label": "Order received",
+   "zone": "restaurant"
+  },
+  {
+   "id": "stock",
+   "kind": "exclusive",
+   "label": "In stock?",
+   "zone": "restaurant"
+  },
+  {
+   "id": "confirm",
+   "kind": "send",
+   "label": "Confirm order",
+   "zone": "restaurant",
+   "column": 5
+  },
+  {
+   "id": "cook",
+   "label": "Cook",
+   "zone": "restaurant"
+  },
+  {
+   "id": "pack",
+   "label": "Pack",
+   "zone": "restaurant"
+  },
+  {
+   "id": "hand",
+   "kind": "send",
+   "label": "Hand to courier",
+   "zone": "restaurant"
+  },
+  {
+   "id": "served",
+   "kind": "end",
+   "zone": "restaurant"
+  },
+  {
+   "id": "reject",
+   "kind": "send",
+   "label": "Reject order",
+   "zone": "restaurant"
+  },
+  {
+   "id": "declined",
+   "kind": "end",
+   "zone": "restaurant"
+  },
+  {
+   "id": "request",
+   "kind": "start",
+   "trigger": "message",
+   "label": "Pickup request",
+   "zone": "courier"
+  },
+  {
+   "id": "pickup",
+   "kind": "manual",
+   "label": "Pick up",
+   "zone": "courier"
+  },
+  {
+   "id": "ride",
+   "kind": "manual",
+   "label": "Ride",
+   "zone": "courier"
+  },
+  {
+   "id": "handover",
+   "kind": "send",
+   "label": "Hand over",
+   "zone": "courier"
+  },
+  {
+   "id": "delivered",
+   "kind": "end",
+   "zone": "courier"
+  }
+ ],
+ "flows": [
+  {
+   "from": "hungry",
+   "to": "place",
+   "main": true
+  },
+  {
+   "from": "place",
+   "to": "wait",
+   "main": true
+  },
+  {
+   "from": "wait",
+   "to": "confirmed",
+   "main": true
+  },
+  {
+   "from": "wait",
+   "to": "rejected"
+  },
+  {
+   "from": "rejected",
+   "to": "notserved"
+  },
+  {
+   "from": "confirmed",
+   "to": "track",
+   "main": true
+  },
+  {
+   "from": "track",
+   "to": "arrives",
+   "main": true
+  },
+  {
+   "from": "arrives",
+   "to": "eat",
+   "main": true
+  },
+  {
+   "from": "eat",
+   "to": "done",
+   "main": true
+  },
+  {
+   "from": "received",
+   "to": "stock"
+  },
+  {
+   "from": "stock",
+   "to": "confirm",
+   "label": "yes"
+  },
+  {
+   "from": "stock",
+   "to": "reject",
+   "label": "no"
+  },
+  {
+   "from": "confirm",
+   "to": "cook"
+  },
+  {
+   "from": "cook",
+   "to": "pack"
+  },
+  {
+   "from": "pack",
+   "to": "hand"
+  },
+  {
+   "from": "hand",
+   "to": "served"
+  },
+  {
+   "from": "reject",
+   "to": "declined"
+  },
+  {
+   "from": "request",
+   "to": "pickup"
+  },
+  {
+   "from": "pickup",
+   "to": "ride"
+  },
+  {
+   "from": "ride",
+   "to": "handover"
+  },
+  {
+   "from": "handover",
+   "to": "delivered"
+  },
+  {
+   "from": "place",
+   "to": "received",
+   "style": "message",
+   "label": "order"
+  },
+  {
+   "from": "reject",
+   "to": "rejected",
+   "style": "message",
+   "label": "rejection"
+  },
+  {
+   "from": "confirm",
+   "to": "confirmed",
+   "style": "message",
+   "label": "confirmation"
+  },
+  {
+   "from": "hand",
+   "to": "request",
+   "style": "message",
+   "label": "pickup"
+  },
+  {
+   "from": "handover",
+   "to": "arrives",
+   "style": "message",
+   "label": "delivery"
+  }
+ ]
+}

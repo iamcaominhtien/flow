@@ -9,6 +9,7 @@ from ..reader import Reader, SpecError
 from . import (
     architecture,
     boards,
+    bpmn,
     catalog,
     concept,
     dfd,
@@ -43,6 +44,7 @@ LAYOUTS: dict[str, Layout] = {
     "mindmap": tree.layout_mind_map,
     **{name: graph.layout_with(each) for name, each in catalog.TYPES.items()},
     "screen": screenflow.layout_raw,
+    "bpmn": bpmn.layout_raw,
     DFD: dfd.layout_raw,
 }
 

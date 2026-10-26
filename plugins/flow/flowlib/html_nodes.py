@@ -316,18 +316,20 @@ def _marks_html(node: Node, theme: Theme) -> str:
     html = ""
     for slot in slots:
         place = f'style="position:absolute;left:{px(slot.x)};top:{px(slot.y)}"'
-        html += mark_svg(slot.marker, slot.size, stroke, place)
+        html += mark_svg(slot.marker, slot.size, (stroke, theme.paper), place)
     return html
 
 
 def _caption_html(node: Node, theme: Theme) -> str:
-    """Draw the caption under a node (an event, an actor), or return nothing."""
+    """Draw the caption of a node (an event, a gateway, an actor), under it or above it."""
     if not node.caption:
         return ""
     style = {
         **ABSOLUTE,
         "left": px(node.x + node.width / 2 - CAPTION_WIDTH_PX / 2),
-        "top": px(node.y + node.height + CAPTION_GAP_PX),
+        "top": px(
+            node.y - CAPTION_GAP_PX if node.caption_above else node.y + node.height + CAPTION_GAP_PX
+        ),
         "width": px(CAPTION_WIDTH_PX),
         "text-align": "center",
         "font-size": px(CAPTION_FONT_SIZE_PX),
@@ -335,6 +337,8 @@ def _caption_html(node: Node, theme: Theme) -> str:
         "color": theme.ink,
         "line-height": px(int(CAPTION_FONT_SIZE_PX * LINE_HEIGHT_FACTOR)),
     }
+    if node.caption_above:
+        style["transform"] = "translateY(-100%)"
     return tag("div", style, esc(node.caption))
 
 

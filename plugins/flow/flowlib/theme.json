@@ -1063,7 +1063,7 @@
     "label_gap": 6,
     "data_store_drop": 70,
     "stub": 18,
-    "pool_title_gap": 0,
-    "extra_row_clearance": 0
+    "content_pad": 60,
+    "pool_right_pad": 60
   }
 }

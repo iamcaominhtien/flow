@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 
 from .drawio_common import (
     FLOW_FRAME_KEY,
+    FLOW_HOST_KEY,
     FLOW_MARKERS_KEY,
     FLOW_SHAPE_KEY,
     FONT_BOLD,
@@ -24,6 +25,7 @@ from .sizing import estimate_text_width
 from .theme import Theme, detailed_icon_svg, has_detailed_icon, icon_svg
 
 SVG_NAMESPACE = "http://www.w3.org/2000/svg"
+NOTATION_SHAPES = (Shape.TASK, Shape.START, Shape.END, Shape.INTERMEDIATE)  # round trip by key
 PILL_ARC_PERCENT = 50
 STRIP_INSET_PX = 2
 STRIP_TEXT_INSET_PX = 8
@@ -306,10 +308,15 @@ def _add_card_lines(
 
 
 def marks_style(node: Node) -> dict[str, object]:
-    """Return the style pair that records the BPMN marks of a node, or nothing."""
-    if not node.markers:
-        return {}
-    return {FLOW_MARKERS_KEY: ",".join(marker.value for marker in node.markers)}
+    """Return the style pairs that record the BPMN shape, marks and task of a node, or nothing."""
+    pairs: dict[str, object] = {}
+    if node.shape in NOTATION_SHAPES or node.markers:
+        pairs[FLOW_SHAPE_KEY] = node.shape.value
+    if node.markers:
+        pairs[FLOW_MARKERS_KEY] = ",".join(marker.value for marker in node.markers)
+    if node.host:
+        pairs[FLOW_HOST_KEY] = node.host
+    return pairs
 
 
 def add_marks(root: ET.Element, node: Node, theme: Theme) -> None:
@@ -318,7 +325,7 @@ def add_marks(root: ET.Element, node: Node, theme: Theme) -> None:
     stroke = theme.ink if node.shape is Shape.TASK else theme.shapes[node.shape].stroke
     slots = mark_slots(node, rules.marker_extent, rules.task_marker_inset, rules.bottom_marker_gap)
     for index, slot in enumerate(slots):
-        svg = mark_svg(slot.marker, slot.size, stroke, f'xmlns="{SVG_NAMESPACE}"')
+        svg = mark_svg(slot.marker, slot.size, (stroke, theme.paper), f'xmlns="{SVG_NAMESPACE}"')
         cell = _image_cell(root, f"mark-{node.id}-{index}", f"node-{node.id}", svg)
         add_geometry(cell, (slot.x, slot.y, slot.size, slot.size))
 

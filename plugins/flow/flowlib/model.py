@@ -352,11 +352,13 @@ class Node:
     font_size: float
     detail: tuple[str, ...] = ()
     caption: str | None = None
+    caption_above: bool = False  # the caption hangs above the node, where a line leaves below
     sections: tuple[tuple[Row, ...], ...] = ()
     card: bool = False  # drawn as an illustrated card: a large icon, a name pill, a detail line
     dashed: bool = False  # a dashed outline: a reference to something drawn elsewhere
     screen: ScreenView | None = None  # what a screen of a screen flow shows
     markers: tuple[Marker, ...] = ()  # BPMN marks: the trigger, the task type, the repeat
+    host: str | None = None  # the id of the task a boundary event sits on the edge of
     chip: EdgeLabel | None = None  # a chip on the node; ``at`` is relative to its top-left
 
 

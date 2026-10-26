@@ -12,7 +12,7 @@ PLUGIN_DIR = ROOT / "plugins" / "flow"
 EXAMPLES = ROOT / "examples"
 sys.path.insert(0, str(PLUGIN_DIR))
 
-from flowlib import diagrams, render_drawio, render_html  # noqa: E402
+from flowlib import diagrams, import_drawio, render_drawio, render_html  # noqa: E402
 from flowlib import scene as scene_io  # noqa: E402
 from flowlib.check import Severity, check_scene  # noqa: E402
 from flowlib.model import FrameVariant, Role, Scene, Shape  # noqa: E402
@@ -278,3 +278,18 @@ def test_a_level_with_too_few_processes_is_a_warning() -> None:
     """Level 1 asks for four to seven processes; one process is allowed but reported."""
     codes = [finding.code.value for finding in check_scene(draw(small()))]
     assert "dfd-process-count" in codes
+
+
+@pytest.mark.parametrize("name", LEVELS)
+def test_drawio_file_reads_back_with_its_shapes(name: str, tmp_path: Path) -> None:
+    """Importing the draw.io file brings back each shape, mark, number and frame variant."""
+    scene = draw(raw_example(name))
+    path = tmp_path / "diagram.drawio"
+    path.write_text(render_drawio.render(scene), encoding="utf-8")
+    back = {node.id.removeprefix("node-"): node for node in import_drawio.convert(path).scene.nodes}
+    for node in scene.nodes:
+        read = back[node.id]
+        assert (read.shape, read.markers, read.number) == (node.shape, node.markers, node.number)
+        assert read.host == node.host
+    frames = import_drawio.convert(path).scene.frames
+    assert [frame.variant for frame in frames] == [frame.variant for frame in scene.frames]
