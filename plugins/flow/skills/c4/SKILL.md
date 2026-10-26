@@ -90,6 +90,7 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **Element**: `id`, `label`, `kind` (`system` default, `person`, `external`, `container`, `component`, `database`), `detail` (put the technology here, e.g. `PostgreSQL`), `icon`, `tone`, `zone`.
 - **Zone**: the system boundary, `id`, `label`, optional `tone` and `parent`.
 - **Relation**: `from`, `to`, `label` (a verb), `style` (`call` solid, `async` dashed), `main: true`.

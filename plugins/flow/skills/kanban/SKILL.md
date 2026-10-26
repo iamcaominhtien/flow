@@ -63,6 +63,7 @@ You write a short **spec**: columns, each with cards. A script sizes the cards, 
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **Column**: `label`, optional `tone`, `cards`.
 - **Card**: `label`, optional `detail` (a small second line), `icon`, `tone`.
 - For a comparison, make each option a column and each point a card.

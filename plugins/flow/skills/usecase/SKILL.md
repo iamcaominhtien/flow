@@ -84,6 +84,7 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **Item**: `id`, `label`, `kind` (`usecase` default, an ellipse; or `actor`), `zone` (the system boundary), `icon`, `tone`.
 - **Zone**: the system, `id`, `label`.
 - **Link**: `from`, `to`, `label`, `style`: `association` (plain line, default), `include` and `extend` (dashed arrow; write `include` or `extend` as the label), `generalizes` (hollow triangle).

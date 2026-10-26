@@ -36,6 +36,7 @@ You write a short **spec**: the tables, their columns and the relations. A scrip
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **Table**: `id`, `name`, `columns`, optional `icon` and `tone`, and `at: [row, column]` to put it in a grid cell (give `at` to every table or to none).
 - **Column**: `name`, optional `type`, optional `flags` from `pk`, `fk`, `uq`, `null`. The keys are drawn as chips before the name (`PK` amber, `FK` blue, `UQ` violet); `null` adds a `?` to the type. Keys first, then the columns that explain the relations.
 - **Relation**: `from`, `to`, optional `label`. `from_end` and `to_end` set the mark at each end: `one`, `zero_one`, `one_many`, `zero_many`. The default is `one` at `from` and `zero_many` at `to`. `style` is `solid` (a foreign key) or `logical` (dashed, no real key). `main: true` highlights and animates the relation to follow first. Mark one or two, not all.

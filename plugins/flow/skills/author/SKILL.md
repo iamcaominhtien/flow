@@ -59,6 +59,10 @@ print(format_report(findings))
 - Icons: names from `flowlib.theme.icon_names()`; a card (`card=True`, with an icon and a `detail`) is the illustrated style.
 - `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py check <scene.json>` re-checks a scene; `flow.py edit` changes a draw.io file in place.
 
+## Theme
+
+Set `canvas.theme = "technical"` or `"midnight"` (default `"pastel"`) before `canvas.write(...)` to restyle the whole diagram in HTML and draw.io; an unknown name raises `ValueError`. Details in the flowchart skill ("Themes"). On `midnight` pick tones for the owner or domain as usual; the colours are swapped for you. Do not write colours by hand.
+
 ## The design to follow
 
 **Shapes by meaning** (flowchart): terminator = start or end (green pill, a failed end is rose); process = one action (blue box); decision = a question (amber diamond); IO = data in or out (violet parallelogram); document = a readable output; subprocess = a step with its own chart; preparation = setup (teal); connector = off-page link, one letter. A database is a cylinder only in diagram types that have one (architecture, DFD, ER); a flowchart has none.
