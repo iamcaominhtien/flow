@@ -95,3 +95,5 @@ Add `"style": "illustrated"` at the top level to draw each box that has an `icon
 - Screens are plain boxes: there are no thumbnails or device frames, and no tabs or overlays as in the design.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
 - Fixes beyond the spec: see the flowchart skill (overrides file).
+
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.

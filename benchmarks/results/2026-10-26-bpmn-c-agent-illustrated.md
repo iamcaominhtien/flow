@@ -57,3 +57,22 @@ Looked at in a headless browser render (the draw.io file was not opened).
 1. Check: report overlapping line stretches and a label covering a caption.
 2. Skill: list the tones; say when to use cards on many elements.
 3. Layout: spread shared stretches; shorter routes for long message lines.
+
+## After the follow-ups (same spec, rebuilt)
+
+Done in the commit after this run:
+
+- Check: new `lines-overlap` (warning) and `caption-covered` (error) codes. The
+  check reported 0 errors on the run above only because it did not look at captions.
+- Layout: captions are now kept clear in routing, including when the flow runs
+  left to right (the clearance had been applied on the wrong axis there). Label chips
+  that cover a box, a caption or another chip are slid along their line. The route
+  search can run beside a line already drawn, not only on it.
+- Skill: the tone list, how to choose an event or gateway type from its name, and
+  when to use cards.
+
+Rebuilt result for the same agent spec: 0 errors; 3 `lines-cross` and 3 `lines-overlap`
+warnings. The captions and the "More time" label are clear in the picture. Still there:
+the gateway's message lines share a trunk with its solid line (the three `lines-overlap`),
+and the "Standard" bus is shared by three lines. Long message lines still cross the page.
+Not done: moving a message line to another side of the gateway, and shortening long lines.

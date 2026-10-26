@@ -81,3 +81,5 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 - Multiplicity labels (`from_label`, `to_label`) are accepted but not drawn yet. Interfaces and abstract classes have no special look: put `«interface»` in the label.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
 - Fixes beyond the spec: see the flowchart skill (overrides file).
+
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.

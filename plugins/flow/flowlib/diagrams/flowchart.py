@@ -3,6 +3,7 @@
 from .. import spec as spec_io
 from .. import transpose
 from ..canvas import fit_canvas
+from ..labels import place_labels
 from ..layered import build_grid
 from ..model import Direction, Scene
 from ..placement import place_nodes
@@ -42,7 +43,7 @@ def layout(spec: Spec) -> Scene:
         nodes=nodes,
         edges=edges,
     )
-    return fit_canvas(scene)
+    return fit_canvas(place_labels(scene))
 
 
 def layout_raw(raw: object) -> Scene:

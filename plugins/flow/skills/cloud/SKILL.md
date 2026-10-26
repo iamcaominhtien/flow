@@ -107,3 +107,5 @@ Add `"style": "illustrated"` at the top level to draw each box that has an `icon
 - There are no provider icons (AWS, GCP, Azure logos). Use the built-in icons or draw one; say so if the user expects official icons.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
 - Fixes beyond the spec: see the flowchart skill (overrides file).
+
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.

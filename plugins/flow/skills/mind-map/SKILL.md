@@ -75,3 +75,5 @@ You write a short **spec**: a nested tree. A script places the boxes (left to ri
 - Each level starts after the tallest or widest item of the level above, and siblings are never packed closer, so a wide tree gets wide. There is no radial mind map layout.
 - Only one root. Cross links between branches are not supported.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
+
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.

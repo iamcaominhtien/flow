@@ -80,3 +80,5 @@ You write a short **spec**: the periods and the lanes with their items. A script
 - Time is in whole periods; there are no dates, dependencies or progress marks.
 - A long item label makes the periods wide.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
+
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.

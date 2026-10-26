@@ -100,3 +100,5 @@ You write a short **spec**: the periods and the tasks. A script scales the bars,
 - The period width grows so that every task label fits, so a long label makes the chart wide.
 - There is no progress marker or milestone shape; a milestone is a task of length 1.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
+
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.

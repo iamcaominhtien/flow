@@ -94,3 +94,5 @@ Add `"style": "illustrated"` at the top level to draw each box that has an `icon
 - Items in a layer sit in one row: a layer with many items gets wide. There is no wrapping to a second row.
 - Arrows join whole layers, not single items.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
+
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.

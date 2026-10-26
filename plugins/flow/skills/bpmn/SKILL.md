@@ -166,3 +166,11 @@ Add `"style": "illustrated"` at the top level to draw each box that has an `icon
 - The report names each flow by its two ends, for example `line 'e10' (Scoring failed to Send rejection) passes through ...`; the ids `e1`, `e2`, ... count the flows in the order written, from 1. To fix a line through a box, change the order of the elements or the pool of one of its ends, or move the element with `at`.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
 - Fixes beyond the spec: see the flowchart skill (overrides file).
+
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.
+
+When the brief names an event without saying its type, choose from its name: "Timer", "Deadline" or "Wait" is a `timer`; a message, report or notice that is received is a `message`; "Error", "Rejected" or "Failed" is an `error`; anything else is a plain `event`. A gateway that splits into alternatives is `exclusive`; one that starts or joins parallel work is `parallel`; say in the answer which you chose.
+
+With many elements, give a card (`icon`, `tone`, `detail`) to the few that matter and leave the rest plain, or leave `style` out. Do not shorten a flow label to make the check pass when the build reports `label-covers`: the build moves a label along its line to find a clear spot, so shorten it only when it still covers something.
+
+The check also reports `lines-overlap` (two lines run on top of each other, so they cannot be told apart) and `caption-covered` (a line or a label sits on the name under an event). `lines-overlap` is a warning: mention it. `caption-covered` is an error: fix the spec.

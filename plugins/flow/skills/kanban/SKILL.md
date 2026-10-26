@@ -77,3 +77,5 @@ Add `"style": "illustrated"` at the top level to draw each box that has an `icon
 - Cards cannot be dragged or edited as a board in draw.io; they are plain boxes.
 - There are no counts, limits, assignees or dates.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
+
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.

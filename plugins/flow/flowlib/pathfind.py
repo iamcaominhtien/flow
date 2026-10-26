@@ -16,7 +16,8 @@ Segment = tuple[Point, Point]
 
 BEND_COST_PX = 30.0
 CROSSING_COST_PX = 60.0
-OVERLAP_COST_PER_PX = 3.0
+OVERLAP_COST_PER_PX = 6.0
+TRACK_GAP_PX = 10.0  # a route may run this far beside a line already drawn
 OUTSIDE_MARGIN_PX = 40.0
 MIN_CORRIDOR_PX = 8.0  # a gap narrower than this gets no middle line
 SAME_LINE_PX = 2.0
@@ -72,6 +73,11 @@ def _grid(space: SearchSpace, ends: tuple[Point, Point]) -> tuple[list[float], l
     for left, top, right, bottom in space.obstacles:
         xs.update((left, right))
         ys.update((top, bottom))
+    for first, second in space.lines:
+        if abs(first[0] - second[0]) < SAME_LINE_PX:
+            xs.update((first[0] - TRACK_GAP_PX, first[0] + TRACK_GAP_PX))
+        else:
+            ys.update((first[1] - TRACK_GAP_PX, first[1] + TRACK_GAP_PX))
     xs.update((min(xs) - OUTSIDE_MARGIN_PX, max(xs) + OUTSIDE_MARGIN_PX))
     ys.update((min(ys) - OUTSIDE_MARGIN_PX, max(ys) + OUTSIDE_MARGIN_PX))
     return _corridors(xs), _corridors(ys)

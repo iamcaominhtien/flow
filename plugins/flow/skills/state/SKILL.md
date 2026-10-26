@@ -49,3 +49,5 @@ Built-in icon names: `user phone cart card bell clock pin pot check box bike ref
 
 - Two transitions that leave the same side of a state can share the first stretch of line, and a label can sit on the neighbouring line. Check the picture.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
+
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.

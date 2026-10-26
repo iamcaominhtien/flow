@@ -10,8 +10,9 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from itertools import pairwise
 
+from .html_nodes import CAPTION_WIDTH_PX
 from .layered import Grid
-from .model import SYMBOL_HEADS, Edge, EdgeLabel, LabelKind, Node, Point, Role, Shape
+from .model import SYMBOL_HEADS, Direction, Edge, EdgeLabel, LabelKind, Node, Point, Role, Shape
 from .pathfind import SearchSpace, find_route
 from .placement import Placement
 from .spec import Spec, SpecEdge
@@ -58,25 +59,44 @@ class _Context:
     rules: LayoutRules
     used_ports: set[tuple[str, Port]]
     channels_used: dict[Port, int]
+    caption_port: Port = Port.BOTTOM
     slots: dict[SpecEdge, tuple[float, float]] = field(default_factory=dict)
     lines: list[tuple[Point, Point]] = field(default_factory=list)
 
 
-def _bottom(node: Node) -> float:
-    """Return where a line leaves the bottom of a node: under its caption when it has one."""
-    caption = load_theme().layout.caption_height if node.caption else 0.0
-    return node.y + node.height + caption
+def _attach(node: Node, port: Port, caption_port: Port = Port.BOTTOM) -> Point:
+    """Return the point in the middle of one side of a node.
 
+    Args:
+        node: The node.
+        port: The side.
+        caption_port: The side the caption hangs from: the bottom of the page, which is the right
+            of the node when the layout is transposed. A line leaves that side beyond the caption.
 
-def _attach(node: Node, port: Port) -> Point:
-    """Return the point in the middle of one side of a node."""
+    Returns:
+        The attach point.
+    """
+    reach = load_theme().layout.caption_height if node.caption and port is caption_port else 0.0
     center_x, center_y = node.x + node.width / 2, node.y + node.height / 2
     return {
         Port.TOP: (center_x, node.y),
-        Port.BOTTOM: (center_x, _bottom(node)),
+        Port.BOTTOM: (center_x, node.y + node.height + reach),
         Port.LEFT: (node.x, center_y),
-        Port.RIGHT: (node.x + node.width, center_y),
+        Port.RIGHT: (node.x + node.width + reach, center_y),
     }[port]
+
+
+def _caption_box(node: Node, caption_port: Port) -> tuple[float, float, float, float] | None:
+    """Return the box a caption covers, as left, top, right, bottom, in layout space."""
+    if not node.caption:
+        return None
+    reach = load_theme().layout.caption_height
+    half = CAPTION_WIDTH_PX / 2
+    if caption_port is Port.RIGHT:
+        center_y = node.y + node.height / 2
+        return (node.x + node.width, center_y - half, node.x + node.width + reach, center_y + half)
+    center_x = node.x + node.width / 2
+    return (center_x - half, node.y + node.height, center_x + half, node.y + node.height + reach)
 
 
 def _hits(node: Node, start: Point, end: Point) -> bool:
@@ -89,6 +109,17 @@ def _hits(node: Node, start: Point, end: Point) -> bool:
         and low_y < node.y + node.height + CLEARANCE_PX
         and high_y > node.y - CLEARANCE_PX
     )
+
+
+def _hits_caption(node: Node, start: Point, end: Point, caption_port: Port) -> bool:
+    """Tell whether a segment passes over the caption of a node."""
+    box = _caption_box(node, caption_port)
+    if box is None:
+        return False
+    low_x, high_x = sorted((start[0], end[0]))
+    low_y, high_y = sorted((start[1], end[1]))
+    left, top, right, bottom = box
+    return low_x < right and high_x > left and low_y < bottom and high_y > top
 
 
 def _is_clear(points: list[Point], context: _Context, ends: tuple[str, str]) -> bool:
@@ -113,6 +144,8 @@ def _is_clear(points: list[Point], context: _Context, ends: tuple[str, str]) -> 
                 node_id == target_id and index == last
             )
             if not attaches and _hits(node, start, end):
+                return False
+            if _hits_caption(node, start, end, context.caption_port):
                 return False
     return True
 
@@ -179,7 +212,7 @@ def _slots(edges: list[SpecEdge], nodes: dict[str, Node]) -> dict[SpecEdge, tupl
 
 
 def _forward_points(
-    source: Node, target: Node, slot: tuple[float, float] | None
+    source: Node, target: Node, slot: tuple[float, float] | None, caption_port: Port
 ) -> tuple[list[Point], Port]:
     """Return the direct route between two nodes and the port it leaves from.
 
@@ -188,6 +221,7 @@ def _forward_points(
         target: Where the line ends.
         slot: Where the line leaves the bottom of the source and enters the top of the target,
             when it runs to a lower row.
+        caption_port: The side the captions hang from.
 
     Returns:
         The points, and the port of the source that the line leaves from.
@@ -196,7 +230,7 @@ def _forward_points(
     same_row = abs(source_y - target_y) < SAME_LINE_TOLERANCE_PX
     if slot is not None and not (source.shape is Shape.DECISION and source_x != slot[0]):
         exit_x, entry_x = slot
-        start, end = (exit_x, _bottom(source)), (entry_x, target.y)
+        start, end = (exit_x, _attach(source, Port.BOTTOM, caption_port)[1]), (entry_x, target.y)
         if abs(exit_x - entry_x) < SAME_LINE_TOLERANCE_PX:
             return [start, end], Port.BOTTOM
         bus_y = max(start[1] + BUS_BELOW_SOURCE_PX, end[1] - BUS_ABOVE_TARGET_PX)
@@ -204,9 +238,12 @@ def _forward_points(
     leaving = Port.RIGHT if target_x > source_x else Port.LEFT
     if same_row:
         arriving = Port.LEFT if leaving is Port.RIGHT else Port.RIGHT
-        return [_attach(source, leaving), _attach(target, arriving)], leaving
+        return [
+            _attach(source, leaving, caption_port),
+            _attach(target, arriving, caption_port),
+        ], leaving
     corner = (target_x, source_y)
-    return [_attach(source, leaving), corner, _attach(target, Port.TOP)], leaving
+    return [_attach(source, leaving, caption_port), corner, _attach(target, Port.TOP)], leaving
 
 
 def _peek_channel_x(side: Port, rows: tuple[float, float], context: _Context) -> float:
@@ -241,7 +278,8 @@ def _channel_route(source: Node, target: Node, side: Port, context: _Context) ->
     Returns:
         The route.
     """
-    start, end = _attach(source, side), _attach(target, side)
+    start = _attach(source, side, context.caption_port)
+    end = _attach(target, side, context.caption_port)
     channel = _peek_channel_x(side, (min(start[1], end[1]), max(start[1], end[1])), context)
     points = [start, (channel, start[1]), (channel, end[1]), end]
     return _Route(points, leaves=side, arrives=side, channel=side)
@@ -258,7 +296,7 @@ def _arc_route(source: Node, target: Node, context: _Context) -> _Route:
     Returns:
         The route; it needs no channel.
     """
-    start, end = _attach(source, Port.TOP), _attach(target, Port.TOP)
+    start, end = _attach(source, Port.TOP, context.caption_port), _attach(target, Port.TOP)
     ridge = min(start[1], end[1]) - context.rules.channel_offset
     points = [start, (start[0], ridge), (end[0], ridge), end]
     return _Route(points, leaves=Port.TOP, arrives=Port.TOP, channel=None)
@@ -352,22 +390,28 @@ OUTWARD = {
 
 
 def _obstacles(context: _Context) -> tuple[tuple[float, float, float, float], ...]:
-    """Return every node as a box grown by the search margin, with room for its caption."""
-    caption = context.rules.caption_height
+    """Return every node and every caption as a box grown by the search margin."""
+    boxes = []
+    for node in context.nodes.values():
+        left, top, right, bottom = node.x, node.y, node.x + node.width, node.y + node.height
+        boxes.append((left, top, right, bottom))
+        caption = _caption_box(node, context.caption_port)
+        if caption is not None:
+            boxes.append(caption)
     return tuple(
         (
-            node.x - SEARCH_MARGIN_PX,
-            node.y - SEARCH_MARGIN_PX,
-            node.x + node.width + SEARCH_MARGIN_PX,
-            node.y + node.height + SEARCH_MARGIN_PX + (caption if node.caption else 0.0),
+            left - SEARCH_MARGIN_PX,
+            top - SEARCH_MARGIN_PX,
+            right + SEARCH_MARGIN_PX,
+            bottom + SEARCH_MARGIN_PX,
         )
-        for node in context.nodes.values()
+        for left, top, right, bottom in boxes
     )
 
 
-def _stub(node: Node, port: Port) -> Point:
+def _stub(node: Node, port: Port, caption_port: Port) -> Point:
     """Return the point just outside a node, straight out from one of its sides."""
-    x, y = _attach(node, port)
+    x, y = _attach(node, port, caption_port)
     out_x, out_y = OUTWARD[port]
     return (x + out_x * STUB_PX, y + out_y * STUB_PX)
 
@@ -387,11 +431,19 @@ def _search_route(source: Node, target: Node, context: _Context) -> _Route | Non
     best: tuple[float, _Route] | None = None
     for leave in Port:
         for arrive in Port:
-            found = find_route(space, _stub(source, leave), _stub(target, arrive))
+            found = find_route(
+                space,
+                _stub(source, leave, context.caption_port),
+                _stub(target, arrive, context.caption_port),
+            )
             if found is None:
                 continue
             cost = found.cost + _reuse_cost(source, target, (leave, arrive), context)
-            points = [_attach(source, leave), *found.points, _attach(target, arrive)]
+            points = [
+                _attach(source, leave, context.caption_port),
+                *found.points,
+                _attach(target, arrive, context.caption_port),
+            ]
             if best is None or cost < best[0]:
                 best = (cost, _Route(points, leaves=leave, arrives=arrive, channel=None))
     return None if best is None else best[1]
@@ -416,7 +468,9 @@ def _route_one(spec_edge: SpecEdge, returning: bool, context: _Context) -> list[
         The points of the route.
     """
     source, target = context.nodes[spec_edge.source], context.nodes[spec_edge.target]
-    points, port = _forward_points(source, target, context.slots.get(spec_edge))
+    points, port = _forward_points(
+        source, target, context.slots.get(spec_edge), context.caption_port
+    )
     route = _Route(points, leaves=port, arrives=Port.TOP, channel=None)
     if returning:
         route = _returning_route(source, target, context)
@@ -441,7 +495,8 @@ def route_edges(spec: Spec, grid: Grid, placement: Placement, rules: LayoutRules
         One scene edge per spec edge, in spec order. Forward edges are routed first so that
         the returning ones take the ports that are left.
     """
-    context = _Context(placement.nodes, rules, set(), {})
+    caption_port = Port.RIGHT if spec.direction is Direction.RIGHT else Port.BOTTOM
+    context = _Context(placement.nodes, rules, set(), {}, caption_port)
     returning = set(grid.returning)
     context.slots = _slots(list(grid.forward), placement.nodes)
     order = sorted(spec.edges, key=lambda edge: edge in returning)

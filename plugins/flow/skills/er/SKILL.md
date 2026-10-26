@@ -50,3 +50,5 @@ Built-in icon names: `user phone cart card bell clock pin pot check box bike ref
 - Text width is estimated, not measured; a long column name may be tight.
 - The draw.io file was checked in a viewer, not in the draw.io editor.
 - Fixes beyond the spec: see the flowchart skill (overrides file).
+
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.
