@@ -35,7 +35,7 @@ from .theme import load_theme
 
 CAPTIONED_SHAPES = {Shape.START, Shape.END, Shape.INTERMEDIATE, Shape.ACTOR}  # the text goes under
 LABEL_KIND_OF_ROLE = {Role.YES: LabelKind.YES, Role.NO: LabelKind.NO, Role.BACK: LabelKind.BACK}
-SMALL_WORDS = {"a", "an", "and", "as", "at", "by", "for", "in", "of", "on", "or", "the", "to"}
+MIDDLE = 0.5
 
 
 class Side(StrEnum):
@@ -53,29 +53,38 @@ class Box:
 
     node: Node
 
-    def port(self, side: str) -> Point:
-        """Return where a line attaches to one side: the middle of the side, or a tip.
+    def port(self, side: str, along: float = 0.5) -> Point:
+        """Return where a line attaches to one side of the node.
 
         Args:
             side: ``top``, ``bottom``, ``left`` or ``right``.
+            along: How far along the side the point is, from 0 (the left end of a top or bottom
+                side, the top end of a left or right side) to 1. The middle, 0.5, is the default.
+                Use other values to spread several lines over a wide node or a bar. A diamond
+                has a point only at its tips, so it takes the middle only.
 
         Returns:
             The point on the outline of the node.
 
         Raises:
-            ValueError: If the side is not one of the four.
+            ValueError: If the side is not one of the four, ``along`` is outside 0 to 1, or a
+                diamond is given a point other than a tip.
         """
         node = self.node
-        centre_x, centre_y = node.x + node.width / 2, node.y + node.height / 2
-        ports = {
-            Side.TOP: (centre_x, node.y),
-            Side.BOTTOM: (centre_x, node.y + node.height),
-            Side.LEFT: (node.x, centre_y),
-            Side.RIGHT: (node.x + node.width, centre_y),
-        }
-        if side not in ports:
+        if side not in tuple(Side):
             raise ValueError(f"unknown side '{side}'; use top, bottom, left or right")
-        return ports[side]
+        if not 0.0 <= along <= 1.0:
+            raise ValueError("'along' must be between 0 and 1")
+        if node.shape is Shape.DECISION and along != MIDDLE:
+            raise ValueError("a decision has a point only at its four tips (along=0.5)")
+        across_x, across_y = node.x + node.width * along, node.y + node.height * along
+        ports = {
+            Side.TOP: (across_x, node.y),
+            Side.BOTTOM: (across_x, node.y + node.height),
+            Side.LEFT: (node.x, across_y),
+            Side.RIGHT: (node.x + node.width, across_y),
+        }
+        return ports[Side(side)]
 
     @property
     def centre(self) -> Point:
@@ -185,7 +194,11 @@ class Canvas:
         first, second = self.boxes[source], self.boxes[target]
         leave = route.leave or _facing_side(first, second)
         arrive = route.arrive or _facing_side(second, first)
-        corners = [first.port(leave), *route.via, second.port(arrive)]
+        corners = [
+            first.port(leave, route.leave_along),
+            *route.via,
+            second.port(arrive, route.arrive_along),
+        ]
         points = _right_angled(corners)
         label = None
         if route.label:
@@ -257,6 +270,8 @@ class Route:
 
     leave: str | None = None
     arrive: str | None = None
+    leave_along: float = MIDDLE
+    arrive_along: float = MIDDLE
     via: tuple[Point, ...] = ()
     role: Role = Role.NEXT
     label: str | None = None
@@ -272,14 +287,21 @@ def sentence_case(text: str) -> str:
 
     Returns:
         The same words in sentence case, for example ``"Soft reconfig store"``. A word that is
-        all capitals (``"RIB"``) is kept as it is.
+        with capitals inside (``"RIB"``, ``"Adj-RIB-In"``) is kept as it is.
     """
     words = text.split()
     kept = [
-        word if word.isupper() and len(word) > 1 else word.lower() if index else word.capitalize()
+        word if _is_name(word) else word.lower() if index else word.capitalize()
         for index, word in enumerate(words)
     ]
     return " ".join(kept)
+
+
+def _is_name(word: str) -> bool:
+    """Tell whether a word has capitals inside it (``RIB``, ``Adj-RIB-In``) and must be kept."""
+    letters = [char for char in word if char.isalpha()]
+    inner = sum(1 for char in letters[1:] if char.isupper())
+    return len(letters) > 1 and inner > 0
 
 
 def _frame(

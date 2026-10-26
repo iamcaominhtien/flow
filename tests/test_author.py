@@ -74,3 +74,21 @@ def test_sentence_case_keeps_acronyms() -> None:
     """Only the first word is capitalised; an acronym keeps its capitals."""
     assert sentence_case("Soft Reconfig Store") == "Soft reconfig store"
     assert sentence_case("install RIB table") == "Install RIB table"
+
+
+def test_a_port_can_be_anywhere_along_a_side_except_on_a_diamond() -> None:
+    """A wide node takes several lines at different points; a diamond only has its tips."""
+    canvas = Canvas()
+    wide = canvas.node("bar", Shape.PROCESS, "Hub", NodeOptions((300, 100), width=400, height=40))
+    diamond = canvas.node("q", Shape.DECISION, "Ok?", NodeOptions((300, 300)))
+    left, right = wide.port(Side.TOP, 0.0), wide.port(Side.TOP, 1.0)
+    assert right[0] - left[0] == 400
+    with pytest.raises(ValueError, match="tips"):
+        diamond.port(Side.LEFT, 0.25)
+    with pytest.raises(ValueError, match="between 0 and 1"):
+        wide.port(Side.TOP, 1.5)
+
+
+def test_sentence_case_keeps_names_with_capitals_inside() -> None:
+    """Names such as Adj-RIB-In stay as written."""
+    assert sentence_case("Store Adj-RIB-In") == "Store Adj-RIB-In"

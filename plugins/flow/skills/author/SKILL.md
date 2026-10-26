@@ -20,25 +20,35 @@ The other Flow skills turn a short spec into a diagram with one fixed automatic 
 
 ```python
 import sys
+
 sys.path.insert(0, "${CLAUDE_PLUGIN_ROOT}")
 from flowlib.author import Canvas, NodeOptions, Route, Side, sentence_case
 from flowlib.check import format_report
 from flowlib.model import Role, Shape, Tone
 
 canvas = Canvas("Title", "One sentence of description")
-canvas.lane("ops", "Operations", Tone.BLUE, (40, 120, 1800, 240))     # left, top, width, height
-canvas.zone("core", "Core", Tone.GREEN, (400, 420, 600, 300))          # a group area
-canvas.node("go", Shape.TERMINATOR, "Start", NodeOptions((200, 240)))   # centre point
+canvas.lane("ops", "Operations", Tone.BLUE, (40, 120, 1800, 240))  # left, top, width, height
+canvas.zone("core", "Core", Tone.GREEN, (400, 420, 600, 300))  # a group area
+canvas.node("go", Shape.TERMINATOR, "Start", NodeOptions((200, 240)))  # centre point
 canvas.node("ok", Shape.DECISION, "Valid?", NodeOptions((420, 240), tone=Tone.AMBER))
-canvas.edge("go", "ok")                                                  # sides that face each other
-canvas.edge("ok", "go", Route(leave=Side.BOTTOM, arrive=Side.BOTTOM,
-            via=((420, 330), (200, 330)), role=Role.BACK, label="Retry"))
-findings = canvas.write("out", "diagram")      # writes out/diagram.scene.json, .html, .drawio
+canvas.edge("go", "ok")  # sides that face each other
+canvas.edge(
+    "ok",
+    "go",
+    Route(
+        leave=Side.BOTTOM,
+        arrive=Side.BOTTOM,
+        via=((420, 330), (200, 330)),
+        role=Role.BACK,
+        label="Retry",
+    ),
+)
+findings = canvas.write("out", "diagram")  # writes out/diagram.scene.json, .html, .drawio
 print(format_report(findings))
 ```
 
 - `Canvas.node(id, shape, text, NodeOptions(centre, icon=, tone=, number=, detail=, card=, width=, height=))`: the node is sized by the design's rules to hold its text (widened, never made taller, until it fits; at most two lines). You may force `width`/`height`.
-- `Box.port(side)` gives the attach point on `top`, `bottom`, `left`, `right`. A diamond attaches at its four tips. `canvas.boxes[id]` is the box; `box.centre` is its middle.
+- `Box.port(side, along=0.5)` gives the attach point on `top`, `bottom`, `left`, `right`; `along` (0 to 1) moves it along the side, so a wide node or a bar can take several lines apart (`Route(leave_along=, arrive_along=)` does the same for a line). A diamond attaches only at its four tips. `canvas.boxes[id]` is the box; `box.centre` is its middle.
 - `Canvas.edge(from, to, Route(...))`: with no route the line leaves and enters the facing sides. `via` is a list of waypoints; corners are added so every segment is horizontal or vertical. A route is `leave`, `arrive`, `via`, `role`, `label`, `dashed`, `head`.
 - `Canvas.lane(...)` is a swimlane (a dark tab with the name, a lightly tinted band). `Canvas.zone(...)` is a dashed tinted group area with a name pill.
 - `Canvas.write(folder, name)` writes the scene, the HTML (animated) and the draw.io file, runs the check and returns the findings. Labels that cover a node or another label are moved along their line for you.
@@ -54,7 +64,7 @@ print(format_report(findings))
 
 **Line roles** (`Role`): `main` = the one most important path, thick, blue, animated; `data` = a data or event stream, violet, animated slowly; `yes` green and `no` rose for decision exits; `back` = dashed slate, a return or retry; `next` = a plain step, ink. Mark the main path with `main` on every line of that chain (one connected route from the start to an end) so the page moves; everything else stays still.
 
-**Text**: a process starts with a verb (`Check stock`); a terminator names the state (`Order placed`); a decision is a question ending with `?`. Four words or fewer, **sentence case** (use `sentence_case`; keep acronyms), never wrapped by hand. A decision with two exits labels them `Yes` and `No`; with more, label each with its value and the last `Else`. Edge labels are short.
+**Text**: a process starts with a verb (`Check stock`); a terminator names the state (`Order placed`); a decision is a question ending with `?`. Four words or fewer, **sentence case** (use `sentence_case`; names with capitals inside, such as `RIB` or `Adj-RIB-In`, are kept), never wrapped by hand. A decision with two exits labels them `Yes` and `No`; with more, label each with its value and the last `Else`. Edge labels are short.
 
 **Layout**: the happy path stays on one straight line; exceptions branch to the side or down. Steps in a row share a centre line. Gaps: 56 px or more between rows, 70 px or more between columns, more where a line carries a label. Return lines run *outside* the flow, never through a step. Snap positions to a 10 px grid. In a swimlane chart a step sits in exactly one lane, the actor who starts is in the top lane, a line that changes lane runs straight across.
 
@@ -73,4 +83,6 @@ You cannot judge a layout from numbers. Render the HTML to an image and open it:
 
 - Do not use `flow.py build` for the diagram you are authoring by hand; it applies the automatic layout and ignores your positions.
 - Do not edit the plugin's code. If the kit lacks something you need, write it in your own script and say so in your report.
+- Keep the brief's step names recognisable. The design wants a decision to be a question and a process to start with a verb, so reword where needed, but a reader should be able to match every step to the brief; keep a list of the mapping in your script.
+- A step that the brief puts in a group belongs in that group's area. If the layout needs it elsewhere, say so in your report.
 - Do not drop a step or a connection to make the layout easier. If the brief cannot be expressed, say what and why.
