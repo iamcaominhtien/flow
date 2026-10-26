@@ -1,0 +1,165 @@
+{
+  "type": "screen",
+  "title": "Product screen · Overlays",
+  "desc": "Modals, bottom sheets and toasts are drawn on the screen they cover, not as screens of their own. Closing one returns to the same screen, so every path ends back at S12.",
+  "screens": [
+    {
+      "id": "modal",
+      "code": "S12",
+      "label": "Product",
+      "at": [
+        0,
+        0
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "overlay": "modal",
+      "overlay_title": "Delete review?",
+      "elements": [
+        {
+          "text": "Share",
+          "style": "outline"
+        },
+        {
+          "text": "Delete",
+          "style": "danger"
+        },
+        {
+          "text": "Cancel",
+          "style": "outline",
+          "on": "overlay"
+        },
+        {
+          "text": "Delete",
+          "style": "danger",
+          "on": "overlay"
+        }
+      ]
+    },
+    {
+      "id": "base",
+      "code": "S12",
+      "label": "Product",
+      "at": [
+        0,
+        1
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "elements": [
+        {
+          "text": "Share",
+          "style": "outline"
+        },
+        {
+          "text": "Delete",
+          "style": "danger"
+        }
+      ]
+    },
+    {
+      "id": "sheet",
+      "code": "S12",
+      "label": "Product",
+      "at": [
+        0,
+        2
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "overlay": "sheet",
+      "elements": [
+        {
+          "text": "Share",
+          "style": "outline"
+        },
+        {
+          "text": "Delete",
+          "style": "danger"
+        },
+        {
+          "text": "Copy link",
+          "style": "secondary",
+          "on": "overlay"
+        },
+        {
+          "text": "Message",
+          "style": "outline",
+          "on": "overlay",
+          "hotspot": false
+        }
+      ]
+    },
+    {
+      "id": "toast",
+      "code": "S12",
+      "label": "Product",
+      "at": [
+        0,
+        3
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "overlay": "toast",
+      "overlay_title": "Link copied",
+      "elements": [
+        {
+          "text": "Share",
+          "style": "outline"
+        },
+        {
+          "text": "Delete",
+          "style": "danger"
+        }
+      ]
+    }
+  ],
+  "taps": [
+    {
+      "from": "base",
+      "to": "modal",
+      "trigger": "tap Delete"
+    },
+    {
+      "from": "modal",
+      "to": "base",
+      "trigger": "tap Confirm",
+      "effect": "remove item"
+    },
+    {
+      "from": "modal",
+      "to": "base",
+      "trigger": "tap Cancel",
+      "kind": "back",
+      "route": "direct"
+    },
+    {
+      "from": "base",
+      "to": "sheet",
+      "trigger": "tap Share"
+    },
+    {
+      "from": "sheet",
+      "to": "base",
+      "trigger": "tap outside",
+      "kind": "back",
+      "route": "direct"
+    },
+    {
+      "from": "sheet",
+      "to": "toast",
+      "trigger": "tap Copy link"
+    },
+    {
+      "from": "toast",
+      "to": "base",
+      "trigger": "auto 2 s",
+      "system": "clock",
+      "kind": "back"
+    }
+  ]
+}

@@ -5,98 +5,89 @@ allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py *)
 
 # Screen flow
 
-You write a short **spec**. A script places the boxes, routes the lines, checks the result and writes the files. Never write coordinates or HTML yourself.
+You write a short **spec**. A script places the screens in device frames, routes the arrows, checks the result and writes the files. Never write coordinates or HTML yourself.
 
 ## Steps
 
-1. List the screens, the decisions, the start and end, and what the person taps to go from one to the next.
-2. Write `diagrams/<name>.spec.json` in the current project.
-3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` and `<name>.drawio` next to the spec and prints a check report. Exit code 0: no error; 2: errors found (files still written); 1: the spec is invalid and the message lists every problem.
-4. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Do not say the diagram "looks good": you have not seen it.
-5. Tell the user where the HTML and the `.drawio` file are.
+1. Ask, or pick from the stage of the design, the **fidelity** of each screen: L0 names only, L1 skeleton, L2 key elements (see below). There is no default level in the design; a screen with no `fidelity` is drawn as L0.
+2. List the screens (device, id, name), the decisions, the entry points and the arrows: what the person does, which condition decides the path, what happens on the way.
+3. Put the screens on a grid: `at: [row, column]`. Flow runs left to right in a row; a branch goes to the next row. Group screens in zones. Draw a web flow as its own zone in rows below the phone flow.
+4. Write `diagrams/<name>.spec.json` in the current project.
+5. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` and `<name>.drawio` next to the spec and prints a check report. Exit code 0: no error; 2: errors found (files still written); 1: the spec is invalid and the message lists every problem.
+6. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Do not say the diagram "looks good" unless you have looked at the picture.
+7. Tell the user where the HTML and the `.drawio` file are.
 
 ## The spec
 
 ```json
 {
   "type": "screen",
-  "title": "Screen flow: sign up",
-  "desc": "From the welcome screen a person signs up, confirms an email code and lands on the home screen.",
+  "title": "Shop app: checkout",
+  "zones": [{"id": "co", "label": "Checkout", "tone": "violet"}],
   "screens": [
-    {
-      "id": "begin",
-      "kind": "start"
-    },
-    {
-      "id": "welcome",
-      "label": "Welcome",
-      "icon": "phone"
-    },
-    {
-      "id": "form",
-      "label": "Sign-up form"
-    },
-    {
-      "id": "code",
-      "label": "Enter email code",
-      "icon": "mail"
-    },
-    {
-      "id": "home",
-      "label": "Home",
-      "icon": "home"
-    }
+    {"id": "cart", "code": "S13", "label": "Cart", "device": "phone", "size": "mini",
+     "fidelity": "L2", "zone": "co", "at": [0, 0], "elements": ["Checkout"]},
+    {"id": "pay", "code": "S21", "label": "Payment", "device": "phone", "size": "mini",
+     "fidelity": "L2", "zone": "co", "at": [0, 1], "elements": ["Pay"]},
+    {"id": "ok", "kind": "decision", "label": "Payment ok?", "trigger": "API result",
+     "system": "cloud", "at": [0, 2]},
+    {"id": "done", "code": "S22", "label": "Done", "device": "phone", "size": "mini",
+     "fidelity": "L2", "content": "success", "at": [0, 3]}
   ],
   "taps": [
-    {
-      "from": "begin",
-      "to": "welcome"
-    },
-    {
-      "from": "welcome",
-      "to": "form",
-      "label": "Sign up",
-      "main": true
-    },
-    {
-      "from": "form",
-      "to": "code",
-      "label": "Continue",
-      "main": true
-    },
-    {
-      "from": "code",
-      "to": "home",
-      "label": "Verify",
-      "main": true
-    },
-    {
-      "from": "code",
-      "to": "form",
-      "label": "Wrong email",
-      "style": "back"
-    }
+    {"from": "cart", "to": "pay", "trigger": "tap Checkout", "guard": "cart not empty", "main": true},
+    {"from": "pay", "to": "ok", "trigger": "tap Pay", "main": true},
+    {"from": "ok", "to": "done", "guard": "paid", "effect": "send receipt", "main": true},
+    {"from": "ok", "to": "pay", "guard": "declined", "kind": "failure"}
   ]
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
-- **Screen**: `id`, `label`, `kind` (`screen` default, `dialog`, `decision`, `start`, `end`), `detail`, `icon`, `tone`.
-- **Tap**: `from`, `to`, `label` (what the person does), `style` (`tap` solid, default; `back` dashed, for going back), `main: true` for the happy path.
-- Top level: `type` (`screen`), `title`, `desc`, optional `direction` (`down` default, or `right`).
-- Optional `at: [row, column]` on an item places it on an explicit grid cell. Use it only when the automatic placement is wrong.
-- Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
+Top level: `type` (`screen`), `title`, `desc`, `theme` (see the flowchart skill), `zones`, `screens`, `taps`, `buses`, `conditions` (`inline` default, or `coded`), `tab_count` (tabs in a tab bar, default 4).
 
-## Illustrated style
+### Screens and ids
 
-Add `"style": "illustrated"` at the top level to draw each box that has an `icon` as a card: a large icon on a tinted disc, the name in a pill, and the `detail` text under it. Boxes without an icon stay plain. Cards are bigger, so use it for a few boxes (about eight or fewer), give each a `tone` and a short `detail`, and keep names short: the name stays on one line. The default is `"style": "plain"`. Icons with a detailed drawing (shaded, with a highlight and a ground shadow) show it on a card in place of the disc: `bell calendar card cart chat cloud code database file folder globe key lock mail phone pot refund search server store user warn wifi`. More names that exist only in the detailed set and can be used in any spec: `admin api-gateway approved-doc backup-archive bar-chart batch-scheduler block-storage bot browser bucket cache cdn ci-cd cluster container container-registry containers courier cpu dashboard data-lake data-warehouse dns email-service error event event-stream file-storage firewall firewall-waf flag function gateway id-card idea identity-iam in-memory-cache info json kubernetes laptop launch load-balancer logging message-queue ml-model money monitoring nosql-database object-storage package pie-chart pipeline plugin private-network pub-sub pub-sub-topic queue region schedule secrets security serverless-function sql-database start stop success table target team terminal virtual-machine virtual-network workflow`.
+- **Item**: `id` (any name you use in `taps`), `label` (the name), `kind`, `at: [row, column]`, `zone`, `tone`.
+- **Kinds**: `screen` (default), `decision` (a diamond, no id), `start`, `end`, `entry` (a green pill in the left column; `label` is its source: App icon, Push, Deep link; `detail` a second line; `at` is `[row]`), `flag` (an off-page mark with `label` and `detail`, such as "To Checkout flow" and "diagram 02"), `tab` (one tab of a bar, with an `icon`).
+- **Screen id chip**: `code` is the id written on the chip, `S` and two digits (group digit: 0 onboarding, 1 browse, 2 checkout, 3 account), `W` for web (W01). Default: the `id`. A state of one screen shares its id: `"code": "S31", "state": "loading"` is `S31 · loading`. An overlay drawn on the screen it covers: `"overlay": "modal"` (or `sheet`, `toast`) gives `S12 + modal`. Give an overlay its own code only if it has onward arrows of its own.
+- **Device**: `device` is `phone` (default), `tablet`, `desktop` (a browser bar) or `watch`; `orientation` is `portrait` or `landscape`; `"size": "mini"` draws a phone at 120 × 240 for diagrams with many screens. Sizes: phone 156 × 324, tablet 164 × 236, desktop 240 × 170, watch 80 × 96 (landscape swaps them). Use the frame that matches the platform; never a badge.
+- **Fidelity** `L0` to `L3`. Every level has the width of the device frame and the same centre line, so raising a screen never moves an arrow.
+  - `L0`: a rounded card with the id and the name.
+  - `L1`: a frame with the same generic skeleton and "content TBD".
+  - `L2`: only the elements that cause a transition are drawn and named, the rest is hatched. `elements` is a list; each is a string (a primary button with a red dot where it was tapped) or an object `{"text", "style": "primary|secondary|outline|danger|field", "at": "top|bottom", "on": "overlay", "hotspot": false}`. `hatch` is the text of the hatched block (default "other content"). `content` replaces it with `splash`, `success`, `error`, `loading` or `empty`. `tab: 1` draws a tab bar with the second tab active.
+  - `L3`: a full wireframe. It is drawn as L2 for now; the wireframe blocks are not placed inside a screen yet. Say so to the user.
+  - `"undecided": true`: a dashed card with a TBD tag; the arrows into it are dashed.
+- **Overlays**: `overlay`, `overlay_title` (the title of a modal or the text of a toast); elements with `"on": "overlay"` belong to the overlay (the buttons of a modal, the rows of a sheet).
+
+### Arrows
+
+An arrow is written `trigger [guard] / effect`.
+
+- `trigger`: a chip. Dark when the user does it (verb plus target: tap Login, click product, swipe left). Slate with an icon when the system does: add `"system": "clock"` (time), `bolt` (event), `shield` (permission), `cloud` (API result), `phone` (device action). Use tap on touch, click on desktop.
+- `guard`: lower case, in brackets. Green on the success path, rose when `kind` is `failure`.
+- `effect`: grey, after a slash.
+- `kind`: `forward` (default), `main` (the happy path: blue, thick, animated; or `"main": true`; only one route per diagram), `failure` (rose), `back` (dashed slate, runs in a strip above the row), `retry` (dashed slate, returns to an earlier screen).
+- `route` (optional): `direct` keeps a back arrow straight between two frames, `elbow` leaves the top or bottom of the source and turns once into the side of the target.
+- `code`, `conditions: "coded"`: a label longer than about 20 characters, or shared by several arrows, becomes a code (C1, C2) on the arrow and a table below the diagram. The check warns about a long label.
+- Old specs still work: a spec with only `label` and `style` (`tap`, `back`) is drawn as plain boxes as before.
+
+### Layout
+
+- Rows and columns come from `at`. Gap between frames: 130 px when an arrow carries a chip, 96 px otherwise. Arrows leave the middle of the facing edge; two arrows between the same frames use the upper and lower third. A return that cannot turn once loops round the outside.
+- `zones`: `id`, `label`, `tone` (`blue`, `violet`, `amber`, `green`, `teal`, `gray`, `red`). Each is a dashed tinted frame with a pill; the id chip takes the zone colour. A zone is the box around its screens, so keep a zone's screens next to each other.
+- Rows of desktop screens are laid out in their own columns: the web flow goes in its own zone below the app flow.
+- **Tab bar**: one `tab` item per tab on one row, and `"buses": [{"trigger": "tap any tab", "to": ["tab1", "tab2"]}]`. The bar is drawn once as a bus. Then an arrow from each tab to the first screen of its stack. Screens that hide the bar go in their own zone.
+- Examples: `examples/shop-screen-flow.spec.json` (the complete shop app at mixed fidelity), `shop-highlight-screen-flow`, `shop-fidelity-screen-flow`, `shop-entry-screen-flow`, `shop-tabs-screen-flow`, `shop-overlays-screen-flow`, `shop-states-screen-flow`, `shop-coded-screen-flow`.
+- Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart` and the others of the icon library. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
 
 ## Limits to tell the user
 
-- Screens are plain boxes: there are no thumbnails or device frames, and no tabs or overlays as in the design.
-- Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
-- Fixes beyond the spec: see the flowchart skill (overrides file).
+- L3 is drawn as L2. The wireframe blocks are not placed inside a screen.
+- Elements are named, not laid out: the frame shows them in a fixed order (top ones, the hatched block, bottom ones, tab bar).
+- Routing follows the grid. If two arrows still share a corridor, the check says so; move a screen to another row or column.
+- Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor; the dark and slate chips are text with a background there, not pills.
+- An undefined `at` is placed by rank, which is rarely what you want for a diagram with zones: give `at` on every screen.
 
-Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`, `red`. Any other value is refused by the build.
 
-For a large or dense diagram (more than about 15 elements, many groups, or a hub with many lines) the automatic layout gives long pages and bundled lines; use the `author` skill (`/flow:author`) instead, which lays the diagram out by hand and looks at the result.
+For a diagram with more than about 25 items the automatic grid gives a very wide page; split it by zone into several specs, or use the `author` skill (`/flow:author`), which lays the diagram out by hand and looks at the result.

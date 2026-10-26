@@ -1,0 +1,231 @@
+{
+  "type": "screen",
+  "title": "Shop app · Tab navigation",
+  "desc": "A tab bar lets the user jump between any two tabs. Drawing every pair would need 12 arrows, so the bar is drawn once as a bus: one line into all four tabs. Each tab then has its own stack of screens. Screens that hide the bar sit outside the blue zone.",
+  "zones": [
+    {
+      "id": "tabs",
+      "label": "Tab bar visible",
+      "tone": "blue"
+    },
+    {
+      "id": "full",
+      "label": "Full screen, no tab bar",
+      "tone": "violet"
+    }
+  ],
+  "screens": [
+    {
+      "id": "t-home",
+      "code": "Home",
+      "label": "Home",
+      "at": [
+        0,
+        0
+      ],
+      "kind": "tab",
+      "icon": "home",
+      "zone": "tabs"
+    },
+    {
+      "id": "t-search",
+      "code": "Search",
+      "label": "Search",
+      "at": [
+        0,
+        1
+      ],
+      "kind": "tab",
+      "icon": "search",
+      "zone": "tabs"
+    },
+    {
+      "id": "t-profile",
+      "code": "Profile",
+      "label": "Profile",
+      "at": [
+        0,
+        2
+      ],
+      "kind": "tab",
+      "icon": "user",
+      "zone": "tabs"
+    },
+    {
+      "id": "t-cart",
+      "code": "Cart",
+      "label": "Cart",
+      "at": [
+        0,
+        3
+      ],
+      "kind": "tab",
+      "icon": "cart",
+      "zone": "tabs"
+    },
+    {
+      "id": "s10",
+      "code": "S10",
+      "label": "Home",
+      "at": [
+        1,
+        0
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "tabs",
+      "fidelity": "L2",
+      "tab": 0
+    },
+    {
+      "id": "s11",
+      "code": "S11",
+      "label": "Search",
+      "at": [
+        1,
+        1
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "tabs",
+      "fidelity": "L2",
+      "tab": 1
+    },
+    {
+      "id": "s30",
+      "code": "S30",
+      "label": "Profile",
+      "at": [
+        1,
+        2
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "tabs",
+      "fidelity": "L2",
+      "tab": 2
+    },
+    {
+      "id": "s13",
+      "code": "S13",
+      "label": "Cart",
+      "at": [
+        1,
+        3
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "tabs",
+      "fidelity": "L2",
+      "tab": 3
+    },
+    {
+      "id": "s20",
+      "code": "S20",
+      "label": "Checkout",
+      "at": [
+        1,
+        4
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "full",
+      "fidelity": "L2",
+      "elements": [
+        "Pay"
+      ]
+    },
+    {
+      "id": "s12",
+      "code": "S12",
+      "label": "Product",
+      "at": [
+        2,
+        0
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "tabs",
+      "fidelity": "L2",
+      "tab": 0
+    },
+    {
+      "id": "s15",
+      "code": "S15",
+      "label": "Results",
+      "at": [
+        2,
+        1
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "tabs",
+      "fidelity": "L2",
+      "tab": 1
+    },
+    {
+      "id": "s31",
+      "code": "S31",
+      "label": "Orders",
+      "at": [
+        2,
+        2
+      ],
+      "device": "phone",
+      "size": "mini",
+      "zone": "tabs",
+      "fidelity": "L2",
+      "tab": 2
+    }
+  ],
+  "taps": [
+    {
+      "from": "t-home",
+      "to": "s10"
+    },
+    {
+      "from": "t-search",
+      "to": "s11"
+    },
+    {
+      "from": "t-profile",
+      "to": "s30"
+    },
+    {
+      "from": "t-cart",
+      "to": "s13"
+    },
+    {
+      "from": "s10",
+      "to": "s12",
+      "trigger": "tap card"
+    },
+    {
+      "from": "s11",
+      "to": "s15",
+      "trigger": "tap result"
+    },
+    {
+      "from": "s30",
+      "to": "s31",
+      "trigger": "tap Orders"
+    },
+    {
+      "from": "s13",
+      "to": "s20",
+      "trigger": "tap Checkout",
+      "guard": "cart not empty"
+    }
+  ],
+  "buses": [
+    {
+      "trigger": "tap any tab",
+      "to": [
+        "t-home",
+        "t-search",
+        "t-profile",
+        "t-cart"
+      ]
+    }
+  ]
+}

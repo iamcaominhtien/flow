@@ -1,0 +1,229 @@
+{
+  "type": "screen",
+  "title": "Shop app · Entry points and links to other diagrams",
+  "desc": "An app is rarely entered from one place. Each way in is a green pill at the left and runs into the flow at the screen it opens, which may skip the screens a cold start passes through. Flags at the edge point to another diagram instead of repeating it here.",
+  "screens": [
+    {
+      "id": "app",
+      "code": "App icon",
+      "label": "App icon",
+      "at": [
+        0
+      ],
+      "kind": "entry",
+      "detail": "cold start"
+    },
+    {
+      "id": "push",
+      "code": "Push",
+      "label": "Push",
+      "at": [
+        1
+      ],
+      "kind": "entry",
+      "detail": "order shipped"
+    },
+    {
+      "id": "link",
+      "code": "Deep link",
+      "label": "Deep link",
+      "at": [
+        3
+      ],
+      "kind": "entry",
+      "detail": "shop://product/42"
+    },
+    {
+      "id": "widget",
+      "code": "Widget",
+      "label": "Widget",
+      "at": [
+        4
+      ],
+      "kind": "entry",
+      "detail": "recent items"
+    },
+    {
+      "id": "s00",
+      "code": "S00",
+      "label": "Splash",
+      "at": [
+        0,
+        0
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L0"
+    },
+    {
+      "id": "d1",
+      "kind": "decision",
+      "label": "Has session?",
+      "at": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "s10",
+      "code": "S10",
+      "label": "Home",
+      "at": [
+        0,
+        2
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L0"
+    },
+    {
+      "id": "d2",
+      "kind": "decision",
+      "label": "Has session?",
+      "at": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "s02",
+      "code": "S02",
+      "label": "Login",
+      "at": [
+        1,
+        1
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L0"
+    },
+    {
+      "id": "from-auth",
+      "code": "From Auth flow",
+      "label": "From Auth flow",
+      "at": [
+        1,
+        2
+      ],
+      "kind": "flag",
+      "detail": "diagram 01"
+    },
+    {
+      "id": "s31",
+      "code": "S31",
+      "label": "Order detail",
+      "at": [
+        2,
+        0
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L0"
+    },
+    {
+      "id": "s12",
+      "code": "S12",
+      "label": "Product",
+      "at": [
+        3,
+        2
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L0"
+    },
+    {
+      "id": "to-checkout",
+      "code": "To Checkout flow",
+      "label": "To Checkout flow",
+      "at": [
+        3,
+        3
+      ],
+      "kind": "flag",
+      "detail": "diagram 02"
+    },
+    {
+      "id": "s11",
+      "code": "S11",
+      "label": "Search",
+      "at": [
+        4,
+        2
+      ],
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L0"
+    }
+  ],
+  "taps": [
+    {
+      "from": "app",
+      "to": "s00",
+      "trigger": "tap app icon"
+    },
+    {
+      "from": "s00",
+      "to": "d1",
+      "trigger": "auto 2 s",
+      "system": "clock"
+    },
+    {
+      "from": "d1",
+      "to": "s10",
+      "guard": "session valid"
+    },
+    {
+      "from": "d1",
+      "to": "s02",
+      "guard": "no session",
+      "kind": "failure"
+    },
+    {
+      "from": "push",
+      "to": "d2",
+      "trigger": "tap notification"
+    },
+    {
+      "from": "d2",
+      "to": "s02",
+      "guard": "no session",
+      "kind": "failure"
+    },
+    {
+      "from": "d2",
+      "to": "s31",
+      "guard": "session valid"
+    },
+    {
+      "from": "from-auth",
+      "to": "s02",
+      "trigger": "from Auth flow",
+      "system": "link",
+      "kind": "back",
+      "route": "direct"
+    },
+    {
+      "from": "s02",
+      "to": "s31",
+      "guard": "resume push target",
+      "route": "elbow"
+    },
+    {
+      "from": "link",
+      "to": "s12",
+      "trigger": "open link",
+      "guard": "product exists"
+    },
+    {
+      "from": "s12",
+      "to": "to-checkout",
+      "trigger": "tap Buy"
+    },
+    {
+      "from": "widget",
+      "to": "s11",
+      "trigger": "tap widget"
+    }
+  ]
+}

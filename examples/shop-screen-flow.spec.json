@@ -1,0 +1,579 @@
+{
+  "type": "screen",
+  "title": "Shop app · Screen flow",
+  "desc": "Phone app: 14 screens and 2 decisions. Desktop web, at the bottom: 8 screens and 1 decision, with its own flow. Drawn at mixed fidelity. Dark chip: the user acts. Slate chip: the system moves on. Green and rose: success and failure paths. Dashed: back or retry.",
+  "zones": [
+    {
+      "id": "auth",
+      "label": "Onboarding and sign-in"
+    },
+    {
+      "id": "browse",
+      "label": "Browse and shop"
+    },
+    {
+      "id": "checkout",
+      "label": "Checkout and orders"
+    },
+    {
+      "id": "web",
+      "label": "Desktop web"
+    }
+  ],
+  "screens": [
+    {
+      "id": "s00",
+      "code": "S00",
+      "label": "Splash",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "auth",
+      "at": [
+        0,
+        0
+      ],
+      "content": "splash"
+    },
+    {
+      "id": "has-session",
+      "kind": "decision",
+      "label": "Has session?",
+      "zone": "auth",
+      "at": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "s01",
+      "code": "S01",
+      "label": "Welcome",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L1",
+      "zone": "auth",
+      "at": [
+        0,
+        2
+      ]
+    },
+    {
+      "id": "s02",
+      "code": "S02",
+      "label": "Login",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "auth",
+      "at": [
+        0,
+        3
+      ],
+      "elements": [
+        "Login button"
+      ]
+    },
+    {
+      "id": "s03",
+      "code": "S03",
+      "label": "Sign up",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "auth",
+      "at": [
+        0,
+        4
+      ],
+      "elements": [
+        "Create account"
+      ]
+    },
+    {
+      "id": "s30",
+      "code": "S30",
+      "label": "Profile",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "browse",
+      "at": [
+        1,
+        0
+      ],
+      "elements": [
+        {
+          "text": "Orders row",
+          "style": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "s10",
+      "code": "S10",
+      "label": "Home",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "browse",
+      "at": [
+        1,
+        1
+      ],
+      "elements": [
+        {
+          "text": "Search bar",
+          "style": "secondary",
+          "at": "top"
+        },
+        {
+          "text": "Profile tab",
+          "style": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "s11",
+      "code": "S11",
+      "label": "Search",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "browse",
+      "at": [
+        1,
+        2
+      ],
+      "elements": [
+        {
+          "text": "Result item",
+          "style": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "s12",
+      "code": "S12",
+      "label": "Product",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "browse",
+      "at": [
+        1,
+        3
+      ],
+      "elements": [
+        "Add to cart"
+      ]
+    },
+    {
+      "id": "s13",
+      "code": "S13",
+      "label": "Cart",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "browse",
+      "at": [
+        1,
+        4
+      ],
+      "elements": [
+        "Checkout"
+      ]
+    },
+    {
+      "id": "s31",
+      "code": "S31",
+      "label": "Orders",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L0",
+      "zone": "checkout",
+      "at": [
+        2,
+        0
+      ]
+    },
+    {
+      "id": "s20",
+      "code": "S20",
+      "label": "Address",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "checkout",
+      "at": [
+        2,
+        1
+      ],
+      "elements": [
+        "Continue"
+      ]
+    },
+    {
+      "id": "s21",
+      "code": "S21",
+      "label": "Payment",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "checkout",
+      "at": [
+        2,
+        2
+      ],
+      "elements": [
+        "Pay"
+      ]
+    },
+    {
+      "id": "pay-ok",
+      "kind": "decision",
+      "label": "Payment ok?",
+      "trigger": "API result",
+      "system": "cloud",
+      "zone": "checkout",
+      "at": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": "s22",
+      "code": "S22",
+      "label": "Done",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "checkout",
+      "at": [
+        2,
+        4
+      ],
+      "content": "success"
+    },
+    {
+      "id": "s23",
+      "code": "S23",
+      "label": "Payment failed",
+      "device": "phone",
+      "size": "mini",
+      "fidelity": "L2",
+      "zone": "checkout",
+      "at": [
+        3,
+        3
+      ],
+      "content": "error",
+      "elements": [
+        {
+          "text": "Retry button",
+          "style": "outline"
+        }
+      ]
+    },
+    {
+      "id": "w01",
+      "code": "W01",
+      "label": "Login",
+      "device": "desktop",
+      "fidelity": "L2",
+      "zone": "web",
+      "at": [
+        4,
+        0
+      ],
+      "elements": [
+        "Login button"
+      ]
+    },
+    {
+      "id": "w02",
+      "code": "W02",
+      "label": "Home",
+      "device": "desktop",
+      "fidelity": "L2",
+      "zone": "web",
+      "at": [
+        4,
+        1
+      ],
+      "elements": [
+        {
+          "text": "Product card",
+          "style": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "w03",
+      "code": "W03",
+      "label": "Product",
+      "device": "desktop",
+      "fidelity": "L2",
+      "zone": "web",
+      "at": [
+        4,
+        2
+      ],
+      "elements": [
+        "Add to cart"
+      ]
+    },
+    {
+      "id": "w04",
+      "code": "W04",
+      "label": "Cart",
+      "device": "desktop",
+      "fidelity": "L2",
+      "zone": "web",
+      "at": [
+        4,
+        3
+      ],
+      "elements": [
+        "Checkout"
+      ]
+    },
+    {
+      "id": "w05",
+      "code": "W05",
+      "label": "Checkout (one page)",
+      "device": "desktop",
+      "fidelity": "L2",
+      "zone": "web",
+      "at": [
+        5,
+        0
+      ],
+      "hatch": "address and payment",
+      "elements": [
+        "Pay"
+      ]
+    },
+    {
+      "id": "web-pay-ok",
+      "kind": "decision",
+      "label": "Payment ok?",
+      "trigger": "API result",
+      "system": "cloud",
+      "zone": "web",
+      "at": [
+        5,
+        1
+      ]
+    },
+    {
+      "id": "w06",
+      "code": "W06",
+      "label": "Done",
+      "device": "desktop",
+      "fidelity": "L2",
+      "zone": "web",
+      "at": [
+        5,
+        2
+      ],
+      "elements": [
+        {
+          "text": "View orders",
+          "style": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "w08",
+      "code": "W08",
+      "label": "Orders",
+      "device": "desktop",
+      "fidelity": "L2",
+      "zone": "web",
+      "at": [
+        5,
+        3
+      ],
+      "hatch": "orders table"
+    },
+    {
+      "id": "w07",
+      "code": "W07",
+      "label": "Payment failed",
+      "device": "desktop",
+      "fidelity": "L2",
+      "zone": "web",
+      "at": [
+        6,
+        1
+      ],
+      "hatch": "Your card was declined",
+      "elements": [
+        {
+          "text": "Retry button",
+          "style": "outline"
+        }
+      ]
+    }
+  ],
+  "taps": [
+    {
+      "from": "s00",
+      "to": "has-session",
+      "trigger": "auto 2 s",
+      "system": "clock"
+    },
+    {
+      "from": "has-session",
+      "to": "s10",
+      "guard": "session valid"
+    },
+    {
+      "from": "has-session",
+      "to": "s01",
+      "guard": "no session",
+      "kind": "failure"
+    },
+    {
+      "from": "s01",
+      "to": "s02",
+      "trigger": "tap Log in"
+    },
+    {
+      "from": "s01",
+      "to": "s03",
+      "trigger": "tap Sign up"
+    },
+    {
+      "from": "s02",
+      "to": "s10",
+      "trigger": "tap Login",
+      "guard": "valid",
+      "effect": "save token"
+    },
+    {
+      "from": "s03",
+      "to": "s10",
+      "trigger": "tap Create account",
+      "guard": "account created"
+    },
+    {
+      "from": "s10",
+      "to": "s30",
+      "trigger": "tap Profile tab"
+    },
+    {
+      "from": "s10",
+      "to": "s11",
+      "trigger": "tap search"
+    },
+    {
+      "from": "s11",
+      "to": "s12",
+      "trigger": "tap result"
+    },
+    {
+      "from": "s12",
+      "to": "s11",
+      "trigger": "back",
+      "kind": "back"
+    },
+    {
+      "from": "s12",
+      "to": "s13",
+      "trigger": "add to cart",
+      "guard": "in stock"
+    },
+    {
+      "from": "s13",
+      "to": "s20",
+      "trigger": "tap Checkout",
+      "guard": "cart not empty"
+    },
+    {
+      "from": "s30",
+      "to": "s31",
+      "trigger": "tap Orders"
+    },
+    {
+      "from": "s20",
+      "to": "s21",
+      "trigger": "tap Continue",
+      "guard": "address valid"
+    },
+    {
+      "from": "s21",
+      "to": "pay-ok",
+      "trigger": "tap Pay"
+    },
+    {
+      "from": "pay-ok",
+      "to": "s22",
+      "guard": "paid",
+      "effect": "send receipt"
+    },
+    {
+      "from": "pay-ok",
+      "to": "s23",
+      "guard": "declined",
+      "kind": "failure"
+    },
+    {
+      "from": "s23",
+      "to": "s21",
+      "trigger": "tap Retry",
+      "kind": "retry"
+    },
+    {
+      "from": "w01",
+      "to": "w02",
+      "trigger": "click Login",
+      "guard": "valid"
+    },
+    {
+      "from": "w02",
+      "to": "w03",
+      "trigger": "click product"
+    },
+    {
+      "from": "w03",
+      "to": "w04",
+      "trigger": "add to cart"
+    },
+    {
+      "from": "w04",
+      "to": "w05",
+      "trigger": "click Checkout",
+      "guard": "cart not empty"
+    },
+    {
+      "from": "w05",
+      "to": "web-pay-ok",
+      "trigger": "click Pay"
+    },
+    {
+      "from": "web-pay-ok",
+      "to": "w06",
+      "guard": "paid",
+      "effect": "send receipt"
+    },
+    {
+      "from": "web-pay-ok",
+      "to": "w07",
+      "guard": "declined",
+      "kind": "failure"
+    },
+    {
+      "from": "w07",
+      "to": "w05",
+      "trigger": "click Retry",
+      "kind": "retry"
+    },
+    {
+      "from": "w06",
+      "to": "w08",
+      "trigger": "view orders"
+    }
+  ]
+}

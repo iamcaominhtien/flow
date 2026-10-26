@@ -1,0 +1,115 @@
+{
+  "type": "screen",
+  "title": "Orders screen · States of one screen",
+  "desc": "Loading, data, empty and error are not four screens. They are four states of S31 and share its id. Loading is the hub: every state is reached from it, and refresh or retry returns to it.",
+  "screens": [
+    {
+      "id": "begin",
+      "kind": "start",
+      "at": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "loading",
+      "code": "S31",
+      "label": "Orders",
+      "at": [
+        1,
+        1
+      ],
+      "device": "phone",
+      "size": "mini",
+      "state": "loading",
+      "fidelity": "L2",
+      "content": "loading"
+    },
+    {
+      "id": "data",
+      "code": "S31",
+      "label": "Orders",
+      "at": [
+        2,
+        0
+      ],
+      "device": "phone",
+      "size": "mini",
+      "state": "data",
+      "fidelity": "L2"
+    },
+    {
+      "id": "empty",
+      "code": "S31",
+      "label": "Orders",
+      "at": [
+        2,
+        1
+      ],
+      "device": "phone",
+      "size": "mini",
+      "state": "empty",
+      "fidelity": "L2",
+      "content": "empty",
+      "hatch": "No orders yet",
+      "elements": [
+        "Browse shop"
+      ]
+    },
+    {
+      "id": "error",
+      "code": "S31",
+      "label": "Orders",
+      "at": [
+        2,
+        2
+      ],
+      "device": "phone",
+      "size": "mini",
+      "state": "error",
+      "fidelity": "L2",
+      "content": "error",
+      "elements": [
+        {
+          "text": "Retry",
+          "style": "outline"
+        }
+      ]
+    }
+  ],
+  "taps": [
+    {
+      "from": "begin",
+      "to": "loading",
+      "trigger": "open Orders"
+    },
+    {
+      "from": "loading",
+      "to": "data",
+      "guard": "has data"
+    },
+    {
+      "from": "loading",
+      "to": "empty",
+      "guard": "no data"
+    },
+    {
+      "from": "loading",
+      "to": "error",
+      "guard": "request failed",
+      "kind": "failure"
+    },
+    {
+      "from": "data",
+      "to": "loading",
+      "trigger": "pull to refresh",
+      "kind": "retry"
+    },
+    {
+      "from": "error",
+      "to": "loading",
+      "trigger": "tap Retry",
+      "kind": "retry"
+    }
+  ]
+}
