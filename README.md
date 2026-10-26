@@ -79,6 +79,7 @@ To export to PNG, SVG or PDF, also run `/plugin marketplace add jgraph/drawio-mc
 | Skill | Draws |
 | --- | --- |
 | `/flow:flowchart` | Flowcharts, top to bottom or left to right, with swimlanes and an overrides file for fixes |
+| `/flow:author` | For large or dense diagrams of any type: Claude lays the diagram out by hand in a script of its own, using a small kit that keeps the design, and looks at the result and improves it |
 | `/flow:sequence` | Sequence diagrams: activation bars, fragments, notes, create and destroy |
 | `/flow:er` | ER diagrams: tables, keys, crow's-foot cardinality |
 | `/flow:architecture`, `/flow:cloud`, `/flow:c4` | Components in nested zones; cloud resources; C4 elements |
