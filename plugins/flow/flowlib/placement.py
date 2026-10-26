@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass, replace
 
 from .layered import Grid
-from .model import DEFAULT_FONT_SIZE_PX, Direction, Frame, Node, Point, Shape
+from .model import DEFAULT_FONT_SIZE_PX, Direction, Frame, FrameVariant, Node, Point, Shape
 from .sizing import FittedNode, NodeContent, fit_card, fit_node, fit_table
 from .spec import Spec, SpecEdge, SpecNode
 from .theme import LayoutRules
@@ -146,7 +146,7 @@ def _layout_sizes(spec: Spec, rules: LayoutRules) -> dict[str, FittedNode]:
 
 
 def _lane_frames(
-    spec: Spec, bands: dict[int, tuple[float, float]], rows: tuple[float, float], pad: float
+    spec: Spec, bands: dict[int, tuple[float, float]], rows: tuple[float, float], rules: LayoutRules
 ) -> tuple[Frame, ...]:
     """Build one frame per swimlane, covering the whole length of the flow.
 
@@ -154,21 +154,24 @@ def _lane_frames(
         spec: The flowchart description, with its lanes.
         bands: Lane index to the left edge and the width of its band.
         rows: The top and bottom of the nodes along the flow.
-        pad: Space kept between the nodes and the end of a lane.
+        rules: The layout rules: the space kept between the nodes and the end of a lane, and
+            the room for the tab that holds the lane's name at the start of the flow.
 
     Returns:
         The frames, in lane order.
     """
     top, bottom = rows
+    pad, tab = rules.lane_padding, rules.lane_tab
     return tuple(
         Frame(
             id=f"lane-{lane.id}",
             x=bands[index][0],
-            y=top - pad,
+            y=top - pad - tab,
             width=bands[index][1],
-            height=bottom - top + 2 * pad,
+            height=bottom - top + 2 * pad + tab,
             label=lane.label,
             tone=lane.tone,
+            variant=FrameVariant.LANE,
         )
         for index, lane in enumerate(spec.lanes)
     )
@@ -182,7 +185,7 @@ def page_origin(spec: Spec, rules: LayoutRules) -> tuple[float, float]:
     """
     title = rules.title_block_height if spec.title else 0
     is_down = spec.direction is Direction.DOWN
-    lane_room = rules.lane_padding if spec.lanes else 0
+    lane_room = rules.lane_padding + rules.lane_tab if spec.lanes else 0
     return rules.margin + (0 if is_down else title), rules.margin + (
         title if is_down else 0
     ) + lane_room
@@ -236,7 +239,10 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
     else:
         center_x = _column_centers(spec, grid, fitted, rules)
     if spec.lanes and not bands:
-        bands = {index: (center_x[index] - widths[index] / 2, widths[index]) for index in center_x}
+        bands = {
+            index: (center_x[index] - size / 2, size)
+            for index, size in _lane_widths(widths, rules).items()
+        }
     heights: dict[int, float] = defaultdict(float)
     for node_id, size in fitted.items():
         heights[grid.rank[node_id]] = max(heights[grid.rank[node_id]], size.height)
@@ -256,16 +262,21 @@ def place_nodes(spec: Spec, grid: Grid, base_rules: LayoutRules) -> Placement:
     return _with_frames(spec, nodes, bands, rules)
 
 
+def _lane_widths(widths: dict[int, float], rules: LayoutRules) -> dict[int, float]:
+    """Return the width of the lane of each column: the widest node plus padding, or a minimum."""
+    return {
+        index: max(rules.lane_min_size, width + 2 * rules.lane_padding)
+        for index, width in widths.items()
+    }
+
+
 def _column_centers(
     spec: Spec, grid: Grid, fitted: dict[str, FittedNode], rules: LayoutRules
 ) -> dict[int, float]:
     """Return the centre x of each column when the columns are not lane-owned."""
     widths = _column_widths(fitted, grid.column)
     if spec.lanes:
-        widths = {
-            index: max(rules.lane_min_size, width + 2 * rules.lane_padding)
-            for index, width in widths.items()
-        }
+        widths = _lane_widths(widths, rules)
     column_gaps = (
         (0.0, 0.0) if spec.lanes else (rules.gap_horizontal, rules.gap_horizontal_labelled)
     )
@@ -331,7 +342,7 @@ def _with_frames(
     frames: tuple[Frame, ...] = ()
     if spec.lanes:
         row_span = (min(node.y for node in nodes.values()), bottom)
-        frames = _lane_frames(spec, bands, row_span, rules.lane_padding)
+        frames = _lane_frames(spec, bands, row_span, rules)
     if spec.zones:
         frames = frames + zone_frames(spec, nodes, rules)
     if frames:

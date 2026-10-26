@@ -45,6 +45,7 @@ DESCRIPTION_FONT_SIZE_PX = 13
 DESCRIPTION_HEIGHT_PX = 44
 DESCRIPTION_MAX_WIDTH_PX = 900
 FRAME_CORNER_PERCENT = 6
+LANE_TAB_FONT_SIZE = 13
 PARALLELOGRAM_SLANT_MAX_PX = 18
 PARALLELOGRAM_SLANT_DIVISOR = 6
 HEXAGON_SLANT_MAX_PX = 20
@@ -454,6 +455,9 @@ def _add_frame(root: ET.Element, frame: Frame, theme: Theme) -> None:
     if frame.variant is FrameVariant.FRAGMENT:
         _add_fragment(root, frame, theme)
         return
+    if frame.variant is FrameVariant.LANE:
+        _add_lane(root, frame, theme)
+        return
     tone = theme.tones[frame.tone]
     style = style_string(
         {
@@ -476,6 +480,43 @@ def _add_frame(root: ET.Element, frame: Frame, theme: Theme) -> None:
     )
     cell = add_vertex(root, f"frame-{frame.id}", esc(frame.label or ""), style)
     add_geometry(cell, (frame.x, frame.y, frame.width, frame.height))
+
+
+def _add_lane(root: ET.Element, frame: Frame, theme: Theme) -> None:
+    """Add a swimlane: a lightly tinted band and, on top of it, a dark tab with the lane's name."""
+    tone = theme.tones[frame.tone]
+    band = style_string(
+        {
+            "rounded": 0,
+            "html": 1,
+            "fillColor": tone.lane,
+            "strokeColor": tone.pill,
+            "strokeWidth": 1,
+        }
+    )
+    add_geometry(
+        add_vertex(root, f"frame-{frame.id}", "", band),
+        (frame.x, frame.y, frame.width, frame.height),
+    )
+    tab_size = load_theme().layout.lane_tab
+    is_row = frame.width >= frame.height
+    tab = style_string(
+        {
+            "rounded": 0,
+            "html": 1,
+            "fillColor": tone.accent,
+            "strokeColor": "none",
+            "fontColor": "#FFFFFF",
+            "fontStyle": FONT_BOLD,
+            "fontSize": LANE_TAB_FONT_SIZE,
+            "fontFamily": theme.fonts.sans,
+            "horizontal": 0 if is_row else 1,
+            "whiteSpace": "wrap",
+        }
+    )
+    size = (tab_size, frame.height) if is_row else (frame.width, tab_size)
+    cell = add_vertex(root, f"tab-{frame.id}", esc(frame.label or ""), tab)
+    add_geometry(cell, (frame.x, frame.y, *size))
 
 
 def _guard_style(theme: Theme) -> str:

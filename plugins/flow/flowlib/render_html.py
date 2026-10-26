@@ -47,6 +47,9 @@ PILL_PADDING_X_PX = 12
 PILL_FONT_SIZE_PX = 12
 PILL_RADIUS_PX = 999
 
+LANE_BORDER_PX = 1  # the thin outline of a swimlane
+LANE_TAB_FONT_SIZE_PX = 13
+
 # Fragment frame
 FRAGMENT_RADIUS_PX = 8
 FRAGMENT_TAG_HEIGHT_PX = 18
@@ -82,6 +85,8 @@ def _frame_html(frame: Frame, theme: Theme) -> str:
     """Draw one frame: a tinted area with a label pill, or a fragment with a tag and a guard."""
     if frame.variant is FrameVariant.FRAGMENT:
         return _fragment_html(frame, theme)
+    if frame.variant is FrameVariant.LANE:
+        return _lane_html(frame, theme)
     tone = theme.tones[frame.tone]
     area = {
         **ABSOLUTE,
@@ -113,6 +118,49 @@ def _frame_html(frame: Frame, theme: Theme) -> str:
         }
         html += tag("div", pill, esc(frame.label))
     return html
+
+
+def _lane_html(frame: Frame, theme: Theme) -> str:
+    """Draw a swimlane: a lightly tinted band with its name on a dark tab at the start.
+
+    The tab is at the left of a lane that is wider than it is tall, and at the top of a tall one.
+    """
+    tone = theme.tones[frame.tone]
+    area = {
+        **ABSOLUTE,
+        "left": px(frame.x),
+        "top": px(frame.y),
+        "width": px(frame.width),
+        "height": px(frame.height),
+        "box-sizing": "border-box",
+        "background": tone.lane,
+        "border": f"{px(LANE_BORDER_PX)} solid {tone.pill}",
+    }
+    html = tag("div", area, data_id=frame.id)
+    tab_size = load_theme().layout.lane_tab
+    is_row = frame.width >= frame.height
+    tab = {
+        **ABSOLUTE,
+        "left": px(frame.x),
+        "top": px(frame.y),
+        "width": px(tab_size if is_row else frame.width),
+        "height": px(frame.height if is_row else tab_size),
+        "box-sizing": "border-box",
+        "background": tone.accent,
+        "color": "#FFFFFF",
+        "font-size": px(LANE_TAB_FONT_SIZE_PX),
+        "font-weight": "700",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "text-align": "center",
+        "overflow": "hidden",
+    }
+    if is_row:
+        tab["writing-mode"] = "vertical-rl"
+        tab["transform"] = "rotate(180deg)"
+        tab["transform-origin"] = "center"
+    return html + tag("div", tab, esc(frame.label or ""))
 
 
 def _mono_font(theme: Theme) -> str:

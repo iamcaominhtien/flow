@@ -104,9 +104,10 @@ SYMBOL_HEADS = (
 
 
 class FrameVariant(StrEnum):
-    """How a frame is drawn: a tinted area (lane, zone) or a bordered fragment with a tag."""
+    """How a frame is drawn: a tinted area (zone), a lane with a tab, or a fragment with a tag."""
 
     AREA = "area"
+    LANE = "lane"
     FRAGMENT = "fragment"
 
 

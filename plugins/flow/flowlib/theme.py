@@ -35,6 +35,8 @@ class ToneColors:
     box: str
     pill: str
     stroke: str
+    accent: str
+    lane: str
 
 
 @dataclass(frozen=True)
@@ -90,6 +92,7 @@ class LayoutRules:
     zone_padding: float
     zone_label_room: float
     lane_padding: float
+    lane_tab: float
     fold_extent: float
     band_gap: float
     lane_min_size: float

@@ -96,32 +96,44 @@
     "blue": {
       "box": "#DCEEFB",
       "pill": "#BFDBFE",
-      "stroke": "#60A5FA"
+      "stroke": "#60A5FA",
+      "accent": "#1D4ED8",
+      "lane": "#EEF5FF"
     },
     "violet": {
       "box": "#E6E3FB",
       "pill": "#CFC8F7",
-      "stroke": "#8B7FE8"
+      "stroke": "#8B7FE8",
+      "accent": "#5B4BD6",
+      "lane": "#F3F0FF"
     },
     "amber": {
       "box": "#FFF1DD",
       "pill": "#FFD9A3",
-      "stroke": "#F59E3A"
+      "stroke": "#F59E3A",
+      "accent": "#B45309",
+      "lane": "#FFF5E9"
     },
     "green": {
       "box": "#DCF5E1",
       "pill": "#B5EBC1",
-      "stroke": "#4CC38A"
+      "stroke": "#4CC38A",
+      "accent": "#15803D",
+      "lane": "#EEFAF0"
     },
     "teal": {
       "box": "#D3F3EF",
       "pill": "#A8E6DE",
-      "stroke": "#2BB3A6"
+      "stroke": "#2BB3A6",
+      "accent": "#0F766E",
+      "lane": "#E8F8F5"
     },
     "gray": {
       "box": "#F1F5F9",
       "pill": "#E2E8F0",
-      "stroke": "#94A3B8"
+      "stroke": "#94A3B8",
+      "accent": "#475569",
+      "lane": "#F6F8FA"
     }
   },
   "roles": {
@@ -345,7 +357,8 @@
     "card_gap": 10,
     "card_pill_height": 26,
     "card_pill_padding": 12,
-    "card_icon_fraction": 0.55
+    "card_icon_fraction": 0.55,
+    "lane_tab": 44
   },
   "sequence": {
     "participant_width": 135,
