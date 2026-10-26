@@ -4,15 +4,12 @@ import math
 import xml.etree.ElementTree as ET
 from itertools import pairwise
 
-from .drawio_common import FONT_BOLD, LAYER_CELL_ID, add_geometry, add_vertex, style_string
+from .drawio_common import LAYER_CELL_ID, add_geometry, add_vertex, font_style, style_string
 from .markup import esc, fmt
 from .model import SYMBOL_HEADS, Edge, EdgeLabel, Head, Node, Point
 from .theme import LineStyle, Theme
 
-CHIP_FONT_SIZE_PX = 11
 CHIP_SPACING_PX = 3  # room around the text of a label chip
-MILLISECONDS_PER_SECOND = 1000
-DRAWIO_CYCLE_PX = 16  # draw.io spends ``flowAnimationDuration`` ms per 16 px of dash cycle
 ARROW_SIZE_PER_STROKE = 3  # ``endSize`` per pixel of line width, tuned by eye against the HTML
 NO_COLOR = "none"
 DEFAULT_DASH = "6 5"  # for a line that is dashed by choice, not by its role
@@ -98,21 +95,23 @@ def _dash_pattern(dash: str, width: float) -> str:
     return " ".join(fmt(float(length) / width) for length in dash.split())
 
 
-def _flow_duration_ms(dash: str | None, seconds: float) -> int:
-    """Return the ``flowAnimationDuration`` that makes a line move as fast as in the HTML page.
+def drawio_width(line: LineStyle, theme: Theme) -> float:
+    """Return the draw.io ``strokeWidth`` of a line role.
 
-    draw.io runs one dash cycle in ``duration * cycle / DRAWIO_CYCLE_PX`` milliseconds, while the
-    page runs one cycle in ``seconds``; this solves for ``duration``.
+    An animated line takes the width of its tier (design 01 section 6.3); any other line takes
+    the entry of the weight table for its canvas width, and keeps that width when the table has
+    no entry for it.
 
     Args:
-        dash: The dash pattern in pixels, such as ``"10 8"``; None is not animated.
-        seconds: How long one dash cycle lasts in the HTML page.
+        line: The role's line style, whose width is in canvas pixels.
+        theme: The design tokens, which hold the table and the tiers.
 
     Returns:
-        The duration in milliseconds.
+        The stroke width to write.
     """
-    cycle = sum(float(length) for length in (dash or "").split())
-    return round(seconds * MILLISECONDS_PER_SECOND * DRAWIO_CYCLE_PX / cycle)
+    if line.animation:
+        return theme.animations[line.animation].drawio_width
+    return theme.drawio_weights.get(line.width, line.width)
 
 
 def _end_style(edge: Edge, line: LineStyle) -> dict[str, object]:
@@ -149,8 +148,8 @@ def _label_style(edge: Edge, theme: Theme) -> dict[str, object]:
     chip = theme.chips[edge.label.kind]
     style: dict[str, object] = {
         "fontColor": chip.foreground,
-        "fontSize": CHIP_FONT_SIZE_PX,
-        "fontStyle": FONT_BOLD,
+        "fontSize": fmt(theme.type_scale.edge.size),
+        "fontStyle": font_style(theme.type_scale.edge.weight),
         "spacing": CHIP_SPACING_PX,
     }
     if chip.background != NO_COLOR:
@@ -165,18 +164,18 @@ def _edge_style(edge: Edge, nodes: dict[str, Node], theme: Theme) -> str:
         "html": 1,
         "rounded": 0,
         "strokeColor": line.color,
-        "strokeWidth": fmt(line.width),
+        "strokeWidth": fmt(drawio_width(line, theme)),
         **_end_style(edge, line),
         "fontFamily": theme.fonts.sans,
     }
     dash = line.dash or (DEFAULT_DASH if edge.dashed else None)
     if dash:
         style["dashed"] = 1
-        style["dashPattern"] = _dash_pattern(dash, line.width)
+        style["dashPattern"] = _dash_pattern(dash, drawio_width(line, theme))
     if line.animation:
         style["flowAnimation"] = 1
         speed = theme.animations[line.animation]
-        style["flowAnimationDuration"] = _flow_duration_ms(line.dash, speed.seconds)
+        style["flowAnimationDuration"] = speed.drawio_duration_ms
     style.update(_port_style(edge, nodes))
     style.update(_label_style(edge, theme))
     return style_string(style)
@@ -242,8 +241,8 @@ def _add_extra(root: ET.Element, cell_id: str, extra: EdgeLabel, theme: Theme) -
             "verticalAlign": "middle",
             "strokeColor": "none",
             "fillColor": "none",
-            "fontSize": CHIP_FONT_SIZE_PX,
-            "fontStyle": FONT_BOLD,
+            "fontSize": fmt(theme.type_scale.mono.size),
+            "fontStyle": font_style(theme.type_scale.mono.weight),
             "fontColor": chip.foreground,
             "fontFamily": theme.fonts.mono,
         }

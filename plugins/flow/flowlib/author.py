@@ -18,6 +18,7 @@ from .canvas import fit_canvas
 from .labels import place_labels
 from .model import (
     DEFAULT_FONT_SIZE_PX,
+    DEFAULT_THEME,
     Edge,
     EdgeLabel,
     Frame,
@@ -43,7 +44,7 @@ from .sizing import (
     wrap_text,
 )
 from .text_area import text_area_width
-from .theme import LayoutRules, load_theme
+from .theme import LayoutRules, load_theme, theme_names
 
 CAPTIONED_SHAPES = {Shape.START, Shape.END, Shape.INTERMEDIATE, Shape.ACTOR}  # the text goes under
 LABEL_KIND_OF_ROLE = {Role.YES: LabelKind.YES, Role.NO: LabelKind.NO, Role.BACK: LabelKind.BACK}
@@ -130,6 +131,7 @@ class Canvas:
     boxes: dict[str, Box] = field(default_factory=dict)
     frames: list[Frame] = field(default_factory=list)
     edges: list[Edge] = field(default_factory=list)
+    theme: str = DEFAULT_THEME  # ``pastel``, ``technical`` or ``midnight``
 
     def lane(
         self, name: str, label: str, tone: Tone, bounds: tuple[float, float, float, float]
@@ -297,7 +299,15 @@ class Canvas:
         return line
 
     def scene(self) -> Scene:
-        """Return the finished scene: labels moved off boxes, canvas sized to hold everything."""
+        """Return the finished scene: labels moved off boxes, canvas sized to hold everything.
+
+        Raises:
+            ValueError: If ``theme`` is not one of the themes.
+        """
+        if self.theme not in theme_names():
+            raise ValueError(
+                f"unknown theme '{self.theme}'; use one of: {', '.join(theme_names())}"
+            )
         done = Scene(
             width=0,
             height=0,
@@ -306,6 +316,7 @@ class Canvas:
             frames=tuple(self.frames),
             nodes=tuple(box.node for box in self.boxes.values()),
             edges=tuple(self.edges),
+            theme=self.theme,
         )
         return fit_canvas(place_labels(done))
 

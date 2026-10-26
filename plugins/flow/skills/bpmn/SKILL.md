@@ -146,6 +146,7 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **Element**: `id`, `label`, `kind`: `task` (default), `subprocess`, `gateway` (an empty diamond), `exclusive` (diamond with an X), `parallel` (diamond with a +), `start`, `end`, `event` (plain intermediate event), `timer`, `message`, `error` (intermediate events with a clock, an envelope or a warning mark), `document`. Start, end, event and gateway kinds need no label; a label on an event sits under it.
 - **Zone**: a pool or lane, drawn as a swimlane: `id`, `label`, `tone`. When there are zones, every element needs one (`zone`), and the build refuses an element without one. Zones are laid out side by side; nesting (`parent`) is not used.
 - **Flow**: `from`, `to`, `label`, `style`: `sequence` (solid, default) or `message` (dashed, a dot at the start and an open arrow, for messages between pools), `main: true`.

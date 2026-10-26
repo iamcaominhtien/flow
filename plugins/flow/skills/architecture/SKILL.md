@@ -39,6 +39,7 @@ You write a short **spec**: the zones, the components and the links. A script pl
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **Zone**: `id`, `label`, optional `tone`, optional `parent` (another zone) to nest it.
 - **Component**: `id`, `label`, optional `kind` (`service` default, `client`, `external`, `database`, `store`, `queue`), `detail` (a small second line), `icon`, `tone`, `zone`.
 - **Link**: `from`, `to`, optional `label`, `style` (`call` solid, `async` dashed), `main: true` to highlight and animate the path to follow first (one or two links, not all).

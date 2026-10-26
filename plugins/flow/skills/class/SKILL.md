@@ -70,6 +70,7 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **Class**: `id`, `label`, `attributes` (list of strings such as `-radius: float`), `methods` (list of strings), `icon`, `tone`.
 - **Relation**: `from`, `to`, `label`, `style`: `association` (default), `inheritance` (hollow triangle at `to`, the parent), `implements` (dashed, hollow triangle), `composition` (filled diamond at `from`, the whole), `aggregation` (hollow diamond at `from`), `dependency` (dashed arrow). `from_label` and `to_label` are accepted for multiplicity.
 - Top level: `type` (`class`), `title`, `desc`, optional `direction` (`down` default, or `right`).

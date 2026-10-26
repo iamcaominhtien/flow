@@ -36,6 +36,7 @@ You write a short **spec**: the states and the transitions. A script places the 
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **State**: `id`, `label`, optional `kind` (`state` default, `start`, `end`, `fail`), `detail`, `icon`, `tone`. A `start` or `end` mark needs no label.
 - **Transition**: `from`, `to`, optional `label` (the event), `main: true` to highlight and animate the path to follow first.
 - `direction`: `down` (default) or `right`.

@@ -63,6 +63,7 @@ You write a short **spec**: a nested tree. A script places the boxes (top to bot
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - `root`: one item. Every item has `label`, and optionally `detail` (a small second line, such as a name), `icon`, `tone` (`blue violet amber green teal gray`) and `children` (a list of items).
 - Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
 - Items are numbered in the order written, so the ids in the scene file are `n0`, `n1`, ...: use them in an overrides file.

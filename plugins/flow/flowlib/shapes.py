@@ -1,12 +1,12 @@
 """The outline of each flowchart shape, drawn as SVG to fill a box of a given size."""
 
 from collections.abc import Callable
+from dataclasses import replace
 
 from .markup import fmt
 from .model import Shape
 from .theme import ShapeColors
 
-STROKE_WIDTH_PX = 2
 BAR_STROKE_WIDTH_PX = 1.5
 BAR_RADIUS_PX = 2
 NOTE_FOLD_PX = 16
@@ -15,7 +15,6 @@ CROSS_STROKE_WIDTH_PX = 2.5
 CYLINDER_CAP_PX = 10  # the height of the half-ellipse at the top and bottom of a cylinder
 TABLE_RADIUS_PX = 8
 ENTITY_RADIUS_PX = 2
-START_STROKE_WIDTH_PX = 2
 END_STROKE_WIDTH_PX = 5
 INTERMEDIATE_RING_GAP_PX = 4
 ACTOR_HEAD_FRACTION = 0.12  # head radius as a fraction of the actor's height
@@ -26,7 +25,6 @@ ACTOR_FOOT_FRACTION = 0.86
 ACTOR_ARM_SPAN_FRACTION = 0.3  # half the arm span as a fraction of the actor's width
 ACTOR_STROKE_WIDTH_PX = 2.5
 INSET_PX = 1  # keeps the outline inside the box, so the stroke is not clipped
-BOX_CORNER_RADIUS_PX = 10
 SUBPROCESS_BAR_INSET_PX = 14
 PARALLELOGRAM_SLANT_MAX_PX = 18
 PARALLELOGRAM_SLANT_DIVISOR = 6  # the slant is a sixth of the width, up to the maximum
@@ -39,10 +37,16 @@ DOCUMENT_WAVE_CONTROL_FRACTION = 0.75
 Drawer = Callable[[float, float, ShapeColors], str]
 
 
+def table_radius(colors: ShapeColors) -> float:
+    """Return the corner radius of a table: the theme's radius, but never rounder than a table."""
+    return min(TABLE_RADIUS_PX, colors.radius)
+
+
 def _paint(colors: ShapeColors) -> str:
     """Return the SVG attributes that fill and outline a shape."""
     dash = f' stroke-dasharray="{colors.dash}"' if colors.dash else ""
-    return f'fill="{colors.fill}" stroke="{colors.stroke}" stroke-width="{STROKE_WIDTH_PX}"{dash}'
+    width = fmt(colors.stroke_width)
+    return f'fill="{colors.fill}" stroke="{colors.stroke}" stroke-width="{width}"{dash}'
 
 
 def _pill(width: float, height: float, colors: ShapeColors) -> str:
@@ -60,7 +64,7 @@ def _rounded_box(width: float, height: float, colors: ShapeColors) -> str:
     paint = _paint(colors)
     return (
         f'<rect x="{INSET_PX}" y="{INSET_PX}" width="{fmt(width - 2 * INSET_PX)}" '
-        f'height="{fmt(height - 2 * INSET_PX)}" rx="{BOX_CORNER_RADIUS_PX}" {paint}/>'
+        f'height="{fmt(height - 2 * INSET_PX)}" rx="{fmt(colors.radius)}" {paint}/>'
     )
 
 
@@ -70,7 +74,7 @@ def _subprocess(width: float, height: float, colors: ShapeColors) -> str:
     bottom = height - INSET_PX
     bars = (
         f'<path d="M{left} {INSET_PX}V{fmt(bottom)}M{fmt(right)} {INSET_PX}V{fmt(bottom)}" '
-        f'fill="none" stroke="{colors.stroke}" stroke-width="{STROKE_WIDTH_PX}"/>'
+        f'fill="none" stroke="{colors.stroke}" stroke-width="{fmt(colors.stroke_width)}"/>'
     )
     return _rounded_box(width, height, colors) + bars
 
@@ -138,7 +142,8 @@ def _note(width: float, height: float, colors: ShapeColors) -> str:
     )
     crease = (
         f'<path d="M{fmt(width - fold)} {INSET_PX}V{fold}H{fmt(width - INSET_PX)}" fill="none" '
-        f'stroke="{colors.stroke}" stroke-width="{STROKE_WIDTH_PX}" stroke-linejoin="round"/>'
+        f'stroke="{colors.stroke}" stroke-width="{fmt(colors.stroke_width)}" '
+        'stroke-linejoin="round"/>'
     )
     return outline + crease
 
@@ -169,7 +174,7 @@ def _cylinder(width: float, height: float, colors: ShapeColors) -> str:
     )
     lid = (
         f'<path d="M{INSET_PX} {cap}A{fmt(rx)} {cap} 0 0 0 {fmt(width - INSET_PX)} {cap}" '
-        f'fill="none" stroke="{colors.stroke}" stroke-width="{STROKE_WIDTH_PX}"/>'
+        f'fill="none" stroke="{colors.stroke}" stroke-width="{fmt(colors.stroke_width)}"/>'
     )
     return body + lid
 
@@ -178,7 +183,7 @@ def _table(width: float, height: float, colors: ShapeColors) -> str:
     """Draw the frame of a table: a white rounded rectangle; the header is drawn on top."""
     return (
         f'<rect x="{INSET_PX}" y="{INSET_PX}" width="{fmt(width - 2 * INSET_PX)}" '
-        f'height="{fmt(height - 2 * INSET_PX)}" rx="{TABLE_RADIUS_PX}" {_paint(colors)}/>'
+        f'height="{fmt(height - 2 * INSET_PX)}" rx="{fmt(table_radius(colors))}" {_paint(colors)}/>'
     )
 
 
@@ -209,7 +214,7 @@ def _ring(width: float, height: float, colors: ShapeColors, stroke_width: float)
 
 def _start(width: float, height: float, colors: ShapeColors) -> str:
     """Draw a thin circle: the start of a flow."""
-    return _ring(width, height, colors, START_STROKE_WIDTH_PX)
+    return _ring(width, height, colors, colors.stroke_width)
 
 
 def _end(width: float, height: float, colors: ShapeColors) -> str:
@@ -222,12 +227,12 @@ def _intermediate(width: float, height: float, colors: ShapeColors) -> str:
     inner = _ring(
         width - 2 * INTERMEDIATE_RING_GAP_PX,
         height - 2 * INTERMEDIATE_RING_GAP_PX,
-        ShapeColors(fill="none", stroke=colors.stroke),
-        START_STROKE_WIDTH_PX,
+        replace(colors, fill="none"),
+        colors.stroke_width,
     )
     gap = INTERMEDIATE_RING_GAP_PX
     shifted = f'<g transform="translate({gap} {gap})">{inner}</g>'
-    return _ring(width, height, colors, START_STROKE_WIDTH_PX) + shifted
+    return _ring(width, height, colors, colors.stroke_width) + shifted
 
 
 def _actor(width: float, height: float, colors: ShapeColors) -> str:

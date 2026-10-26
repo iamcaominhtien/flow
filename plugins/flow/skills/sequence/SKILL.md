@@ -35,6 +35,7 @@ Use it when the *order of messages* is the point. For structure use an architect
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 Items run top to bottom in the order written. An item is one of:
 
 - **A message**: `kind`, `from`, `to`, `label`, optional `role`, optional `number`.

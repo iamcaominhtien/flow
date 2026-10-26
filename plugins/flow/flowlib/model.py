@@ -9,7 +9,8 @@ from enum import StrEnum
 
 Point = tuple[float, float]
 
-DEFAULT_FONT_SIZE_PX = 13.0
+DEFAULT_FONT_SIZE_PX = 12.0
+DEFAULT_THEME = "pastel"  # the look of every diagram that does not ask for another
 
 
 class Shape(StrEnum):
@@ -232,3 +233,4 @@ class Scene:
     frames: tuple[Frame, ...]
     nodes: tuple[Node, ...]
     edges: tuple[Edge, ...]
+    theme: str = DEFAULT_THEME

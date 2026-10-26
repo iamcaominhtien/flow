@@ -102,42 +102,48 @@
       "pill": "#BFDBFE",
       "stroke": "#60A5FA",
       "accent": "#1D4ED8",
-      "lane": "#EEF5FF"
+      "lane": "#EEF5FF",
+      "label": "#1D4ED8"
     },
     "violet": {
       "box": "#E6E3FB",
       "pill": "#CFC8F7",
       "stroke": "#8B7FE8",
       "accent": "#5B4BD6",
-      "lane": "#F3F0FF"
+      "lane": "#F3F0FF",
+      "label": "#5B4BD6"
     },
     "amber": {
       "box": "#FFF1DD",
       "pill": "#FFD9A3",
       "stroke": "#F59E3A",
       "accent": "#B45309",
-      "lane": "#FFF5E9"
+      "lane": "#FFF5E9",
+      "label": "#B45309"
     },
     "green": {
       "box": "#DCF5E1",
       "pill": "#B5EBC1",
       "stroke": "#4CC38A",
       "accent": "#15803D",
-      "lane": "#EEFAF0"
+      "lane": "#EEFAF0",
+      "label": "#15803D"
     },
     "teal": {
       "box": "#D3F3EF",
       "pill": "#A8E6DE",
       "stroke": "#2BB3A6",
       "accent": "#0F766E",
-      "lane": "#E8F8F5"
+      "lane": "#E8F8F5",
+      "label": "#0F766E"
     },
     "gray": {
       "box": "#F1F5F9",
       "pill": "#E2E8F0",
       "stroke": "#94A3B8",
       "accent": "#475569",
-      "lane": "#F6F8FA"
+      "lane": "#F6F8FA",
+      "label": "#475569"
     }
   },
   "roles": {
@@ -185,7 +191,13 @@
       "animation": "flow2",
       "head_size": 5
     },
-    "logical": {"color": "#475569", "dash": "6 5", "width": 2, "gap": 5, "head_size": 5},
+    "logical": {
+      "color": "#475569",
+      "dash": "6 5",
+      "width": 2,
+      "gap": 5,
+      "head_size": 5
+    },
     "lifeline": {
       "color": "#94A3B8",
       "dash": "4 4",
@@ -197,11 +209,15 @@
   "animations": {
     "flow": {
       "seconds": 0.7,
-      "dash_offset": -18
+      "dash_offset": -18,
+      "drawio_width": 3,
+      "drawio_duration_ms": 500
     },
     "flow2": {
       "seconds": 1.8,
-      "dash_offset": -12
+      "dash_offset": -12,
+      "drawio_width": 1,
+      "drawio_duration_ms": 1500
     }
   },
   "chips": {
@@ -402,5 +418,298 @@
     "destroy_size": 24,
     "tail_gap": 40,
     "bottom_gap": 48
+  },
+  "paper": "#FFFFFF",
+  "on_accent": "#FFFFFF",
+  "rule": "#CBD5E1",
+  "row_rule": "#E2E8F0",
+  "style": {
+    "corner_radius": 10,
+    "frame_radius": 16,
+    "stroke_width": 2,
+    "shadow": true
+  },
+  "type_scale": {
+    "title": {
+      "size": 20,
+      "weight": 800
+    },
+    "pill": {
+      "size": 13,
+      "weight": 700
+    },
+    "node": {
+      "size": 12,
+      "weight": 600
+    },
+    "edge": {
+      "size": 10,
+      "weight": 500
+    },
+    "mono": {
+      "size": 11,
+      "weight": 500
+    }
+  },
+  "drawio_weights": {
+    "1": 1,
+    "2": 2,
+    "4": 3
+  },
+  "themes": {
+    "technical": {
+      "canvas": "#FFFFFF",
+      "style": {
+        "corner_radius": 4,
+        "frame_radius": 4,
+        "stroke_width": 1.5,
+        "shadow": false
+      },
+      "shape_paint": {
+        "fill": "#FFFFFF",
+        "stroke": "#334155",
+        "except": [
+          "cross",
+          "text",
+          "bar",
+          "note",
+          "start",
+          "end"
+        ]
+      },
+      "shapes": {
+        "start": {
+          "fill": "#334155",
+          "stroke": "#334155"
+        },
+        "end": {
+          "fill": "#334155",
+          "stroke": "#0F172A"
+        },
+        "bar": {
+          "fill": "#334155",
+          "stroke": "#334155"
+        }
+      },
+      "roles": {
+        "next": {
+          "color": "#334155"
+        },
+        "main": {
+          "dash": null,
+          "animation": null
+        },
+        "data": {
+          "dash": null,
+          "animation": null
+        }
+      }
+    },
+    "midnight": {
+      "canvas": "#0B1220",
+      "ink": "#E2E8F0",
+      "slate": "#94A3B8",
+      "paper": "#111A2E",
+      "rule": "#334155",
+      "row_rule": "#1E293B",
+      "style": {
+        "corner_radius": 12,
+        "frame_radius": 16,
+        "stroke_width": 2,
+        "shadow": false
+      },
+      "shapes": {
+        "terminator": {
+          "fill": "#11291C",
+          "stroke": "#4CC38A"
+        },
+        "start": {
+          "fill": "#11291C",
+          "stroke": "#4CC38A"
+        },
+        "fail": {
+          "fill": "#2E1417",
+          "stroke": "#F87171"
+        },
+        "end": {
+          "fill": "#2E1417",
+          "stroke": "#F87171"
+        },
+        "connector": {
+          "fill": "#2E1417",
+          "stroke": "#F87171"
+        },
+        "process": {
+          "fill": "#12263F",
+          "stroke": "#60A5FA"
+        },
+        "subprocess": {
+          "fill": "#12263F",
+          "stroke": "#60A5FA"
+        },
+        "ellipse": {
+          "fill": "#12263F",
+          "stroke": "#60A5FA"
+        },
+        "bar": {
+          "fill": "#12263F",
+          "stroke": "#94A3B8"
+        },
+        "decision": {
+          "fill": "#2E2111",
+          "stroke": "#F59E3A"
+        },
+        "intermediate": {
+          "fill": "#2E2111",
+          "stroke": "#F59E3A"
+        },
+        "note": {
+          "fill": "#2E2111",
+          "stroke": "#F59E3A"
+        },
+        "store": {
+          "fill": "#2E2111",
+          "stroke": "#E2E8F0"
+        },
+        "io": {
+          "fill": "#1E1B3A",
+          "stroke": "#8B7FE8"
+        },
+        "cylinder": {
+          "fill": "#1E1B3A",
+          "stroke": "#8B7FE8"
+        },
+        "document": {
+          "fill": "#111A2E",
+          "stroke": "#94A3B8"
+        },
+        "table": {
+          "fill": "#111A2E",
+          "stroke": "#94A3B8"
+        },
+        "actor": {
+          "fill": "#111A2E",
+          "stroke": "#E2E8F0"
+        },
+        "preparation": {
+          "fill": "#0F2A28",
+          "stroke": "#2BB3A6"
+        },
+        "entity": {
+          "fill": "#1A2336",
+          "stroke": "#E2E8F0"
+        },
+        "cross": {
+          "fill": "none",
+          "stroke": "#F87171"
+        }
+      },
+      "tones": {
+        "blue": {
+          "box": "#12263F",
+          "pill": "#1E3A5F",
+          "stroke": "#60A5FA",
+          "accent": "#2563EB",
+          "lane": "#0F1B2D",
+          "label": "#93C5FD"
+        },
+        "violet": {
+          "box": "#1E1B3A",
+          "pill": "#2E2A5E",
+          "stroke": "#8B7FE8",
+          "accent": "#6D5BF0",
+          "lane": "#151330",
+          "label": "#C4B5FD"
+        },
+        "amber": {
+          "box": "#2E2111",
+          "pill": "#4A3314",
+          "stroke": "#F59E3A",
+          "accent": "#B45309",
+          "lane": "#241A0E",
+          "label": "#FCD34D"
+        },
+        "green": {
+          "box": "#11291C",
+          "pill": "#174A2C",
+          "stroke": "#4CC38A",
+          "accent": "#15803D",
+          "lane": "#0E2016",
+          "label": "#86EFAC"
+        },
+        "teal": {
+          "box": "#0F2A28",
+          "pill": "#14504B",
+          "stroke": "#2BB3A6",
+          "accent": "#0F766E",
+          "lane": "#0C201F",
+          "label": "#5EEAD4"
+        },
+        "gray": {
+          "box": "#1A2336",
+          "pill": "#2A364D",
+          "stroke": "#64748B",
+          "accent": "#475569",
+          "lane": "#131B2B",
+          "label": "#CBD5E1"
+        }
+      },
+      "roles": {
+        "next": {
+          "color": "#CBD5E1"
+        },
+        "yes": {
+          "color": "#4ADE80"
+        },
+        "no": {
+          "color": "#F87171"
+        },
+        "back": {
+          "color": "#94A3B8"
+        },
+        "main": {
+          "color": "#60A5FA"
+        },
+        "data": {
+          "color": "#A78BFA"
+        },
+        "logical": {
+          "color": "#94A3B8"
+        },
+        "lifeline": {
+          "color": "#475569"
+        }
+      },
+      "chips": {
+        "yes": {
+          "background": "#11291C",
+          "foreground": "#4ADE80"
+        },
+        "no": {
+          "background": "#2E1417",
+          "foreground": "#F87171"
+        },
+        "back": {
+          "background": "#1E293B",
+          "foreground": "#CBD5E1"
+        },
+        "plain": {
+          "background": "#1A2336",
+          "foreground": "#CBD5E1"
+        },
+        "text": {
+          "background": "none",
+          "foreground": "#E2E8F0"
+        },
+        "text_fail": {
+          "background": "none",
+          "foreground": "#F87171"
+        }
+      },
+      "badge": {
+        "background": "#7DD3CB",
+        "foreground": "#0B1220"
+      }
+    }
   }
 }

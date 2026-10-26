@@ -77,6 +77,7 @@ You write a short **spec**: screens, each with its elements from top to bottom. 
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **Screen**: `label`, `elements`.
 - **Element**: `kind` is `header`, `text`, `input`, `button`, `image` or `list`; `label` is its text. A `list` takes `items`, a list of strings, one row each.
 - Screens sit side by side, in the order written.

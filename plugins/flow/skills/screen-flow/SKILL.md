@@ -80,6 +80,7 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **Screen**: `id`, `label`, `kind` (`screen` default, `dialog`, `decision`, `start`, `end`), `detail`, `icon`, `tone`.
 - **Tap**: `from`, `to`, `label` (what the person does), `style` (`tap` solid, default; `back` dashed, for going back), `main: true` for the happy path.
 - Top level: `type` (`screen`), `title`, `desc`, optional `direction` (`down` default, or `right`).

@@ -15,6 +15,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 from .canvas import fit_canvas
+from .drawio_common import FRAME_LABEL_PREFIX
 from .geometry import border_point, center_of
 from .model import (
     Edge,
@@ -203,6 +204,17 @@ def _node(cell: ET.Element, style: dict[str, str], box: Box) -> Node:
     )
 
 
+def _frame_label_cell(cell: ET.Element, cells: dict[str, ET.Element]) -> ET.Element | None:
+    """Return the pill cell that holds the name of a container cell, if the file has one."""
+    return cells.get(f"{FRAME_LABEL_PREFIX}{cell.get('id', '')}")
+
+
+def _is_frame_label(cell: ET.Element, cells: dict[str, ET.Element]) -> bool:
+    """Tell a pill cell that names a container; the frame holds its text."""
+    ident = cell.get("id", "")
+    return ident.startswith(FRAME_LABEL_PREFIX) and ident.removeprefix(FRAME_LABEL_PREFIX) in cells
+
+
 def _frame(cell: ET.Element, style: dict[str, str], box: Box) -> Frame:
     """Build a frame from a container cell that sits at ``box``."""
     x, y, width, height = box
@@ -340,6 +352,10 @@ class _Import:
             self.nodes[node.id] = replace(node, shape=Shape.TABLE, sections=(_table_rows(rows),))
         elif "swimlane" in style or style.get("container") == "1":
             self.frames.append(_frame(cell, style, self.box(cell)))
+            pill = _frame_label_cell(cell, self.cells)
+            if pill is not None:
+                label = plain_lines(pill.get("value", ""))
+                self.frames[-1] = replace(self.frames[-1], label=label[0] if label else None)
         elif "image" in style.get("shape", ""):
             self.skipped_images += 1
         elif _is_label_only(style):
@@ -383,7 +399,13 @@ def convert(path: Path) -> ImportResult:
     cells = {cell.get("id", ""): cell for cell in read_graph(path).iter("mxCell")}
     vertices = [c for c in cells.values() if c.get("vertex") == "1"]
     text_ids = (TITLE_CELL_ID, DESCRIPTION_CELL_ID)
-    drawn = [c for c in vertices if c.get("id") not in text_ids and not _is_table_row(c, cells)]
+    drawn = [
+        c
+        for c in vertices
+        if c.get("id") not in text_ids
+        and not _is_table_row(c, cells)
+        and not _is_frame_label(c, cells)
+    ]
     top_level = [c for c in drawn if c.get("parent") in LAYER_IDS]
     texts = {name: plain_lines(cells[name].get("value", "")) for name in text_ids if name in cells}
     state = _Import(cells, _origin(top_level, bool(texts.get(TITLE_CELL_ID))))

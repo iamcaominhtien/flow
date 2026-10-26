@@ -70,6 +70,7 @@ You write a short **spec**: the periods and the lanes with their items. A script
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - `periods`: the names of the columns, such as `["Q1", "Q2", "Q3", "Q4"]`.
 - **Lane**: `label`, optional `tone`, `items`.
 - **Item**: `label`, `start` (period number from 0), `length` (number of periods), optional `tone`. Items of a lane that overlap in time are stacked in extra rows.

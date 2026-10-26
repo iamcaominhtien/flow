@@ -89,6 +89,7 @@ You write a short **spec**: the periods and the tasks. A script scales the bars,
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - `periods`: the names of the columns, such as `["W1", "W2"]`. Dates are not read: name the periods yourself.
 - **Task**: `id`, `label`, `start` (period number from 0), `length` (number of periods, at least 1), optional `group` (tasks with the same group share a frame), `tone`, `after` (the id of a task that must end first; a line is drawn from its end to this task's start).
 - A task must fit inside the periods, and a task with `after` must start at or after the end of that task: the build refuses anything else with the reason.

@@ -91,6 +91,7 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **Resource**: `id`, `label`, `kind` (`service` default, `client`, `external`, `balancer`, `database`, `storage`, `queue`), `detail`, `icon`, `tone`, `zone`.
 - **Zone**: `id`, `label`, optional `tone` and `parent` to nest it (a VPC inside a region).
 - **Link**: `from`, `to`, `label`, `style` (`call` solid, `async` dashed), `main: true`.

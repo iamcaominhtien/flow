@@ -12,6 +12,7 @@ from collections.abc import Callable
 
 from .drawio_common import (
     FONT_BOLD,
+    FRAME_LABEL_PREFIX,
     LAYER_CELL_ID,
     ROOT_CELL_ID,
     Bounds,
@@ -22,7 +23,7 @@ from .drawio_common import (
 from .drawio_lines import add_divider, add_edge
 from .markup import esc, fmt
 from .model import KEY_FLAG_TONES, Frame, FrameVariant, Node, Row, Scene, Shape, Tone
-from .shapes import BOX_CORNER_RADIUS_PX, STROKE_WIDTH_PX, SUBPROCESS_BAR_INSET_PX
+from .shapes import SUBPROCESS_BAR_INSET_PX
 from .sizing import estimate_text_width, key_room
 from .text_area import ICON_TEXT_RESERVE_PX
 from .theme import Theme, detailed_icon_svg, has_detailed_icon, icon_svg, load_theme
@@ -39,13 +40,31 @@ BADGE_OVERHANG_TOP_PX = 10
 BADGE_FONT_SIZE_PX = 11
 TITLE_LEFT_PX = 64
 TITLE_TOP_PX = 48
-TITLE_FONT_SIZE_PX = 24
 TITLE_HEIGHT_PX = 34
 DESCRIPTION_FONT_SIZE_PX = 13
 DESCRIPTION_HEIGHT_PX = 44
 DESCRIPTION_MAX_WIDTH_PX = 900
 FRAME_CORNER_PERCENT = 6
 LANE_TAB_FONT_SIZE = 13
+FRAME_DASH_PATTERN = "4 3"  # design 01 section 3: the container
+FRAME_STROKE_WIDTH_PX = 1.5
+FRAME_PILL_LEFT_PX = 16
+FRAME_PILL_TOP_PX = 12
+FRAME_PILL_HEIGHT_PX = 22
+FRAME_PILL_PADDING_PX = 12
+ROUNDED_SHAPES = (Shape.PROCESS,)  # boxes whose corner radius is in pixels
+SHADOW_SHAPES = (  # the rounded boxes of design 01 section 3 carry ``shadow=1``
+    Shape.TERMINATOR,
+    Shape.FAIL,
+    Shape.PROCESS,
+    Shape.SUBPROCESS,
+    Shape.IO,
+    Shape.DOCUMENT,
+    Shape.PREPARATION,
+    Shape.DECISION,
+    Shape.CYLINDER,
+    Shape.ELLIPSE,
+)
 PARALLELOGRAM_SLANT_MAX_PX = 18
 PARALLELOGRAM_SLANT_DIVISOR = 6
 HEXAGON_SLANT_MAX_PX = 20
@@ -57,7 +76,7 @@ TABLE_ARC_PERCENT = 6
 TABLE_TEXT_INSET_PX = 12
 ROW_PADDING_PX = 12
 DASH_PATTERN = "6 4"
-CHIP_FONT_SIZE_PX = 9
+CHIP_FONT_SIZE_PX = 10
 TABLE_PILL_HEIGHT_PX = 28  # the name pill in the header of an illustrated table
 TABLE_CARD_ICON_PX = 52
 CYLINDER_CAP_PX = 10
@@ -82,7 +101,7 @@ def _pill_style(node: Node) -> dict[str, object]:
 
 def _box_style(node: Node) -> dict[str, object]:
     """Style pairs for a rectangle with rounded corners."""
-    return {"rounded": 1, "absoluteArcSize": 1, "arcSize": 2 * BOX_CORNER_RADIUS_PX}
+    return {"rounded": 1, "absoluteArcSize": 1}
 
 
 def _subprocess_style(node: Node) -> dict[str, object]:
@@ -232,6 +251,16 @@ SHAPE_STYLES: dict[Shape, Callable[[Node], dict[str, object]]] = {
 }
 
 
+def _theme_pairs(node: Node, theme: Theme) -> dict[str, object]:
+    """Return the style pairs a theme decides: the corner radius and the shadow of a box."""
+    pairs: dict[str, object] = {}
+    if node.shape in ROUNDED_SHAPES:
+        pairs["arcSize"] = 2 * theme.shapes[node.shape].radius
+    if theme.style.shadow and node.shape in SHADOW_SHAPES:
+        pairs["shadow"] = 1
+    return pairs
+
+
 def _node_style(node: Node, theme: Theme) -> str:
     """Return the full style of a node cell: outline, colours and text."""
     colors = theme.shapes[node.shape]
@@ -243,13 +272,14 @@ def _node_style(node: Node, theme: Theme) -> str:
         "whiteSpace": "wrap",
         "fillColor": fill,
         "strokeColor": colors.stroke,
-        "strokeWidth": STROKE_WIDTH_PX,
+        "strokeWidth": fmt(colors.stroke_width),
         "fontColor": theme.ink,
         "fontSize": fmt(node.font_size),
         "fontStyle": FONT_BOLD,
         "fontFamily": theme.fonts.sans,
     }
     style.update(SHAPE_STYLES[node.shape](node))
+    style.update(_theme_pairs(node, theme))
     if node.dashed:
         style.update({"dashed": 1, "dashPattern": DASH_PATTERN})
     if node.shape in (Shape.NOTE, Shape.TEXT):
@@ -259,7 +289,7 @@ def _node_style(node: Node, theme: Theme) -> str:
         style.update(
             {
                 "startSize": _table_header_height(node, theme),
-                "swimlaneFillColor": "#FFFFFF",
+                "swimlaneFillColor": theme.paper,
                 "spacingLeft": TABLE_TEXT_INSET_PX + icon_room,
             }
         )
@@ -279,6 +309,11 @@ def _card_text_style(node: Node, theme: Theme) -> dict[str, object]:
         "fontSize": theme.layout.detail_font_size,
         "fontColor": theme.slate,
     }
+
+
+def _shadow_pair(theme: Theme) -> dict[str, object]:
+    """Return ``shadow=1`` when the theme has shadows, else no pair."""
+    return {"shadow": 1} if theme.style.shadow else {}
 
 
 def _label_value(lines: tuple[str, ...]) -> str:
@@ -406,7 +441,7 @@ def _chip_value(flag: str, theme: Theme) -> str:
     """Return one key chip as an HTML span with the tint of its kind."""
     tone = theme.tones[KEY_FLAG_TONES.get(flag, Tone.GRAY)]
     style = (
-        f"background:{tone.pill};color:{tone.accent};border-radius:4px;padding:1px 5px;"
+        f"background:{tone.pill};color:{tone.label};border-radius:4px;padding:1px 5px;"
         f"font-size:{CHIP_FONT_SIZE_PX}px;font-weight:bold;font-family:{theme.fonts.sans}"
     )
     return f'<span style="{style}">{esc(flag)}</span>'
@@ -454,13 +489,13 @@ def _add_table_card_parts(root: ET.Element, node: Node, theme: Theme) -> None:
             "arcSize": PILL_ARC_PERCENT,
             "html": 1,
             "strokeColor": theme.shapes[node.shape].stroke,
-            "strokeWidth": STROKE_WIDTH_PX,
+            "strokeWidth": fmt(theme.shapes[node.shape].stroke_width),
             "fillColor": tone.box,
-            "shadow": 1,
             "fontColor": theme.ink,
             "fontSize": fmt(node.font_size),
             "fontStyle": FONT_BOLD,
             "fontFamily": theme.fonts.sans,
+            **_shadow_pair(theme),
         }
     )
     pill = add_vertex(root, f"pill-{node.id}", esc(" ".join(node.text)), pill_style)
@@ -549,22 +584,45 @@ def _add_frame(root: ET.Element, frame: Frame, theme: Theme) -> None:
             "rounded": 1,
             "arcSize": FRAME_CORNER_PERCENT,
             "dashed": 1,
+            "dashPattern": FRAME_DASH_PATTERN,
             "container": 1,
             "collapsible": 0,
             "html": 1,
             "verticalAlign": "top",
-            "align": "left",
-            "spacingLeft": 16,
-            "spacingTop": 8,
             "fillColor": tone.box,
             "strokeColor": tone.pill,
+            "strokeWidth": FRAME_STROKE_WIDTH_PX,
+        }
+    )
+    cell = add_vertex(root, f"frame-{frame.id}", "", style)
+    add_geometry(cell, (frame.x, frame.y, frame.width, frame.height))
+    if frame.label:
+        _add_frame_pill(root, frame, theme)
+
+
+def _add_frame_pill(root: ET.Element, frame: Frame, theme: Theme) -> None:
+    """Add the pill with the name of a frame, in the style of design 01 section 3."""
+    tone = theme.tones[frame.tone]
+    pill = theme.type_scale.pill
+    style = style_string(
+        {
+            "rounded": 1,
+            "arcSize": PILL_ARC_PERCENT,
+            "whiteSpace": "wrap",
+            "html": 1,
+            "fillColor": tone.pill,
+            "strokeColor": "none",
             "fontColor": theme.ink,
             "fontStyle": FONT_BOLD,
+            "fontSize": fmt(pill.size),
             "fontFamily": theme.fonts.sans,
         }
     )
-    cell = add_vertex(root, f"frame-{frame.id}", esc(frame.label or ""), style)
-    add_geometry(cell, (frame.x, frame.y, frame.width, frame.height))
+    label = frame.label or ""
+    width = estimate_text_width(label, theme.layout, pill.size) + 2 * FRAME_PILL_PADDING_PX
+    cell = add_vertex(root, f"{FRAME_LABEL_PREFIX}frame-{frame.id}", esc(label), style)
+    left, top = frame.x + FRAME_PILL_LEFT_PX, frame.y + FRAME_PILL_TOP_PX
+    add_geometry(cell, (left, top, width, FRAME_PILL_HEIGHT_PX))
 
 
 def _add_lane(root: ET.Element, frame: Frame, theme: Theme) -> None:
@@ -591,7 +649,7 @@ def _add_lane(root: ET.Element, frame: Frame, theme: Theme) -> None:
             "html": 1,
             "fillColor": tone.accent,
             "strokeColor": "none",
-            "fontColor": "#FFFFFF",
+            "fontColor": theme.on_accent,
             "fontStyle": FONT_BOLD,
             "fontSize": LANE_TAB_FONT_SIZE,
             "fontFamily": theme.fonts.sans,
@@ -668,7 +726,7 @@ def _add_title(root: ET.Element, scene: Scene, theme: Theme) -> None:
     title_style = style_string(
         {
             **common,
-            "fontSize": TITLE_FONT_SIZE_PX,
+            "fontSize": fmt(theme.type_scale.title.size),
             "fontStyle": FONT_BOLD,
             "fontColor": theme.ink,
             "fontFamily": theme.fonts.sans,
@@ -702,7 +760,7 @@ def render(scene: Scene) -> str:
     Returns:
         An uncompressed ``mxfile`` document.
     """
-    theme = load_theme()
+    theme = load_theme(scene.theme)
     nodes = {node.id: node for node in scene.nodes}
     mxfile = ET.Element("mxfile", {"host": "flow", "type": "device"})
     diagram = ET.SubElement(

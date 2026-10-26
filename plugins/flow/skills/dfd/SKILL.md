@@ -63,6 +63,7 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - **Element**: `id`, `label`, optional `kind`: `process` (default, an ellipse), `external` (a box for a person or system outside), `store` (open-ended box for stored data). Also `detail`, `icon`, `tone`.
 - **Flow**: `from`, `to`, `label` (the data that moves), `main: true` to highlight one path.
 - DFD rule: data should not flow directly between two externals, between two stores, or between an external and a store. The tool does not enforce this; check it yourself.

@@ -80,6 +80,7 @@ You write a short **spec**: layers from top to bottom, each with its items. A sc
 }
 ```
 
+- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
 - `flow`: `true` draws a highlighted arrow down between each pair of layers.
 - **Layer**: `label`, optional `tone`, `items`, with at least one item.
 - **Item**: `label`, optional `detail`, `icon`, `tone`.

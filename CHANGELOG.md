@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0 (2026-10-26)
+
+Foundations, from `docs/design/01-foundations.md`. First phase of closing the gaps listed in `docs/plugin/design-gaps.md`.
+
+- **Themes:** a `theme` key on every spec (`pastel` default, `technical`, `midnight`) for HTML and draw.io, page background included; an unknown name is an error. The author kit has `Canvas.theme`.
+- **draw.io line weights** come from one table; animated lines use the design recipe (main 3 at 500 ms, data 1 at 1500 ms).
+- **Type scale** from the design: title 20/800, frame pill 13/700, node 12/600, edge label 10/500, nothing under 10.
+- **draw.io:** frame names are pill cells, containers have a dash pattern and stroke, nodes have a shadow. The importer reads the pills back.
+- **Check:** warns when a label or box straddles a frame border or sits on a divider (`crosses-border`, `on-divider`). It finds real defects in four examples, not fixed yet.
+- Not done: callout tag and root node (no type draws them); a scene imported from draw.io is always pastel; the real draw.io editor was not used.
+
 ## 0.1.5 (2026-10-26)
 
 The three ER features of the design that were missing, and two fixes found on the way.

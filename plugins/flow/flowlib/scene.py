@@ -21,6 +21,7 @@ from typing import Any, TypeVar
 
 from .model import (
     DEFAULT_FONT_SIZE_PX,
+    DEFAULT_THEME,
     Divider,
     Edge,
     EdgeLabel,
@@ -41,7 +42,7 @@ from .theme import icon_names
 
 Built = TypeVar("Built")
 
-SCENE_KEYS = {"size", "title", "desc", "frames", "nodes", "edges"}
+SCENE_KEYS = {"size", "title", "desc", "frames", "nodes", "edges", "theme"}
 FRAME_KEYS = {"id", "x", "y", "width", "height", "label", "tone", "variant", "guard", "dividers"}
 DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
@@ -104,7 +105,7 @@ def dump(scene: Scene) -> dict[str, Any]:
     Returns:
         A JSON-style dict that ``parse`` accepts.
     """
-    return {
+    written: dict[str, Any] = {
         "size": [scene.width, scene.height],
         "title": scene.title,
         "desc": scene.description,
@@ -112,6 +113,9 @@ def dump(scene: Scene) -> dict[str, Any]:
         "nodes": [_dump_node(node) for node in scene.nodes],
         "edges": [_dump_edge(edge) for edge in scene.edges],
     }
+    if scene.theme != DEFAULT_THEME:
+        written["theme"] = scene.theme
+    return written
 
 
 def dumps(scene: Scene, indent: int | None = None) -> str:
@@ -250,6 +254,7 @@ class _SceneParser:
             frames=frames,
             nodes=nodes,
             edges=edges,
+            theme=self._read.theme(raw),
         )
 
     def _each(

@@ -6,9 +6,11 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
-from .model import Animation, LabelKind, Role, Shape, Tone
+from .model import DEFAULT_THEME, Animation, LabelKind, Role, Shape, Tone
 
 DATA_DIR = Path(__file__).parent
+THEMES_KEY = "themes"  # in ``theme.json``: the overrides of each theme other than the default
+SHAPE_PAINT_KEY = "shape_paint"  # an override that paints every shape the same way
 ICON_STROKE_WIDTH = 2  # line weight of a flat icon, in its 24 px grid
 
 
@@ -27,17 +29,20 @@ class ShapeColors:
     fill: str
     stroke: str
     dash: str = ""  # an SVG dash pattern, or nothing for a solid outline
+    stroke_width: float = 2  # outline weight in pixels, set by the theme
+    radius: float = 10  # corner radius of a rounded box in pixels, set by the theme
 
 
 @dataclass(frozen=True)
 class ToneColors:
-    """The box tint, the darker pill tint, and the outline colour of a tone."""
+    """The tints, outline, accent and text colour of a tone."""
 
     box: str
     pill: str
     stroke: str
     accent: str
     lane: str
+    label: str  # text on the pill tint, such as a key chip; the accent where that reads well
 
 
 @dataclass(frozen=True)
@@ -66,6 +71,37 @@ class AnimationSpeed:
 
     dash_offset: float
     seconds: float
+    drawio_width: float  # draw.io ``strokeWidth`` of a line in this tier (design 01 section 6.3)
+    drawio_duration_ms: int  # draw.io ``flowAnimationDuration`` of a line in this tier
+
+
+@dataclass(frozen=True)
+class StyleRules:
+    """The parts of a theme that are not colours."""
+
+    corner_radius: float
+    frame_radius: float
+    stroke_width: float
+    shadow: bool
+
+
+@dataclass(frozen=True)
+class TextStyle:
+    """Size in points and weight of one step of the type scale."""
+
+    size: float
+    weight: int
+
+
+@dataclass(frozen=True)
+class TypeScale:
+    """The type scale of design 01 section 2."""
+
+    title: TextStyle
+    pill: TextStyle
+    node: TextStyle
+    edge: TextStyle
+    mono: TextStyle
 
 
 @dataclass(frozen=True)
@@ -160,10 +196,18 @@ class SequenceRules:
 class Theme:
     """Every colour, line style and animation the renderers use."""
 
+    name: str
     fonts: Fonts
     ink: str
     slate: str
     canvas: str
+    paper: str  # the surface of a table body or a tag, which stands out from the canvas
+    on_accent: str  # text on an accent colour, such as a lane tab
+    rule: str  # a divider inside a table
+    row_rule: str  # the lighter rule between two rows
+    style: StyleRules
+    type_scale: TypeScale
+    drawio_weights: dict[float, float]  # canvas line width in px to draw.io ``strokeWidth``
     badge: ChipColors
     shapes: dict[Shape, ShapeColors]
     tones: dict[Tone, ToneColors]
@@ -207,22 +251,37 @@ def _layout_rules(raw: dict[str, Any]) -> LayoutRules:
     return LayoutRules(**{**raw, "min_sizes": sizes})
 
 
-def _build_theme(raw: dict[str, Any]) -> Theme:
-    """Build a theme from the parsed ``theme.json``.
+def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
+    """Build a theme from the parsed ``theme.json``, with a theme's overrides already merged.
 
     Args:
+        name: The theme name.
         raw: The parsed JSON document.
 
     Returns:
         The theme. A key that is not a member of the matching enum raises ``ValueError``.
     """
+    style = StyleRules(**raw["style"])
+    paint = {"stroke_width": style.stroke_width, "radius": style.corner_radius}
     return Theme(
+        name=name,
         fonts=Fonts(**raw["fonts"]),
         ink=raw["ink"],
         slate=raw["slate"],
         canvas=raw["canvas"],
+        paper=raw["paper"],
+        on_accent=raw["on_accent"],
+        rule=raw["rule"],
+        row_rule=raw["row_rule"],
+        style=style,
+        type_scale=TypeScale(
+            **{key: TextStyle(**value) for key, value in raw["type_scale"].items()}
+        ),
+        drawio_weights={float(key): value for key, value in raw["drawio_weights"].items()},
         badge=ChipColors(**raw["badge"]),
-        shapes={Shape(name): ShapeColors(**colors) for name, colors in raw["shapes"].items()},
+        shapes={
+            Shape(shape): ShapeColors(**colors, **paint) for shape, colors in raw["shapes"].items()
+        },
         tones={Tone(name): ToneColors(**colors) for name, colors in raw["tones"].items()},
         roles={Role(name): _line_style(style) for name, style in raw["roles"].items()},
         animations={
@@ -234,11 +293,69 @@ def _build_theme(raw: dict[str, Any]) -> Theme:
     )
 
 
-@cache
-def load_theme() -> Theme:
-    """Return the theme, read once from ``theme.json``."""
+def _merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
+    """Return ``base`` with ``override`` laid over it, going into nested objects.
+
+    Args:
+        base: The settings to start from; not changed.
+        override: The settings that win. A value that is not an object replaces the one in base.
+
+    Returns:
+        A new dict.
+    """
+    merged = dict(base)
+    for key, value in override.items():
+        if isinstance(value, dict) and isinstance(base.get(key), dict):
+            merged[key] = _merge(base[key], value)
+        else:
+            merged[key] = value
+    return merged
+
+
+def _paint_every_shape(raw: dict[str, Any], paint: dict[str, Any]) -> dict[str, Any]:
+    """Give each shape one fill and outline colour, except the shapes the override names.
+
+    Args:
+        raw: The merged settings.
+        paint: The ``shape_paint`` override: ``fill``, ``stroke`` and ``except``, a list of shapes.
+
+    Returns:
+        The settings with every shape repainted.
+    """
+    colors = {"fill": paint["fill"], "stroke": paint["stroke"]}
+    kept = set(paint.get("except", ()))
+    shapes = {name: (old if name in kept else colors) for name, old in raw["shapes"].items()}
+    return {**raw, "shapes": shapes}
+
+
+def theme_names() -> list[str]:
+    """Return every theme name a spec may use, the default first."""
     raw = json.loads((DATA_DIR / "theme.json").read_text(encoding="utf-8"))
-    return _build_theme(raw)
+    return [DEFAULT_THEME, *raw[THEMES_KEY]]
+
+
+@cache
+def load_theme(name: str = DEFAULT_THEME) -> Theme:
+    """Return a theme, read once from ``theme.json``.
+
+    Args:
+        name: One of ``theme_names()``. Every theme but the default is the default with the
+            overrides listed under its name in ``theme.json``.
+
+    Returns:
+        The theme.
+
+    Raises:
+        KeyError: If the name is not a theme.
+    """
+    raw = json.loads((DATA_DIR / "theme.json").read_text(encoding="utf-8"))
+    overrides = raw.pop(THEMES_KEY)
+    if name == DEFAULT_THEME:
+        return _build_theme(name, raw)
+    override = dict(overrides[name])
+    paint = override.pop(SHAPE_PAINT_KEY, None)
+    merged = _paint_every_shape(raw, paint) if paint else raw
+    return _build_theme(name, _merge(merged, override))
 
 
 @cache
