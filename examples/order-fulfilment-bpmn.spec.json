@@ -1,0 +1,249 @@
+{
+  "type": "bpmn",
+  "title": "BPMN: order fulfilment",
+  "desc": "A customer orders and pays; the shop checks stock, picks and invoices in parallel, and a courier delivers.",
+  "zones": [
+    {
+      "id": "cust",
+      "label": "Customer"
+    },
+    {
+      "id": "shop",
+      "label": "Shop"
+    },
+    {
+      "id": "cour",
+      "label": "Courier"
+    }
+  ],
+  "elements": [
+    {
+      "id": "c_start",
+      "kind": "start",
+      "zone": "cust",
+      "label": "Order placed"
+    },
+    {
+      "id": "c_pay",
+      "label": "Pay for the order",
+      "zone": "cust"
+    },
+    {
+      "id": "c_recv",
+      "label": "Receive the parcel",
+      "zone": "cust"
+    },
+    {
+      "id": "c_end",
+      "kind": "end",
+      "zone": "cust",
+      "label": "Order received"
+    },
+    {
+      "id": "s_recv",
+      "label": "Register the order",
+      "zone": "shop"
+    },
+    {
+      "id": "s_wait",
+      "kind": "timer",
+      "label": "Wait 24h for payment",
+      "zone": "shop"
+    },
+    {
+      "id": "s_paid",
+      "kind": "exclusive",
+      "label": "Payment ok?",
+      "zone": "shop"
+    },
+    {
+      "id": "s_reject",
+      "label": "Report rejected payment",
+      "zone": "shop"
+    },
+    {
+      "id": "s_stock",
+      "kind": "exclusive",
+      "label": "Stock level?",
+      "zone": "shop"
+    },
+    {
+      "id": "s_split",
+      "kind": "parallel",
+      "zone": "shop"
+    },
+    {
+      "id": "s_pick",
+      "kind": "subprocess",
+      "label": "Pick items",
+      "zone": "shop"
+    },
+    {
+      "id": "s_inv",
+      "label": "Prepare invoice",
+      "zone": "shop"
+    },
+    {
+      "id": "s_join",
+      "kind": "parallel",
+      "zone": "shop"
+    },
+    {
+      "id": "s_hand",
+      "label": "Hand parcel to courier",
+      "zone": "shop"
+    },
+    {
+      "id": "s_partial",
+      "label": "Back-order missing items",
+      "zone": "shop"
+    },
+    {
+      "id": "s_out",
+      "kind": "error",
+      "label": "Out of stock",
+      "zone": "shop"
+    },
+    {
+      "id": "s_refund",
+      "label": "Refund the payment",
+      "zone": "shop"
+    },
+    {
+      "id": "s_end",
+      "kind": "end",
+      "label": "Order cancelled",
+      "zone": "shop"
+    },
+    {
+      "id": "k_recv",
+      "label": "Collect the parcel",
+      "zone": "cour"
+    },
+    {
+      "id": "k_deliver",
+      "label": "Deliver the parcel",
+      "zone": "cour"
+    }
+  ],
+  "flows": [
+    {
+      "from": "c_start",
+      "to": "c_pay"
+    },
+    {
+      "from": "c_pay",
+      "to": "c_recv"
+    },
+    {
+      "from": "c_recv",
+      "to": "c_end"
+    },
+    {
+      "from": "s_recv",
+      "to": "s_wait"
+    },
+    {
+      "from": "s_wait",
+      "to": "s_paid"
+    },
+    {
+      "from": "s_paid",
+      "to": "s_stock",
+      "label": "Yes",
+      "main": true
+    },
+    {
+      "from": "s_paid",
+      "to": "s_reject",
+      "label": "Rejected"
+    },
+    {
+      "from": "s_reject",
+      "to": "s_wait"
+    },
+    {
+      "from": "s_stock",
+      "to": "s_split",
+      "label": "In stock",
+      "main": true
+    },
+    {
+      "from": "s_stock",
+      "to": "s_partial",
+      "label": "Partial"
+    },
+    {
+      "from": "s_stock",
+      "to": "s_out",
+      "label": "None"
+    },
+    {
+      "from": "s_partial",
+      "to": "s_split"
+    },
+    {
+      "from": "s_split",
+      "to": "s_pick"
+    },
+    {
+      "from": "s_split",
+      "to": "s_inv"
+    },
+    {
+      "from": "s_pick",
+      "to": "s_join"
+    },
+    {
+      "from": "s_inv",
+      "to": "s_join"
+    },
+    {
+      "from": "s_join",
+      "to": "s_hand"
+    },
+    {
+      "from": "s_out",
+      "to": "s_refund"
+    },
+    {
+      "from": "s_refund",
+      "to": "s_end"
+    },
+    {
+      "from": "k_recv",
+      "to": "k_deliver"
+    },
+    {
+      "from": "c_start",
+      "to": "s_recv",
+      "style": "message",
+      "label": "Order"
+    },
+    {
+      "from": "c_pay",
+      "to": "s_paid",
+      "style": "message",
+      "label": "Payment"
+    },
+    {
+      "from": "s_reject",
+      "to": "c_pay",
+      "style": "message",
+      "label": "Pay again"
+    },
+    {
+      "from": "s_hand",
+      "to": "k_recv",
+      "style": "message",
+      "label": "Parcel"
+    },
+    {
+      "from": "k_deliver",
+      "to": "c_recv",
+      "style": "message",
+      "label": "Delivery"
+    }
+  ],
+  "direction": "right"
+}

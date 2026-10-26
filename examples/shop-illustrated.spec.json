@@ -1,0 +1,18 @@
+{
+  "type": "architecture",
+  "style": "illustrated",
+  "title": "Illustrated: online shop",
+  "desc": "The same shop as a row of cards: each has an icon, a name and one line about what it does.",
+  "direction": "right",
+  "components": [
+    {"id": "web", "label": "Web app", "icon": "globe", "detail": "What shoppers see", "tone": "blue"},
+    {"id": "api", "label": "API", "icon": "server", "detail": "Rules and checks", "tone": "violet"},
+    {"id": "db", "label": "Orders", "icon": "database", "detail": "Every order and its status", "tone": "amber"},
+    {"id": "pay", "label": "Payments", "icon": "card", "detail": "Charges the card", "tone": "green"}
+  ],
+  "links": [
+    {"from": "web", "to": "api", "label": "calls", "main": true},
+    {"from": "api", "to": "db", "label": "saves"},
+    {"from": "api", "to": "pay", "label": "charges", "style": "async"}
+  ]
+}

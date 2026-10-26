@@ -1,0 +1,23 @@
+{
+  "type": "state",
+  "title": "States of an order",
+  "desc": "An order is created, paid, shipped and delivered; it can be cancelled before it ships.",
+  "states": [
+    {"id": "begin", "kind": "start"},
+    {"id": "created", "label": "Created"},
+    {"id": "paid", "label": "Paid", "icon": "card"},
+    {"id": "shipped", "label": "Shipped", "icon": "box"},
+    {"id": "delivered", "label": "Delivered", "icon": "check"},
+    {"id": "cancelled", "label": "Cancelled", "kind": "fail"},
+    {"id": "done", "kind": "end"}
+  ],
+  "transitions": [
+    {"from": "begin", "to": "created"},
+    {"from": "created", "to": "paid", "label": "pay", "main": true},
+    {"from": "paid", "to": "shipped", "label": "ship", "main": true},
+    {"from": "shipped", "to": "delivered", "label": "arrive", "main": true},
+    {"from": "delivered", "to": "done"},
+    {"from": "created", "to": "cancelled", "label": "cancel"},
+    {"from": "paid", "to": "cancelled", "label": "cancel"}
+  ]
+}

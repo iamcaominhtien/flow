@@ -1,0 +1,14 @@
+{
+  "type": "gantt",
+  "title": "Gantt: build a website",
+  "desc": "Design, build and launch a small website over eight weeks.",
+  "periods": ["W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8"],
+  "tasks": [
+    {"id": "brief", "label": "Write the brief", "start": 0, "length": 1, "group": "Plan", "tone": "violet"},
+    {"id": "design", "label": "Design the pages", "start": 1, "length": 2, "group": "Plan", "tone": "violet", "after": "brief"},
+    {"id": "build", "label": "Build the site", "start": 3, "length": 3, "group": "Build", "tone": "blue", "after": "design"},
+    {"id": "content", "label": "Write the content", "start": 2, "length": 3, "group": "Build", "tone": "blue"},
+    {"id": "test", "label": "Test and fix", "start": 6, "length": 1, "group": "Launch", "tone": "green", "after": "build"},
+    {"id": "launch", "label": "Launch", "start": 7, "length": 1, "group": "Launch", "tone": "green", "after": "test"}
+  ]
+}

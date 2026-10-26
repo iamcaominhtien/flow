@@ -1,0 +1,27 @@
+{
+  "type": "flowchart",
+  "title": "Basic flowchart: top to bottom",
+  "desc": "A login flow. Steps run down, the happy path stays in one straight column, exceptions branch to the right, and the retry loop returns around the flow as a dashed line.",
+  "nodes": [
+    {"id": "start", "kind": "terminator", "text": "Start"},
+    {"id": "enter", "kind": "io", "text": "Enter email and password"},
+    {"id": "check", "kind": "process", "text": "Check credentials"},
+    {"id": "valid", "kind": "decision", "text": "Valid?"},
+    {"id": "session", "kind": "process", "text": "Create session"},
+    {"id": "dash", "kind": "terminator", "text": "Open dashboard"},
+    {"id": "attempts", "kind": "decision", "text": "Fewer than 3 attempts?"},
+    {"id": "lock", "kind": "process", "text": "Lock account"},
+    {"id": "notice", "kind": "fail", "text": "Show lock notice"}
+  ],
+  "edges": [
+    {"from": "start", "to": "enter"},
+    {"from": "enter", "to": "check"},
+    {"from": "check", "to": "valid"},
+    {"from": "valid", "to": "session", "role": "yes", "label": "Yes"},
+    {"from": "session", "to": "dash"},
+    {"from": "valid", "to": "attempts", "role": "no", "label": "No"},
+    {"from": "attempts", "to": "lock", "role": "no", "label": "No"},
+    {"from": "lock", "to": "notice"},
+    {"from": "attempts", "to": "enter", "role": "back", "label": "Yes, retry"}
+  ]
+}

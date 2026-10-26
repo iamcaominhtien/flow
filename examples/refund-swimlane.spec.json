@@ -1,0 +1,28 @@
+{
+  "type": "flowchart",
+  "title": "Refund across three teams",
+  "desc": "A customer asks for a refund; support checks it and finance pays it. One lane per team.",
+  "direction": "right",
+  "lanes": [
+    {"id": "customer", "label": "Customer", "tone": "blue"},
+    {"id": "support", "label": "Support", "tone": "violet"},
+    {"id": "finance", "label": "Finance", "tone": "green"}
+  ],
+  "nodes": [
+    {"id": "ask", "kind": "terminator", "text": "Asks for a refund", "lane": "customer"},
+    {"id": "review", "kind": "process", "text": "Review the request", "lane": "support"},
+    {"id": "eligible", "kind": "decision", "text": "Eligible?", "lane": "support"},
+    {"id": "pay", "kind": "process", "text": "Send the money back", "icon": "refund", "lane": "finance"},
+    {"id": "decline", "kind": "process", "text": "Explain why not", "lane": "support"},
+    {"id": "paid", "kind": "terminator", "text": "Gets the money", "lane": "customer"},
+    {"id": "refused", "kind": "fail", "text": "Refund refused", "lane": "customer"}
+  ],
+  "edges": [
+    {"from": "ask", "to": "review"},
+    {"from": "review", "to": "eligible"},
+    {"from": "eligible", "to": "pay", "role": "yes", "label": "Yes"},
+    {"from": "eligible", "to": "decline", "role": "no", "label": "No"},
+    {"from": "pay", "to": "paid"},
+    {"from": "decline", "to": "refused"}
+  ]
+}

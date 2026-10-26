@@ -1,0 +1,256 @@
+{
+ "size": [
+  1160,
+  900
+ ],
+ "title": "Basic flowchart: top to bottom",
+ "desc": "A login flow. Steps run down, the happy path stays in one straight column, exceptions branch to the right, and the retry loop returns above the flow as a dashed line.",
+ "nodes": [
+  {
+   "id": "start",
+   "shape": "terminator",
+   "x": 255.0,
+   "y": 176.0,
+   "text": "Start",
+   "width": 150,
+   "height": 48
+  },
+  {
+   "id": "enter",
+   "shape": "io",
+   "x": 235.0,
+   "y": 278.0,
+   "text": "Enter email and password",
+   "width": 190,
+   "height": 56
+  },
+  {
+   "id": "check",
+   "shape": "process",
+   "x": 245.0,
+   "y": 384.0,
+   "text": "Check credentials",
+   "width": 170,
+   "height": 56
+  },
+  {
+   "id": "valid",
+   "shape": "decision",
+   "x": 245.0,
+   "y": 490.0,
+   "text": "Valid?",
+   "width": 170,
+   "height": 100
+  },
+  {
+   "id": "session",
+   "shape": "process",
+   "x": 245.0,
+   "y": 658.0,
+   "text": "Create session",
+   "width": 170,
+   "height": 56
+  },
+  {
+   "id": "dash",
+   "shape": "terminator",
+   "x": 255.0,
+   "y": 770.0,
+   "text": "Open dashboard",
+   "width": 150,
+   "height": 48
+  },
+  {
+   "id": "attempts",
+   "shape": "decision",
+   "x": 625.0,
+   "y": 490.0,
+   "text": "Fewer than 3 attempts?",
+   "font_size": 12,
+   "width": 190,
+   "height": 100
+  },
+  {
+   "id": "lock",
+   "shape": "process",
+   "x": 635.0,
+   "y": 658.0,
+   "text": "Lock account",
+   "width": 170,
+   "height": 56
+  },
+  {
+   "id": "notice",
+   "shape": "fail",
+   "x": 645.0,
+   "y": 770.0,
+   "text": "Show lock notice",
+   "width": 150,
+   "height": 48
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "role": "next",
+   "points": [
+    [
+     330.0,
+     224.0
+    ],
+    [
+     330.0,
+     278.0
+    ]
+   ]
+  },
+  {
+   "id": "e2",
+   "role": "next",
+   "points": [
+    [
+     330.0,
+     334.0
+    ],
+    [
+     330.0,
+     384.0
+    ]
+   ]
+  },
+  {
+   "id": "e3",
+   "role": "next",
+   "points": [
+    [
+     330.0,
+     440.0
+    ],
+    [
+     330.0,
+     490.0
+    ]
+   ]
+  },
+  {
+   "id": "e4",
+   "role": "yes",
+   "points": [
+    [
+     330.0,
+     590.0
+    ],
+    [
+     330.0,
+     658.0
+    ]
+   ],
+   "label": {
+    "text": "Yes",
+    "at": [
+     352,
+     612
+    ],
+    "kind": "yes"
+   }
+  },
+  {
+   "id": "e5",
+   "role": "next",
+   "points": [
+    [
+     330.0,
+     714.0
+    ],
+    [
+     330.0,
+     770.0
+    ]
+   ]
+  },
+  {
+   "id": "e6",
+   "role": "no",
+   "points": [
+    [
+     415.0,
+     540.0
+    ],
+    [
+     625.0,
+     540.0
+    ]
+   ],
+   "label": {
+    "text": "No",
+    "at": [
+     520.0,
+     540
+    ],
+    "kind": "no"
+   }
+  },
+  {
+   "id": "e7",
+   "role": "no",
+   "points": [
+    [
+     720.0,
+     590.0
+    ],
+    [
+     720.0,
+     658.0
+    ]
+   ],
+   "label": {
+    "text": "No",
+    "at": [
+     742,
+     612
+    ],
+    "kind": "no"
+   }
+  },
+  {
+   "id": "e8",
+   "role": "next",
+   "points": [
+    [
+     720.0,
+     714.0
+    ],
+    [
+     720,
+     770
+    ]
+   ]
+  },
+  {
+   "id": "e9",
+   "role": "back",
+   "points": [
+    [
+     720.0,
+     490.0
+    ],
+    [
+     720,
+     306
+    ],
+    [
+     425.0,
+     306.0
+    ]
+   ],
+   "label": {
+    "text": "Yes, retry",
+    "at": [
+     720,
+     400
+    ],
+    "kind": "back"
+   }
+  }
+ ]
+}

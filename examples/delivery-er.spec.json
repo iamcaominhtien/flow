@@ -1,0 +1,34 @@
+{
+  "type": "er",
+  "title": "ER: food delivery",
+  "desc": "Customers place orders at restaurants; couriers deliver them. A solid line is a foreign key; a dashed one is only a logical link.",
+  "tables": [
+    {"id": "customers", "name": "customers", "icon": "user", "tone": "blue", "columns": [
+      {"name": "id", "type": "bigint", "flags": ["pk"]},
+      {"name": "email", "type": "text", "flags": ["uq"]},
+      {"name": "name", "type": "text"}]},
+    {"id": "restaurants", "name": "restaurants", "icon": "store", "tone": "green", "columns": [
+      {"name": "id", "type": "bigint", "flags": ["pk"]},
+      {"name": "name", "type": "text"},
+      {"name": "city", "type": "text", "flags": ["null"]}]},
+    {"id": "orders", "name": "orders", "icon": "box", "tone": "violet", "columns": [
+      {"name": "id", "type": "bigint", "flags": ["pk"]},
+      {"name": "customer_id", "type": "bigint", "flags": ["fk"]},
+      {"name": "restaurant_id", "type": "bigint", "flags": ["fk"]},
+      {"name": "courier_id", "type": "bigint", "flags": ["fk", "null"]},
+      {"name": "status", "type": "text"}]},
+    {"id": "couriers", "name": "couriers", "icon": "bike", "tone": "teal", "columns": [
+      {"name": "id", "type": "bigint", "flags": ["pk"]},
+      {"name": "name", "type": "text"}]},
+    {"id": "payments", "name": "payments", "icon": "card", "tone": "amber", "columns": [
+      {"name": "id", "type": "bigint", "flags": ["pk"]},
+      {"name": "order_id", "type": "bigint", "flags": ["fk", "uq"]},
+      {"name": "amount", "type": "numeric"}]}
+  ],
+  "relations": [
+    {"from": "customers", "to": "orders", "from_column": "id", "to_column": "customer_id", "label": "places", "main": true},
+    {"from": "restaurants", "to": "orders", "from_column": "id", "to_column": "restaurant_id", "label": "receives"},
+    {"from": "couriers", "to": "orders", "to_end": "zero_many", "from_end": "zero_one", "label": "delivers"},
+    {"from": "orders", "to": "payments", "to_end": "one", "from_end": "one", "label": "is paid by", "style": "logical"}
+  ]
+}

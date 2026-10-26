@@ -1,0 +1,26 @@
+{
+  "type": "architecture",
+  "title": "Architecture: online shop",
+  "desc": "The web app calls the API; the API reads the database and hands payments to a queue that the worker drains.",
+  "zones": [
+    {"id": "cloud", "label": "Cloud", "tone": "blue"},
+    {"id": "backend", "label": "Backend", "tone": "violet", "parent": "cloud"}
+  ],
+  "components": [
+    {"id": "browser", "label": "Browser", "kind": "client", "icon": "user"},
+    {"id": "web", "label": "Web app", "zone": "cloud", "icon": "phone"},
+    {"id": "api", "label": "API", "detail": "REST, JSON", "zone": "backend", "tone": "violet"},
+    {"id": "db", "label": "Orders DB", "kind": "database", "zone": "backend", "tone": "violet"},
+    {"id": "queue", "label": "Payment queue", "kind": "queue", "zone": "backend", "tone": "violet"},
+    {"id": "worker", "label": "Worker", "zone": "backend", "tone": "violet"},
+    {"id": "psp", "label": "Payment provider", "kind": "external", "icon": "card"}
+  ],
+  "links": [
+    {"from": "browser", "to": "web", "label": "HTTPS", "main": true},
+    {"from": "web", "to": "api", "label": "calls", "main": true},
+    {"from": "api", "to": "db", "label": "reads and writes"},
+    {"from": "api", "to": "queue", "label": "enqueues", "style": "async"},
+    {"from": "queue", "to": "worker", "style": "async"},
+    {"from": "worker", "to": "psp", "label": "charges"}
+  ]
+}

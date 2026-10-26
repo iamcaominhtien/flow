@@ -1,0 +1,19 @@
+{
+  "type": "screen",
+  "title": "Screen flow: sign up",
+  "desc": "From the welcome screen a person signs up, confirms an email code and lands on the home screen.",
+  "screens": [
+    {"id": "begin", "kind": "start"},
+    {"id": "welcome", "label": "Welcome", "icon": "phone"},
+    {"id": "form", "label": "Sign-up form"},
+    {"id": "code", "label": "Enter email code", "icon": "mail"},
+    {"id": "home", "label": "Home", "icon": "home"}
+  ],
+  "taps": [
+    {"from": "begin", "to": "welcome"},
+    {"from": "welcome", "to": "form", "label": "Sign up", "main": true},
+    {"from": "form", "to": "code", "label": "Continue", "main": true},
+    {"from": "code", "to": "home", "label": "Verify", "main": true},
+    {"from": "code", "to": "form", "label": "Wrong email", "style": "back"}
+  ]
+}
