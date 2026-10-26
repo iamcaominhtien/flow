@@ -16,23 +16,45 @@ stored as two relations and a junction table.
 
 from dataclasses import replace
 from enum import StrEnum
+from itertools import pairwise
 from typing import Any
 
-from ..model import Direction, Head, Role, Row, Scene, Shape, Tone
+from ..canvas import fit_canvas
+from ..model import (
+    Direction,
+    Edge,
+    EdgeLabel,
+    Frame,
+    Head,
+    Node,
+    Point,
+    Role,
+    Row,
+    Scene,
+    Shape,
+    Tone,
+)
 from ..reader import Reader, SpecError, suggestion
 from ..spec import Spec, SpecEdge, SpecNode, check_explicit_cells
-from ..theme import icon_names, load_theme
+from ..theme import LayoutRules, icon_names, load_theme
 from . import flowchart
 
 ER = "er"
-SPEC_KEYS = {"type", "title", "desc", "tables", "relations", "style"}
-TABLE_KEYS = {"id", "name", "icon", "tone", "columns", "at"}
+SPEC_KEYS = {"type", "title", "desc", "tables", "relations", "style", "domain_frames"}
+TABLE_KEYS = {"id", "name", "icon", "tone", "columns", "at", "domain", "see"}
 COLUMN_KEYS = {"name", "type", "flags"}
 RELATION_KEYS = {
     "from", "to", "from_column", "to_column", "from_end", "to_end", "label", "style", "main",
 }  # fmt: skip
 AT_LENGTH = 2
-TABLE_GAP_PX = 150  # room for two cardinality marks and a label between two tables
+TABLE_GAP_PX = 160  # room for two cardinality marks and a label between two tables
+ROW_INSET_PX = 1  # the header border, between the header and the first row
+MIN_STRAIGHT_POINTS = 2
+DOMAIN_FRAME_PADDING_PX = 28
+DOMAIN_FRAME_TOP_PX = 56  # room above the tables for the name pill
+DOMAIN_FRAME_CEILING_PX = 128  # the lowest a frame may start without touching the description
+SELF_LOOP_LABEL_GAP_PX = 6  # between a self reference and its label
+SELF_LOOP_PX = 48  # how far a self reference sticks out of its table
 NULLABLE_MARK = "?"
 TABLE_ICON = "table"  # the icon of an illustrated table that names none
 
@@ -47,10 +69,15 @@ class Cardinality(StrEnum):
 
 
 class RelationStyle(StrEnum):
-    """A solid line is enforced by the database; a logical one only by the application."""
+    """A solid line is enforced by the database; a logical one only by the application.
+
+    A subtype line joins a parent (``from``) to a child that shares its key; a hollow triangle
+    marks the parent.
+    """
 
     SOLID = "solid"
     LOGICAL = "logical"
+    SUBTYPE = "subtype"
 
 
 class Flag(StrEnum):
@@ -121,7 +148,16 @@ def _table(raw: object, where: str, read: Reader, icons: set[str]) -> SpecNode |
         lane=None,
         sections=(tuple(rows),),
         at=(int(at[0]), int(at[1])) if at else None,
+        caption=read.text(raw, "see", where),
+        dashed=raw.get("see") is not None,
     )
+
+
+def _relation_role(is_main: bool, style: RelationStyle) -> Role:
+    """Pick the line role: the animated main path, a dashed slate logical link, or a plain line."""
+    if is_main:
+        return Role.MAIN
+    return Role.LOGICAL if style is RelationStyle.LOGICAL else Role.NEXT
 
 
 def _relation(
@@ -149,13 +185,14 @@ def _relation(
     style = read.enum(RelationStyle, raw, "style", where) or RelationStyle.SOLID
     start = read.enum(Cardinality, raw, "from_end", where) or Cardinality.ONE
     end = read.enum(Cardinality, raw, "to_end", where) or Cardinality.ZERO_MANY
+    is_subtype = style is RelationStyle.SUBTYPE
     return SpecEdge(
         source=ends[0],
         target=ends[1],
-        role=Role.MAIN if raw.get("main") is True else Role.NEXT,
+        role=_relation_role(raw.get("main") is True, style),
         label=read.text(raw, "label", where),
-        head=HEAD_OF_CARDINALITY[end],
-        tail=HEAD_OF_CARDINALITY[start],
+        head=Head.NONE if is_subtype else HEAD_OF_CARDINALITY[end],
+        tail=Head.TRIANGLE if is_subtype else HEAD_OF_CARDINALITY[start],
         dashed=style is RelationStyle.LOGICAL,
     )
 
@@ -211,6 +248,138 @@ def to_spec(raw: object) -> Spec:
     )
 
 
+def _with_domain_frames(scene: Scene, raw: dict[str, Any]) -> Scene:
+    """Draw a dashed tinted frame with a name pill around the tables of each domain.
+
+    A frame is the bounding box of its tables with room for the pill above. The whole scene
+    moves down when a frame would otherwise rise into the title. Tables of one domain should
+    sit side by side in the grid, so that no frame covers a table of another domain.
+    """
+    domains: dict[str, list[Node]] = {}
+    tones: dict[str, Tone] = {}
+    by_id = {node.id: node for node in scene.nodes}
+    for table in raw.get("tables", []):
+        domain, node = table.get("domain"), by_id.get(table.get("id"))
+        if domain and node is not None:
+            domains.setdefault(domain, []).append(node)
+            tones.setdefault(domain, node.tone or Tone.GRAY)
+    frames = []
+    for domain, nodes in domains.items():
+        left = min(node.x for node in nodes) - DOMAIN_FRAME_PADDING_PX
+        top = min(node.y for node in nodes) - DOMAIN_FRAME_TOP_PX
+        right = max(node.x + node.width for node in nodes) + DOMAIN_FRAME_PADDING_PX
+        bottom = max(node.y + node.height for node in nodes) + DOMAIN_FRAME_PADDING_PX
+        frames.append(
+            Frame(f"domain-{domain}", left, top, right - left, bottom - top, domain, tones[domain])
+        )
+    if not frames:
+        return scene
+    drop = max(0.0, DOMAIN_FRAME_CEILING_PX - min(frame.y for frame in frames))
+    return fit_canvas(_moved_down(replace(scene, frames=(*scene.frames, *frames)), drop))
+
+
+def _moved_down(scene: Scene, drop: float) -> Scene:
+    """Move everything in a scene down by ``drop`` pixels."""
+    if not drop:
+        return scene
+    nodes = tuple(replace(node, y=node.y + drop) for node in scene.nodes)
+    frames = tuple(replace(frame, y=frame.y + drop) for frame in scene.frames)
+    edges = tuple(
+        replace(
+            edge,
+            points=tuple((x, y + drop) for x, y in edge.points),
+            label=replace(edge.label, at=(edge.label.at[0], edge.label.at[1] + drop))
+            if edge.label
+            else None,
+        )
+        for edge in scene.edges
+    )
+    return replace(scene, nodes=nodes, frames=frames, edges=edges)
+
+
+def _row_y(node: Node, column: str | None, rules: LayoutRules) -> float | None:
+    """Return the y of the middle of a column's row in a table, or None for an unknown column."""
+    header = rules.table_card_header_height if node.card else rules.table_header_height
+    for index, row in enumerate(node.sections[0] if node.sections else ()):
+        if row.left == column:
+            return node.y + header + ROW_INSET_PX + (index + 0.5) * rules.table_row_height
+    return None
+
+
+def _move_end(points: tuple[Point, ...], y: float, is_start: bool) -> tuple[Point, ...]:
+    """Move one end of a line to height ``y`` when the line meets a side of its table.
+
+    The points that run level with that end move with it, so the segment stays horizontal and the
+    first vertical segment of the route is simply longer or shorter. A line that is one level
+    run from end to end gets a jog in the middle.
+    """
+    ends = list(points if is_start else reversed(points))
+    level = ends[0][1]
+    run = 0
+    while run < len(ends) and ends[run][1] == level:
+        run += 1
+    if run < MIN_STRAIGHT_POINTS or ends[0][0] == ends[1][0]:
+        return points
+    if run == len(ends):
+        middle = (ends[0][0] + ends[-1][0]) / 2
+        ends = [(ends[0][0], y), (middle, y), (middle, level), ends[-1]]
+    else:
+        ends[:run] = [(x, y) for x, _ in ends[:run]]
+    return tuple(ends if is_start else reversed(ends))
+
+
+def _attach_to_rows(scene: Scene, raw: object) -> Scene:
+    """Make each line leave and enter a table at the row of the column it joins.
+
+    The design draws a relation from the row of its foreign key. A line that meets the top or
+    the bottom of a table is left as it is.
+    """
+    rules = load_theme().layout
+    nodes = {node.id: node for node in scene.nodes}
+    relations = raw.get("relations", []) if isinstance(raw, dict) else []
+    edges = []
+    for edge, relation in zip(scene.edges, relations, strict=True):
+        if edge.source == edge.target:
+            edges.append(_self_loop(edge, nodes[edge.source], relation, rules))
+            continue
+        points = edge.points
+        for key, is_start in (("from_column", True), ("to_column", False)):
+            node = nodes[edge.source if is_start else edge.target]
+            row_y = _row_y(node, relation.get(key), rules)
+            if row_y is not None:
+                points = _move_end(points, row_y, is_start)
+        edges.append(replace(edge, points=points, label=_relabelled(edge.label, points)))
+    return fit_canvas(replace(scene, edges=tuple(edges)))
+
+
+def _self_loop(edge: Edge, node: Node, relation: dict[str, Any], rules: LayoutRules) -> Edge:
+    """Draw a table that points at itself as a loop at its right side.
+
+    The loop leaves at the row of ``from_column`` and comes back at the row of ``to_column``;
+    without them it uses a third and two thirds of the table's height.
+    """
+    right = node.x + node.width
+    first = _row_y(node, relation.get("from_column"), rules) or node.y + node.height / 3
+    second = _row_y(node, relation.get("to_column"), rules) or node.y + 2 * node.height / 3
+    out = right + SELF_LOOP_PX
+    points = ((right, first), (out, first), (out, second), (right, second))
+    label = None
+    if edge.label:
+        chip = len(edge.label.text) * rules.chip_char_width_em * rules.chip_font_size
+        beside = out + SELF_LOOP_LABEL_GAP_PX + (chip + rules.chip_padding_x) / 2
+        label = replace(edge.label, at=(beside, (first + second) / 2))
+    return replace(edge, points=points, label=label)
+
+
+def _relabelled(label: EdgeLabel | None, points: tuple[Point, ...]) -> EdgeLabel | None:
+    """Put a label back on the middle of the longest segment of a line that was changed."""
+    if label is None:
+        return None
+    segments = list(pairwise(points))
+    start, end = max(segments, key=lambda s: abs(s[1][0] - s[0][0]) + abs(s[1][1] - s[0][1]))
+    return replace(label, at=((start[0] + end[0]) / 2, (start[1] + end[1]) / 2))
+
+
 def layout_raw(raw: object) -> Scene:
     """Lay out an ER diagram from a parsed JSON spec.
 
@@ -231,4 +400,7 @@ def layout_raw(raw: object) -> Scene:
         gap_horizontal=TABLE_GAP_PX,
         gap_horizontal_labelled=TABLE_GAP_PX,
     )
-    return flowchart.layout(to_spec(raw), wide)
+    scene = _attach_to_rows(flowchart.layout(to_spec(raw), wide), raw)
+    if isinstance(raw, dict) and raw.get("domain_frames") is True:
+        return _with_domain_frames(scene, raw)
+    return scene

@@ -41,7 +41,8 @@ Drawer = Callable[[float, float, ShapeColors], str]
 
 def _paint(colors: ShapeColors) -> str:
     """Return the SVG attributes that fill and outline a shape."""
-    return f'fill="{colors.fill}" stroke="{colors.stroke}" stroke-width="{STROKE_WIDTH_PX}"'
+    dash = f' stroke-dasharray="{colors.dash}"' if colors.dash else ""
+    return f'fill="{colors.fill}" stroke="{colors.stroke}" stroke-width="{STROKE_WIDTH_PX}"{dash}'
 
 
 def _pill(width: float, height: float, colors: ShapeColors) -> str:

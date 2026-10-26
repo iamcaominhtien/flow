@@ -334,50 +334,66 @@
    "label": "places",
    "main": true,
    "from_end": "one",
-   "to_end": "zero_many"
+   "to_end": "zero_many",
+   "from_column": "id",
+   "to_column": "customer_id"
   },
   {
    "from": "restaurants",
    "to": "orders",
    "label": "receives",
-   "to_end": "zero_many"
+   "to_end": "zero_many",
+   "from_column": "id",
+   "to_column": "restaurant_id"
   },
   {
    "from": "restaurants",
    "to": "dishes",
    "label": "offers",
-   "to_end": "zero_many"
+   "to_end": "zero_many",
+   "from_column": "id",
+   "to_column": "restaurant_id"
   },
   {
    "from": "couriers",
    "to": "deliveries",
    "label": "carries",
-   "to_end": "zero_many"
+   "to_end": "zero_many",
+   "from_column": "id",
+   "to_column": "courier_id"
   },
   {
    "from": "orders",
    "to": "payments",
    "label": "paid by",
-   "to_end": "zero_many"
+   "to_end": "zero_many",
+   "from_column": "id",
+   "to_column": "order_id"
   },
   {
    "from": "orders",
    "to": "items",
    "label": "contains",
    "main": true,
-   "to_end": "one_many"
+   "to_end": "one_many",
+   "from_column": "id",
+   "to_column": "order_id"
   },
   {
    "from": "dishes",
    "to": "items",
    "label": "sold as",
-   "to_end": "zero_many"
+   "to_end": "zero_many",
+   "from_column": "id",
+   "to_column": "dish_id"
   },
   {
    "from": "orders",
    "to": "deliveries",
    "label": "delivered by",
-   "to_end": "zero_one"
+   "to_end": "zero_one",
+   "from_column": "id",
+   "to_column": "order_id"
   }
  ]
 }

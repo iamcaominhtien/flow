@@ -218,6 +218,7 @@ def make_node(node: SpecNode, size: FittedNode, center: Point, width: float) -> 
         caption=node.caption,
         sections=node.sections,
         card=node.card,
+        dashed=node.dashed,
     )
 
 

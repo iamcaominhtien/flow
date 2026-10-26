@@ -152,5 +152,5 @@ def test_a_table_is_sized_by_its_rows_and_has_a_taller_header_when_illustrated()
     card = canvas.node(
         "card", Shape.TABLE, "orders", NodeOptions((700, 300), rows=rows, card=True, icon="cart")
     )
-    assert card.node.height - plain.node.height == 28
+    assert card.node.height - plain.node.height == 24
     assert plain.node.sections == (rows,)

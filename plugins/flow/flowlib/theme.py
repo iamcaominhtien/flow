@@ -26,6 +26,7 @@ class ShapeColors:
 
     fill: str
     stroke: str
+    dash: str = ""  # an SVG dash pattern, or nothing for a solid outline
 
 
 @dataclass(frozen=True)

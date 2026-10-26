@@ -1,5 +1,7 @@
 """Draw the nodes of a scene as HTML: outline, icon, text, table rows, badge and caption."""
 
+from dataclasses import replace
+
 from .markup import esc, px, tag
 from .model import KEY_FLAG_TONES, Node, Row, Shape, Tone
 from .shapes import outline_svg
@@ -55,6 +57,7 @@ CAPTION_WIDTH_PX = 150
 CAPTION_GAP_PX = 4
 CAPTION_FONT_SIZE_PX = 12
 
+DASH_PATTERN = "6 4"  # the outline of a reference to a table drawn on another page
 ABSOLUTE = {"position": "absolute"}
 
 
@@ -387,6 +390,8 @@ def node_html(node: Node, theme: Theme) -> str:
     colors = theme.shapes[node.shape]
     if node.tone is not None and node.shape is not Shape.TABLE:
         colors = ShapeColors(fill=theme.tones[node.tone].box, stroke=colors.stroke)
+    if node.dashed:
+        colors = replace(colors, dash=DASH_PATTERN)
     inside = outline_svg(node.shape, node.width, node.height, colors)
     if node.card and node.shape is not Shape.TABLE:
         inside += _card_html(node, theme)

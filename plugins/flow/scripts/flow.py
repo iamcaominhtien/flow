@@ -2,6 +2,7 @@
 """Flow command line. Standard library only.
 
 flow.py build spec.json [-o dir]           place, check and draw a flowchart spec (HTML and draw.io)
+flow.py split spec.json [-o dir]           split an ER spec by domain: an overview and one page each
 flow.py check scene.json                   check a scene
 flow.py render scene.json [-o out.html]    draw a scene as HTML
 flow.py import file.drawio [-o dir]        read a draw.io file into a scene (HTML and draw.io)
@@ -20,6 +21,7 @@ from flowlib import (
     build,
     check,
     edit_drawio,
+    er_split,
     icon_check,
     import_drawio,
     overrides,
@@ -105,6 +107,41 @@ def run_build(arguments: argparse.Namespace) -> int:
     print(check.format_report(result.findings))
     has_errors = any(finding.severity is check.Severity.ERROR for finding in result.findings)
     return EXIT_ERRORS_FOUND if has_errors else EXIT_OK
+
+
+def run_split(arguments: argparse.Namespace) -> int:
+    """Split an ER spec by domain and build the overview and every domain page.
+
+    Args:
+        arguments: The parsed command line; ``spec`` is the ER spec and ``output`` the optional
+            output folder (default: the folder of the spec).
+
+    Returns:
+        0 when every page was written and the checks found no error, 2 when they found at least
+        one error (the files are still written), 1 when the spec cannot be split.
+    """
+    spec_path = Path(arguments.spec)
+    out_dir = Path(arguments.output or spec_path.parent)
+    try:
+        pages = er_split.split_by_domain(json.loads(spec_path.read_text(encoding="utf-8")))
+    except er_split.SplitError as error:
+        print(f"{spec_path} cannot be split: {error}", file=sys.stderr)
+        return EXIT_INVALID_INPUT
+    out_dir.mkdir(parents=True, exist_ok=True)
+    exit_code = EXIT_OK
+    for name, page in pages.items():
+        path = out_dir / f"{build.output_stem(spec_path)}-{name}{build.SPEC_SUFFIX}"
+        path.write_text(json.dumps(page, indent=build.JSON_INDENT) + "\n", encoding="utf-8")
+        try:
+            result = build.build(path, out_dir)
+        except spec.SpecError as error:
+            print(f"{path} is not a valid spec:\n{error}", file=sys.stderr)
+            return EXIT_INVALID_INPUT
+        print(f"wrote {result.html_path}\nwrote {result.drawio_path}")
+        print(check.format_report(result.findings))
+        if any(f.severity is check.Severity.ERROR for f in result.findings):
+            exit_code = EXIT_ERRORS_FOUND
+    return exit_code
 
 
 def run_import(arguments: argparse.Namespace) -> int:
@@ -208,6 +245,12 @@ def build_parser() -> argparse.ArgumentParser:
     build_command.add_argument("spec")
     build_command.add_argument("-o", "--output")
     build_command.set_defaults(run=run_build)
+    split_command = commands.add_parser(
+        "split", help="split an ER spec by domain into an overview and one page per domain"
+    )
+    split_command.add_argument("spec")
+    split_command.add_argument("-o", "--output")
+    split_command.set_defaults(run=run_split)
     check_command = commands.add_parser("check", help="check a scene")
     check_command.add_argument("scene")
     check_command.set_defaults(run=run_check)
