@@ -67,7 +67,7 @@ Flow aims to cover **nearly every common diagram type**, grouped into 8 categori
 
 ## Getting started
 
-Flow installs as a Claude Code plugin from this repository. Flow writes `.drawio` files itself; the official draw.io plugin is optional and only useful for exporting them to PNG, SVG or PDF. To install Flow alone:
+Flow installs as a Claude Code plugin from this repository; full steps, including a not-yet-tested way to try it in Google Antigravity, are in [INSTALL.md](INSTALL.md). Flow writes `.drawio` files itself; the official draw.io plugin is optional and only useful for exporting them to PNG, SVG or PDF. To install Flow alone:
 
 ```
 /plugin marketplace add iamcaominhtien/flow
