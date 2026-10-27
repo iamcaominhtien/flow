@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.11.1 (2026-10-27)
+
+Screen flow: large flows. Found by the `screen-C-01` benchmark (52 screens, 77 arrows): 27 errors with 0.11.0, 0 errors now.
+
+- Arrows that would cross a frame (returns, far targets, entries) run in free lanes between rows and columns, each in a slot of its own, so parallel returns never overlap. The old outside loop is replaced by the lane router.
+- Chips, guards and effects sit on a free stretch of their line, off frames, id chips, zone labels and borders, and other words.
+- Screens with no `at` are arranged by zone, in flow order, wrapping in whole rows from the left, on shelves; web zones go below.
+- The skill says what the automatic layout handles and suggests splitting by zone with flags, or `/flow:author`, above about 25 screens.
+- Example `ride-screen-flow` (52 screens, 6 zones, 77 arrows); tests `test_screen_lanes.py`.
+- Not done: the benchmark still builds with 41 warnings (33 `lines-cross`, mostly long cross-zone arrows), and the page is about 3800 by 5700 px; chips on long vertical runs sit beside the line; real draw.io editor not used.
+
 ## 0.11.0 (2026-10-27)
 
 Wireframe rebuilt from `docs/design/10-wireframe.md`. Last phase of the design-gap plan (`docs/plugin/design-gaps.md` has the final status table).
