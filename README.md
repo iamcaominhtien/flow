@@ -88,6 +88,7 @@ Claude writes the files next to your spec: `<name>.html` (open it in any browser
 | `/flow:org-chart`, `/flow:mind-map` | Trees with a tidy layout (top down; left to right) |
 | `/flow:gantt`, `/flow:roadmap` | Time axis in named periods; lanes of items |
 | `/flow:kanban`, `/flow:layers`, `/flow:wireframe`, `/flow:concept` | Columns of cards (also a comparison); stacked bands; low-fidelity screens; a hub with parts around it |
+| `/flow:explainer` | One idea taught to a newcomer: a journey through bands, a tree, a comparison or a concept with an analogy, or several on one page |
 | `/flow:import-drawio` | Reads an existing `.drawio` file into a scene (best effort) |
 | `/flow:edit-drawio` | Changes an existing `.drawio` file in place; the rest of the file stays as it was |
 | `/flow:doctor` | Checks the install |

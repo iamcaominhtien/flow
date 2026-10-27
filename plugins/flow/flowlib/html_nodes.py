@@ -3,9 +3,11 @@
 from dataclasses import replace
 
 from .cards import card_parts
+from .explain_parts import is_explain_node
 from .html_board import board_node_html, is_board_node
 from .html_c4 import c4_html, is_c4_node
 from .html_dfd import dfd_html, is_dfd_node
+from .html_explain import explain_node_html
 from .html_plan import is_plan_node, plan_node_html
 from .html_screen import screen_html
 from .html_wide import is_wide_card, wide_card_html
@@ -515,6 +517,8 @@ def node_html(node: Node, theme: Theme) -> str:
         return plan_node_html(node, theme)
     if is_board_node(node):
         return board_node_html(node, theme)
+    if is_explain_node(node):
+        return explain_node_html(node, theme)
     colors = theme.shapes[node.shape]
     if node.tone is not None and node.shape is not Shape.TABLE:
         colors = replace(colors, fill=theme.tones[node.tone].box)

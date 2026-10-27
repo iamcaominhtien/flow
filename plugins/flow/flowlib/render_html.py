@@ -2,6 +2,8 @@
 
 from dataclasses import replace
 
+from .explain_parts import EXPLAINER
+from .html_explain import strip_frame_html
 from .html_frames import BAND_VARIANTS, frame_with_band_html
 from .html_lines import lines_layer
 from .html_nodes import node_html
@@ -98,6 +100,8 @@ def _frame_html(frame: Frame, theme: Theme) -> str:
     """Draw one frame: a tinted area with a label pill, or a fragment with a tag and a guard."""
     if frame.variant is FrameVariant.FRAGMENT:
         return _fragment_html(frame, theme)
+    if frame.variant is FrameVariant.STRIP:
+        return strip_frame_html(frame, theme)
     if frame.variant is FrameVariant.LANE:
         return _lane_html(frame, theme)
     if frame.variant in BAND_VARIANTS:
@@ -352,24 +356,35 @@ def _title_html(scene: Scene, theme: Theme) -> str:
     """Draw the title and the description of a scene, or return nothing without a title."""
     if not scene.title:
         return ""
+    is_explainer = scene.diagram == EXPLAINER
+    rules = theme.explainer
+    title_size = rules.title_size if is_explainer else theme.type_scale.title.size
     title_style = {
-        "font-size": px(theme.type_scale.title.size),
+        "font-size": px(title_size),
         "font-weight": str(theme.type_scale.title.weight),
     }
+    if is_explainer:
+        title_style["line-height"] = px(rules.title_height)
     title = tag("div", title_style, esc(scene.title))
     description = ""
     if scene.description:
         style = {
-            "font-size": px(DESCRIPTION_FONT_SIZE_PX),
-            "line-height": px(DESCRIPTION_LINE_HEIGHT_PX),
+            "font-size": px(rules.description_size if is_explainer else DESCRIPTION_FONT_SIZE_PX),
+            "line-height": px(
+                rules.description_line_height if is_explainer else DESCRIPTION_LINE_HEIGHT_PX
+            ),
             "color": theme.slate,
-            "max-width": px(min(scene.width - 2 * TITLE_LEFT_PX, DESCRIPTION_MAX_WIDTH_PX)),
+            "max-width": px(
+                rules.description_max_width
+                if is_explainer
+                else min(scene.width - 2 * TITLE_LEFT_PX, DESCRIPTION_MAX_WIDTH_PX)
+            ),
         }
         description = tag("div", style, esc(scene.description))
     block = {
         **ABSOLUTE,
         "left": px(TITLE_LEFT_PX),
-        "top": px(TITLE_TOP_PX),
+        "top": px(rules.title_top if is_explainer else TITLE_TOP_PX),
         "display": "flex",
         "flex-direction": "column",
         "gap": px(TITLE_GAP_PX),

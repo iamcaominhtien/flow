@@ -1,0 +1,20 @@
+{
+  "type": "explainer",
+  "shape": "concept",
+  "title": "What a cache does",
+  "desc": "A cache keeps a copy of what you used recently, close at hand, so you do not have to fetch it again.",
+  "hub": {"name": "Cache", "text": "A small, fast place that holds copies.", "icon": "in-memory-cache", "tone": "teal"},
+  "facts": [
+    {"name": "Fast", "text": "Answers in a blink, because it is near.", "icon": "launch", "tone": "amber"},
+    {"name": "Small", "text": "Holds only a little, so it keeps what is popular.", "icon": "package", "tone": "violet"},
+    {"name": "Temporary", "text": "Old copies expire so they never go stale.", "icon": "schedule", "tone": "blue"},
+    {"name": "A copy, not the original", "text": "The real data stays in the database.", "icon": "database", "tone": "green"}
+  ],
+  "analogy": {
+    "label": "Like a desk and a library",
+    "tone": "amber",
+    "left": {"name": "Your desk", "text": "The books you use every day are within reach.", "icon": "in-memory-cache", "tone": "teal"},
+    "right": {"name": "The library", "text": "Everything is here, but it takes a walk.", "icon": "folder", "tone": "blue"},
+    "link": "not on the desk? walk"
+  }
+}

@@ -23,6 +23,7 @@ from .drawio_common import (
     add_vertex,
     style_string,
 )
+from .drawio_explain import add_explain_node, add_strip_frame
 from .drawio_lines import add_divider, add_edge
 from .drawio_notation import (
     add_band_frame,
@@ -35,6 +36,7 @@ from .drawio_notation import (
 from .drawio_plan import add_plan_node
 from .drawio_screen import add_node_chip, add_screen_parts, screen_style
 from .drawio_wide import add_wide_parts, wide_style
+from .explain_parts import EXPLAINER, is_explain_node
 from .html_board import is_board_node
 from .html_c4 import is_c4_node
 from .html_dfd import is_dfd_node
@@ -486,6 +488,9 @@ def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
     if is_board_node(node):
         add_board_node(root, node, theme)
         return
+    if is_explain_node(node):
+        add_explain_node(root, node, theme)
+        return
     cell = add_vertex(root, f"node-{node.id}", _node_value(node, theme), _node_style(node, theme))
     add_geometry(cell, (node.x, node.y, node.width, node.height))
     if node.screen is not None:
@@ -760,6 +765,9 @@ def _add_frame(root: ET.Element, frame: Frame, theme: Theme) -> None:
     if frame.variant is FrameVariant.LANE:
         _add_lane(root, frame, theme)
         return
+    if frame.variant is FrameVariant.STRIP:
+        add_strip_frame(root, frame, theme)
+        return
     if frame.variant in BAND_VARIANTS:
         add_band_frame(root, frame, theme)
         return
@@ -930,11 +938,16 @@ def _add_title(root: ET.Element, scene: Scene, theme: Theme) -> None:
     """Add the title and the description as plain text cells."""
     if not scene.title:
         return
+    rules = theme.explainer
+    is_explainer = scene.diagram == EXPLAINER
+    title_size = rules.title_size if is_explainer else theme.type_scale.title.size
+    title_top = rules.title_top if is_explainer else TITLE_TOP_PX
+    title_height = rules.title_height if is_explainer else TITLE_HEIGHT_PX
     common = {"text": "", "html": 1, "align": "left", "verticalAlign": "top", "strokeColor": "none"}
     title_style = style_string(
         {
             **common,
-            "fontSize": fmt(theme.type_scale.title.size),
+            "fontSize": fmt(title_size),
             "fontStyle": FONT_BOLD,
             "fontColor": theme.ink,
             "fontFamily": theme.fonts.sans,
@@ -942,21 +955,30 @@ def _add_title(root: ET.Element, scene: Scene, theme: Theme) -> None:
     )
     title = add_vertex(root, "title", esc(scene.title), title_style)
     title_width = scene.width - 2 * TITLE_LEFT_PX
-    add_geometry(title, (TITLE_LEFT_PX, TITLE_TOP_PX, title_width, TITLE_HEIGHT_PX))
+    add_geometry(title, (TITLE_LEFT_PX, title_top, title_width, title_height))
     if scene.description:
+        description_size = rules.description_size if is_explainer else DESCRIPTION_FONT_SIZE_PX
         description_style = style_string(
             {
                 **common,
                 "whiteSpace": "wrap",
-                "fontSize": DESCRIPTION_FONT_SIZE_PX,
+                "fontSize": description_size,
                 "fontColor": theme.slate,
                 "fontFamily": theme.fonts.sans,
             }
         )
         description = add_vertex(root, "description", esc(scene.description), description_style)
-        width = min(scene.width - 2 * TITLE_LEFT_PX, DESCRIPTION_MAX_WIDTH_PX)
-        top = TITLE_TOP_PX + TITLE_HEIGHT_PX
-        add_geometry(description, (TITLE_LEFT_PX, top, width, DESCRIPTION_HEIGHT_PX))
+        limit = rules.description_max_width if is_explainer else DESCRIPTION_MAX_WIDTH_PX
+        height = rules.description_height if is_explainer else DESCRIPTION_HEIGHT_PX
+        add_geometry(
+            description,
+            (
+                TITLE_LEFT_PX,
+                title_top + title_height,
+                min(scene.width - 2 * TITLE_LEFT_PX, limit),
+                height,
+            ),
+        )
 
 
 def render(scene: Scene) -> str:

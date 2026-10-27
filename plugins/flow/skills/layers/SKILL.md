@@ -92,6 +92,8 @@ Add `"style": "illustrated"` at the top level to draw each box that has an `icon
 
 ## Limits to tell the user
 
+- To teach a journey to a newcomer (numbered cards, bands, spoken labels), use `/flow:explainer`; this skill is for stacks and tiers.
+
 - Items in a layer sit in one row: a layer with many items gets wide. There is no wrapping to a second row.
 - Arrows join whole layers, not single items.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.

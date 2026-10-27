@@ -194,6 +194,30 @@
     "leaf": {
       "fill": "#FFFFFF",
       "stroke": "#1D4ED8"
+    },
+    "explain_card": {
+      "fill": "#DCEEFB",
+      "stroke": "#0F172A"
+    },
+    "row_card": {
+      "fill": "#DCEEFB",
+      "stroke": "#0F172A"
+    },
+    "cell": {
+      "fill": "#DCEEFB",
+      "stroke": "#0F172A"
+    },
+    "pill_label": {
+      "fill": "#FFF1DD",
+      "stroke": "#0F172A"
+    },
+    "remark": {
+      "fill": "none",
+      "stroke": "none"
+    },
+    "section_head": {
+      "fill": "none",
+      "stroke": "none"
     }
   },
   "tones": {
@@ -976,6 +1000,30 @@
         "leaf": {
           "fill": "#111A2E",
           "stroke": "#60A5FA"
+        },
+        "explain_card": {
+          "fill": "#12263F",
+          "stroke": "#E2E8F0"
+        },
+        "row_card": {
+          "fill": "#12263F",
+          "stroke": "#E2E8F0"
+        },
+        "cell": {
+          "fill": "#12263F",
+          "stroke": "#E2E8F0"
+        },
+        "pill_label": {
+          "fill": "#12263F",
+          "stroke": "#E2E8F0"
+        },
+        "remark": {
+          "fill": "none",
+          "stroke": "none"
+        },
+        "section_head": {
+          "fill": "none",
+          "stroke": "none"
         }
       },
       "tones": {
@@ -1793,5 +1841,197 @@
       "amber": "#D97706",
       "red": "#B42318"
     }
+  },
+  "explainer": {
+    "title_size": 40,
+    "title_top": 41,
+    "title_height": 52,
+    "description_size": 16,
+    "description_line_height": 24,
+    "description_height": 56,
+    "description_max_width": 880,
+    "canvas_width": 1500,
+    "narrow_width": 1400,
+    "bottom_margin": 60,
+    "column_gap": 60,
+    "section_gap": 80,
+    "section_head_size": 36,
+    "section_head_font": 22,
+    "section_head_gap": 64,
+    "section_head_letter_font": 16,
+    "first_section_top": 210,
+    "layers_top": 206,
+    "tree_top": 284,
+    "compare_top": 230,
+    "concept_top": 260,
+    "card_icon_size": 88,
+    "card_icon_top": 14,
+    "card_pill_top": 112,
+    "card_pill_height": 28,
+    "card_pill_font": 14,
+    "card_detail_top": 151,
+    "card_detail_font": 12.5,
+    "card_detail_line": 17.5,
+    "card_pad": 24,
+    "card_radius": 16,
+    "border_width": 2,
+    "pill_shadow": 3,
+    "pill_pad": 14,
+    "badge_size": 26,
+    "badge_overhang": 11,
+    "badge_font": 12,
+    "row_icon_inset": 18,
+    "row_name_font": 15,
+    "row_detail_gap": 6,
+    "row_detail_font": 12.5,
+    "row_radius": 14,
+    "chip_height": 26,
+    "chip_font": 11,
+    "chip_gap": 8,
+    "chip_pad": 12,
+    "chips_label_font": 11,
+    "cell_font": 13,
+    "cell_pad": 22,
+    "cell_radius": 12,
+    "label_font": 13,
+    "vs_font": 14,
+    "remark_font": 13,
+    "remark_gap": 100,
+    "closing_gap": 30,
+    "note_font": 12,
+    "note_gap": 86,
+    "rule_title_font": 15,
+    "rule_text_font": 13,
+    "rule_pad": 32,
+    "rule_height": 120,
+    "rule_gap": 60,
+    "rule_title_top": 20,
+    "rule_text_top": 46,
+    "band_radius": 24,
+    "band_pill_left": 18,
+    "band_pill_top": 16,
+    "band_pill_height": 28,
+    "band_pill_font": 13,
+    "band_alpha": 0.65,
+    "band_pill_pad": 14,
+    "analogy_card_top": 100,
+    "analogy_bottom": 70,
+    "stack_gap": 21,
+    "label_gap": 16,
+    "tree_root_inset": 36,
+    "tree_bus_gap": 60,
+    "concept_spread": 450,
+    "concept_row_pitch": 400,
+    "hub_line_offset": 40,
+    "rule_line_extend": 18,
+    "standard": {
+      "card_size": [
+        260,
+        200
+      ],
+      "band_height": 248,
+      "band_pitch": 290,
+      "band_card_top": 34,
+      "col_offset": 226,
+      "col_pitch": 400,
+      "branch_size": [
+        296,
+        78
+      ],
+      "branch_icon": 48,
+      "row_size": [
+        700,
+        92
+      ],
+      "row_icon": 60,
+      "row_pitch": 112,
+      "head_size": [
+        320,
+        200
+      ],
+      "cell_size": [
+        340,
+        88
+      ],
+      "label_size": [
+        224,
+        40
+      ],
+      "vs_size": [
+        120,
+        40
+      ],
+      "compare_pitch": 124,
+      "compare_gap": 46,
+      "compare_spread": 360,
+      "fact_size": [
+        300,
+        200
+      ],
+      "hub_size": [
+        340,
+        238
+      ],
+      "root_size": [
+        300,
+        208
+      ]
+    },
+    "compact": {
+      "card_size": [
+        256,
+        196
+      ],
+      "band_height": 245,
+      "band_pitch": 267,
+      "band_card_top": 35,
+      "col_offset": 184,
+      "col_pitch": 376,
+      "branch_size": [
+        296,
+        78
+      ],
+      "branch_icon": 48,
+      "row_size": [
+        435,
+        94
+      ],
+      "row_icon": 48,
+      "row_pitch": 119,
+      "head_size": [
+        246,
+        198
+      ],
+      "cell_size": [
+        246,
+        78
+      ],
+      "label_size": [
+        162,
+        40
+      ],
+      "vs_size": [
+        60,
+        34
+      ],
+      "compare_pitch": 103,
+      "compare_gap": 59,
+      "compare_spread": 237,
+      "fact_size": [
+        296,
+        196
+      ],
+      "hub_size": [
+        340,
+        238
+      ],
+      "root_size": [
+        236,
+        196
+      ]
+    },
+    "left_column_width": 926,
+    "right_column_width": 770,
+    "page_margin": 64
   }
 }

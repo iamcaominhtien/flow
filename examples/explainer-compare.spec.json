@@ -1,0 +1,19 @@
+{
+  "type": "explainer",
+  "shape": "comparison",
+  "title": "SQL or NoSQL?",
+  "desc": "Two ways to store data. Neither is better; they fit different jobs. Read across each row to compare.",
+  "left": {"name": "SQL database", "text": "Data in tables with fixed columns, linked by keys.", "icon": "table", "tone": "blue"},
+  "right": {"name": "NoSQL database", "text": "Data as flexible documents, each shaped as it needs.", "icon": "json", "tone": "green"},
+  "rows": [
+    {"label": "Shape of the data", "left": "Every row has the same columns.", "right": "Each document can have its own fields."},
+    {"label": "Changing the shape", "left": "A planned change to the table, applied to all rows.", "right": "Just start writing the new field."},
+    {"label": "Links between things", "left": "Strong: keys and joins keep them consistent.", "right": "Weak: you repeat data or link it yourself."},
+    {"label": "Growing very large", "left": "Harder: usually one big machine, then careful splitting.", "right": "Easier: designed to spread over many machines."},
+    {"label": "Best for", "left": "Orders, accounts, money: data that must stay exact.", "right": "Feeds, logs, catalogues: lots of data that changes shape."}
+  ],
+  "rule": {
+    "title": "Rule of thumb",
+    "text": "Start with SQL when the data has clear relationships and must stay correct. Add NoSQL beside it when one kind of data is huge or its shape keeps changing. Many systems use both."
+  }
+}

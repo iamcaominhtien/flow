@@ -9,6 +9,7 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from itertools import combinations, pairwise
 
+from .explain_parts import is_explain_node
 from .html_board import board_text_room, is_board_node
 from .html_nodes import CAPTION_FONT_SIZE_PX, CAPTION_GAP_PX, CAPTION_WIDTH_PX
 from .html_plan import is_plan_node, plan_text_room
@@ -79,6 +80,10 @@ class Code(StrEnum):
     KANBAN_CARD_FULL = "kanban-card-full"
     ROADMAP_EXACT_DATE = "roadmap-exact-date"
     ROADMAP_DEPENDENCIES = "roadmap-dependencies"
+    EXPLAINER_TOO_MANY_CARDS = "explainer-too-many-cards"
+    EXPLAINER_TEXT_LONG = "explainer-text-long"
+    EXPLAINER_JARGON = "explainer-jargon"
+    EXPLAINER_NO_TITLE = "explainer-no-title"
 
 
 @dataclass(frozen=True)
@@ -364,6 +369,8 @@ def check_text_fit(scene: Scene, rules: LayoutRules) -> list[Finding]:
 
 def _text_room(node: Node, rules: LayoutRules, theme: Theme) -> float | None:
     """Return how wide the text of a node may be, or None for a node whose text is not checked."""
+    if is_explain_node(node):
+        return None
     if is_plan_node(node):
         return plan_text_room(node, theme)
     if is_board_node(node):

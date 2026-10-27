@@ -1,0 +1,17 @@
+{
+  "type": "explainer",
+  "shape": "tree",
+  "title": "What is inside a web project",
+  "desc": "A project is a folder with a few well-known places in it. Knowing what each one is for makes any new project easy to read.",
+  "root": {"name": "my-app/", "text": "The project folder. Everything below lives here.", "icon": "folder", "tone": "amber"},
+  "rows": [
+    {"name": "src/", "text": "The code you write. Most of your time is spent here.", "icon": "code", "tone": "blue", "inside": ["components/", "pages/", "api/"]},
+    {"name": "public/", "text": "Files sent to the browser as they are: images, icons, fonts.", "icon": "globe", "tone": "violet"},
+    {"name": "tests/", "text": "Small programs that check the code still works.", "icon": "success", "tone": "green"},
+    {"name": "docs/", "text": "Notes for people: how to start, how it is built.", "icon": "info", "tone": "teal"},
+    {"name": "package.json", "text": "The shopping list: which libraries the project needs.", "icon": "package", "tone": "amber"},
+    {"name": "README.md", "text": "The front door: what this is and how to run it.", "icon": "file", "tone": "gray"},
+    {"name": ".env", "text": "Secrets such as passwords. Never shared, never uploaded.", "icon": "lock", "tone": "red"}
+  ],
+  "note": "Folder names end with a slash. Names with a dot are files. Order here is only for reading; real folders are listed alphabetically."
+}

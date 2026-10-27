@@ -63,7 +63,7 @@ DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
 NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections", "card", "dashed"}
 NODE_KEYS |= {"screen", "chip", "markers", "caption_above", "host", "technology"}
-NODE_KEYS |= {"activities", "stereotype", "italic", "centered", "plan"}
+NODE_KEYS |= {"activities", "stereotype", "italic", "centered", "plan", "chips", "mono"}
 ROW_KEYS = {"left", "right", "flags", "mono"}
 EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label", "extras"}
 EDGE_KEYS |= {"tone", "curved"}
@@ -215,6 +215,8 @@ def _dump_node(node: Node) -> dict[str, Any]:
         "stereotype": node.stereotype,
         "italic": node.is_italic,
         "centered": node.is_centered,
+        "chips": list(node.chips),
+        "mono": node.is_mono,
     }
     written.update({key: value for key, value in optional.items() if value})
     if node.plan is not None:
@@ -407,6 +409,8 @@ class _SceneParser:
             stereotype=read.text(raw, "stereotype", where) or "",
             is_italic=raw.get("italic") is True,
             is_centered=raw.get("centered") is True,
+            chips=self._lines(raw.get("chips", []), where),
+            is_mono=raw.get("mono") is True,
             plan=parse_plan(raw["plan"], f"{where}.plan", read) if "plan" in raw else None,
         )
 
