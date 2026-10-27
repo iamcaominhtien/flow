@@ -1,8 +1,8 @@
 """Turn the items of a screen flow into nodes, and give each one a cell of the grid.
 
-The author names a row and a column (``at``); an item without one is placed by rank: its column
-follows its distance from the start of the flow and its row is the first free one. Entries, which
-sit in a column of their own at the left, take the row of the screen they open.
+The author names a row and a column (``at``); an item without one is placed by ``screen_arrange``:
+zone by zone, in reading order, wrapping in whole rows. Entries, which sit in a column of their
+own at the left, take the row of the screen they open.
 """
 
 from ..model import (
@@ -17,7 +17,8 @@ from ..reader import SpecError
 from ..screen_parts import screen_size
 from ..sizing import wrap_text
 from ..theme import Theme
-from .screen_spec import FlowSpec, Item, ItemKind, Transition, TransitionKind
+from .screen_arrange import arrange
+from .screen_spec import FlowSpec, Item, ItemKind
 
 ENTRY_COLUMN = -1  # entries sit in a column of their own, left of column 0
 DECISION_TEXT_FRACTION = 0.64  # of its width, the part of a diamond that can hold text
@@ -170,13 +171,9 @@ def assign_cells(spec: FlowSpec) -> dict[str, Cell]:
         if item.at is not None
     }
     _check_free(spec, cells)
-    ranks = _ranks(spec)
-    taken = set(cells.values())
-    for item in spec.items:
-        if item.id in cells or item.kind is ItemKind.ENTRY:
-            continue
-        cells[item.id] = _free_cell(ranks[item.id], taken)
-        taken.add(cells[item.id])
+    loose = [i for i in spec.items if i.id not in cells and i.kind is not ItemKind.ENTRY]
+    first_row = max((row for row, _ in cells.values()), default=-1) + 1
+    cells.update(arrange(spec, loose, first_row))
     for item in spec.items:
         if item.kind is ItemKind.ENTRY and item.id not in cells:
             cells[item.id] = (_entry_row(item, spec, cells), ENTRY_COLUMN)
@@ -196,36 +193,6 @@ def _check_free(spec: FlowSpec, cells: dict[str, Cell]) -> None:
         owners[cell] = item_id
     if problems:
         raise SpecError(problems)
-
-
-def _is_flow_edge(transition: Transition) -> bool:
-    """Tell a transition that moves the flow on, as opposed to one that goes back."""
-    return transition.kind not in (TransitionKind.BACK, TransitionKind.RETRY)
-
-
-def _ranks(spec: FlowSpec) -> dict[str, int]:
-    """Return each item's column by rank: its longest distance from the start of the flow."""
-    entries = {item.id for item in spec.items if item.kind is ItemKind.ENTRY}
-    edges = [t for t in spec.transitions if _is_flow_edge(t) and t.source not in entries]
-    ranks = {item.id: 0 for item in spec.items}
-    for _ in spec.items:
-        changed = False
-        for transition in edges:
-            wanted = ranks[transition.source] + 1
-            if wanted > ranks[transition.target] and wanted < len(spec.items):
-                ranks[transition.target] = wanted
-                changed = True
-        if not changed:
-            break
-    return ranks
-
-
-def _free_cell(column: int, taken: set[Cell]) -> Cell:
-    """Return the first free row of a column."""
-    row = 0
-    while (row, column) in taken:
-        row += 1
-    return (row, column)
 
 
 def _entry_row(item: Item, spec: FlowSpec, cells: dict[str, Cell]) -> int:

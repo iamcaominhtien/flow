@@ -9,11 +9,13 @@ boxes, as in earlier versions.
 from dataclasses import dataclass, replace
 
 from ..canvas import fit_canvas
+from ..check import chip_rect
 from ..model import (
     Edge,
     Frame,
     Head,
     Node,
+    Point,
     Role,
     Row,
     Scene,
@@ -23,9 +25,10 @@ from ..model import (
 from ..sizing import estimate_text_width, key_room
 from ..theme import LayoutRules, Theme, load_theme
 from . import catalog, graph
+from .screen_chips import Crowd, blocks_of, choose_spot, lines_of
 from .screen_geometry import Geometry, Sizing, compute_geometry
 from .screen_items import assign_cells, build_nodes, densify
-from .screen_labels import Caption, assign_codes, caption_of, place_caption, trigger_label
+from .screen_labels import Caption, assign_codes, caption_of, trigger_label
 from .screen_plan import (
     ENTRY_STACK_GAP_PX,
     ENTRY_ZONE_ID,
@@ -34,22 +37,23 @@ from .screen_plan import (
     RouteType,
     ZoneExtent,
     channel_counts,
+    lane_counts,
     make_grid,
     plan_routes,
+    sides_of,
     split_bands,
     strip_counts,
+    zig_counts,
     zone_extents,
 )
 from .screen_routes import (
     BACK_KINDS,
     End,
     collect_uses,
-    label_segment,
     place_chips,
     port_offsets,
     port_point,
     route_points,
-    sides_of,
 )
 from .screen_spec import (
     Bus,
@@ -120,9 +124,9 @@ def build_scene(spec: FlowSpec) -> Scene:
     sizing = _sizing(spec, theme, (nodes, grid), (plans, captions))
     build = Build(spec, theme, grid, plans, captions, compute_geometry(sizing))
     placed = _place_nodes(nodes, build)
-    edges, placed = _edges(placed, build)
-    edges = edges + _bus_edges(placed, build)
     frames = _zone_frames(placed, build)
+    routes, placed = _routes(placed, build)
+    edges = _labelled(routes, _bus_edges(placed, build), (placed, frames), build)
     table = _conditions_table(placed, frames, build, codes)
     scene = Scene(
         0, 0, spec.title, spec.description, tuple(frames), (*placed.values(), *table), tuple(edges)
@@ -148,7 +152,11 @@ def _sizing(
     left = theme.layout.margin + (rules.zone_pad_x if _begins_at_first_column(zones) else 0)
     top = theme.layout.margin + (theme.layout.title_block_height if spec.title else 0)
     bands = split_bands(spec, grid)
-    return Sizing(nodes, grid, plans, captions, zones, rules, channels, strips, bands, top, left)
+    zigs = zig_counts(plans, grid.rows)
+    lanes = lane_counts(plans)
+    return Sizing(
+        nodes, grid, plans, captions, zones, rules, channels, zigs, strips, bands, lanes, top, left
+    )
 
 
 def _begins_at_first_column(zones: dict[str, ZoneExtent]) -> bool:
@@ -183,25 +191,22 @@ def _role_of(transition: Transition) -> Role:
     return Role.YES if transition.guard else Role.NEXT
 
 
-def _edges(nodes: dict[str, Node], build: Build) -> tuple[list[Edge], dict[str, Node]]:
-    """Route every transition and place its words; returns the nodes with their chips placed."""
+def _routes(
+    nodes: dict[str, Node], build: Build
+) -> tuple[list[tuple[Plan, tuple[Point, ...]]], dict[str, Node]]:
+    """Route every transition; returns the routes and the nodes with their id chips placed."""
     uses = collect_uses(build.plans, build.grid.cells)
     offsets = port_offsets(uses, nodes, build.theme)
     nodes, offsets = place_chips(nodes, uses, offsets, build.theme)
-    edges, seen = [], set()
-    for plan in build.plans:
-        edge_id = _unique_id(f"{plan.transition.source}>{plan.transition.target}", seen)
-        edges.append(_edge(edge_id, plan, (nodes, offsets), build))
-    return edges, nodes
+    return [(plan, _points(plan, (nodes, offsets), build)) for plan in build.plans], nodes
 
 
-def _edge(
-    edge_id: str,
+def _points(
     plan: Plan,
     placed: tuple[dict[str, Node], dict[tuple[int, End], float]],
     build: Build,
-) -> Edge:
-    """Route one transition between the sides of its two frames and place its words."""
+) -> tuple[Point, ...]:
+    """Route one transition between the sides of its two frames."""
     nodes, offsets = placed
     transition = plan.transition
     cells = build.grid.cells
@@ -213,19 +218,43 @@ def _edge(
             (transition.target, sides[1], End.TARGET),
         )
     )
-    points = route_points(plan, ends, build.geometry)
-    label, extras = place_caption(label_segment(plan, points), build.captions[plan.index])
-    return Edge(
-        id=edge_id,
-        role=_role_of(transition),
-        points=points,
-        label=label,
-        source=transition.source,
-        target=transition.target,
-        head=Head.FILLED,
-        dashed=_is_undecided(nodes[transition.target]),
-        extras=extras,
-    )
+    return route_points(plan, ends, build.geometry)
+
+
+def _labelled(
+    routes: list[tuple[Plan, tuple[Point, ...]]],
+    buses: list[Edge],
+    around: tuple[dict[str, Node], list[Frame]],
+    build: Build,
+) -> list[Edge]:
+    """Place the words of every arrow clear of frames, chips and other lines; returns the edges."""
+    nodes, frames = around
+    rules = build.theme.layout
+    crowd = Crowd(blocks_of(nodes, frames, build.theme))
+    crowd.blocks.extend(chip_rect(bus.label, rules) for bus in buses if bus.label)
+    crowd.lines = lines_of([points for _, points in routes] + [bus.points for bus in buses])
+    edges: list[Edge] = []
+    seen: set[str] = set()
+    for number, (plan, points) in enumerate(routes):
+        caption = build.captions[plan.index]
+        spot = choose_spot(number, points, caption, (crowd, build.theme))
+        crowd.blocks.extend(spot.rects)
+        transition = plan.transition
+        edge_id = _unique_id(f"{transition.source}>{transition.target}", seen)
+        edges.append(
+            Edge(
+                id=edge_id,
+                role=_role_of(transition),
+                points=points,
+                label=spot.chip,
+                source=transition.source,
+                target=transition.target,
+                head=Head.FILLED,
+                dashed=_is_undecided(nodes[transition.target]),
+                extras=spot.texts,
+            )
+        )
+    return edges + buses
 
 
 def _unique_id(wanted: str, seen: set[str]) -> str:

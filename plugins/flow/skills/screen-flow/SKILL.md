@@ -11,7 +11,7 @@ You write a short **spec**. A script places the screens in device frames, routes
 
 1. Ask, or pick from the stage of the design, the **fidelity** of each screen: L0 names only, L1 skeleton, L2 key elements (see below). There is no default level in the design; a screen with no `fidelity` is drawn as L0.
 2. List the screens (device, id, name), the decisions, the entry points and the arrows: what the person does, which condition decides the path, what happens on the way.
-3. Put the screens on a grid: `at: [row, column]`. Flow runs left to right in a row; a branch goes to the next row. Group screens in zones. Draw a web flow as its own zone in rows below the phone flow.
+3. Put the screens in zones. For up to about 12 screens give each an `at: [row, column]` (flow runs left to right in a row; a branch goes to the next row). With more, leave `at` out and let the script arrange the zones (see Layout). Draw a web flow as its own zone below the phone flow.
 4. Write `diagrams/<name>.spec.json` in the current project.
 5. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` and `<name>.drawio` next to the spec and prints a check report. Exit code 0: no error; 2: errors found (files still written); 1: the spec is invalid and the message lists every problem.
 6. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Do not say the diagram "looks good" unless you have looked at the picture.
@@ -73,21 +73,24 @@ An arrow is written `trigger [guard] / effect`.
 
 ### Layout
 
-- Rows and columns come from `at`. Gap between frames: 130 px when an arrow carries a chip, 96 px otherwise. Arrows leave the middle of the facing edge; two arrows between the same frames use the upper and lower third. A return that cannot turn once loops round the outside.
+- Rows and columns come from `at`. Gap between frames: 130 px when an arrow carries a chip, 96 px otherwise. Arrows leave the middle of the facing edge; two arrows between the same frames use the upper and lower third.
+- **Arrows never cross a frame.** A neighbour arrow is straight; a diagonal one runs in the channel between two rows. Any other arrow, and every `back` or `retry` that cannot turn once, runs in the free lanes between rows and columns (or round the outside of the grid) and gets a slot of its own, so that two returns never run on top of each other. A return in the same row runs in a strip above the row.
+- **Words** (trigger chip, guard, effect) sit on the longest free stretch of their line, clear of frames, id chips, zone labels and other words. If a stretch is taken they move along the line.
+- **No `at`: automatic arrangement.** A screen with no `at` is placed by zone. Each zone is a block; its screens are read left to right in the order of the flow (steps from where the flow enters the zone) and wrap in whole rows: a row is filled before the next begins, and the next row starts at the left (a zone is at most 5 columns wide, rows balanced). Blocks sit on shelves from the left, up to 9 columns, in the order of the flow; a zone with desktop screens goes below the app zones; the tabs of a bar stay on one row. A screen or decision with no zone joins the zone of a neighbour in the flow. You can mix: screens with `at` stay, the others are arranged below them.
 - `zones`: `id`, `label`, `tone` (`blue`, `violet`, `amber`, `green`, `teal`, `gray`, `red`). Each is a dashed tinted frame with a pill; the id chip takes the zone colour. A zone is the box around its screens, so keep a zone's screens next to each other.
 - Rows of desktop screens are laid out in their own columns: the web flow goes in its own zone below the app flow.
 - **Tab bar**: one `tab` item per tab on one row, and `"buses": [{"trigger": "tap any tab", "to": ["tab1", "tab2"]}]`. The bar is drawn once as a bus. Then an arrow from each tab to the first screen of its stack. Screens that hide the bar go in their own zone.
-- Examples: `examples/shop-screen-flow.spec.json` (the complete shop app at mixed fidelity), `shop-highlight-screen-flow`, `shop-fidelity-screen-flow`, `shop-entry-screen-flow`, `shop-tabs-screen-flow`, `shop-overlays-screen-flow`, `shop-states-screen-flow`, `shop-coded-screen-flow`, `shop-wireframe-screen-flow` (two screens at L3 with blocks).
+- Examples: `examples/ride-screen-flow.spec.json` (52 screens, 6 zones, 77 arrows; take the `at` keys out and it still builds with no error), `examples/shop-screen-flow.spec.json` (the complete shop app at mixed fidelity), `shop-highlight-screen-flow`, `shop-fidelity-screen-flow`, `shop-entry-screen-flow`, `shop-tabs-screen-flow`, `shop-overlays-screen-flow`, `shop-states-screen-flow`, `shop-coded-screen-flow`, `shop-wireframe-screen-flow` (two screens at L3 with blocks).
 - Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart` and the others of the icon library. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
 
 ## Limits to tell the user
 
 - L3 blocks are shrunk to fit the flow: a screen at L3 is taller than one at L2 only by the device, but its text is small. Open the wireframe skill for a screen you want to read.
 - Elements are named, not laid out: the frame shows them in a fixed order (top ones, the hatched block, bottom ones, tab bar).
-- Routing follows the grid. If two arrows still share a corridor, the check says so; move a screen to another row or column.
+- Routing follows the grid. Long returns and arrows between far zones cross other lines (the check warns `lines-cross`): that is geometry, not a bug. Put the screens a flow goes through next to each other, and a hub that many screens return to near them.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor; the dark and slate chips are text with a background there, not pills.
-- An undefined `at` is placed by rank, which is rarely what you want for a diagram with zones: give `at` on every screen.
+- The automatic arrangement orders by flow, not by how the diagram will look: it gives no errors on a large flow, but a hand-set `at` usually crosses fewer lines. The 52-screen benchmark gives about 30 `lines-cross` warnings with good `at` hints and more than 100 without.
 
 Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`, `red`. Any other value is refused by the build.
 
-For a diagram with more than about 25 items the automatic grid gives a very wide page; split it by zone into several specs, or use the `author` skill (`/flow:author`), which lays the diagram out by hand and looks at the result.
+For a diagram with more than about 25 screens split it by zone into several specs and join them with `flag` items ("To Checkout flow", "diagram 02"), or use the `author` skill (`/flow:author`), which lays the diagram out by hand and looks at the result. The automatic layout does handle a large flow without an error (no line through a frame, no chip on a frame), but the page is large (a 52-screen flow is about 3800 x 5700 px) and long returns still cross other lines.

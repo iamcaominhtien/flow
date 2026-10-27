@@ -212,8 +212,17 @@ def _chip_colors(node: Node, theme: Theme) -> tuple[str, str]:
     return theme.badge.background, theme.badge.foreground
 
 
-def _chip_box(node: Node, view: ScreenView, theme: Theme) -> Bounds:
-    """Return where the id chip sits: above a frame at a corner, or inside the corner of a card."""
+def chip_box(node: Node, view: ScreenView, theme: Theme) -> Bounds:
+    """Return where the id chip sits: above a frame at a corner, or inside the corner of a card.
+
+    Args:
+        node: The screen node.
+        view: Its screen.
+        theme: The design tokens.
+
+    Returns:
+        The chip as ``(left, top, width, height)``, relative to the node.
+    """
     rules = theme.screen
     width = chip_width(view.code, theme)
     if is_card(view):
@@ -232,7 +241,7 @@ def _chip_part(node: Node, view: ScreenView, theme: Theme) -> Part:
     fill = _chip_colors(node, theme)[0]
     if view.is_undecided:
         fill = theme.tones[Tone.GRAY].accent
-    bounds = _chip_box(node, view, theme)
+    bounds = chip_box(node, view, theme)
     return Part(PartKind.RECT, bounds, fill=fill, radius=bounds[3] / 2)
 
 
@@ -241,7 +250,7 @@ def _chip_text(node: Node, view: ScreenView, theme: Theme) -> Part:
     color = theme.on_accent if view.is_undecided else _chip_colors(node, theme)[1]
     return Part(
         PartKind.TEXT,
-        _chip_box(node, view, theme),
+        chip_box(node, view, theme),
         text=view.code,
         font_size=CHIP_FONT_SIZE_PX,
         is_bold=True,

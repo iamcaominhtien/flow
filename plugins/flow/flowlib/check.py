@@ -167,14 +167,19 @@ def _segment_hits(start: Point, end: Point, rect: Rect) -> bool:
     return low <= high
 
 
+def chip_rect(label: EdgeLabel, rules: LayoutRules) -> Rect:
+    """Return the rectangle a label chip covers, estimated from its text."""
+    width = estimate_text_width(label.text, rules, rules.chip_font_size) + rules.chip_padding_x
+    half_width, half_height = width / 2, rules.chip_height / 2
+    at_x, at_y = label.at
+    return Rect(at_x - half_width, at_y - half_height, at_x + half_width, at_y + half_height)
+
+
 def label_rect(edge: Edge, rules: LayoutRules) -> Rect | None:
     """Return the rectangle a label chip covers, estimated from its text, or None."""
     if edge.label is None:
         return None
-    width = estimate_text_width(edge.label.text, rules, rules.chip_font_size) + rules.chip_padding_x
-    half_width, half_height = width / 2, rules.chip_height / 2
-    at_x, at_y = edge.label.at
-    return Rect(at_x - half_width, at_y - half_height, at_x + half_width, at_y + half_height)
+    return chip_rect(edge.label, rules)
 
 
 def caption_rect(node: Node, rules: LayoutRules) -> Rect | None:

@@ -1,10 +1,12 @@
 """Decide how each arrow of a screen flow runs, and how much room the rows and columns need.
 
-An arrow is one of five shapes. A straight line joins neighbours in a row or in a column. A
+An arrow is one of a few shapes. A straight line joins neighbours in a row or in a column. A
 ``ZIG`` leaves the bottom (or top) of a frame, runs along a channel in the gap between two rows and
 enters the top (or bottom) of the target. A ``BEND`` leaves the side of a frame and turns once
 into the target. A ``STRIP`` runs in the strip above a row, over the frames between its ends.
-Channels are lines in the gap between rows; every arrow that needs one gets its own slot, so that
+A ``ROUTED`` arrow, for a return or a far target that none of these can reach without crossing a
+frame, runs in the free lanes between rows and columns (``screen_lanes``). Channels are lines in
+the gap between rows; every arrow that needs one gets its own slot, so that
 no two chips meet (design 02, Layout).
 """
 
@@ -14,10 +16,20 @@ from enum import StrEnum
 
 from ..model import Device
 from .screen_items import Cell
+from .screen_lanes import (
+    LaneMap,
+    LanePath,
+    Load,
+    PortSide,
+    Request,
+    assign_slots,
+    find_path,
+    make_lane_map,
+    new_load,
+)
 from .screen_spec import FlowSpec, ItemKind, Route, Transition, TransitionKind
 
 ENTRY_ZONE_ID = "entries"
-LOOP_GROUP = 2  # the key that keeps loops apart from strips and channels when slots are given
 ENTRY_STACK_GAP_PX = 16  # between two entries that open screens in the same row
 
 
@@ -29,7 +41,7 @@ class RouteType(StrEnum):
     ZIG = "zig"
     BEND = "bend"
     ELBOW = "elbow"
-    LOOP = "loop"
+    ROUTED = "routed"
     STRIP = "strip"
 
 
@@ -47,8 +59,7 @@ class Plan:
     slot: int = 0  # which of the channels of that gap it takes, from the top
     span: int = 0  # how many columns it crosses
     is_down: bool = True
-    is_west: bool = True  # for a loop: which side of the band it runs along
-    row: int = 0  # the row of its source
+    lanes: LanePath | None = None  # for a routed arrow: its runs in the free lanes
 
 
 @dataclass(frozen=True)
@@ -89,8 +100,9 @@ def plan_routes(spec: FlowSpec, grid: Grid) -> list[Plan]:
     Returns:
         One plan per transition, in the order of the spec.
     """
-    plans = [_plan(index, t, grid) for index, t in enumerate(spec.transitions)]
-    return _with_slots(plans)
+    entries = frozenset(item.id for item in spec.items if item.kind is ItemKind.ENTRY)
+    plans = [_plan(index, t, grid, entries) for index, t in enumerate(spec.transitions)]
+    return _with_lanes(_with_slots(plans), spec, grid)
 
 
 def _is_clear_row(grid: Grid, row: int, columns: range) -> bool:
@@ -108,23 +120,32 @@ def _between(first: int, second: int) -> range:
     return range(min(first, second) + 1, max(first, second))
 
 
-def _plan(index: int, transition: Transition, grid: Grid) -> Plan:
+def _plan(index: int, transition: Transition, grid: Grid, entries: frozenset[str]) -> Plan:
     """Choose the shape of one transition from where its two ends are."""
     source, target = grid.cells[transition.source], grid.cells[transition.target]
     (row_a, column_a), (row_b, column_b) = source, target
     span = abs(column_b - column_a)
     is_down = row_b >= row_a
-    is_west = column_a <= (grid.columns - 1) / 2
-    if row_a == row_b:
+    if transition.source in entries and not _is_clear_row(
+        grid, row_a, range(column_a + 1, column_b)
+    ):
+        route, gap = RouteType.ROUTED, 0
+    elif row_a == row_b:
         route, gap = _same_row(transition, grid, (row_a, column_a, column_b))
     elif column_a == column_b and _is_clear_column(grid, column_a, _between(row_a, row_b)):
         route, gap = RouteType.VERTICAL, 0
-    elif transition.route is Route.ELBOW:
+    elif transition.route is Route.ELBOW and _elbow_is_clear(grid, source, target):
         route, gap = RouteType.ELBOW, 0
     else:
-        is_return = transition.kind in (TransitionKind.BACK, TransitionKind.RETRY)
-        route, gap = _diagonal(grid, (source, target), is_return)
-    return Plan(index, transition, route, gap, 0, span, is_down, is_west, row_a)
+        route, gap = _diagonal(grid, (source, target))
+        if _is_return(transition) and route is not RouteType.BEND:
+            route, gap = RouteType.ROUTED, 0
+    return Plan(index, transition, route, gap, 0, span, is_down)
+
+
+def _is_return(transition: Transition) -> bool:
+    """Tell a back or retry arrow: it runs in the free lanes unless it can turn once."""
+    return transition.kind in (TransitionKind.BACK, TransitionKind.RETRY)
 
 
 def _same_row(
@@ -138,27 +159,40 @@ def _same_row(
     return RouteType.HORIZONTAL, 0
 
 
-def _diagonal(grid: Grid, ends: tuple[Cell, Cell], is_return: bool) -> tuple[RouteType, int]:
+def _diagonal(grid: Grid, ends: tuple[Cell, Cell]) -> tuple[RouteType, int]:
     """Choose the shape of an arrow between items in different rows and columns.
 
-    A return (back or retry) that cannot turn once loops round the outside of the band.
+    The first shape whose lines cross no frame is taken; when none does the arrow is routed in
+    the free lanes.
     """
     source, target = ends
     (row_a, column_a), (row_b, column_b) = source, target
     rows_between = _between(row_a, row_b)
+    is_target_clear = _is_clear_column(grid, column_b, rows_between)
+    is_source_clear = _is_clear_column(grid, column_a, rows_between)
     if row_b < row_a and _bend_is_clear(grid, source, target):
         return RouteType.BEND, 0
-    if row_b < row_a and is_return:
-        return RouteType.LOOP, 0
-    if row_b > row_a:
-        if _is_clear_column(grid, column_b, rows_between):
-            return RouteType.ZIG, row_a + 1
-        return RouteType.ZIG, (
-            row_b if _is_clear_column(grid, column_a, rows_between) else row_a + 1
-        )
-    if _is_clear_column(grid, column_b, rows_between):
+    if row_b > row_a and is_target_clear:
+        return RouteType.ZIG, row_a + 1
+    if row_b > row_a and is_source_clear:
+        return RouteType.ZIG, row_b
+    if row_b < row_a and is_target_clear:
         return RouteType.ZIG, row_a
-    return RouteType.ZIG, (row_b + 1 if _is_clear_column(grid, column_a, rows_between) else row_a)
+    if row_b < row_a and is_source_clear:
+        return RouteType.ZIG, row_b + 1
+    return RouteType.ROUTED, 0
+
+
+def _elbow_is_clear(grid: Grid, source: Cell, target: Cell) -> bool:
+    """Tell whether an arrow can leave the top or bottom of the source and turn into the target."""
+    (row_a, column_a), (row_b, column_b) = source, target
+    if column_a < column_b:
+        columns = range(column_a, column_b)
+    else:
+        columns = range(column_b + 1, column_a + 1)
+    return _is_clear_column(grid, column_a, _between(row_a, row_b)) and _is_clear_row(
+        grid, row_b, columns
+    )
 
 
 def _bend_is_clear(grid: Grid, source: Cell, target: Cell) -> bool:
@@ -173,14 +207,133 @@ def _bend_is_clear(grid: Grid, source: Cell, target: Cell) -> bool:
     )
 
 
+def sides_of(plan: Plan, cells: tuple[Cell, Cell]) -> tuple[PortSide, PortSide]:
+    """Return the side an arrow leaves and the side it enters.
+
+    Args:
+        plan: The plan of the arrow.
+        cells: The cells of its source and its target.
+
+    Returns:
+        The source side and the target side.
+    """
+    (row_a, column_a), (row_b, column_b) = cells
+    goes_right = column_b > column_a
+    goes_down = row_b > row_a
+    sideways = PortSide.EAST if goes_right else PortSide.WEST
+    opposite = PortSide.WEST if goes_right else PortSide.EAST
+    vertical = PortSide.SOUTH if goes_down else PortSide.NORTH
+    facing = PortSide.NORTH if goes_down else PortSide.SOUTH
+    if plan.lanes is not None:
+        return plan.lanes.start_side, plan.lanes.end_side
+    if plan.route is RouteType.HORIZONTAL:
+        return sideways, opposite
+    if plan.route is RouteType.STRIP:
+        return PortSide.NORTH, PortSide.NORTH
+    if plan.route is RouteType.BEND:
+        return sideways, facing
+    if plan.route is RouteType.ELBOW:
+        return vertical, opposite
+    return vertical, facing
+
+
+def _lane_map(grid: Grid, bands: list[range]) -> LaneMap:
+    """Build the lane map: which columns each band holds."""
+    present = [[False] * grid.columns for _ in bands]
+    for row, column in grid.cells.values():
+        band = next(index for index, rows in enumerate(bands) if row in rows)
+        present[band][column] = True
+    return make_lane_map((grid.rows, grid.columns), bands, present, frozenset(grid.cells.values()))
+
+
+def _with_lanes(plans: list[Plan], spec: FlowSpec, grid: Grid) -> list[Plan]:
+    """Route the arrows that need the free lanes and give each of their runs a slot."""
+    routed = [plan for plan in plans if plan.route is RouteType.ROUTED]
+    if not routed:
+        return plans
+    lane_map = _lane_map(grid, split_bands(spec, grid))
+    load = new_load()
+    for plan in plans:
+        if plan.route is not RouteType.ROUTED:
+            _count_sides(load.sides, plan, grid)
+            _count_crossings(load, plan, grid)
+    decisions = frozenset(i.id for i in spec.items if i.kind is ItemKind.DECISION)
+    entries = frozenset(i.id for i in spec.items if i.kind is ItemKind.ENTRY)
+    paths: dict[int, LanePath] = {}
+    for plan in sorted(routed, key=lambda p: _distance(p, grid)):
+        transition = plan.transition
+        ends = (transition.source, transition.target)
+        request = Request(grid.cells[ends[0]], grid.cells[ends[1]], ends, decisions, entries)
+        path = find_path(request, lane_map, load)
+        if path is not None:
+            paths[plan.index] = path
+    zigs = Counter(plan.gap for plan in plans if plan.route is RouteType.ZIG)
+    slotted = assign_slots(paths, dict(zigs))
+    return [_with_path(plan, slotted) for plan in plans]
+
+
+def _with_path(plan: Plan, paths: dict[int, LanePath]) -> Plan:
+    """Give a routed plan its path; one with no path in the lanes falls back to an elbow."""
+    if plan.route is not RouteType.ROUTED:
+        return plan
+    if plan.index in paths:
+        return replace(plan, lanes=paths[plan.index])
+    return replace(plan, route=RouteType.ELBOW)
+
+
+def _count_crossings(load: Load, plan: Plan, grid: Grid) -> None:
+    """Note the gaps and the rows that a plan that is not routed runs across, for the search."""
+    (row_a, column_a) = grid.cells[plan.transition.source]
+    (row_b, column_b) = grid.cells[plan.transition.target]
+    if plan.route is RouteType.HORIZONTAL:
+        for gap in range(min(column_a, column_b) + 1, max(column_a, column_b) + 1):
+            load.horizontals[(row_a, gap)] += 1
+    if plan.route is RouteType.ZIG:
+        for vertical in range(min(column_a, column_b) + 1, max(column_a, column_b) + 1):
+            load.runs_across[(True, plan.gap, vertical)] += 1
+    legs = _vertical_legs(plan, (row_a, row_b))
+    for gaps, column in zip(legs, (column_a, column_b), strict=True):
+        for gap in gaps:
+            load.verticals[(gap, column)] += 1
+
+
+def _vertical_legs(plan: Plan, rows: tuple[int, int]) -> tuple[range, range]:
+    """Return the gaps between rows that the legs at the source and at the target run through."""
+    row_a, row_b = rows
+    empty = range(0)
+    if plan.route is RouteType.VERTICAL:
+        return range(min(rows) + 1, max(rows) + 1), empty
+    if plan.route is RouteType.BEND:
+        return empty, range(min(rows) + 1, max(rows) + 1)
+    if plan.route is not RouteType.ZIG:
+        return empty, empty
+    if row_b > row_a:
+        return range(row_a + 1, plan.gap + 1), range(plan.gap, row_b + 1)
+    return range(plan.gap, row_a + 1), range(row_b + 1, plan.gap + 1)
+
+
+def _count_sides(sides: dict[tuple[str, PortSide], int], plan: Plan, grid: Grid) -> None:
+    """Count the frame sides a plan that is not routed meets."""
+    transition = plan.transition
+    ends = (transition.source, transition.target)
+    met = sides_of(plan, (grid.cells[ends[0]], grid.cells[ends[1]]))
+    for end, side in zip(ends, met, strict=True):
+        sides[(end, side)] += 1
+
+
+def _distance(plan: Plan, grid: Grid) -> int:
+    """Return how far apart the two ends of an arrow are, in cells."""
+    (row_a, column_a) = grid.cells[plan.transition.source]
+    (row_b, column_b) = grid.cells[plan.transition.target]
+    return abs(row_a - row_b) + abs(column_a - column_b)
+
+
 def _slot_order(plan: Plan) -> tuple[int, int, int]:
     """Sort key of the channels of one gap, top to bottom, so that arrows do not cross.
 
     Strips come first, longest on top so that they nest; then the arrows that go up, longest on
     top; then the ones that go down, shortest on top.
     """
-    if plan.route is RouteType.LOOP:
-        return (3, plan.span, plan.index)
     if plan.route is RouteType.STRIP:
         return (0, -plan.span, plan.index)
     if not plan.is_down:
@@ -194,8 +347,6 @@ def _with_slots(plans: list[Plan]) -> list[Plan]:
     for plan in plans:
         if plan.route in CHANNEL_ROUTES:
             groups[(int(plan.route is RouteType.STRIP), plan.gap)].append(plan)
-        elif plan.route is RouteType.LOOP:
-            groups[(LOOP_GROUP, int(plan.is_west))].append(plan)
     slots = {}
     for group in groups.values():
         for slot, plan in enumerate(sorted(group, key=_slot_order)):
@@ -217,7 +368,35 @@ def channel_counts(plans: list[Plan], rows: int, extra: dict[int, int]) -> list[
     counts = Counter(plan.gap for plan in plans if plan.route is RouteType.ZIG)
     for gap, more in extra.items():
         counts[gap] += more
+    for plan in plans:
+        for run in plan.lanes.runs if plan.lanes else ():
+            if run.is_horizontal:
+                counts[run.lane] = max(counts[run.lane], run.slot + 1)
     return [counts[gap] for gap in range(rows + 1)]
+
+
+def zig_counts(plans: list[Plan], rows: int) -> list[int]:
+    """Count the zigs in each gap between rows: each takes a channel with room for its words."""
+    counts = Counter(plan.gap for plan in plans if plan.route is RouteType.ZIG)
+    return [counts[gap] for gap in range(rows + 1)]
+
+
+def lane_counts(plans: list[Plan]) -> dict[tuple[int, int], int]:
+    """Count the slots each vertical lane needs: the lane is a band and a gap between columns.
+
+    Args:
+        plans: The plans of the transitions.
+
+    Returns:
+        ``(band, lane)`` to the number of slots; a lane no arrow uses is absent.
+    """
+    counts: dict[tuple[int, int], int] = {}
+    for plan in plans:
+        for run in plan.lanes.runs if plan.lanes else ():
+            if not run.is_horizontal:
+                key = (run.band, run.lane)
+                counts[key] = max(counts.get(key, 0), run.slot + 1)
+    return counts
 
 
 def strip_counts(plans: list[Plan], rows: int, extra: dict[int, int]) -> list[int]:

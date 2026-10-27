@@ -795,6 +795,8 @@
     "gap_labelled": 130,
     "channel_pitch": 64,
     "channel_margin": 28,
+    "lane_pitch": 34,
+    "lane_edge": 40,
     "chip_room": 34,
     "chip_height": 20,
     "chip_padding": 10,

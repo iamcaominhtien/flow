@@ -16,20 +16,12 @@ from ..screen_parts import chip_width, is_card
 from ..theme import ScreenRules, Theme
 from .screen_geometry import Geometry
 from .screen_items import Cell
-from .screen_plan import CHANNEL_ROUTES, Plan, RouteType
+from .screen_lanes import LanePath, PortSide, Run
+from .screen_plan import CHANNEL_ROUTES, Plan, RouteType, sides_of
 from .screen_spec import TransitionKind
 
 BACK_KINDS = (TransitionKind.BACK, TransitionKind.RETRY)
 CHIP_CLEAR_PX = 4  # between an id chip and an arrow that enters beside it
-
-
-class PortSide(StrEnum):
-    """Which side of a frame an arrow meets."""
-
-    NORTH = "north"
-    SOUTH = "south"
-    EAST = "east"
-    WEST = "west"
 
 
 class End(StrEnum):
@@ -46,42 +38,11 @@ class Use:
     index: int
     end: End
     plan: Plan
-    partner: Cell
+    partner: tuple[float, float]  # where the arrow heads from this frame, in cells
     own: Cell
 
 
 Key = tuple[int, End]
-
-
-def sides_of(plan: Plan, cells: tuple[Cell, Cell]) -> tuple[PortSide, PortSide]:
-    """Return the side an arrow leaves and the side it enters.
-
-    Args:
-        plan: The plan of the arrow.
-        cells: The cells of its source and its target.
-
-    Returns:
-        The source side and the target side.
-    """
-    (row_a, column_a), (row_b, column_b) = cells
-    goes_right = column_b > column_a
-    goes_down = row_b > row_a
-    sideways = PortSide.EAST if goes_right else PortSide.WEST
-    opposite = PortSide.WEST if goes_right else PortSide.EAST
-    vertical = PortSide.SOUTH if goes_down else PortSide.NORTH
-    facing = PortSide.NORTH if goes_down else PortSide.SOUTH
-    if plan.route is RouteType.HORIZONTAL:
-        return sideways, opposite
-    if plan.route is RouteType.STRIP:
-        return PortSide.NORTH, PortSide.NORTH
-    if plan.route is RouteType.BEND:
-        return sideways, facing
-    if plan.route is RouteType.LOOP:
-        edge = PortSide.WEST if plan.is_west else PortSide.EAST
-        return edge, edge
-    if plan.route is RouteType.ELBOW:
-        return vertical, opposite
-    return vertical, facing
 
 
 def collect_uses(
@@ -93,9 +54,17 @@ def collect_uses(
         source, target = plan.transition.source, plan.transition.target
         pair = (cells[source], cells[target])
         side_a, side_b = sides_of(plan, pair)
-        uses[(source, side_a)].append(Use(plan.index, End.SOURCE, plan, pair[1], pair[0]))
-        uses[(target, side_b)].append(Use(plan.index, End.TARGET, plan, pair[0], pair[1]))
+        toward_target, toward_source = _toward(plan, pair)
+        uses[(source, side_a)].append(Use(plan.index, End.SOURCE, plan, toward_target, pair[0]))
+        uses[(target, side_b)].append(Use(plan.index, End.TARGET, plan, toward_source, pair[1]))
     return uses
+
+
+def _toward(plan: Plan, pair: tuple[Cell, Cell]) -> tuple[tuple[float, float], tuple[float, float]]:
+    """Return where each end of an arrow heads: the other frame, or the first lane of a route."""
+    if plan.lanes is None:
+        return pair[1], pair[0]
+    return plan.lanes.start_toward, plan.lanes.end_toward
 
 
 def _is_far_outward(use: Use) -> bool:
@@ -280,9 +249,8 @@ def route_points(plan: Plan, ends: tuple[Point, Point], geometry: Geometry) -> t
         points = [start, (end[0], start[1]), end]
     elif plan.route is RouteType.ELBOW:
         points = [start, (start[0], end[1]), end]
-    elif plan.route is RouteType.LOOP:
-        outer = geometry.loop_x(plan.row, plan.is_west, plan.slot)
-        points = [start, (outer, start[1]), (outer, end[1]), end]
+    elif plan.lanes is not None:
+        points = _lane_points(plan.lanes, ends, geometry)
     elif plan.route is RouteType.VERTICAL and start[0] != end[0]:
         middle = (start[1] + end[1]) / 2
         points = [start, (start[0], middle), (end[0], middle), end]
@@ -292,6 +260,39 @@ def route_points(plan: Plan, ends: tuple[Point, Point], geometry: Geometry) -> t
     else:
         points = [start, end]
     return _without_repeats(points)
+
+
+def _lane_points(path: LanePath, ends: tuple[Point, Point], geometry: Geometry) -> list[Point]:
+    """Return the points of a route in lanes: the ends, and a corner where two runs meet."""
+    start, end = ends
+    runs = path.runs
+    first, last = runs[0], runs[-1]
+    points = [start, _corner(first, start, geometry)]
+    for run, following in pairwise(runs):
+        points.append(_meeting(run, following, geometry))
+    points.extend([_corner(last, end, geometry), end])
+    return points
+
+
+def _corner(run: Run, port: Point, geometry: Geometry) -> Point:
+    """Return where the stub from a frame side meets the first or the last run."""
+    if run.is_horizontal:
+        return (port[0], _line_of(run, geometry))
+    return (_line_of(run, geometry), port[1])
+
+
+def _line_of(run: Run, geometry: Geometry) -> float:
+    """Return where a run is: the y of a horizontal one, the x of a vertical one."""
+    if run.is_horizontal:
+        return geometry.channel_y(run.lane, run.slot)
+    return geometry.lane_x(run.band, run.lane, run.slot)
+
+
+def _meeting(run: Run, following: Run, geometry: Geometry) -> Point:
+    """Return the corner where a run turns into the next one."""
+    if run.is_horizontal:
+        return (_line_of(following, geometry), _line_of(run, geometry))
+    return (_line_of(run, geometry), _line_of(following, geometry))
 
 
 def _level(plan: Plan, geometry: Geometry) -> float:
@@ -306,11 +307,3 @@ def _without_repeats(points: list[Point]) -> tuple[Point, ...]:
     kept = [points[0]]
     kept.extend(point for point in points[1:] if point != kept[-1])
     return tuple(kept)
-
-
-def label_segment(plan: Plan, points: tuple[Point, ...]) -> tuple[Point, Point]:
-    """Return the segment of a route where its words go: the longest, or the last of a loop."""
-    segments = list(pairwise(points))
-    if plan.route is RouteType.LOOP:
-        return segments[-1]
-    return max(segments, key=lambda s: abs(s[1][0] - s[0][0]) + abs(s[1][1] - s[0][1]))
