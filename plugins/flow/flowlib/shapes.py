@@ -25,6 +25,7 @@ ACTOR_ARM_FRACTION = 0.4
 ACTOR_FOOT_FRACTION = 0.86
 ACTOR_ARM_SPAN_FRACTION = 0.3  # half the arm span as a fraction of the actor's width
 ACTOR_STROKE_WIDTH_PX = 2.5
+FINAL_DOT_GAP_FRACTION = 0.22  # the gap between the ring and the dot of a final state
 INSET_PX = 1  # keeps the outline inside the box, so the stroke is not clipped
 SUBPROCESS_BAR_INSET_PX = 14
 PARALLELOGRAM_SLANT_MAX_PX = 18
@@ -240,6 +241,19 @@ def _end(width: float, height: float, colors: ShapeColors) -> str:
     return _ring(width, height, colors, END_STROKE_WIDTH_PX)
 
 
+def _initial(width: float, height: float, colors: ShapeColors) -> str:
+    """Draw a filled dot: the start of a state diagram."""
+    return _ring(width, height, colors, colors.stroke_width)
+
+
+def _final(width: float, height: float, colors: ShapeColors) -> str:
+    """Draw a ring round a filled dot: an end of a state diagram."""
+    ring = _ring(width, height, replace(colors, fill="none"), colors.stroke_width)
+    gap = min(width, height) * FINAL_DOT_GAP_FRACTION
+    dot = _ring(width - 2 * gap, height - 2 * gap, colors, 0)
+    return f'{ring}<g transform="translate({fmt(gap)} {fmt(gap)})">{dot}</g>'
+
+
 def _intermediate(width: float, height: float, colors: ShapeColors) -> str:
     """Draw a double circle: something that happens in the middle of a flow."""
     inner = _ring(
@@ -320,11 +334,14 @@ DRAWERS: dict[Shape, Drawer] = {
     Shape.CYLINDER: _cylinder,
     Shape.ENTITY: _entity,
     Shape.STORE: _store,
+    Shape.INITIAL: _initial,
+    Shape.FINAL: _final,
     Shape.START: _start,
     Shape.END: _end,
     Shape.INTERMEDIATE: _intermediate,
     Shape.ACTOR: _actor,
     Shape.ELLIPSE: _ellipse,
+    Shape.USE_CASE: _ellipse,
     Shape.SCREEN: _rounded_box,
     Shape.FLAG: _flag,
     Shape.TASK: _rounded_box,

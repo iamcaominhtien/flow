@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0 (2026-10-27)
+
+UML (state, use case, class) brought up to `docs/design/09-uml.md`.
+
+- **State:** labels `event [guard] / action` (any part optional; `label` still works as `event`); `entry`/`do`/`exit` lines; composite states (`states` or `group`) as a frame with a pill; filled start dot, ringed end dots (several allowed); self loop above the box; rose failure paths; left-to-right happy path with branches below; 130 px or more between labelled states. `direction` is gone. Example `delivery-state`.
+- **Use case:** system frame, stick-figure or illustrated actors, external systems on the right with the "external system" tag, 240x64 ovals tinted by the actor, include/extend dashed open arrows, hollow triangle for generalizes; one column per actor. The old `items`/`zones` form is still read. Examples `delivery-usecase`, `delivery-usecase-illustrated`.
+- **Class:** boxes 280 wide, empty compartments omitted, mono members, `kind: abstract` (italic name) and `kind: interface` («interface»), multiplicities drawn at both ends, all relationship ends, parents above children. Example `delivery-class`.
+- New shapes `INITIAL`, `FINAL`, `USE_CASE`, frame variant `SYSTEM`, node fields `activities`, `stereotype`, `is_italic`, `is_centered`, `Row.is_mono`, in every theme and in scene.json. The check tests slanted lines exactly (no false errors on diagonals).
+- Not done: real draw.io editor and SVG export not tested; slight jogs where two lines share a box side; illustrated cards keep a pastel outline where the design has ink; illustrated actors need an `icon` (fall back to `user`).
+
 ## 0.6.0 (2026-10-26)
 
 C4, cloud and architecture brought up to `docs/design/12-c4.md`, `13-cloud.md` and `06-architecture.md`.

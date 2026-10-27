@@ -1,0 +1,39 @@
+{
+  "type": "state",
+  "title": "State machine: the life of an order",
+  "desc": "Boxes are states, arrows are transitions written as event, [guard] and / action. The filled dot is the start, the ringed dot an end. The blue path is the happy path. A frame groups states that belong together.",
+  "states": [
+    {"id": "begin", "kind": "start"},
+    {"id": "placed", "label": "Placed", "tone": "blue"},
+    {"id": "paid", "label": "Paid", "tone": "amber"},
+    {"id": "preparing", "label": "Preparing", "tone": "green", "do": "cook"},
+    {"id": "ready", "label": "Ready", "tone": "green"},
+    {"id": "delivering", "label": "Delivering", "states": [
+      {"id": "picked", "label": "Picked up", "tone": "teal"},
+      {"id": "onway", "label": "On the way", "tone": "teal", "do": "share location"},
+      {"id": "arrived", "label": "Arrived", "tone": "teal"}
+    ]},
+    {"id": "delivered", "label": "Delivered", "tone": "green"},
+    {"id": "cancelled", "label": "Cancelled", "kind": "fail"},
+    {"id": "refunded", "label": "Refunded", "kind": "fail"},
+    {"id": "finish", "kind": "end"},
+    {"id": "closed", "kind": "end"}
+  ],
+  "transitions": [
+    {"from": "begin", "to": "placed", "main": true},
+    {"from": "placed", "to": "paid", "event": "payment succeeded", "main": true},
+    {"from": "paid", "to": "preparing", "event": "restaurant accepts", "main": true},
+    {"from": "preparing", "to": "preparing", "event": "item out of stock", "action": "substitute"},
+    {"from": "preparing", "to": "ready", "event": "food done", "main": true},
+    {"from": "ready", "to": "picked", "event": "courier arrives", "main": true},
+    {"from": "picked", "to": "onway", "event": "leaves restaurant", "main": true},
+    {"from": "onway", "to": "arrived", "guard": "near address", "action": "notify customer", "main": true},
+    {"from": "arrived", "to": "delivered", "event": "customer confirms", "main": true},
+    {"from": "delivered", "to": "finish", "main": true},
+    {"from": "placed", "to": "cancelled", "event": "cancel"},
+    {"from": "paid", "to": "cancelled", "event": "cancel", "action": "refund"},
+    {"from": "delivered", "to": "refunded", "event": "refund", "guard": "within 7 days"},
+    {"from": "refunded", "to": "closed"},
+    {"from": "cancelled", "to": "closed", "event": "cleanup"}
+  ]
+}

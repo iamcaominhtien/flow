@@ -35,7 +35,14 @@ from flowlib.theme import load_theme, theme_names  # noqa: E402
 
 THEMES = ["pastel", "technical", "midnight"]
 MIN_FONT_PX = 10
-NO_TEXT_SHAPES = (Shape.START, Shape.END, Shape.BAR, Shape.FORK)  # solid marks that hold no words
+NO_TEXT_SHAPES = (
+    Shape.START,
+    Shape.END,
+    Shape.INITIAL,
+    Shape.FINAL,
+    Shape.BAR,
+    Shape.FORK,
+)  # solid marks that hold no words
 MIN_TEXT_CONTRAST = 4.5
 MIDNIGHT_BACKGROUND = "#0B1220"
 SIZE_PATTERN = re.compile(r"font-size:\s*([\d.]+)px")

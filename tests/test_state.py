@@ -37,9 +37,9 @@ def test_example_has_no_errors() -> None:
 def test_kind_decides_the_shape() -> None:
     """Start and end marks and the failure state get their own outlines."""
     shapes = {node.id: node.shape for node in diagrams.layout(order_raw()).nodes}
-    assert shapes["begin"] is Shape.START
-    assert shapes["done"] is Shape.END
-    assert shapes["cancelled"] is Shape.FAIL
+    assert shapes["begin"] is Shape.INITIAL
+    assert shapes["done"] is Shape.FINAL
+    assert shapes["cancelled"] is Shape.PROCESS
     assert shapes["paid"] is Shape.PROCESS
 
 

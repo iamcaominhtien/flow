@@ -1,0 +1,125 @@
+{
+ "type": "usecase",
+ "title": "Use case diagram: the delivery app, plain",
+ "desc": "Who uses the system and what for. Actors stand outside the frame, use cases inside it. A solid line means the actor takes part. A dashed arrow says one use case includes or extends another.",
+ "system": "Delivery app",
+ "actors": [
+  {
+   "id": "customer",
+   "label": "Customer",
+   "tone": "blue",
+   "icon": "user"
+  },
+  {
+   "id": "restaurant",
+   "label": "Restaurant",
+   "tone": "green",
+   "icon": "store"
+  },
+  {
+   "id": "courier",
+   "label": "Courier",
+   "tone": "teal",
+   "icon": "courier"
+  },
+  {
+   "id": "payment",
+   "label": "Payment provider",
+   "tone": "amber",
+   "icon": "card",
+   "external": true
+  }
+ ],
+ "usecases": [
+  {
+   "id": "browse",
+   "label": "Browse menus"
+  },
+  {
+   "id": "place",
+   "label": "Place an order"
+  },
+  {
+   "id": "rate",
+   "label": "Rate the meal"
+  },
+  {
+   "id": "track",
+   "label": "Track the order"
+  },
+  {
+   "id": "promo",
+   "label": "Apply a promo code"
+  },
+  {
+   "id": "pay",
+   "label": "Pay for the order"
+  },
+  {
+   "id": "accept",
+   "label": "Accept an order"
+  },
+  {
+   "id": "prepare",
+   "label": "Prepare the food"
+  },
+  {
+   "id": "deliver",
+   "label": "Deliver the order"
+  },
+  {
+   "id": "share",
+   "label": "Share live location"
+  }
+ ],
+ "links": [
+  {
+   "from": "customer",
+   "to": "browse"
+  },
+  {
+   "from": "customer",
+   "to": "place"
+  },
+  {
+   "from": "customer",
+   "to": "rate"
+  },
+  {
+   "from": "customer",
+   "to": "track"
+  },
+  {
+   "from": "restaurant",
+   "to": "accept"
+  },
+  {
+   "from": "courier",
+   "to": "deliver"
+  },
+  {
+   "from": "payment",
+   "to": "pay"
+  },
+  {
+   "from": "promo",
+   "to": "place",
+   "style": "extend"
+  },
+  {
+   "from": "place",
+   "to": "pay",
+   "style": "include"
+  },
+  {
+   "from": "accept",
+   "to": "prepare",
+   "style": "include"
+  },
+  {
+   "from": "deliver",
+   "to": "share",
+   "style": "include"
+  }
+ ]
+}

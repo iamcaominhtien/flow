@@ -11,7 +11,7 @@ from .marks import mark_slots, mark_svg
 from .markup import esc, px, tag
 from .model import KEY_FLAG_TONES, Node, Row, Shape, Tone
 from .shapes import outline_svg, table_radius
-from .sizing import key_room
+from .sizing import key_room, table_header_height
 from .text_area import text_area_width
 from .theme import ShapeColors, Theme, detailed_icon_svg, has_detailed_icon, icon_svg
 
@@ -20,6 +20,7 @@ LINE_HEIGHT_FACTOR = 1.25
 NOTE_TEXT_WEIGHT = 400
 DETAIL_TEXT_WEIGHT = 400
 DETAIL_GAP_PX = 2
+ACTIVITY_FONT_SIZE_PX = 10
 DOCUMENT_LABEL_TRIM_PX = 6  # the wavy bottom of a document leaves less room for text
 DOCUMENT_ICON_LIFT_PX = 3
 SHAPES_WITHOUT_TEXT = (Shape.TABLE,)  # drawn by their own function
@@ -55,11 +56,13 @@ TABLE_CARD_ICON_PX = 52
 TABLE_CHIP_HEIGHT_PX = 16
 TABLE_CHIP_FONT_SIZE_PX = 10
 TABLE_CHIP_RADIUS_PX = 4
+TABLE_STEREOTYPE_FONT_SIZE_PX = 10
 
 # Caption under a node
 CAPTION_WIDTH_PX = 150
 CAPTION_GAP_PX = 4
 CAPTION_FONT_SIZE_PX = 12
+CAPTION_NOTE_FONT_SIZE_PX = 11  # a second caption line, such as ``«external system»``
 
 # Note beside an off-page connector: where the flow continues
 CONNECTOR_NOTE_GAP_PX = 10
@@ -118,7 +121,7 @@ def _label_html(node: Node, theme: Theme) -> str:
         "color": theme.slate if is_note else theme.ink,
     }
     title = "<br>".join(esc(line) for line in node.text)
-    if not node.detail or node.shape is Shape.CONNECTOR:
+    if not (node.detail or node.activities) or node.shape is Shape.CONNECTOR:
         return tag("div", style, title)
     style.update({"flex-direction": "column", "justify-content": "center"})
     detail_style = {
@@ -128,8 +131,27 @@ def _label_html(node: Node, theme: Theme) -> str:
         "color": theme.slate,
         "margin-top": px(DETAIL_GAP_PX),
     }
-    detail = tag("div", detail_style, "<br>".join(esc(line) for line in node.detail))
-    return tag("div", style, tag("div", {}, title) + detail)
+    detail = (
+        tag("div", detail_style, "<br>".join(esc(line) for line in node.detail))
+        if node.detail
+        else ""
+    )
+    return tag("div", style, tag("div", {}, title) + detail + _activities_html(node, theme))
+
+
+def _activities_html(node: Node, theme: Theme) -> str:
+    """Draw the activity lines of a state (``do / cook``): mono, grey, under the name."""
+    if not node.activities:
+        return ""
+    mono = theme.type_scale.mono
+    line_height = px(theme.uml.state_activity_line_height)
+    style = {
+        "font": f"{mono.weight} {px(ACTIVITY_FONT_SIZE_PX)}/{line_height} "
+        f"'{theme.fonts.mono}',monospace",
+        "color": theme.slate,
+        "margin-top": px(DETAIL_GAP_PX),
+    }
+    return tag("div", style, "<br>".join(esc(line) for line in node.activities))
 
 
 def _badge_html(node: Node, theme: Theme) -> str:
@@ -156,9 +178,7 @@ def _badge_html(node: Node, theme: Theme) -> str:
 
 def _header_height(node: Node, theme: Theme) -> float:
     """Return the height of the header band of a table: tall when it is illustrated."""
-    if node.card:
-        return theme.layout.table_card_header_height
-    return theme.layout.table_header_height
+    return table_header_height(node, theme.layout)
 
 
 def _header_box(node: Node, theme: Theme) -> dict[str, str]:
@@ -189,12 +209,15 @@ def _table_title_html(node: Node, theme: Theme) -> str:
             **_header_box(node, theme),
             "padding": f"0 {px(TABLE_TEXT_PADDING_PX)} 0 {px(TABLE_TEXT_PADDING_PX + shift)}",
             "display": "flex",
-            "align-items": "center",
+            "flex-direction": "column",
+            "justify-content": "center",
+            "align-items": "center" if node.is_centered else "flex-start",
             "font-size": px(node.font_size),
             "font-weight": str(theme.type_scale.node.weight),
+            "font-style": "italic" if node.is_italic else "normal",
             "color": theme.ink,
         }
-        return tag("div", title, name)
+        return tag("div", title, _stereotype_html(node, theme) + name)
     stroke = theme.shapes[node.shape].stroke
     pill = {
         **ABSOLUTE,
@@ -219,6 +242,20 @@ def _table_title_html(node: Node, theme: Theme) -> str:
         + tag("div", pill, name)
         + _table_icon_html(node, theme)
     )
+
+
+def _stereotype_html(node: Node, theme: Theme) -> str:
+    """Draw the small ``«interface»`` line above the name of a class."""
+    if not node.stereotype:
+        return ""
+    style = {
+        "font-size": px(TABLE_STEREOTYPE_FONT_SIZE_PX),
+        "font-weight": "400",
+        "font-style": "normal",
+        "line-height": px(theme.layout.table_stereotype_height),
+        "color": theme.slate,
+    }
+    return tag("div", style, esc(node.stereotype))
 
 
 def _table_icon_html(node: Node, theme: Theme) -> str:
@@ -304,7 +341,12 @@ def _row_html(row: Row, place: tuple[float, float, float, bool], theme: Theme) -
     chips = "".join(_chip_html(flag, theme) for flag in row.flags)
     key_cell = tag("span", {"display": "inline-block", "width": px(key_width)}, chips)
     weight = "700" if "PK" in row.flags else "500"
-    name = tag("span", {"font-weight": weight, "flex": "1"}, esc(row.left))
+    name_style = {"font-weight": weight, "flex": "1"}
+    if row.is_mono:
+        name_style.update(
+            {"font-family": f"'{theme.fonts.mono}',monospace", "font-size": px(mono.size)}
+        )
+    name = tag("span", name_style, esc(row.left))
     kind_font = f"{mono.weight} {px(mono.size)}/1 '{theme.fonts.mono}',monospace"
     kind = tag("span", {"color": theme.slate, "font": kind_font}, esc(row.right))
     return tag("div", style, (key_cell if key_width else "") + name + kind)
@@ -341,7 +383,9 @@ def _caption_html(node: Node, theme: Theme) -> str:
     }
     if node.caption_above:
         style["transform"] = "translateY(-100%)"
-    return tag("div", style, esc(node.caption))
+    first, *rest = node.caption.split("\n")
+    note = {"font-weight": "400", "font-size": px(CAPTION_NOTE_FONT_SIZE_PX), "color": theme.slate}
+    return tag("div", style, esc(first) + "".join(tag("div", note, esc(line)) for line in rest))
 
 
 def _connector_note_html(node: Node, theme: Theme) -> str:

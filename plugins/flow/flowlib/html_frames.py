@@ -15,7 +15,17 @@ OPENED_PILL_HEIGHT_PX = 22
 OPENED_PILL_PADDING_PX = 12
 OPENED_PILL_FONT_SIZE_PX = 11
 PILL_RADIUS_PX = 999
-BAND_VARIANTS = (FrameVariant.POOL, FrameVariant.BLACK_BOX, FrameVariant.OPENED, *ZONE_VARIANTS)
+BAND_VARIANTS = (
+    FrameVariant.POOL,
+    FrameVariant.BLACK_BOX,
+    FrameVariant.OPENED,
+    FrameVariant.SYSTEM,
+    *ZONE_VARIANTS,
+)
+SYSTEM_RADIUS_PX = 16
+SYSTEM_LABEL_LEFT_PX = 20
+SYSTEM_LABEL_TOP_PX = 14
+SYSTEM_LABEL_FONT_SIZE_PX = 15
 
 
 def frame_with_band_html(frame: Frame, theme: Theme) -> str:
@@ -34,6 +44,8 @@ def frame_with_band_html(frame: Frame, theme: Theme) -> str:
         return _pool_html(frame, theme)
     if frame.variant is FrameVariant.BLACK_BOX:
         return _black_box_html(frame, theme)
+    if frame.variant is FrameVariant.SYSTEM:
+        return _system_html(frame, theme)
     return _opened_html(frame, theme)
 
 
@@ -123,3 +135,23 @@ def _opened_html(frame: Frame, theme: Theme) -> str:
         "white-space": "nowrap",
     }
     return tag("div", area, data_id=frame.id) + tag("div", pill, esc(frame.label or ""))
+
+
+def _system_html(frame: Frame, theme: Theme) -> str:
+    """Draw the system of a use case diagram: a white box with its name at the top left."""
+    area = {
+        **_box(frame),
+        "background": theme.paper,
+        "border": f"{px(POOL_BORDER_PX)} solid {theme.ink}",
+        "border-radius": px(SYSTEM_RADIUS_PX),
+    }
+    name = {
+        **ABSOLUTE,
+        "left": px(frame.x + SYSTEM_LABEL_LEFT_PX),
+        "top": px(frame.y + SYSTEM_LABEL_TOP_PX),
+        "color": theme.ink,
+        "font-size": px(SYSTEM_LABEL_FONT_SIZE_PX),
+        "font-weight": "700",
+        "white-space": "nowrap",
+    }
+    return tag("div", area, data_id=frame.id) + tag("div", name, esc(frame.label or ""))

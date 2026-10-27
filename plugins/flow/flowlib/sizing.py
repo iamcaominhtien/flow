@@ -8,7 +8,7 @@ is ``char_width_em`` times the font size. The estimate has a safety margin built
 import math
 from dataclasses import dataclass
 
-from .model import DEFAULT_FONT_SIZE_PX, Row, Shape
+from .model import DEFAULT_FONT_SIZE_PX, Node, Row, Shape
 from .text_area import ICON_TEXT_RESERVE_PX, text_area_width
 from .theme import LayoutRules
 
@@ -167,6 +167,20 @@ def fit_table_card(
     return _fit_table(title, sections, (extra, rules.table_card_header_height), rules)
 
 
+def table_header_height(node: Node, rules: LayoutRules) -> float:
+    """Return the height of the header band of a table node.
+
+    Args:
+        node: The table.
+        rules: The layout rules.
+
+    Returns:
+        The tall band of an illustrated table, or the plain one, plus a line for a stereotype.
+    """
+    base = rules.table_card_header_height if node.card else rules.table_header_height
+    return base + (rules.table_stereotype_height if node.stereotype else 0)
+
+
 def key_room(sections: tuple[tuple[Row, ...], ...], rules: LayoutRules) -> float:
     """Return the width reserved before the column names for the key chips of a table.
 
@@ -184,6 +198,13 @@ def key_room(sections: tuple[tuple[Row, ...], ...], rules: LayoutRules) -> float
     return columns * rules.table_chip_width + (columns - 1) * 2 + rules.table_chip_gap
 
 
+def _row_name_width(row: Row, rules: LayoutRules) -> float:
+    """Return the width of the name of a row: mono text is wider than the sans text."""
+    if row.is_mono:
+        return len(row.left) * rules.char_width_em * rules.detail_font_size
+    return estimate_text_width(row.left, rules, rules.table_name_font_size)
+
+
 def _fit_table(
     title: str,
     sections: tuple[tuple[Row, ...], ...],
@@ -194,9 +215,7 @@ def _fit_table(
     mono_width = rules.char_width_em * rules.detail_font_size
     widest_row = max(
         (
-            estimate_text_width(row.left, rules, rules.table_name_font_size)
-            + len(row.right) * mono_width
-            + rules.table_row_gap
+            _row_name_width(row, rules) + len(row.right) * mono_width + rules.table_row_gap
             for section in sections
             for row in section
         ),

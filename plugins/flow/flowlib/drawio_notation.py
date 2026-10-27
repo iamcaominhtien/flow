@@ -43,6 +43,9 @@ ID_SPAN_STYLE = "font-size:{size}px;font-weight:normal;color:{color}"
 DETAIL_SPAN_STYLE = "font-size:{size}px;font-weight:normal;color:{color}"
 BAND_FONT_SIZE_PX = 13
 BAND_STROKE_WIDTH_PX = 1.5
+SYSTEM_ARC_PERCENT = 3
+SYSTEM_LABEL_INSET_PX = 20
+SYSTEM_FONT_SIZE_PX = 15
 OPENED_PILL_FONT_SIZE_PX = 11
 OPENED_PILL_PADDING_PX = 12
 OPENED_DASH_PATTERN = "4 3"
@@ -340,6 +343,8 @@ def add_band_frame(root: ET.Element, frame: Frame, theme: Theme) -> None:
         _add_pool(root, frame, theme)
     elif frame.variant is FrameVariant.BLACK_BOX:
         _add_black_box(root, frame, theme)
+    elif frame.variant is FrameVariant.SYSTEM:
+        _add_system(root, frame, theme)
     else:
         _add_opened(root, frame, theme)
 
@@ -393,6 +398,33 @@ def _add_black_box(root: ET.Element, frame: Frame, theme: Theme) -> None:
             "fontColor": theme.ink,
             "fontStyle": FONT_BOLD,
             "fontSize": BAND_FONT_SIZE_PX,
+            "fontFamily": theme.fonts.sans,
+        }
+    )
+    cell = add_vertex(root, f"frame-{frame.id}", esc(frame.label or ""), style)
+    add_geometry(cell, (frame.x, frame.y, frame.width, frame.height))
+
+
+def _add_system(root: ET.Element, frame: Frame, theme: Theme) -> None:
+    """Add the system of a use case diagram: a white container whose name is at its top left."""
+    style = style_string(
+        {
+            FLOW_FRAME_KEY: frame.variant.value,
+            "rounded": 1,
+            "arcSize": SYSTEM_ARC_PERCENT,
+            "container": 1,
+            "collapsible": 0,
+            "html": 1,
+            "align": "left",
+            "verticalAlign": "top",
+            "spacingLeft": SYSTEM_LABEL_INSET_PX,
+            "spacingTop": SYSTEM_LABEL_INSET_PX // 2,
+            "fillColor": theme.paper,
+            "strokeColor": theme.ink,
+            "strokeWidth": BAND_STROKE_WIDTH_PX,
+            "fontColor": theme.ink,
+            "fontStyle": FONT_BOLD,
+            "fontSize": SYSTEM_FONT_SIZE_PX,
             "fontFamily": theme.fonts.sans,
         }
     )

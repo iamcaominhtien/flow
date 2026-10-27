@@ -20,66 +20,39 @@ You write a short **spec**. A script places the boxes, routes the lines, checks 
 ```json
 {
   "type": "class",
-  "title": "Class diagram",
-  "desc": "Shapes.",
+  "title": "Class diagram: the delivery domain",
+  "desc": "One sentence that says what the diagram shows.",
   "classes": [
-    {
-      "id": "shape",
-      "label": "Shape",
-      "attributes": [
-        "+name: str"
-      ],
-      "methods": [
-        "+area(): float"
-      ]
-    },
-    {
-      "id": "circle",
-      "label": "Circle",
-      "attributes": [
-        "-radius: float"
-      ],
-      "methods": [
-        "+area(): float"
-      ]
-    },
-    {
-      "id": "canvas",
-      "label": "Canvas",
-      "attributes": [
-        "-shapes: list"
-      ],
-      "methods": [
-        "+draw()"
-      ]
-    }
+    {"id": "order", "label": "Order", "tone": "violet", "at": [0, 1],
+     "attributes": ["-id: UUID", "-status: OrderStatus"],
+     "operations": ["+addItem(d: Dish, n: int)", "+pay(p: Payment)"]},
+    {"id": "payment", "label": "Payment", "kind": "abstract", "tone": "amber", "at": [1, 1],
+     "operations": ["+authorise(): bool"]},
+    {"id": "card", "label": "CardPayment", "tone": "amber", "at": [2, 1],
+     "attributes": ["-cardToken: String"], "operations": ["+authorise(): bool"]}
   ],
   "relations": [
-    {
-      "from": "circle",
-      "to": "shape",
-      "style": "inheritance"
-    },
-    {
-      "from": "canvas",
-      "to": "shape",
-      "style": "aggregation",
-      "to_label": "*"
-    }
+    {"from": "order", "to": "payment", "label": "paid by", "from_label": "1", "to_label": "0..*"},
+    {"from": "card", "to": "payment", "style": "inheritance"}
   ]
 }
 ```
 
 - `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
-- **Class**: `id`, `label`, `attributes` (list of strings such as `-radius: float`), `methods` (list of strings), `icon`, `tone`.
-- **Relation**: `from`, `to`, `label`, `style`: `association` (default), `inheritance` (hollow triangle at `to`, the parent), `implements` (dashed, hollow triangle), `composition` (filled diamond at `from`, the whole), `aggregation` (hollow diamond at `from`), `dependency` (dashed arrow). `from_label` and `to_label` are accepted for multiplicity.
-- Top level: `type` (`class`), `title`, `desc`, optional `direction` (`down` default, or `right`).
-- Optional `at: [row, column]` on an item places it on an explicit grid cell. Use it only when the automatic placement is wrong.
-- Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
+- **Class**: `id`, `label` (a singular noun in PascalCase), `attributes` and `operations` (lists of strings; `methods` is accepted for `operations`), optional `kind` (`class`, `abstract`: the name is italic; `interface`: `«interface»` above the name), `stereotype` (own text such as `«enumeration»`), `tone`, `at: [row, column]`. A compartment with nothing in it is left out. The box is 280 px wide; the header has the class tint (default blue, interface gray).
+- **Members** are written as in UML: a visibility mark (`+` public, `-` private, `#` protected), the name, a colon and the type; an operation has its parameters and return type: `+addItem(d: Dish, n: int)`, `+authorise(): bool`. Show the members that explain the relationships, not every field.
+- **Relation**: `from`, `to`, optional `label` (a verb: `places`), `from_label` and `to_label` (the multiplicity at each end: `1`, `0..1`, `0..*`, `1..*`; drawn next to the boxes), and `style`:
+  - `association` (default): a plain line; `navigable`: an open arrow at `to`;
+  - `composition`: a filled diamond at `from`, the whole; `aggregation`: a hollow diamond at `from`;
+  - `inheritance`: a hollow triangle at `to`, the parent, so write it from the child; `implements`: the same triangle on a dashed line (the interface is `to`);
+  - `dependency`: a dashed open arrow at `to`, a weak, temporary use.
+- **Layout (from the design):** boxes sit on a grid 460 px apart sideways and at least 130 px apart downward; a half column is allowed (`[2, 0.5]`) to put two children under a parent. Without `at` the parents go above their children (inheritance and implements), the first class goes top left, the rest follow the relations, four to a row. Lines are orthogonal with at most two bends and do not cross a box. About ten classes fit on a page; past that, one diagram per module.
+- Names agree with the ER diagram of the same domain: the class `Order` is the table `orders`.
+- Icons: not drawn on classes. The class diagram is plain only.
 
 ## Limits to tell the user
 
-- Multiplicity labels (`from_label`, `to_label`) are accepted but not drawn yet. Interfaces and abstract classes have no special look: put `«interface»` in the label.
+- Several lines on one side of a box are spread 60 px apart, so a line can have a small jog. A class that points at itself is a loop at its right side.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
 - Fixes beyond the spec: see the flowchart skill (overrides file).
 
