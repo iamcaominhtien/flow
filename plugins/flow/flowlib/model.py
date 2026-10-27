@@ -64,6 +64,12 @@ class Shape(StrEnum):
     BOARD_PILL = "board_pill"  # a pill in the header of a Kanban column: its name, count or limit
     LANE_HEAD = "lane_head"  # the card at the left of a roadmap row: a large icon and the theme
     PERIOD_HEAD = "period_head"  # the header of a roadmap column: a name and its dates in words
+    EXPLAIN_CARD = "explain_card"  # an explainer card: large icon, name pill, two lines of text
+    ROW_CARD = "row_card"  # an explainer row: icon at the left, a name and one line of text
+    CELL = "cell"  # a tinted box of an explainer comparison, with left-aligned text
+    PILL_LABEL = "pill_label"  # a pill with an ink outline: a comparison row name, or ``vs``
+    REMARK = "remark"  # bold text with no outline: a remark in a band, a closing line, a note
+    SECTION_HEAD = "section_head"  # a dark letter circle and the heading of a section
 
 
 class Marker(StrEnum):
@@ -194,6 +200,7 @@ class FrameVariant(StrEnum):
     PANEL = "panel"  # a white rounded box with a thin outline, such as the header of a Gantt
     BAND = "band"  # a grey row with its name in bold, such as a phase of a Gantt
     COLUMN = "column"  # a tinted rounded area with no outline: a Kanban column or a roadmap row
+    STRIP = "strip"  # an explainer band: a wide tinted strip with a pill label at its top left
 
 
 class Side(StrEnum):
@@ -455,6 +462,8 @@ class Node:
     is_italic: bool = False  # the name is in italics, as the name of an abstract class
     is_centered: bool = False  # the header text of a table is centred, as in a class box
     plan: PlanView | None = None  # what a planning node shows: status, person, mind map level
+    chips: tuple[str, ...] = ()  # the small mono pills at the right of an explainer row
+    is_mono: bool = False  # the name of an explainer row is code: a file or a folder
 
 
 @dataclass(frozen=True)

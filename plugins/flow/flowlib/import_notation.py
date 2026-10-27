@@ -16,7 +16,7 @@ from .model import Frame, FrameVariant, Marker, Node, Shape, Tone
 from .theme import load_theme
 
 LAYER_IDS = {"0", "1"}
-PART_PREFIXES = ("strip-", "pill-", "detail-", "mark-")
+PART_PREFIXES = ("strip-", "pill-", "detail-", "mark-", "name-", "chip")
 BADGE_PREFIX = "badge-"
 NODE_PREFIX = "node-"
 TAB_PREFIX = "tab-"
@@ -24,6 +24,8 @@ FRAME_PREFIX = "frame-"
 OPENED_LABEL_PREFIX = "label-frame-"
 DFD_SHAPES = (Shape.DFD_PROCESS, Shape.DFD_STORE)
 C4_SHAPES = (Shape.C4_BOX, Shape.C4_PERSON)
+EXPLAIN_PARTED_SHAPES = (Shape.EXPLAIN_CARD, Shape.ROW_CARD)
+CHIP_STEM = re.compile(r"chip(\d+)-")
 TYPE_LINE_END = "]"  # the mono ``[Kind: technology]`` line of a C4 box ends here
 C4_MIN_LINES = 2
 TAG = re.compile(r"<[^>]+>")
@@ -95,6 +97,8 @@ def notation_frame(frame: Frame, style: dict[str, str], cells: dict[str, ET.Elem
         label = _text(pill) or label
     if variant in ZONE_VARIANTS:
         return _zone_frame(replace(frame, variant=variant, label=label), style)
+    if variant is FrameVariant.STRIP:
+        return replace(frame, variant=variant, label=label, tone=_pill_tone(pill) or frame.tone)
     return replace(frame, variant=variant, label=label, tone=_pill_tone(tab) or frame.tone)
 
 
@@ -152,6 +156,8 @@ def notation_node(node: Node, cell: ET.Element, cells: dict[str, ET.Element]) ->
         return _c4_parts(node)
     if shape is Shape.WIDE_CARD:
         return _wide_parts(node, cell, cells)
+    if shape in EXPLAIN_PARTED_SHAPES:
+        return _explain_parts(node, cell, cells)
     return _dfd_parts(node, cell, cells) if _is_dfd(node) else node
 
 
@@ -181,6 +187,28 @@ def _wide_parts(node: Node, cell: ET.Element, cells: dict[str, ET.Element]) -> N
     name = (_text(pill),) if pill is not None else node.text
     lines = (_text(detail),) if detail is not None else ()
     return replace(node, text=name, detail=lines)
+
+
+def _explain_parts(node: Node, cell: ET.Element, cells: dict[str, ET.Element]) -> Node:
+    """Read the name, the text and the chips of an explainer card or row from its parts."""
+    stem = cell.get("id", "").removeprefix(NODE_PREFIX)
+    name = cells.get(f"pill-{stem}")
+    if name is None:
+        name = cells.get(f"name-{stem}")
+    detail = cells.get(f"detail-{stem}")
+    chips = sorted(
+        (int(found.group(1)), _text(part))
+        for ident, part in cells.items()
+        if (found := CHIP_STEM.match(ident)) and ident.endswith(f"-{stem}")
+    )
+    is_mono = name is not None and load_theme().fonts.mono in _style(name).get("fontFamily", "")
+    return replace(
+        node,
+        text=(_text(name),) if name is not None else node.text,
+        detail=(_text(detail),) if detail is not None else (),
+        chips=tuple(text for _index, text in chips),
+        is_mono=is_mono,
+    )
 
 
 def _is_dfd(node: Node) -> bool:

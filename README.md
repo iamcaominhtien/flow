@@ -8,7 +8,7 @@
 Describe a diagram in plain language. Get a web page you can view and share, and a <code>.drawio</code> file you can keep editing.</p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.9.0-1D4ED8?style=flat-square">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.10.0-1D4ED8?style=flat-square">
   <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude_Code-plugin-D97757?style=flat-square">
   <img alt="Python" src="https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white">
   <img alt="Standard library only" src="https://img.shields.io/badge/dependencies-none-15803D?style=flat-square">
@@ -88,6 +88,7 @@ Claude writes the files next to your spec: `<name>.html` (open it in any browser
 | `/flow:org-chart`, `/flow:mind-map` | Trees with a tidy layout (top down; left to right) |
 | `/flow:gantt`, `/flow:roadmap` | Time axis in named periods; lanes of items |
 | `/flow:kanban`, `/flow:layers`, `/flow:wireframe`, `/flow:concept` | Columns of cards (also a comparison); stacked bands; low-fidelity screens; a hub with parts around it |
+| `/flow:explainer` | One idea taught to a newcomer: a journey through bands, a tree, a comparison or a concept with an analogy, or several on one page |
 | `/flow:import-drawio` | Reads an existing `.drawio` file into a scene (best effort) |
 | `/flow:edit-drawio` | Changes an existing `.drawio` file in place; the rest of the file stays as it was |
 | `/flow:doctor` | Checks the install |

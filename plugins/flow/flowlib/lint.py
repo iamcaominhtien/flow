@@ -7,6 +7,7 @@ author may break a rule on purpose. Which rules apply depends on ``Scene.diagram
 
 from .check import Code, Finding, Severity
 from .lint_board import lint_kanban, lint_roadmap
+from .lint_explainer import lint_explainer
 from .model import Edge, FrameVariant, MindLevel, Node, Role, Scene, Shape
 from .theme import load_theme
 
@@ -258,4 +259,5 @@ PLANNING_LINTS = {
     "mindmap": lint_mindmap,
     "kanban": lint_kanban,
     "roadmap": lint_roadmap,
+    "explainer": lint_explainer,
 }

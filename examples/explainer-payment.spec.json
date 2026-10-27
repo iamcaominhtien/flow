@@ -1,0 +1,71 @@
+{
+  "type": "explainer",
+  "title": "What happens when you pay by card online",
+  "desc": "A yes or no comes back in about two seconds, but the money moves days later. Follow the numbers in A, then compare the two steps in B.",
+  "sections": [
+    {
+      "shape": "layers",
+      "column": "left",
+      "title": "Authorisation: a yes or no in two seconds",
+      "bands": [
+        {"label": "You", "tone": "blue", "cards": [
+          {"id": "you", "name": "You", "text": "Enter the card details at checkout and press Pay.", "icon": "user"}]},
+        {"label": "The shop", "tone": "violet", "cards": [
+          {"id": "shop", "name": "The shop", "text": "Sends your order. Card details go straight to the gateway.", "icon": "cart"},
+          {"id": "gateway", "name": "Payment gateway", "text": "Wraps the request in a safe, standard format.", "icon": "gateway"}]},
+        {"label": "The banks' network", "tone": "amber", "cards": [
+          {"id": "network", "name": "Card network", "text": "Visa or Mastercard: the postman between the banks.", "icon": "globe", "number": "5"},
+          {"id": "acquirer", "name": "The shop's bank", "text": "Also called the acquirer. It receives the shop's money.", "icon": "money", "number": "4"}]},
+        {"label": "Your bank", "tone": "teal", "cards": [
+          {"id": "bank", "name": "Your bank", "text": "Checks your money and the fraud signals, then decides.", "icon": "security", "number": "6"},
+          {"id": "approved", "name": "Approved", "text": "The money is put on hold.", "icon": "success", "tone": "green", "branch": true, "number": "6a", "col": 1},
+          {"id": "declined", "name": "Declined", "text": "Nothing is held. The shop is told no.", "icon": "error", "tone": "red", "branch": true, "number": "6b", "col": 1, "stack": 1}]}
+      ],
+      "links": [
+        {"from": "you", "to": "shop", "label": "presses Pay"},
+        {"from": "shop", "to": "gateway", "label": "card details"},
+        {"from": "gateway", "to": "acquirer", "label": "asks for approval"},
+        {"from": "acquirer", "to": "network", "label": "forwards it"},
+        {"from": "network", "to": "bank", "label": "routes to your bank"},
+        {"from": "bank", "to": "approved", "label": "yes", "kind": "yes"},
+        {"from": "bank", "to": "declined", "label": "no", "kind": "no"}
+      ],
+      "closing": "The answer travels back the same way, bank to network to bank to shop to you."
+    },
+    {
+      "shape": "comparison",
+      "column": "right",
+      "title": "Two steps, not one",
+      "left": {"name": "Authorisation", "text": "The \"yes\". Happens while you wait.", "icon": "lock", "tone": "blue"},
+      "right": {"name": "Settlement", "text": "The money. Happens later.", "icon": "money", "tone": "green"},
+      "rows": [
+        {"label": "When", "left": "Right now, while you wait.", "right": "Later, usually the same night."},
+        {"label": "What moves", "left": "Nothing. A hold is placed on the money.", "right": "The money itself, minus small fees."},
+        {"label": "Who is involved", "left": "All six: you, shop, gateway, two banks, network.", "right": "Mostly the banks and the network."},
+        {"label": "Can it be undone?", "left": "Yes: the hold just expires.", "right": "Only as a refund, which takes days."}
+      ]
+    },
+    {
+      "shape": "tree",
+      "column": "right",
+      "title": "Why a payment is declined",
+      "names": "plain",
+      "root": {"name": "Declined", "text": "The bank said no.", "icon": "error", "tone": "red"},
+      "rows": [
+        {"name": "Not enough money", "text": "There is nothing to approve. Try another card.", "icon": "warn", "tone": "amber"},
+        {"name": "Looks like fraud", "text": "An unusual place or amount. Call the bank to allow it.", "icon": "security", "tone": "violet"},
+        {"name": "The bank wants proof", "text": "A screen asks you to confirm in your banking app (3-D Secure).", "icon": "id-card", "tone": "blue"}
+      ]
+    },
+    {
+      "shape": "analogy",
+      "column": "full",
+      "label": "Like a hotel stay",
+      "tone": "amber",
+      "left": {"name": "Check-in", "text": "The hotel holds your card as a deposit. That is authorisation.", "icon": "lock", "tone": "blue"},
+      "right": {"name": "Check-out", "text": "The hotel really charges the card. That is settlement.", "icon": "money", "tone": "green"},
+      "link": "a few days later",
+      "closing": "Same idea, different clock: the promise is instant, the money is not."
+    }
+  ]
+}

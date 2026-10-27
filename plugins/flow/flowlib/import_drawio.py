@@ -15,7 +15,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 from .canvas import fit_canvas
-from .drawio_common import FRAME_LABEL_PREFIX
+from .drawio_common import FLOW_SHAPE_KEY, FRAME_LABEL_PREFIX
 from .geometry import border_point, center_of
 from .import_notation import (
     is_notation_frame,
@@ -395,7 +395,7 @@ class _Import:
                 self.frames[-1] = replace(self.frames[-1], label=label[0] if label else None)
         elif "image" in style.get("shape", ""):
             self.skipped_images += 1
-        elif _is_label_only(style):
+        elif _is_label_only(style) and FLOW_SHAPE_KEY not in style:
             self.notes.append(f"skipped the free text '{cell.get('value', '')[:30]}'")
         else:
             node = screen_node(_node(cell, style, self.box(cell)), style)

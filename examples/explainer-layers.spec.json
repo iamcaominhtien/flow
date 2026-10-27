@@ -1,0 +1,57 @@
+{
+  "type": "explainer",
+  "shape": "layers",
+  "title": "How a web page reaches you",
+  "desc": "Type an address and a few things happen in about a tenth of a second. Follow the numbers from top to bottom.",
+  "bands": [
+    {
+      "label": "You",
+      "tone": "blue",
+      "remark": "Your browser knows only the name of the site, like shop.com.",
+      "cards": [
+        {"id": "browser", "name": "Your browser", "text": "You type a web address and press Enter.", "icon": "browser"}
+      ]
+    },
+    {
+      "label": "Finding the address",
+      "tone": "violet",
+      "remark": "Names are for people. Computers need numbers, so this lookup comes first.",
+      "cards": [
+        {"id": "dns", "name": "DNS", "text": "Turns the name into a number, the IP address.", "icon": "dns"}
+      ]
+    },
+    {
+      "label": "The edge",
+      "tone": "amber",
+      "remark": "Fast path: with a copy at the CDN, the trip ends at step 3.",
+      "cards": [
+        {"id": "cdn", "name": "CDN", "text": "A copy near you. If it has the page, it answers here.", "icon": "cdn"},
+        {"id": "lb", "name": "Load balancer", "text": "Otherwise it picks a server that is not busy.", "icon": "load-balancer"}
+      ]
+    },
+    {
+      "label": "The app",
+      "tone": "green",
+      "cards": [
+        {"id": "web", "name": "Web server", "text": "Builds the page from the pieces it needs.", "icon": "server", "col": 1},
+        {"id": "cache", "name": "Cache", "text": "Remembers recent answers so it can skip the database.", "icon": "in-memory-cache"}
+      ]
+    },
+    {
+      "label": "The data",
+      "tone": "teal",
+      "remark": "The answer travels back the same way, and the browser draws the page.",
+      "cards": [
+        {"id": "db", "name": "Database", "text": "Holds the real information: products, accounts, orders.", "icon": "database", "col": 1}
+      ]
+    }
+  ],
+  "links": [
+    {"from": "browser", "to": "dns", "label": "asks \"where is it?\""},
+    {"from": "dns", "to": "cdn", "label": "here is the address"},
+    {"from": "cdn", "to": "lb", "label": "no copy", "kind": "step"},
+    {"from": "lb", "to": "web", "label": "sends the request"},
+    {"from": "web", "to": "cache", "label": "asks first", "kind": "step"},
+    {"from": "web", "to": "db", "label": "if not remembered"}
+  ]
+}

@@ -70,6 +70,8 @@ You write a short **spec**: the central idea and the parts around it. A script p
 
 ## Limits to tell the user
 
+- To explain an idea to a newcomer (a hub, four facts and an analogy), use `/flow:explainer`; this skill draws a ring of parts.
+
 - The ring is a circle: many wide parts make it large. Ten is the most.
 - The spokes are plain lines; there are no arrows and no labels on them. To show direction or order, use another skill.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.

@@ -25,6 +25,19 @@ BPMN_SIZE_KEYS = ("task_size", "data_store_size")
 C4_SIZE_KEYS = ("box_size", "system_size")
 CLOUD_SIZE_KEYS = ("part_size",)
 ARCHITECTURE_SIZE_KEYS = ("part_size", "card_size")
+EXPLAINER_PROFILE_NAMES = ("standard", "compact")
+EXPLAINER_SIZE_KEYS = (
+    "card_size",
+    "branch_size",
+    "row_size",
+    "head_size",
+    "cell_size",
+    "label_size",
+    "vs_size",
+    "fact_size",
+    "hub_size",
+    "root_size",
+)  # the fields of ``ExplainerProfile`` that are a (width, height) pair in ``theme.json``
 UML_SIZE_KEYS = ("state_size", "case_size", "actor_size", "actor_card_size")
 GANTT_SIZE_KEYS = ("today_pill", "legend_swatch")
 ORG_SIZE_KEYS = ("card", "card_illustrated", "works_pill")
@@ -575,6 +588,125 @@ class ArchitectureRules:
 
 
 @dataclass(frozen=True)
+class ExplainerProfile:
+    """The sizes of one scale of an explainer: a page of its own, or a section beside others."""
+
+    card_size: tuple[float, float]
+    band_height: float
+    band_pitch: float
+    band_card_top: float
+    col_offset: float
+    col_pitch: float
+    branch_size: tuple[float, float]
+    branch_icon: float
+    row_size: tuple[float, float]
+    row_icon: float
+    row_pitch: float
+    head_size: tuple[float, float]
+    cell_size: tuple[float, float]
+    label_size: tuple[float, float]
+    vs_size: tuple[float, float]
+    compare_pitch: float
+    compare_gap: float
+    compare_spread: float
+    fact_size: tuple[float, float]
+    hub_size: tuple[float, float]
+    root_size: tuple[float, float]
+
+
+@dataclass(frozen=True)
+class ExplainerRules:
+    """Sizes, gaps and type of an explainer (design 07). Lengths are in pixels."""
+
+    title_size: float
+    title_top: float
+    title_height: float
+    description_size: float
+    description_line_height: float
+    description_height: float
+    description_max_width: float
+    canvas_width: float
+    narrow_width: float
+    left_column_width: float
+    right_column_width: float
+    page_margin: float
+    bottom_margin: float
+    column_gap: float
+    section_gap: float
+    section_head_size: float
+    section_head_font: float
+    section_head_gap: float
+    section_head_letter_font: float
+    first_section_top: float
+    layers_top: float
+    tree_top: float
+    compare_top: float
+    concept_top: float
+    card_icon_size: float
+    card_icon_top: float
+    card_pill_top: float
+    card_pill_height: float
+    card_pill_font: float
+    card_detail_top: float
+    card_detail_font: float
+    card_detail_line: float
+    card_pad: float
+    card_radius: float
+    border_width: float
+    pill_shadow: float
+    pill_pad: float
+    badge_size: float
+    badge_overhang: float
+    badge_font: float
+    row_icon_inset: float
+    row_name_font: float
+    row_detail_gap: float
+    row_detail_font: float
+    row_radius: float
+    chip_height: float
+    chip_font: float
+    chip_gap: float
+    chip_pad: float
+    chips_label_font: float
+    cell_font: float
+    cell_pad: float
+    cell_radius: float
+    label_font: float
+    vs_font: float
+    remark_font: float
+    remark_gap: float
+    closing_gap: float
+    note_font: float
+    note_gap: float
+    rule_title_font: float
+    rule_text_font: float
+    rule_pad: float
+    rule_height: float
+    rule_gap: float
+    rule_title_top: float
+    rule_text_top: float
+    band_radius: float
+    band_pill_left: float
+    band_pill_top: float
+    band_pill_height: float
+    band_pill_font: float
+    band_alpha: float
+    band_pill_pad: float
+    analogy_card_top: float
+    analogy_bottom: float
+    stack_gap: float
+    label_gap: float
+    tree_root_inset: float
+    tree_bus_gap: float
+    concept_spread: float
+    concept_row_pitch: float
+    hub_line_offset: float
+    rule_line_extend: float
+    standard: ExplainerProfile
+    compact: ExplainerProfile
+
+
+@dataclass(frozen=True)
 class BpmnRules:
     """Sizes and gaps of a BPMN diagram (design 11 section 7). Lengths are in pixels."""
 
@@ -691,6 +823,7 @@ class Theme:
     c4: C4Rules
     cloud: CloudRules
     architecture: ArchitectureRules
+    explainer: ExplainerRules
     uml: UmlRules
     planning: PlanningRules
 
@@ -842,9 +975,27 @@ def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
         c4=C4Rules(**_sized(raw["c4"], C4_SIZE_KEYS)),
         cloud=CloudRules(**_sized(raw["cloud"], CLOUD_SIZE_KEYS)),
         architecture=ArchitectureRules(**_sized(raw["architecture"], ARCHITECTURE_SIZE_KEYS)),
+        explainer=_explainer_rules(raw["explainer"]),
         uml=UmlRules(**_sized(raw["uml"], UML_SIZE_KEYS)),
         planning=_planning_rules(raw["planning"], tones),
     )
+
+
+def _explainer_rules(raw: dict[str, Any]) -> ExplainerRules:
+    """Build the explainer rules; each profile has its sizes turned into pairs.
+
+    Args:
+        raw: The ``explainer`` object of ``theme.json``.
+
+    Returns:
+        The rules, with the ``standard`` and ``compact`` profiles.
+    """
+    profiles = {
+        name: ExplainerProfile(**_sized(raw[name], EXPLAINER_SIZE_KEYS))
+        for name in EXPLAINER_PROFILE_NAMES
+    }
+    loose = {key: value for key, value in raw.items() if key not in EXPLAINER_PROFILE_NAMES}
+    return ExplainerRules(**loose, **profiles)
 
 
 def _merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
