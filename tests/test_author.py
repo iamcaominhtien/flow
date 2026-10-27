@@ -1,6 +1,7 @@
 """Tests for the helpers a hand-laid diagram script uses."""
 
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 PLUGIN_DIR = Path(__file__).resolve().parent.parent / "plugins" / "flow"
@@ -8,9 +9,21 @@ PLUGIN_DIR = Path(__file__).resolve().parent.parent / "plugins" / "flow"
 sys.path.insert(0, str(PLUGIN_DIR))
 
 import pytest  # noqa: E402
-from flowlib.author import Canvas, NodeOptions, Route, Side, sentence_case  # noqa: E402
-from flowlib.check import Severity  # noqa: E402
-from flowlib.model import Role, Row, Shape, Tone  # noqa: E402
+from flowlib.author import Canvas, EdgeWords, NodeOptions, Route, Side, sentence_case  # noqa: E402
+from flowlib.check import Code, Severity, check_scene  # noqa: E402
+from flowlib.labels import place_labels  # noqa: E402
+from flowlib.model import (  # noqa: E402
+    Device,
+    Edge,
+    Fidelity,
+    LabelKind,
+    Role,
+    Row,
+    ScreenView,
+    Shape,
+    Tone,
+)
+from flowlib.theme import load_theme  # noqa: E402
 
 
 def _small_canvas() -> Canvas:
@@ -154,3 +167,124 @@ def test_a_table_is_sized_by_its_rows_and_has_a_taller_header_when_illustrated()
     )
     assert card.node.height - plain.node.height == 24
     assert plain.node.sections == (rows,)
+
+
+def _screen_canvas(gap: float = 600) -> Canvas:
+    """Return a canvas with a phone screen and a desktop screen side by side."""
+    canvas = Canvas("Screens", "Two screens")
+    phone = ScreenView(code="S1", fidelity=Fidelity.L2)
+    desktop = ScreenView(code="W1", device=Device.DESKTOP, fidelity=Fidelity.L2)
+    canvas.node("home", Shape.SCREEN, "Home", NodeOptions((200, 300), screen=phone))
+    canvas.node("web", Shape.SCREEN, "Web", NodeOptions((200 + gap, 300), screen=desktop))
+    return canvas
+
+
+def test_a_screen_node_is_sized_by_the_device_table() -> None:
+    """A phone and a desktop screen take the size of their device frame, and keep their id."""
+    canvas = _screen_canvas()
+    sizes = load_theme().screen.sizes
+    assert (canvas.boxes["home"].node.width, canvas.boxes["home"].node.height) == sizes["phone"]
+    assert canvas.boxes["web"].node.width == sizes["desktop"][0]
+    view = canvas.boxes["home"].node.screen
+    assert view is not None and view.code == "S1" and view.title == "Home"
+
+
+def test_a_screen_can_take_a_forced_size_and_is_refused_on_another_shape() -> None:
+    """The size may be forced; a screen view on a process box is an error."""
+    canvas = Canvas()
+    view = ScreenView(code="S2", fidelity=Fidelity.L2, is_mini=True)
+    box = canvas.node("a", Shape.SCREEN, "A", NodeOptions((100, 300), screen=view, width=150))
+    assert box.node.width == 150
+    with pytest.raises(ValueError, match="goes with"):
+        canvas.node("b", Shape.PROCESS, "B", NodeOptions((400, 300), screen=view))
+
+
+def test_a_trigger_chip_is_dark_for_a_person_and_slate_with_an_icon_for_the_system() -> None:
+    """The two trigger kinds differ in chip kind and icon."""
+    canvas = _screen_canvas()
+    user = canvas.edge("home", "web", Route(words=EdgeWords(trigger="tap Open")))
+    system = canvas.edge("web", "home", Route(words=EdgeWords("timer ends", system_icon="clock")))
+    assert user.label is not None and user.label.kind is LabelKind.USER
+    assert system.label is not None and system.label.kind is LabelKind.SYSTEM
+    assert system.label.icon == "clock"
+
+
+def test_a_guard_and_an_effect_follow_the_trigger_and_a_failure_is_rose() -> None:
+    """Words are ``trigger [guard] / effect``: the chip is the label, the rest are extras."""
+    canvas = _screen_canvas()
+    words = EdgeWords("tap Pay", guard="card declined", effect="show error", is_failure=True)
+    line = canvas.edge("home", "web", Route(words=words))
+    assert line.label is not None and line.label.text == "tap Pay"
+    assert [extra.text for extra in line.extras] == ["[card declined]", "/ show error"]
+    assert [extra.kind for extra in line.extras] == [LabelKind.GUARD_FAIL, LabelKind.EFFECT]
+    assert line.role is Role.NO
+    guard_only = canvas.edge("web", "home", Route(words=EdgeWords(guard="ok")))
+    assert guard_only.label is not None and guard_only.label.kind is LabelKind.GUARD_OK
+    assert guard_only.extras == ()
+
+
+def test_words_and_a_plain_label_cannot_be_given_together() -> None:
+    """A route has either a short label or the words of a screen flow arrow."""
+    canvas = _screen_canvas()
+    with pytest.raises(ValueError, match="not both"):
+        canvas.edge("home", "web", Route(label="x", words=EdgeWords("tap")))
+
+
+def test_words_beside_a_vertical_line_sit_on_the_chosen_side() -> None:
+    """On a vertical stretch the chip is beside the line, the text under the chip."""
+    canvas = Canvas()
+    view = ScreenView(code="S1", fidelity=Fidelity.L2)
+    canvas.node("top", Shape.SCREEN, "Top", NodeOptions((200, 300), screen=view))
+    canvas.node("low", Shape.SCREEN, "Low", NodeOptions((200, 800), screen=view))
+    words = EdgeWords("tap Next", guard="valid")
+    right = canvas.edge("top", "low", Route(words=words))
+    left = canvas.edge(
+        "top", "low", Route(words=EdgeWords("tap Next", guard="valid", is_left=True))
+    )
+    assert right.label is not None and left.label is not None
+    assert right.label.at[0] > 200 > left.label.at[0]
+    assert right.label.at[1] < right.extras[0].at[1]
+
+
+def _blocked_canvas() -> tuple[Canvas, Edge]:
+    """Return a canvas whose arrow has its chip over a small box beside the line."""
+    canvas = _screen_canvas()
+    canvas.node("note", Shape.PROCESS, "Note", NodeOptions((479, 270), width=100, height=20))
+    line = canvas.edge("home", "web", Route(words=EdgeWords("tap Open", guard="valid")))
+    return canvas, line
+
+
+def test_extras_move_with_the_main_chip_and_stay_on_the_line() -> None:
+    """A chip over a box slides along its line with its guard; both end clear."""
+    canvas, line = _blocked_canvas()
+    assert line.label is not None
+    placed = place_labels(canvas.scene()).edges[0]
+    assert placed.label is not None
+    chip_shift = (placed.label.at[0] - line.label.at[0], placed.label.at[1] - line.label.at[1])
+    extra_shift = (
+        placed.extras[0].at[0] - line.extras[0].at[0],
+        placed.extras[0].at[1] - line.extras[0].at[1],
+    )
+    assert chip_shift == extra_shift
+    assert chip_shift[0] != 0 and chip_shift[1] == 0  # slid along the horizontal line only
+    codes = [finding.code for finding in check_scene(canvas.scene())]
+    assert Code.LABEL_COVERS not in codes
+
+
+def test_a_chip_that_can_be_nudged_is_not_reported_but_one_that_cannot_is() -> None:
+    """The check reports a chip over a box only when no place on its line is clear."""
+    canvas, line = _blocked_canvas()
+    unplaced = replace(canvas.scene(), edges=(line,))
+    assert Code.LABEL_COVERS not in [finding.code for finding in check_scene(unplaced)]
+    narrow = _screen_canvas(gap=240)
+    narrow.edge("home", "web", Route(words=EdgeWords("tap a trigger far wider than the gap")))
+    assert Code.LABEL_COVERS in [finding.code for finding in check_scene(narrow.scene())]
+
+
+def test_a_screen_flow_scene_is_written_and_has_no_error(tmp_path: Path) -> None:
+    """Screens and arrows with chips make the three files, and the check finds no error."""
+    canvas = _screen_canvas()
+    canvas.edge("home", "web", Route(words=EdgeWords("tap Open", guard="valid", effect="log")))
+    findings = canvas.write(tmp_path, "screens")
+    assert not [finding for finding in findings if finding.severity is Severity.ERROR]
+    assert "S1" in (tmp_path / "screens.html").read_text(encoding="utf-8")

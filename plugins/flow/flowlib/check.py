@@ -256,22 +256,20 @@ def check_lines_through_nodes(scene: Scene) -> list[Finding]:
 
 
 def check_labels(scene: Scene, rules: LayoutRules) -> list[Finding]:
-    """Report label chips that sit on a node or on another chip."""
-    chips = [(edge.id, rect) for edge in scene.edges if (rect := label_rect(edge, rules))]
-    findings = []
-    for edge_id, rect in chips:
-        for node in scene.nodes:
-            if rect.overlaps(node_rect(node)):
-                findings.append(
-                    Finding(
-                        Severity.ERROR,
-                        Code.LABEL_COVERS,
-                        f"the label of '{edge_id}' covers '{node.id}'",
-                        (edge_id, node.id),
-                    )
-                )
+    """Report label chips that sit on a node or on another chip.
+
+    A chip that covers a node is not reported when its whole group of chips can be slid along
+    its line to a place clear of every node: the renderers and ``place_labels`` do that. It is
+    reported only when no such place exists, for example a chip wider than the gap it sits in.
+    """
+    chips = [
+        (edge.id, rect)
+        for edge in scene.edges
+        for rect in (chip_rect(label, rules) for label in _chips_of(edge))
+    ]
+    findings = _chips_on_nodes(scene, rules)
     for (first_id, first), (second_id, second) in combinations(chips, 2):
-        if first.overlaps(second):
+        if first_id != second_id and first.overlaps(second):
             findings.append(
                 Finding(
                     Severity.ERROR,
@@ -279,6 +277,35 @@ def check_labels(scene: Scene, rules: LayoutRules) -> list[Finding]:
                     f"the labels of '{first_id}' and '{second_id}' overlap",
                     (first_id, second_id),
                 )
+            )
+    return findings
+
+
+def _chips_of(edge: Edge) -> list[EdgeLabel]:
+    """Return the main chip of a line and its extra chips."""
+    return [edge.label, *edge.extras] if edge.label else []
+
+
+def _chips_on_nodes(scene: Scene, rules: LayoutRules) -> list[Finding]:
+    """Report the chips that cover a node and cannot be slid clear of every node."""
+    # Imported here because ``labels`` builds on this module.
+    from .labels import clear_edge
+
+    node_rects = [node_rect(node) for node in scene.nodes]
+    findings = []
+    for edge in scene.edges:
+        placed = clear_edge(edge, node_rects, rules)
+        for label in _chips_of(placed):
+            rect = chip_rect(label, rules)
+            findings.extend(
+                Finding(
+                    Severity.ERROR,
+                    Code.LABEL_COVERS,
+                    f"the label of '{edge.id}' covers '{node.id}'",
+                    (edge.id, node.id),
+                )
+                for node in scene.nodes
+                if rect.overlaps(node_rect(node))
             )
     return findings
 

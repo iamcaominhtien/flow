@@ -47,17 +47,48 @@ findings = canvas.write("out", "diagram")  # writes out/diagram.scene.json, .htm
 print(format_report(findings))
 ```
 
-- `Canvas.node(id, shape, text, NodeOptions(centre, icon=, tone=, number=, detail=, card=, rows=, width=, height=))`: the node is sized by the design's rules to hold its text (widened, never made taller, until it fits; at most two lines). You may force `width`/`height`.
+- `Canvas.node(id, shape, text, NodeOptions(centre, icon=, tone=, number=, detail=, card=, rows=, width=, height=, screen=))`: the node is sized by the design's rules to hold its text (widened, never made taller, until it fits; at most two lines). You may force `width`/`height`.
 - **ER tables:** `Canvas.node("orders", Shape.TABLE, "orders", NodeOptions(centre, rows=(Row("id", "uuid", ("PK",)), Row("customer_id", "uuid", ("FK",)), Row("note", "text?")), tone=Tone.VIOLET))` draws a table (`from flowlib.model import Row`); add `card=True, icon="cart"` for the illustrated one (tall header, name in a pill, large icon). A relation is `Canvas.edge("customers", "orders", Route(...))` with `head=Head.ZERO_MANY` and `tail=Head.ONE_ONLY` (also `ZERO_ONE`, `ONE_MANY`) for the crow's feet; leave 150 px or more between two tables that a labelled line joins.
 - Node ids that look like `e1`, `e2` are kept for the lines; the kit refuses them. The first y below the title and the description is `CONTENT_TOP_PX` (160) in `flowlib.author`: start the first lane or table at or below it.
 - `Box.port(side, along=0.5)` gives the attach point on `top`, `bottom`, `left`, `right`; `along` (0 to 1) moves it along the side, so a wide node or a bar can take several lines apart (`Route(leave_along=, arrive_along=)` does the same for a line). A diamond attaches only at its four tips. `canvas.boxes[id]` is the box; `box.centre` is its middle.
-- `Canvas.edge(from, to, Route(...))`: with no route the line leaves and enters the facing sides. `via` is a list of waypoints; corners are added so every segment is horizontal or vertical. A route is `leave`, `arrive`, `via`, `role`, `label`, `dashed`, `head`.
+- `Canvas.edge(from, to, Route(...))`: with no route the line leaves and enters the facing sides. `via` is a list of waypoints; corners are added so every segment is horizontal or vertical. A route is `leave`, `arrive`, `via`, `role`, `label`, `words`, `dashed`, `head`.
 - `Canvas.lane(...)` is a swimlane (a dark tab with the name, a lightly tinted band). `Canvas.zone(...)` is a dashed tinted group area with a name pill.
 - `Canvas.text(id, words, (left, middle_y))` is free text with no outline (a heading, a note). `Canvas.legend((left, top), (Role.MAIN, Role.NO, Role.BACK))` adds a "Reading the chart" legend: a heading and, for each role, a sample line and its words. Add one to a chart that uses more than two line roles; leave room for it under the diagram.
 - `Canvas.write(folder, name)` writes the scene, the HTML (animated) and the draw.io file, runs the check and returns the findings. Labels that cover a node or another label are moved along their line for you.
 - Shapes: `TERMINATOR FAIL PROCESS SUBPROCESS DECISION IO DOCUMENT PREPARATION CONNECTOR START END INTERMEDIATE CYLINDER STORE BAR NOTE ACTOR TABLE`. Use a shape for what it means in the diagram type you are drawing; do not invent meanings.
 - Icons: names from `flowlib.theme.icon_names()`; a card (`card=True`, with an icon and a `detail`) is the illustrated style.
 - `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py check <scene.json>` re-checks a scene; `flow.py edit` changes a draw.io file in place.
+
+## Screen flows by hand
+
+For an app's screens (design 02) use the same pieces as the `screen-flow` skill; import `ScreenView`, `Device`, `Fidelity`, `ChipPlace`, `ScreenElement` from `flowlib.model` and `EdgeWords` from `flowlib.author`.
+
+```python
+from flowlib.author import Canvas, EdgeWords, NodeOptions, Route
+from flowlib.model import Fidelity, Role, ScreenElement, ScreenView, Shape, Tone
+
+canvas = Canvas("Checkout", "Pay or fail")
+canvas.zone("pay", "Payments", Tone.TEAL, (40, 170, 1300, 400))
+cart = ScreenView("S31", fidelity=Fidelity.L2, elements=(ScreenElement("Pay now"),))
+canvas.node("cart", Shape.SCREEN, "Cart", NodeOptions((400, 360), tone=Tone.TEAL, screen=cart))
+canvas.node("ok", Shape.DECISION, "Card approved?", NodeOptions((760, 360), width=140, height=104))
+canvas.node("done", Shape.SCREEN, "Receipt", NodeOptions((1160, 360), screen=ScreenView("S32")))
+canvas.node("push", Shape.TERMINATOR, "Push", NodeOptions((130, 360), detail="Entry", width=130))
+canvas.edge("push", "cart", Route(words=EdgeWords("tap the push")))
+canvas.edge("cart", "ok", Route(role=Role.MAIN, words=EdgeWords("tap Pay now")))
+canvas.edge("ok", "done", Route(words=EdgeWords(guard="approved", effect="send receipt")))
+back = EdgeWords("tap Retry", guard="declined", is_failure=True, segment=1)
+route = Route(leave="bottom", arrive="bottom", via=((760, 540), (400, 540)), words=back)
+canvas.edge(
+    "ok", "cart", route
+)  # a failure draws as a "no" line; a return could add role=Role.BACK
+```
+
+- **Screen**: `Shape.SCREEN` with `NodeOptions(screen=ScreenView(code="S31", device=Device.DESKTOP, fidelity=Fidelity.L2, elements=(ScreenElement("Pay now"),), ...))`. It is sized by the device table (phone 156 x 324, mini phone 120 x 240 with `is_mini=True`, tablet, desktop 240 x 170, watch); `width`/`height` force another size. The id chip (`code`) sits above the frame; `chip_place=ChipPlace.ABOVE_RIGHT` or `BELOW` moves it. `elements` are the named parts that cause a transition (a red dot marks the tapped one, `is_hotspot=False` turns it off); `overlay=Overlay.SHEET`, `tab_active=`, `tab_count=` and `is_undecided=True` work as in the spec. A screen with `Fidelity.L0` is a card.
+- **Decision**: `Shape.DECISION` as usual. **Entry pill**: a `Shape.TERMINATOR` with a `detail` line (the source); it is green by default. **Zone**: `Canvas.zone`; put a screen inside a zone only if the brief puts it there.
+- **Arrow words** `EdgeWords(trigger=, system_icon=, guard=, effect=, is_failure=)` on `Route(words=...)` build `trigger [guard] / effect` for you: a dark chip for what the person does, a slate chip with an icon (`clock`, `cloud`, `bolt`, `phone`) for what the system does, the guard in square brackets (green; rose and a red line for `is_failure=True`), the effect after a slash. Write the guard and the effect without the brackets or the slash. Keep each under about 20 characters (the check warns). `segment=` picks the stretch of the line (default the longest), `along=` how far along it, `shift=(dx, dy)` nudges, `is_left=True` puts the words left of a vertical line. Words and `label=` cannot be mixed.
+- Chips that cover a screen are slid along their line, the guard and the effect with them; a chip wider than the gap between two screens cannot be, so leave 140 px or more between screens that a line with words joins.
+- **Long returns** (a line back to the start or to the home screen): never run them through a screen or through the middle of a zone. Give each its own row in a channel in the gap between two rows of zones, or in a column at the left or right edge of the page, about 20 px apart, and send it there with `via` waypoints; put its words on a long stretch (`segment=`). Two returns with the same words (for example `tap Confirm`) need distinct arrival points (`arrive_along`) so they are not mistaken for one line. If a return would run most of the page, check whether the brief needs it drawn at all; drawn or not, say so in the report.
 
 ## Theme
 

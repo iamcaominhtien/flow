@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.11.2 (2026-10-27)
+
+Author kit: screen flows by hand. Found by the second `screen-C-01` benchmark run (`benchmarks/results/2026-10-27-screen-C-01-author.md`).
+
+- `Canvas.node` takes a screen (`NodeOptions(screen=ScreenView(...))` with `Shape.SCREEN`), sized by the device table.
+- `Route(words=EdgeWords(trigger, system_icon, guard, effect, is_failure, ...))` builds user and system trigger chips, green and rose guards, and effects, with the same functions the automatic screen flow uses.
+- `place_labels` moves a chip and its extras together, sliding along the line in small steps first; screen id chips are obstacles.
+- The check looks at extra chips and reports `label-covers` only when a chip cannot be slid clear.
+- Author skill: a "Screen flows by hand" section with a runnable example and advice on lanes and channels for long returns.
+- Benchmarks: the `screen-C-01` brief and two run records (automatic layout and author kit).
+- Not done: a chip across two zone borders still warns `crosses-border`; the hand-laid benchmark script is only about 12% shorter (650 against 736 lines after formatting); real draw.io editor not used.
+
 ## 0.11.1 (2026-10-27)
 
 Screen flow: large flows. Found by the `screen-C-01` benchmark (52 screens, 77 arrows): 27 errors with 0.11.0, 0 errors now.
