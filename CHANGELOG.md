@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.10.0 (2026-10-27)
+
+Explainer, from `docs/design/07-explainer.md`.
+
+- New `explainer` type and skill (`/flow:explainer`): layers, tree, comparison and concept shapes, or several on one page with `sections`; always illustrated. `layers` and `concept` still build as before.
+- Cards 260x200 and row cards 700x92, bands 248 px high with pill labels and one tint each, numbered badges with letters (3a, 6b), spoken labels, a bold closing line, title 40 px and subtitle 16 px with 64 px margin. Sizes live in `theme.json` under `explainer` (`standard` and `compact` profiles).
+- Blue animated path (off for reduced motion; `flowAnimation` in draw.io); step, return, yes and no lines with at most two bends.
+- Warnings: more than 8 cards per shape or section, more than 14 words on a card, a protocol name on a line, no title.
+- New shapes `explain_card`, `row_card`, `cell`, `pill_label`, `remark`, `section_head`, frame variant `strip`, node fields `chips` and `mono`; the draw.io importer reads explainer files back; midnight theme entries.
+- Examples `explainer-layers`, `-tree`, `-compare`, `-concept`, `-payment`.
+- Not done: concept facts are numbered left to right, top to bottom (the design text says clockwise); a card that links to a detail page (undecided in the design); a band with two rows of full cards; the "title is a question" rule is not checked; small pixel offsets; real draw.io editor and SVG export not tested.
+
 ## 0.9.0 (2026-10-27)
 
 Planning part 2: Kanban and roadmap brought up to `docs/design/08-planning.md`.
