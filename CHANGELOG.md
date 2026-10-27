@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.0 (2026-10-27)
+
+Planning part 1: Gantt, org chart and mind map brought up to `docs/design/08-planning.md`.
+
+- **Gantt:** real ISO dates, week numbers or the old `periods` form; month header, 88 px weeks, 300 px label column, 52 px rows, phase bands, owner circles with initials, status colours with check, progress fill and blocked reason, amber milestones, finish-to-start arrows, one computed or marked critical path (blue, animated), today line with a red pill, legend, warning above about 15 rows.
+- **Org chart:** bus lines, plain (210x78) and illustrated (232x110) cards, open role (dashed card), works-with line, legend, warnings above four levels and for roles written as sentences.
+- **Mind map:** radial layout (three branches a side), illustrated, plain and large (four levels) forms, curved coloured lines, P1/P2, done, owner and `+N` marks, dashed violet cross-link arcs, warnings for phrases over four words and for more than four links.
+- Shared: status palette, people circles with a tint stable per name or team, seven node shapes, new line roles and curved lines, in HTML, draw.io, scene.json, import and the technical and midnight themes. Examples `delivery-gantt`, `delivery-org`, `delivery-org-illustrated`, `delivery-mindmap`, `delivery-mindmap-plain`, `delivery-mindmap-large`.
+- Not done: Kanban and roadmap (next); month cells follow ISO weeks, not four weeks a month; imported mind-map curves become polylines; icons are not read back on import; real draw.io editor not used.
+
 ## 0.7.0 (2026-10-27)
 
 UML (state, use case, class) brought up to `docs/design/09-uml.md`.
