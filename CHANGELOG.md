@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.11.0 (2026-10-27)
+
+Wireframe rebuilt from `docs/design/10-wireframe.md`. Last phase of the design-gap plan (`docs/plugin/design-gaps.md` has the final status table).
+
+- 25 grey blocks on a 12-column grid (navbar, sidebar, card, panel, list item, form field, buttons, image, tab bar, bottom nav, search bar, table, chart, figure, modal, sheet, toast, loading, empty, error, success, chips, stepper, rows, checklist) with phone (330x680), tablet and desktop (1320x760 with browser bar) frames; blue only for the primary action and the selection.
+- Annotated screens: numbered badges on corners or named parts, notes in columns below, the red tap dot (`"tap": true`), captions as `id · name`.
+- State set (`set: states`, exactly four states) and responsive set (`set: responsive`, desktop, tablet and phone at the same height).
+- Checks: two primary buttons on one screen is an error; warnings for a badge over text, overlap, a screen taller than its device, stand-in words, notes over two lines, and the state-set rules.
+- Screen flow: an L3 screen takes the same `blocks`, drawn smaller (example `shop-wireframe-screen-flow`).
+- The old `header`, `text`, `input`, `button`, `image`, `list` kinds still build. Examples `wireframe-mobile`, `-desktop`, `-states`, `-responsive`.
+- Not done: free coordinates, an illustrated style and live data in tables and charts (dropped on purpose); phones drawn 1:1, not 0.8; text width is estimated; spacings off by 2 to 8 px in places; real draw.io editor not used.
+
 ## 0.10.0 (2026-10-27)
 
 Explainer, from `docs/design/07-explainer.md`.
