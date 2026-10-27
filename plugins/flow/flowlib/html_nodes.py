@@ -62,6 +62,7 @@ TABLE_STEREOTYPE_FONT_SIZE_PX = 10
 CAPTION_WIDTH_PX = 150
 CAPTION_GAP_PX = 4
 CAPTION_FONT_SIZE_PX = 12
+CAPTION_NOTE_FONT_SIZE_PX = 11  # a second caption line, such as ``«external system»``
 
 # Note beside an off-page connector: where the flow continues
 CONNECTOR_NOTE_GAP_PX = 10
@@ -382,7 +383,9 @@ def _caption_html(node: Node, theme: Theme) -> str:
     }
     if node.caption_above:
         style["transform"] = "translateY(-100%)"
-    return tag("div", style, esc(node.caption))
+    first, *rest = node.caption.split("\n")
+    note = {"font-weight": "400", "font-size": px(CAPTION_NOTE_FONT_SIZE_PX), "color": theme.slate}
+    return tag("div", style, esc(first) + "".join(tag("div", note, esc(line)) for line in rest))
 
 
 def _connector_note_html(node: Node, theme: Theme) -> str:

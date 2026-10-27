@@ -12,6 +12,7 @@ from . import (
     bpmn,
     c4,
     catalog,
+    class_diagram,
     cloud,
     concept,
     dfd,
@@ -23,6 +24,7 @@ from . import (
     state,
     timeline,
     tree,
+    usecase,
 )
 
 THEME_KEY = "theme"
@@ -40,6 +42,8 @@ LAYOUTS: dict[str, Layout] = {
     "sequence": sequence.layout_raw,
     "state": state.layout_raw,
     "er": er.layout_raw,
+    "class": class_diagram.layout_raw,
+    "usecase": usecase.layout_raw,
     "org": tree.layout_org,
     "concept": concept.layout_raw,
     "kanban": boards.layout_kanban,

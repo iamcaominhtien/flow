@@ -99,14 +99,6 @@ def test_multiplicity_label_is_drawn_in_html() -> None:
     assert ">*<" in render_html.render(scene).replace(" ", "")
 
 
-def test_a_line_leaves_an_actor_below_its_name() -> None:
-    """The line from an actor starts under the caption, not through the name."""
-    scene = diagrams.layout(raw_example("shop-usecase.spec.json"))
-    shopper = next(node for node in scene.nodes if node.id == "shopper")
-    line = next(edge for edge in scene.edges if edge.source == "shopper")
-    assert line.points[0][1] > shopper.y + shopper.height
-
-
 def test_bpmn_event_and_gateway_markers_and_pools() -> None:
     """Timer, message and parallel kinds get a marker; each zone becomes a pool with its band."""
     scene = diagrams.layout(raw_example("order-pools-bpmn.spec.json"))

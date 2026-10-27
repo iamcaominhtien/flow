@@ -91,6 +91,7 @@ SHADOW_SHAPES = (  # the rounded boxes of design 01 section 3 carry ``shadow=1``
     Shape.DECISION,
     Shape.CYLINDER,
     Shape.ELLIPSE,
+    Shape.USE_CASE,
 )
 PARALLELOGRAM_SLANT_MAX_PX = 18
 PARALLELOGRAM_SLANT_DIVISOR = 6
@@ -235,6 +236,16 @@ def _start_style(node: Node) -> dict[str, object]:
     return {"ellipse": "", "strokeWidth": START_STROKE_WIDTH_PX, **BELOW}
 
 
+def _initial_style(node: Node) -> dict[str, object]:
+    """Style pairs for the filled dot that starts a state diagram."""
+    return {"ellipse": "", "strokeWidth": START_STROKE_WIDTH_PX, **BELOW}
+
+
+def _final_style(node: Node) -> dict[str, object]:
+    """Style pairs for the ringed dot that ends a state diagram."""
+    return {"shape": "endState", "strokeWidth": START_STROKE_WIDTH_PX, **BELOW}
+
+
 def _end_style(node: Node) -> dict[str, object]:
     """Style pairs for a thick circle."""
     return {"ellipse": "", "strokeWidth": END_STROKE_WIDTH_PX, **BELOW}
@@ -290,11 +301,14 @@ SHAPE_STYLES: dict[Shape, Callable[[Node], dict[str, object]]] = {
     Shape.CYLINDER: _cylinder_style,
     Shape.ENTITY: _entity_style,
     Shape.STORE: _store_style,
+    Shape.INITIAL: _initial_style,
+    Shape.FINAL: _final_style,
     Shape.START: _start_style,
     Shape.END: _end_style,
     Shape.INTERMEDIATE: _intermediate_style,
     Shape.ACTOR: _actor_style,
     Shape.ELLIPSE: _ellipse_style,
+    Shape.USE_CASE: _ellipse_style,
     Shape.SCREEN: _box_style,
     Shape.FLAG: _flag_style,
     Shape.TASK: _box_style,
@@ -408,7 +422,7 @@ def _node_value(node: Node, theme: Theme) -> str:
     if is_dfd_node(node) or is_c4_node(node):
         return dfd_value(node, theme) if is_dfd_node(node) else c4_value(node, theme)
     if node.caption:
-        return esc(node.caption)
+        return _caption_value(node.caption, theme)
     if node.card:
         return _label_value(node.detail)
     title = _label_value(node.text)
@@ -425,6 +439,13 @@ def _node_value(node: Node, theme: Theme) -> str:
         return title
     style = f"font-size:{DETAIL_FONT_SIZE_PX}px;font-weight:normal;color:{theme.slate}"
     return f'{title}<br><span style="{style}">{_label_value(node.detail)}</span>'
+
+
+def _caption_value(caption: str, theme: Theme) -> str:
+    """Return a caption as a label: its first line in the node's bold, the rest small and grey."""
+    first, *rest = caption.split("\n")
+    style = f"font-size:{DETAIL_FONT_SIZE_PX}px;font-weight:normal;color:{theme.slate}"
+    return esc(first) + "".join(f'<br><span style="{style}">{esc(line)}</span>' for line in rest)
 
 
 def _icon_data_uri(name: str, stroke: str, size: float = ICON_SIZE_PX) -> str:

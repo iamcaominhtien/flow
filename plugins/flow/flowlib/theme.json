@@ -134,6 +134,18 @@
     "wide_card": {
       "fill": "#DCEEFB",
       "stroke": "#0F172A"
+    },
+    "initial": {
+      "fill": "#0F172A",
+      "stroke": "#0F172A"
+    },
+    "final": {
+      "fill": "#0F172A",
+      "stroke": "#0F172A"
+    },
+    "use_case": {
+      "fill": "#DCEEFB",
+      "stroke": "#0F172A"
     }
   },
   "tones": {
@@ -607,7 +619,9 @@
           "fork",
           "note",
           "start",
-          "end"
+          "end",
+          "initial",
+          "final"
         ]
       },
       "shapes": {
@@ -620,6 +634,14 @@
           "stroke": "#0F172A"
         },
         "bar": {
+          "fill": "#334155",
+          "stroke": "#334155"
+        },
+        "initial": {
+          "fill": "#334155",
+          "stroke": "#334155"
+        },
+        "final": {
           "fill": "#334155",
           "stroke": "#334155"
         }
@@ -773,6 +795,18 @@
           "stroke": "#E2E8F0"
         },
         "wide_card": {
+          "fill": "#12263F",
+          "stroke": "#E2E8F0"
+        },
+        "initial": {
+          "fill": "#E2E8F0",
+          "stroke": "#E2E8F0"
+        },
+        "final": {
+          "fill": "#E2E8F0",
+          "stroke": "#E2E8F0"
+        },
+        "use_case": {
           "fill": "#12263F",
           "stroke": "#E2E8F0"
         }
@@ -1203,7 +1237,7 @@
     "actor_distance": 330,
     "system_pad_x": 80,
     "system_pad_top": 78,
-    "system_pad_bottom": 78,
+    "system_pad_bottom": 100,
     "class_width": 280,
     "class_column_pitch": 460,
     "class_row_pitch": 340,

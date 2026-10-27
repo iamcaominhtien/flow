@@ -110,6 +110,38 @@ def _segment_rect(start: Point, end: Point) -> Rect:
     )
 
 
+def _segment_hits(start: Point, end: Point, rect: Rect) -> bool:
+    """Tell whether a segment, straight or slanted, passes through a rectangle.
+
+    The rectangle is shrunk by the line clearance. A horizontal or vertical segment is its own
+    bounding box; a slanted one is clipped against the
+    rectangle, so that it does not count as covering the corner its box would.
+    """
+    inner = Rect(
+        rect.left + LINE_CLEARANCE_PX,
+        rect.top + LINE_CLEARANCE_PX,
+        rect.right - LINE_CLEARANCE_PX,
+        rect.bottom - LINE_CLEARANCE_PX,
+    )
+    if not _segment_rect(start, end).overlaps(inner):
+        return False
+    delta_x, delta_y = end[0] - start[0], end[1] - start[1]
+    if abs(delta_x) < LINE_CLEARANCE_PX or abs(delta_y) < LINE_CLEARANCE_PX:
+        return True
+    low, high = 0.0, 1.0
+    for step, distance in (
+        (-delta_x, start[0] - inner.left),
+        (delta_x, inner.right - start[0]),
+        (-delta_y, start[1] - inner.top),
+        (delta_y, inner.bottom - start[1]),
+    ):
+        if step == 0:
+            continue
+        ratio = distance / step
+        low, high = (max(low, ratio), high) if step < 0 else (low, min(high, ratio))
+    return low <= high
+
+
 def label_rect(edge: Edge, rules: LayoutRules) -> Rect | None:
     """Return the rectangle a label chip covers, estimated from its text, or None."""
     if edge.label is None:
@@ -128,8 +160,11 @@ def caption_rect(node: Node, rules: LayoutRules) -> Rect | None:
     """
     if not node.caption:
         return None
-    text_width = estimate_text_width(node.caption, rules, CAPTION_FONT_SIZE_PX)
-    lines = max(1, math.ceil(text_width / CAPTION_WIDTH_PX))
+    widths = [
+        estimate_text_width(line, rules, CAPTION_FONT_SIZE_PX) for line in node.caption.split("\n")
+    ]
+    text_width = max(widths)
+    lines = sum(max(1, math.ceil(width / CAPTION_WIDTH_PX)) for width in widths)
     height = lines * CAPTION_FONT_SIZE_PX * LINE_HEIGHT_FACTOR
     half = min(text_width + CAPTION_TEXT_PAD_PX, CAPTION_WIDTH_PX) / 2
     centre = node.x + node.width / 2
@@ -168,10 +203,7 @@ def check_lines_through_nodes(scene: Scene) -> list[Finding]:
             if node.id in (edge.source, edge.target):
                 continue
             rect = node_rect(node)
-            if any(
-                _segment_rect(start, end).overlaps(rect, -LINE_CLEARANCE_PX)
-                for start, end in pairwise(edge.points)
-            ):
+            if any(_segment_hits(start, end, rect) for start, end in pairwise(edge.points)):
                 findings.append(
                     Finding(
                         Severity.ERROR,
@@ -222,10 +254,7 @@ def check_captions(scene: Scene, rules: LayoutRules) -> list[Finding]:
         for edge in scene.edges:
             if edge.role is Role.LIFELINE:
                 continue
-            if any(
-                _segment_rect(start, end).overlaps(caption, -LINE_CLEARANCE_PX)
-                for start, end in pairwise(edge.points)
-            ):
+            if any(_segment_hits(start, end, caption) for start, end in pairwise(edge.points)):
                 findings.append(
                     Finding(
                         Severity.ERROR,

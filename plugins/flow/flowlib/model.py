@@ -38,9 +38,12 @@ class Shape(StrEnum):
     STORE = "store"
     START = "start"
     END = "end"
+    INITIAL = "initial"  # the filled dot that starts a state diagram
+    FINAL = "final"  # the ringed dot that ends a state diagram
     INTERMEDIATE = "intermediate"
     ACTOR = "actor"
     ELLIPSE = "ellipse"
+    USE_CASE = "use_case"  # an oval of a use case diagram, with an ink outline
     SCREEN = "screen"
     FLAG = "flag"
     TASK = "task"  # a BPMN task: a rounded box with an ink outline
@@ -161,6 +164,7 @@ class FrameVariant(StrEnum):
     BLACK_BOX = "black_box"  # a pool drawn only as a filled bar with its name
     OPENED = "opened"  # the dashed frame around a process that a lower-level diagram opens
     NETWORK = "network"  # a cloud frame: solid or dashed by kind, with a pill in its own colour
+    SYSTEM = "system"  # a use case diagram's system: a white box with its name at the top left
     LAYER = "layer"  # an architecture frame: dashed and tinted, with a dark pill label
 
 

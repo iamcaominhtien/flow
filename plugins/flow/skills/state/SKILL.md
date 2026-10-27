@@ -20,27 +20,39 @@ You write a short **spec**: the states and the transitions. A script places the 
 ```json
 {
   "type": "state",
-  "title": "States of an order",
+  "title": "State machine: the life of an order",
   "desc": "One sentence that says what the diagram shows.",
   "states": [
     {"id": "begin", "kind": "start"},
-    {"id": "created", "label": "Created"},
+    {"id": "placed", "label": "Placed", "tone": "blue"},
+    {"id": "preparing", "label": "Preparing", "tone": "green", "do": "cook"},
+    {"id": "delivering", "label": "Delivering", "states": [
+      {"id": "picked", "label": "Picked up", "tone": "teal"},
+      {"id": "arrived", "label": "Arrived", "tone": "teal"}]},
     {"id": "cancelled", "label": "Cancelled", "kind": "fail"},
-    {"id": "done", "kind": "end"}
+    {"id": "finish", "kind": "end"},
+    {"id": "closed", "kind": "end"}
   ],
   "transitions": [
-    {"from": "begin", "to": "created"},
-    {"from": "created", "to": "cancelled", "label": "cancel"},
-    {"from": "created", "to": "done", "label": "finish", "main": true}
+    {"from": "begin", "to": "placed", "main": true},
+    {"from": "placed", "to": "preparing", "event": "restaurant accepts", "main": true},
+    {"from": "preparing", "to": "preparing", "event": "item out of stock", "action": "substitute"},
+    {"from": "preparing", "to": "picked", "event": "courier arrives", "main": true},
+    {"from": "picked", "to": "arrived", "guard": "near address", "action": "notify customer", "main": true},
+    {"from": "arrived", "to": "finish", "main": true},
+    {"from": "placed", "to": "cancelled", "event": "cancel"},
+    {"from": "cancelled", "to": "closed", "event": "cleanup"}
   ]
 }
 ```
 
 - `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
-- **State**: `id`, `label`, optional `kind` (`state` default, `start`, `end`, `fail`), `detail`, `icon`, `tone`. A `start` or `end` mark needs no label.
-- **Transition**: `from`, `to`, optional `label` (the event), `main: true` to highlight and animate the path to follow first.
-- `direction`: `down` (default) or `right`.
-- Nested states, guards and actions on transitions are not supported: put them in the label or the `detail`.
+- **State**: `id`, `label`, optional `kind` (`state` default, `start` the filled dot, `end` the ringed dot, `fail` a rose box for a failure or cancel), `tone`, `icon`, `detail`. A `start` or `end` mark needs no label; more than one `end` is fine. The name is a noun or an adjective (`Paid`, `On the way`).
+- **Activities** under the name, in mono grey: `entry`, `do`, `exit` (text only: `"do": "cook"` is drawn `do / cook`).
+- **Composite state**: put states in a state's `states` list, or give each a `group` name. They are drawn in a frame with the name in a pill. Keep the members next to each other on the happy path.
+- **Transition**: `from`, `to`, and any of `event` (in words), `guard` (a condition, drawn in brackets) and `action` (drawn after a slash), shown as `event [guard] / action`. `label` is accepted for `event`. `main: true` marks the happy path: blue, thick, animated. Mark every transition of one path, and only one path. A transition from a state to itself is a loop above the box. Transitions to or from a `fail` state are rose; `fail: true` makes any other one rose.
+- **Layout (from the design):** the happy path runs left to right in the first row (the transitions with `main`, else the first transition of each state); other states sit below the state that leads to them; an end that is not on the path sits right of the state that leads to it. Boxes are 160 x 64 and at least 130 px apart where a label sits between them. Tint states by phase (`tone`); it groups, it never means alone.
+- Use `status` values of the ER table as state names, so the two diagrams agree.
 
 ## Icons
 
@@ -48,8 +60,9 @@ Built-in icon names: `user phone cart card bell clock pin pot check box bike ref
 
 ## Limits to tell the user
 
-- Two transitions that leave the same side of a state can share the first stretch of line, and a label can sit on the neighbouring line. Check the picture.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
+- A line that comes into a state from the side of a different row can bend twice; two lines that share a side of a state are spread 60 px apart. Transitions to a composite state go to a state inside it.
+- Fixes beyond the spec: see the flowchart skill (overrides file).
 
 Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.
 
