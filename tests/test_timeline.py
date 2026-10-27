@@ -17,6 +17,7 @@ sys.path.insert(0, str(PLUGIN_DIR))
 from flowlib import diagrams  # noqa: E402
 from flowlib.check import Severity, check_scene  # noqa: E402
 from flowlib.reader import SpecError  # noqa: E402
+from flowlib.theme import load_theme  # noqa: E402
 
 
 def raw_of(path: Path) -> dict:
@@ -42,7 +43,7 @@ def test_bar_position_and_width_follow_start_and_length() -> None:
     """A bar starts at its period and spans as many periods as its length."""
     scene = diagrams.layout(raw_of(GANTT))
     nodes = {node.id: node for node in scene.nodes}
-    period = nodes["period-1"].x - nodes["period-0"].x
+    period = load_theme().planning.gantt.week_width
     assert nodes["design"].x - nodes["brief"].x == pytest.approx(period)
     assert nodes["build"].width > nodes["design"].width > nodes["brief"].width
 
@@ -53,7 +54,7 @@ def test_gantt_dependencies_are_lines_from_the_end_to_the_start() -> None:
     nodes = {node.id: node for node in scene.nodes}
     line = next(edge for edge in scene.edges if edge.target == "design")
     assert line.points[0] == (nodes["brief"].x + nodes["brief"].width, line.points[0][1])
-    assert line.points[-1][0] == nodes["design"].x
+    assert line.points[-1] == (nodes["design"].x, nodes["design"].y + nodes["design"].height / 2)
 
 
 def test_overlapping_roadmap_items_go_to_separate_rows() -> None:

@@ -11,6 +11,7 @@ from collections.abc import Callable
 from dataclasses import replace
 from xml.etree import ElementTree as ET
 
+from .drawio_common import FLOW_ROLE_KEY
 from .drawio_screen import SCREEN_STYLE_KEY, TONE_STYLE_KEY
 from .model import Edge, EdgeLabel, LabelKind, Node, Role, Shape, Tone
 from .screen_scene import decode_screen
@@ -62,7 +63,10 @@ def label_kind(style: Style) -> LabelKind:
 
 
 def line_role(style: Style) -> Role:
-    """Guess the role of a line from its colour and dash."""
+    """Read the role Flow wrote for a planning line, else guess it from the colour."""
+    written = style.get(FLOW_ROLE_KEY)
+    if written in {role.value for role in Role}:
+        return Role(written)
     color = style.get("strokeColor", "").lower()
     roles = load_theme().roles
     for role in (Role.MAIN, Role.YES, Role.NO, Role.BACK):

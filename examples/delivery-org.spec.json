@@ -1,0 +1,21 @@
+{
+  "type": "org",
+  "title": "Org chart: the delivery team, plain",
+  "desc": "Lines run from a manager down to the people who report to them. A dashed line is a working relationship without reporting. A dashed card is an open role.",
+  "root": {"id": "dana", "name": "Dana Reed", "role": "CEO", "tone": "violet", "children": [
+    {"id": "minh", "name": "Minh Tran", "role": "Head of Product", "team": "Product", "tone": "blue", "children": [
+      {"id": "noah", "name": "Noah Kim", "role": "Product analyst"},
+      {"id": "ava", "name": "Ava Lopez", "role": "Designer"}
+    ]},
+    {"id": "sam", "name": "Sam Ortiz", "role": "Head of Engineering", "team": "Engineering", "tone": "green", "children": [
+      {"id": "lia", "name": "Lia Chen", "role": "Mobile developer"},
+      {"id": "kai", "name": "Kai Novak", "role": "Backend developer"},
+      {"id": "qa", "role": "QA engineer", "open": true}
+    ]},
+    {"id": "lena", "name": "Lena Park", "role": "Head of Operations", "team": "Courier operations", "tone": "teal", "children": [
+      {"id": "joy", "name": "Joy Adams", "role": "Support lead"},
+      {"id": "max", "name": "Max Rossi", "role": "Courier operations"}
+    ]}
+  ]},
+  "links": [{"from": "ava", "to": "lia", "label": "works with"}]
+}

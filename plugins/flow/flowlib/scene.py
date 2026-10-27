@@ -38,6 +38,7 @@ from .model import (
     Shape,
     Tone,
 )
+from .plan_scene import dump_plan, parse_plan
 from .reader import POINT_LENGTH, Reader, is_number
 from .screen_scene import dump_screen, parse_screen
 from .theme import icon_names
@@ -62,9 +63,10 @@ DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
 NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections", "card", "dashed"}
 NODE_KEYS |= {"screen", "chip", "markers", "caption_above", "host", "technology"}
-NODE_KEYS |= {"activities", "stereotype", "italic", "centered"}
+NODE_KEYS |= {"activities", "stereotype", "italic", "centered", "plan"}
 ROW_KEYS = {"left", "right", "flags", "mono"}
 EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label", "extras"}
+EDGE_KEYS |= {"tone", "curved"}
 LABEL_KEYS = {"text", "at", "kind", "number", "icon"}
 MIN_ROUTE_POINTS = 2
 
@@ -215,6 +217,8 @@ def _dump_node(node: Node) -> dict[str, Any]:
         "centered": node.is_centered,
     }
     written.update({key: value for key, value in optional.items() if value})
+    if node.plan is not None:
+        written["plan"] = dump_plan(node.plan)
     return written
 
 
@@ -246,6 +250,10 @@ def _dump_edge(edge: Edge) -> dict[str, Any]:
         written["label"] = _dump_label(edge.label)
     if edge.extras:
         written["extras"] = [_dump_label(extra) for extra in edge.extras]
+    if edge.tone:
+        written["tone"] = edge.tone.value
+    if edge.is_curved:
+        written["curved"] = True
     return written
 
 
@@ -399,6 +407,7 @@ class _SceneParser:
             stereotype=read.text(raw, "stereotype", where) or "",
             is_italic=raw.get("italic") is True,
             is_centered=raw.get("centered") is True,
+            plan=parse_plan(raw["plan"], f"{where}.plan", read) if "plan" in raw else None,
         )
 
     def _markers(self, raw: object, where: str) -> tuple[Marker, ...]:
@@ -480,6 +489,8 @@ class _SceneParser:
             tail=read.enum(Head, raw, "tail", where) or Head.NONE,
             dashed=raw.get("dashed", False) is True,
             extras=self._extras(raw.get("extras", []), where),
+            tone=read.enum(Tone, raw, "tone", where),
+            is_curved=raw.get("curved") is True,
         )
 
     def _extras(self, raw: object, where: str) -> tuple[EdgeLabel, ...]:

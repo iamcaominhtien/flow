@@ -146,6 +146,34 @@
     "use_case": {
       "fill": "#DCEEFB",
       "stroke": "#0F172A"
+    },
+    "person": {
+      "fill": "#E2E8F0",
+      "stroke": "#0F172A"
+    },
+    "person_card": {
+      "fill": "#DCEEFB",
+      "stroke": "#0F172A"
+    },
+    "plan_bar": {
+      "fill": "#E2E8F0",
+      "stroke": "#64748B"
+    },
+    "milestone": {
+      "fill": "#F59E0B",
+      "stroke": "#0F172A"
+    },
+    "label": {
+      "fill": "none",
+      "stroke": "none"
+    },
+    "branch": {
+      "fill": "#BFDBFE",
+      "stroke": "#0F172A"
+    },
+    "leaf": {
+      "fill": "#FFFFFF",
+      "stroke": "#1D4ED8"
     }
   },
   "tones": {
@@ -271,6 +299,62 @@
       "width": 1.5,
       "gap": 5,
       "head_size": 5
+    },
+    "grid": {
+      "color": "#E2E8F0",
+      "dash": null,
+      "width": 1,
+      "head_size": 5,
+      "gap": 0
+    },
+    "today": {
+      "color": "#DC2626",
+      "dash": "6 5",
+      "width": 2,
+      "head_size": 5,
+      "gap": 0
+    },
+    "reports": {
+      "color": "#0F172A",
+      "dash": null,
+      "width": 2,
+      "head_size": 5,
+      "gap": 0
+    },
+    "works_with": {
+      "color": "#475569",
+      "dash": "6 5",
+      "width": 2,
+      "head_size": 5,
+      "gap": 0
+    },
+    "branch": {
+      "color": "#475569",
+      "dash": null,
+      "width": 8,
+      "head_size": 5,
+      "gap": 0
+    },
+    "twig": {
+      "color": "#475569",
+      "dash": null,
+      "width": 4,
+      "head_size": 5,
+      "gap": 0
+    },
+    "link": {
+      "color": "#7C3AED",
+      "dash": "6 5",
+      "width": 2,
+      "head_size": 4,
+      "gap": 2
+    },
+    "key": {
+      "color": "#1D4ED8",
+      "dash": "10 8",
+      "width": 4,
+      "head_size": 4,
+      "gap": 8
     }
   },
   "animations": {
@@ -335,6 +419,14 @@
     "effect": {
       "background": "none",
       "foreground": "#475569"
+    },
+    "today": {
+      "background": "#DC2626",
+      "foreground": "#FFFFFF"
+    },
+    "link": {
+      "background": "#EDE9FE",
+      "foreground": "#5B21B6"
     }
   },
   "badge": {
@@ -621,7 +713,8 @@
           "start",
           "end",
           "initial",
-          "final"
+          "final",
+          "label"
         ]
       },
       "shapes": {
@@ -657,6 +750,12 @@
         "data": {
           "dash": null,
           "animation": null
+        },
+        "key": {
+          "dash": null
+        },
+        "link": {
+          "color": "#334155"
         }
       }
     },
@@ -809,6 +908,34 @@
         "use_case": {
           "fill": "#12263F",
           "stroke": "#E2E8F0"
+        },
+        "person": {
+          "fill": "#1A2336",
+          "stroke": "#E2E8F0"
+        },
+        "person_card": {
+          "fill": "#12263F",
+          "stroke": "#60A5FA"
+        },
+        "plan_bar": {
+          "fill": "#1A2336",
+          "stroke": "#64748B"
+        },
+        "milestone": {
+          "fill": "#2E2111",
+          "stroke": "#F59E0B"
+        },
+        "label": {
+          "fill": "none",
+          "stroke": "none"
+        },
+        "branch": {
+          "fill": "#1E3A5F",
+          "stroke": "#60A5FA"
+        },
+        "leaf": {
+          "fill": "#111A2E",
+          "stroke": "#60A5FA"
         }
       },
       "tones": {
@@ -896,6 +1023,30 @@
         },
         "association": {
           "color": "#94A3B8"
+        },
+        "grid": {
+          "color": "#1E293B"
+        },
+        "today": {
+          "color": "#F87171"
+        },
+        "reports": {
+          "color": "#CBD5E1"
+        },
+        "works_with": {
+          "color": "#94A3B8"
+        },
+        "branch": {
+          "color": "#94A3B8"
+        },
+        "twig": {
+          "color": "#94A3B8"
+        },
+        "link": {
+          "color": "#A78BFA"
+        },
+        "key": {
+          "color": "#60A5FA"
         }
       },
       "chips": {
@@ -946,11 +1097,69 @@
         "effect": {
           "background": "none",
           "foreground": "#94A3B8"
+        },
+        "today": {
+          "background": "#DC2626",
+          "foreground": "#FFFFFF"
+        },
+        "link": {
+          "background": "#2E2A5E",
+          "foreground": "#C4B5FD"
         }
       },
       "badge": {
         "background": "#7DD3CB",
         "foreground": "#0B1220"
+      },
+      "planning": {
+        "status": {
+          "done": {
+            "fill": "#2F8F52",
+            "stroke": "#4CC38A",
+            "mark": "#FFFFFF"
+          },
+          "in_progress": {
+            "fill": "#12263F",
+            "stroke": "#60A5FA",
+            "mark": "#2563EB"
+          },
+          "planned": {
+            "fill": "#1A2336",
+            "stroke": "#64748B",
+            "mark": "#94A3B8"
+          },
+          "blocked": {
+            "fill": "#2E1417",
+            "stroke": "#F87171",
+            "mark": "#F87171"
+          }
+        },
+        "marks": {
+          "priority_1": {
+            "fill": "#4A1D22",
+            "text": "#FCA5A5"
+          },
+          "priority_2": {
+            "fill": "#4A3314",
+            "text": "#FCD34D"
+          },
+          "done": {
+            "fill": "#15803D",
+            "text": "#FFFFFF"
+          },
+          "more": {
+            "fill": "#E2E8F0",
+            "text": "#0B1220"
+          },
+          "milestone": {
+            "fill": "#F59E0B",
+            "stroke": "#E2E8F0"
+          }
+        },
+        "accents": {
+          "amber": "#B45309",
+          "red": "#D92D20"
+        }
       }
     }
   },
@@ -1244,5 +1453,228 @@
     "pair_gap": 60,
     "channel_step": 24,
     "channel_clearance": 70
+  },
+  "planning": {
+    "status": {
+      "done": {
+        "fill": "#2F8F52",
+        "stroke": "#14532D",
+        "mark": "#FFFFFF"
+      },
+      "in_progress": {
+        "fill": "#BFDBFE",
+        "stroke": "#1D4ED8",
+        "mark": "#3B63DC"
+      },
+      "planned": {
+        "fill": "#E2E8F0",
+        "stroke": "#64748B",
+        "mark": "#64748B"
+      },
+      "blocked": {
+        "fill": "#FEE2E2",
+        "stroke": "#B42318",
+        "mark": "#B42318"
+      }
+    },
+    "marks": {
+      "priority_1": {
+        "fill": "#FEE2E2",
+        "text": "#B42318"
+      },
+      "priority_2": {
+        "fill": "#FFEDD5",
+        "text": "#B45309"
+      },
+      "done": {
+        "fill": "#15803D",
+        "text": "#FFFFFF"
+      },
+      "more": {
+        "fill": "#0F172A",
+        "text": "#FFFFFF"
+      },
+      "milestone": {
+        "fill": "#F59E0B",
+        "stroke": "#0F172A"
+      }
+    },
+    "gantt": {
+      "week_width": 88,
+      "label_column": 300,
+      "row_height": 52,
+      "bar_height": 26,
+      "bar_inset": 8,
+      "bar_radius": 8,
+      "band_height": 40,
+      "month_height": 30,
+      "week_height": 30,
+      "header_radius": 8,
+      "person_size": 26,
+      "milestone_size": 20,
+      "dependency_gap": 8,
+      "label_pad": 14,
+      "person_gap": 10,
+      "today_pill": [
+        56,
+        22
+      ],
+      "today_gap": 10,
+      "legend_gap": 31,
+      "legend_swatch": [
+        34,
+        14
+      ],
+      "legend_item_gap": 36,
+      "max_rows": 15,
+      "grid_top_gap": 8,
+      "name_font_size": 13,
+      "week_font_size": 11,
+      "month_font_size": 12,
+      "reason_gap": 8,
+      "check_size": 14
+    },
+    "org": {
+      "card": [
+        210,
+        78
+      ],
+      "card_illustrated": [
+        232,
+        110
+      ],
+      "card_pitch": 250,
+      "subtree_gap": 60,
+      "bus_drop": 86,
+      "person_size": 40,
+      "max_levels": 4,
+      "pill_height": 26,
+      "icon_size": 56,
+      "pad": 14,
+      "name_font_size": 13,
+      "role_font_size": 11,
+      "works_pill": [
+        74,
+        18
+      ],
+      "open_opacity": 0.55,
+      "legend_gap": 76,
+      "legend_line": 38,
+      "level_pitch": 240,
+      "level_pitch_illustrated": 270
+    },
+    "mind": {
+      "person_size": 28,
+      "owner_size": 18,
+      "max_leaf_words": 4,
+      "max_links": 4,
+      "illustrated": {
+        "centre": [
+          360,
+          240
+        ],
+        "branch": [
+          260,
+          76
+        ],
+        "group": [
+          196,
+          40
+        ],
+        "idea": [
+          236,
+          44
+        ],
+        "detail": [
+          174,
+          34
+        ],
+        "centre_gap": 160,
+        "column_gap": 92,
+        "row_gap": 14,
+        "subtree_gap": 24,
+        "branch_pitch": 300,
+        "branch_font": 17,
+        "group_font": 14,
+        "idea_font": 13,
+        "detail_font": 12,
+        "disc": 52,
+        "leaf_icon": 16
+      },
+      "plain": {
+        "centre": [
+          320,
+          92
+        ],
+        "branch": [
+          208,
+          50
+        ],
+        "group": [
+          196,
+          40
+        ],
+        "idea": [
+          230,
+          36
+        ],
+        "detail": [
+          174,
+          34
+        ],
+        "centre_gap": 116,
+        "column_gap": 71,
+        "row_gap": 16,
+        "subtree_gap": 24,
+        "branch_pitch": 250,
+        "branch_font": 14,
+        "group_font": 14,
+        "idea_font": 13,
+        "detail_font": 12,
+        "disc": 0,
+        "leaf_icon": 16
+      },
+      "large": {
+        "centre": [
+          380,
+          256
+        ],
+        "branch": [
+          228,
+          68
+        ],
+        "group": [
+          196,
+          40
+        ],
+        "idea": [
+          208,
+          40
+        ],
+        "detail": [
+          174,
+          34
+        ],
+        "centre_gap": 168,
+        "column_gap": 60,
+        "row_gap": 4,
+        "subtree_gap": 28,
+        "branch_pitch": 0,
+        "branch_font": 17,
+        "group_font": 14,
+        "idea_font": 13,
+        "detail_font": 12,
+        "disc": 50,
+        "leaf_icon": 14
+      },
+      "link_bulge": 36,
+      "link_pill_gap": 6,
+      "bar_width": 6,
+      "centre_pill_height": 34
+    },
+    "accents": {
+      "amber": "#D97706",
+      "red": "#B42318"
+    }
   }
 }

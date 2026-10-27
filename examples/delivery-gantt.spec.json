@@ -1,0 +1,38 @@
+{
+  "type": "gantt",
+  "title": "Gantt: launching the delivery app",
+  "desc": "Time runs left to right, one row per task. Bar colour is status, the blue chain is the critical path, the red line is today. Diamonds are milestones.",
+  "today": "2026-04-20",
+  "people": {
+    "Noah Kim": {"tone": "blue"},
+    "Ava Lopez": {"tone": "blue"},
+    "Lia Chen": {"tone": "green"},
+    "Kai Novak": {"tone": "green"},
+    "Max Rossi": {"tone": "teal"}
+  },
+  "tasks": [
+    {"id": "research", "label": "Research", "owner": "Noah Kim", "group": "Discover",
+     "start": "2026-03-02", "end": "2026-03-15", "status": "done"},
+    {"id": "spec", "label": "Write the spec", "owner": "Ava Lopez", "group": "Discover",
+     "start": "2026-03-16", "end": "2026-03-22", "status": "done", "after": "research"},
+    {"id": "design", "label": "Design", "owner": "Ava Lopez", "group": "Build",
+     "start": "2026-03-23", "end": "2026-04-05", "status": "done", "after": "spec"},
+    {"id": "mobile", "label": "Mobile app", "owner": "Lia Chen", "group": "Build",
+     "start": "2026-04-06", "end": "2026-05-10", "status": "in_progress", "progress": 0.3,
+     "after": "design"},
+    {"id": "payments", "label": "Payments", "owner": "Kai Novak", "group": "Build",
+     "start": "2026-04-20", "end": "2026-05-10", "status": "planned"},
+    {"id": "backend", "label": "Backend API", "owner": "Kai Novak", "group": "Build",
+     "start": "2026-03-23", "end": "2026-05-03", "status": "in_progress", "progress": 0.7,
+     "after": "spec"},
+    {"id": "beta", "label": "Beta test", "owner": "Max Rossi", "group": "Launch",
+     "start": "2026-05-11", "end": "2026-05-24", "status": "planned",
+     "after": ["mobile", "payments", "backend"]},
+    {"id": "fix", "label": "Fix bugs", "owner": "Kai Novak", "group": "Launch",
+     "start": "2026-05-25", "end": "2026-06-07", "status": "planned", "after": "beta"}
+  ],
+  "milestones": [
+    {"id": "approved", "label": "Spec approved", "date": "2026-03-23", "group": "Discover"},
+    {"id": "launch", "label": "Launch", "after": "fix", "group": "Launch"}
+  ]
+}

@@ -58,3 +58,4 @@ FLOW_SHAPE_KEY = "flowShape"  # a style key of ours: the Flow shape a cell was d
 FLOW_MARKERS_KEY = "flowMarkers"  # a style key of ours: the BPMN marks of a node, comma-joined
 FLOW_FRAME_KEY = "flowFrame"  # a style key of ours: the frame variant a cell was drawn from
 FLOW_HOST_KEY = "flowHost"  # a style key of ours: the id of the task a boundary event sits on
+FLOW_ROLE_KEY = "flowRole"  # a style key of ours: the role of a line of a planning diagram

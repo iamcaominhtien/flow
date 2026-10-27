@@ -18,7 +18,9 @@ from .drawio_common import (
     add_vertex,
     style_string,
 )
+from .drawio_plan import add_plan_frame
 from .drawio_zones import add_zone_frame
+from .html_plan import PLAN_FRAME_VARIANTS
 from .html_zones import ZONE_VARIANTS
 from .marks import mark_slots, mark_svg
 from .markup import esc, fmt
@@ -339,6 +341,8 @@ def add_band_frame(root: ET.Element, frame: Frame, theme: Theme) -> None:
     """Add a pool, a black-box pool or an opened-process frame."""
     if frame.variant in ZONE_VARIANTS:
         add_zone_frame(root, frame, theme)
+    elif frame.variant in PLAN_FRAME_VARIANTS:
+        add_plan_frame(root, frame, theme)
     elif frame.variant is FrameVariant.POOL:
         _add_pool(root, frame, theme)
     elif frame.variant is FrameVariant.BLACK_BOX:

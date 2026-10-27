@@ -31,14 +31,27 @@ from .drawio_notation import (
     dfd_value,
     marks_style,
 )
+from .drawio_plan import add_plan_node
 from .drawio_screen import add_node_chip, add_screen_parts, screen_style
 from .drawio_wide import add_wide_parts, wide_style
 from .html_c4 import is_c4_node
 from .html_dfd import is_dfd_node
 from .html_frames import BAND_VARIANTS
+from .html_plan import is_plan_node
 from .html_wide import is_wide_card
 from .markup import esc, fmt
-from .model import KEY_FLAG_TONES, REF_FRAGMENT, Frame, FrameVariant, Node, Row, Scene, Shape, Tone
+from .model import (
+    KEY_FLAG_TONES,
+    REF_FRAGMENT,
+    UNDERLAY_ROLES,
+    Frame,
+    FrameVariant,
+    Node,
+    Row,
+    Scene,
+    Shape,
+    Tone,
+)
 from .shapes import SUBPROCESS_BAR_INSET_PX
 from .sizing import estimate_text_width, key_room, table_header_height
 from .text_area import ICON_TEXT_RESERVE_PX
@@ -465,6 +478,9 @@ def _detailed_data_uri(name: str, stroke: str, size: float) -> str:
 
 def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
     """Add a node, its icon (as a child cell) and its number badge."""
+    if is_plan_node(node):
+        add_plan_node(root, node, theme)
+        return
     cell = add_vertex(root, f"node-{node.id}", _node_value(node, theme), _node_style(node, theme))
     add_geometry(cell, (node.x, node.y, node.width, node.height))
     if node.screen is not None:
@@ -972,9 +988,13 @@ def render(scene: Scene) -> str:
     _add_title(root, scene, theme)
     for frame in scene.frames:
         _add_frame(root, frame, theme)
+    for edge in scene.edges:
+        if edge.role in UNDERLAY_ROLES:
+            add_edge(root, edge, nodes, theme)
     for node in scene.nodes:
         add_node(root, node, theme)
     for edge in scene.edges:
-        add_edge(root, edge, nodes, theme)
+        if edge.role not in UNDERLAY_ROLES:
+            add_edge(root, edge, nodes, theme)
     ET.indent(mxfile)
     return ET.tostring(mxfile, encoding="unicode") + "\n"

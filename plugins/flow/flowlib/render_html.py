@@ -9,13 +9,13 @@ from .markup import esc, fmt, px, tag
 from .model import (
     MONO_LABEL_KINDS,
     REF_FRAGMENT,
+    UNDERLAY_ROLES,
     Divider,
     EdgeLabel,
     Frame,
     FrameVariant,
     LabelKind,
     Node,
-    Role,
     Scene,
     Shape,
 )
@@ -403,8 +403,8 @@ def render(scene: Scene) -> str:
     """
     theme = load_theme(scene.theme)
     size = (scene.width, scene.height)
-    underlay = tuple(edge for edge in scene.edges if edge.role is Role.LIFELINE)
-    overlay = tuple(edge for edge in scene.edges if edge.role is not Role.LIFELINE)
+    underlay = tuple(edge for edge in scene.edges if edge.role in UNDERLAY_ROLES)
+    overlay = tuple(edge for edge in scene.edges if edge.role not in UNDERLAY_ROLES)
     layers = [_frame_html(frame, theme) for frame in scene.frames]
     layers.append(lines_layer(underlay, theme, size))
     layers += [node_html(node, theme) for node in scene.nodes]

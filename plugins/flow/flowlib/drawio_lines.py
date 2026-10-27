@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 from itertools import pairwise
 
 from .drawio_common import (
+    FLOW_ROLE_KEY,
     FONT_BOLD,
     LAYER_CELL_ID,
     add_geometry,
@@ -12,9 +13,19 @@ from .drawio_common import (
     font_style,
     style_string,
 )
-from .drawio_screen import chip_value
+from .drawio_screen import TONE_STYLE_KEY, chip_value
 from .markup import esc, fmt
-from .model import MONO_LABEL_KINDS, SYMBOL_HEADS, Edge, EdgeLabel, Head, LabelKind, Node, Point
+from .model import (
+    MONO_LABEL_KINDS,
+    SYMBOL_HEADS,
+    Edge,
+    EdgeLabel,
+    Head,
+    LabelKind,
+    Node,
+    Point,
+    Role,
+)
 from .theme import LineStyle, Theme
 
 CHIP_SPACING_PX = 3  # room around the text of a label chip
@@ -40,6 +51,17 @@ HEAD_ARROWS = {
 BOLD_CHIP_KINDS = (LabelKind.USER, LabelKind.SYSTEM, LabelKind.CODE)
 FILLED_HEADS = (Head.FILLED, Head.DOT, Head.DIAMOND_FILLED)
 SYMBOL_HEAD_SIZE_PX = 12
+PLANNING_ROLES = (
+    Role.GRID,
+    Role.TODAY,
+    Role.REPORTS,
+    Role.WORKS_WITH,
+    Role.BRANCH,
+    Role.TWIG,
+    Role.LINK,
+    Role.KEY,
+)
+CURVE_SAMPLES = (0.25, 0.5, 0.75)  # where on a Bezier curve the waypoints of a draw.io curve lie
 EXTRA_LABEL_WIDTH_PX = 60
 EXTRA_LABEL_HEIGHT_PX = 20
 
@@ -180,11 +202,17 @@ def _edge_style(edge: Edge, nodes: dict[str, Node], theme: Theme) -> str:
     style: dict[str, object] = {
         "html": 1,
         "rounded": 0,
-        "strokeColor": line.color,
+        "strokeColor": theme.planning.accents[edge.tone] if edge.tone else line.color,
         "strokeWidth": fmt(drawio_width(line, theme)),
         **_end_style(edge, line),
         "fontFamily": theme.fonts.sans,
     }
+    if edge.role in PLANNING_ROLES:
+        style[FLOW_ROLE_KEY] = edge.role.value
+    if edge.tone is not None:
+        style[TONE_STYLE_KEY] = edge.tone.value
+    if edge.is_curved:
+        style["curved"] = 1
     dash = line.dash or (DEFAULT_DASH if edge.dashed else None)
     if dash:
         style["dashed"] = 1
@@ -237,7 +265,7 @@ def add_edge(root: ET.Element, edge: Edge, nodes: dict[str, Node], theme: Theme)
     for name, (x, y) in (("sourcePoint", edge.points[0]), ("targetPoint", edge.points[-1])):
         ET.SubElement(geometry, "mxPoint", {"x": fmt(x), "y": fmt(y), "as": name})
     interior = ET.SubElement(geometry, "Array", {"as": "points"})
-    for x, y in edge.points[1:-1]:
+    for x, y in _waypoints(edge):
         ET.SubElement(interior, "mxPoint", {"x": fmt(x), "y": fmt(y)})
     if offset != (0.0, 0.0):
         ET.SubElement(
@@ -245,6 +273,31 @@ def add_edge(root: ET.Element, edge: Edge, nodes: dict[str, Node], theme: Theme)
         )
     for index, extra in enumerate(edge.extras, start=1):
         _add_extra(root, f"edge-{edge.id}-end{index}", extra, theme)
+
+
+def _bezier_point(points: tuple[Point, ...], at: float) -> Point:
+    """Return the point of a cubic Bezier curve at a fraction of its parameter.
+
+    Args:
+        points: The four points of the curve.
+        at: A number from 0 (the start) to 1 (the end).
+
+    Returns:
+        The point on the curve.
+    """
+    keep = 1 - at
+    weights = (keep**3, 3 * keep**2 * at, 3 * keep * at**2, at**3)
+    return (
+        sum(weight * x for weight, (x, _) in zip(weights, points, strict=True)),
+        sum(weight * y for weight, (_, y) in zip(weights, points, strict=True)),
+    )
+
+
+def _waypoints(edge: Edge) -> list[Point]:
+    """Return the waypoints draw.io keeps: the inner points, or samples of a curve."""
+    if edge.is_curved:
+        return [_bezier_point(edge.points, at) for at in CURVE_SAMPLES]
+    return list(edge.points[1:-1])
 
 
 def _add_extra(root: ET.Element, cell_id: str, extra: EdgeLabel, theme: Theme) -> None:

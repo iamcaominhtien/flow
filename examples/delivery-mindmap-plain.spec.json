@@ -1,0 +1,107 @@
+{
+  "type": "mindmap",
+  "style": "plain",
+  "title": "Mind map: plain",
+  "desc": "One topic in the middle, one branch per area of work, one short phrase per leaf. Colour follows the branch. A mind map has no order and no animation.",
+  "root": {
+    "label": "Launch the delivery app",
+    "goal": "first orders in May",
+    "icon": "launch",
+    "children": [
+      {
+        "label": "Product",
+        "icon": "doc",
+        "children": [
+          {
+            "label": "Menu and photos",
+            "icon": "store"
+          },
+          {
+            "label": "Checkout flow",
+            "icon": "cart"
+          },
+          {
+            "label": "Order tracking",
+            "icon": "pin"
+          }
+        ]
+      },
+      {
+        "label": "Engineering",
+        "icon": "phone",
+        "children": [
+          {
+            "label": "Backend API",
+            "icon": "doc"
+          },
+          {
+            "label": "Mobile apps",
+            "icon": "phone"
+          },
+          {
+            "label": "Payments",
+            "icon": "card"
+          },
+          {
+            "label": "Monitoring",
+            "icon": "check"
+          }
+        ]
+      },
+      {
+        "label": "Marketing",
+        "icon": "bell",
+        "children": [
+          {
+            "label": "Launch offer",
+            "icon": "star"
+          },
+          {
+            "label": "Restaurant sign-ups",
+            "icon": "store"
+          },
+          {
+            "label": "Social media",
+            "icon": "bell"
+          }
+        ]
+      },
+      {
+        "label": "Operations",
+        "icon": "bike",
+        "children": [
+          {
+            "label": "Courier onboarding",
+            "icon": "bike"
+          },
+          {
+            "label": "Support desk",
+            "icon": "user"
+          },
+          {
+            "label": "Restaurant onboarding",
+            "icon": "store"
+          }
+        ]
+      },
+      {
+        "label": "Money and law",
+        "icon": "card",
+        "children": [
+          {
+            "label": "Payment licence",
+            "icon": "card"
+          },
+          {
+            "label": "Terms and privacy",
+            "icon": "doc"
+          },
+          {
+            "label": "Budget",
+            "icon": "clock"
+          }
+        ]
+      }
+    ]
+  }
+}
