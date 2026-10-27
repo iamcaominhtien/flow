@@ -296,6 +296,7 @@ class Row:
     left: str
     right: str = ""
     flags: tuple[str, ...] = ()
+    is_mono: bool = False  # the name is code, as a member of a class
 
 
 @dataclass(frozen=True)
@@ -367,6 +368,10 @@ class Node:
     markers: tuple[Marker, ...] = ()  # BPMN marks: the trigger, the task type, the repeat
     host: str | None = None  # the id of the task a boundary event sits on the edge of
     chip: EdgeLabel | None = None  # a chip on the node; ``at`` is relative to its top-left
+    activities: tuple[str, ...] = ()  # mono grey lines under a state name: ``do / cook``
+    stereotype: str = ""  # the small ``«interface»`` line above the name of a class
+    is_italic: bool = False  # the name is in italics, as the name of an abstract class
+    is_centered: bool = False  # the header text of a table is centred, as in a class box
 
 
 @dataclass(frozen=True)

@@ -40,7 +40,7 @@ from .html_wide import is_wide_card
 from .markup import esc, fmt
 from .model import KEY_FLAG_TONES, REF_FRAGMENT, Frame, FrameVariant, Node, Row, Scene, Shape, Tone
 from .shapes import SUBPROCESS_BAR_INSET_PX
-from .sizing import estimate_text_width, key_room
+from .sizing import estimate_text_width, key_room, table_header_height
 from .text_area import ICON_TEXT_RESERVE_PX
 from .theme import Theme, detailed_icon_svg, has_detailed_icon, icon_svg, load_theme
 
@@ -110,6 +110,9 @@ CYLINDER_CAP_PX = 10
 START_STROKE_WIDTH_PX = 2
 END_STROKE_WIDTH_PX = 5
 DETAIL_FONT_SIZE_PX = 11
+STEREOTYPE_FONT_SIZE_PX = 10
+ACTIVITY_FONT_SIZE_PX = 10
+FONT_ITALIC = 2
 BELOW = {
     "verticalLabelPosition": "bottom",
     "verticalAlign": "top",
@@ -206,7 +209,7 @@ def _table_style(node: Node) -> dict[str, object]:
         "swimlane": "",
         "horizontal": 1,
         "collapsible": 0,
-        "align": "left",
+        "align": "center" if node.is_centered else "left",
         "rounded": 1,
         "arcSize": TABLE_ARC_PERCENT,
     }
@@ -327,7 +330,7 @@ def _base_pairs(node: Node, theme: Theme) -> dict[str, object]:
         "strokeWidth": fmt(colors.stroke_width),
         "fontColor": theme.ink,
         "fontSize": fmt(node.font_size),
-        "fontStyle": FONT_BOLD,
+        "fontStyle": FONT_BOLD | FONT_ITALIC if node.is_italic else FONT_BOLD,
         "fontFamily": theme.fonts.sans,
     }
 
@@ -409,6 +412,15 @@ def _node_value(node: Node, theme: Theme) -> str:
     if node.card:
         return _label_value(node.detail)
     title = _label_value(node.text)
+    if node.stereotype:
+        stereotype_style = f"font-size:{STEREOTYPE_FONT_SIZE_PX}px;font-weight:normal"
+        title = f'<span style="{stereotype_style}">{esc(node.stereotype)}</span><br>{title}'
+    if node.activities:
+        activity_style = (
+            f"font-size:{ACTIVITY_FONT_SIZE_PX}px;font-weight:normal;color:{theme.slate};"
+            f"font-family:{theme.fonts.mono}"
+        )
+        title = f'{title}<br><span style="{activity_style}">{_label_value(node.activities)}</span>'
     if not node.detail or node.shape is Shape.CONNECTOR:
         return title
     style = f"font-size:{DETAIL_FONT_SIZE_PX}px;font-weight:normal;color:{theme.slate}"
@@ -582,6 +594,9 @@ def _row_value(row: Row, key_width: float, theme: Theme) -> str:
     """
     chips = "&nbsp;".join(_chip_value(flag, theme) for flag in row.flags)
     name = f"<b>{esc(row.left)}</b>" if "PK" in row.flags else esc(row.left)
+    if row.is_mono:
+        mono_style = f"font-family:{theme.fonts.mono};font-size:{DETAIL_FONT_SIZE_PX}px"
+        name = f'<span style="{mono_style}">{name}</span>'
     key_cell = f'<td style="width:{key_width}px;padding-left:{ROW_PADDING_PX}px">{chips}</td>'
     left = key_cell if key_width else ""
     pad = "" if key_width else f"padding-left:{ROW_PADDING_PX}px"
@@ -596,9 +611,7 @@ def _row_value(row: Row, key_width: float, theme: Theme) -> str:
 
 def _table_header_height(node: Node, theme: Theme) -> float:
     """Return the height of a table header: tall when the table is illustrated."""
-    if node.card:
-        return theme.layout.table_card_header_height
-    return theme.layout.table_header_height
+    return table_header_height(node, theme.layout)
 
 
 def _add_table_card_parts(root: ET.Element, node: Node, theme: Theme) -> None:

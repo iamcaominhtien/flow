@@ -511,7 +511,8 @@
     "fork_overhang": 30,
     "fold_extent_lanes": 3400,
     "lane_size_plain": 210,
-    "lane_size_card": 240
+    "lane_size_card": 240,
+    "table_stereotype_height": 16
   },
   "sequence": {
     "participant_width": 136,
@@ -1168,5 +1169,46 @@
     "channel_step": 24,
     "channel_clearance": 70,
     "card_icon_size": 64
+  },
+  "uml": {
+    "state_size": [
+      160,
+      64
+    ],
+    "state_dot": 28,
+    "state_gap_labelled": 180,
+    "state_gap_mark": 130,
+    "state_row_pitch": 330,
+    "state_column_pitch": 340,
+    "state_loop_height": 44,
+    "state_loop_span": 56,
+    "state_frame_pad_x": 36,
+    "state_frame_pad_top": 60,
+    "state_frame_pad_bottom": 44,
+    "state_activity_line_height": 14,
+    "case_size": [
+      240,
+      64
+    ],
+    "case_column_pitch": 520,
+    "case_row_pitch": 140,
+    "actor_size": [
+      56,
+      84
+    ],
+    "actor_card_size": [
+      180,
+      140
+    ],
+    "actor_distance": 330,
+    "system_pad_x": 80,
+    "system_pad_top": 78,
+    "system_pad_bottom": 78,
+    "class_width": 280,
+    "class_column_pitch": 460,
+    "class_row_pitch": 340,
+    "pair_gap": 60,
+    "channel_step": 24,
+    "channel_clearance": 70
   }
 }

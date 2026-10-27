@@ -25,6 +25,7 @@ BPMN_SIZE_KEYS = ("task_size", "data_store_size")
 C4_SIZE_KEYS = ("box_size", "system_size")
 CLOUD_SIZE_KEYS = ("part_size",)
 ARCHITECTURE_SIZE_KEYS = ("part_size", "card_size")
+UML_SIZE_KEYS = ("state_size", "case_size", "actor_size", "actor_card_size")
 
 
 @dataclass(frozen=True)
@@ -137,6 +138,7 @@ class LayoutRules:
     table_bottom_pad: float
     table_extra_width: float
     table_card_header_height: float
+    table_stereotype_height: float
     table_chip_width: float
     table_chip_gap: float
     table_key_columns: int
@@ -274,6 +276,39 @@ class C4Rules:
     text_left: float
     name_top: float
     text_top: float
+
+
+@dataclass(frozen=True)
+class UmlRules:
+    """Sizes and gaps of the three UML diagrams (design 09). Lengths are in pixels."""
+
+    state_size: tuple[float, float]
+    state_dot: float
+    state_gap_labelled: float
+    state_gap_mark: float
+    state_row_pitch: float
+    state_column_pitch: float
+    state_loop_height: float
+    state_loop_span: float
+    state_frame_pad_x: float
+    state_frame_pad_top: float
+    state_frame_pad_bottom: float
+    state_activity_line_height: float
+    case_size: tuple[float, float]
+    case_column_pitch: float
+    case_row_pitch: float
+    actor_size: tuple[float, float]
+    actor_card_size: tuple[float, float]
+    actor_distance: float
+    system_pad_x: float
+    system_pad_top: float
+    system_pad_bottom: float
+    class_width: float
+    class_column_pitch: float
+    class_row_pitch: float
+    pair_gap: float
+    channel_step: float
+    channel_clearance: float
 
 
 @dataclass(frozen=True)
@@ -433,6 +468,7 @@ class Theme:
     c4: C4Rules
     cloud: CloudRules
     architecture: ArchitectureRules
+    uml: UmlRules
 
 
 def _line_style(raw: dict[str, Any]) -> LineStyle:
@@ -550,6 +586,7 @@ def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
         c4=C4Rules(**_sized(raw["c4"], C4_SIZE_KEYS)),
         cloud=CloudRules(**_sized(raw["cloud"], CLOUD_SIZE_KEYS)),
         architecture=ArchitectureRules(**_sized(raw["architecture"], ARCHITECTURE_SIZE_KEYS)),
+        uml=UmlRules(**_sized(raw["uml"], UML_SIZE_KEYS)),
     )
 
 

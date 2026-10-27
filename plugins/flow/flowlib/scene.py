@@ -62,7 +62,8 @@ DIVIDER_KEYS = {"y", "guard"}
 NODE_KEYS = {"id", "shape", "x", "y", "width", "height", "text", "icon", "tone"}
 NODE_KEYS |= {"number", "font_size", "detail", "caption", "sections", "card", "dashed"}
 NODE_KEYS |= {"screen", "chip", "markers", "caption_above", "host", "technology"}
-ROW_KEYS = {"left", "right", "flags"}
+NODE_KEYS |= {"activities", "stereotype", "italic", "centered"}
+ROW_KEYS = {"left", "right", "flags", "mono"}
 EDGE_KEYS = {"id", "from", "to", "role", "points", "head", "tail", "dashed", "label", "extras"}
 LABEL_KEYS = {"text", "at", "kind", "number", "icon"}
 MIN_ROUTE_POINTS = 2
@@ -176,6 +177,8 @@ def _dump_row(row: Row) -> dict[str, Any]:
     written: dict[str, Any] = {"left": row.left, "right": row.right}
     if row.flags:
         written["flags"] = list(row.flags)
+    if row.is_mono:
+        written["mono"] = True
     return written
 
 
@@ -206,6 +209,10 @@ def _dump_node(node: Node) -> dict[str, Any]:
         "markers": [marker.value for marker in node.markers],
         "host": node.host,
         "technology": node.technology,
+        "activities": list(node.activities),
+        "stereotype": node.stereotype,
+        "italic": node.is_italic,
+        "centered": node.is_centered,
     }
     written.update({key: value for key, value in optional.items() if value})
     return written
@@ -388,6 +395,10 @@ class _SceneParser:
             markers=self._markers(raw.get("markers", []), where),
             host=read.text(raw, "host", where),
             technology=read.text(raw, "technology", where) or "",
+            activities=self._lines(raw.get("activities", []), where),
+            stereotype=read.text(raw, "stereotype", where) or "",
+            is_italic=raw.get("italic") is True,
+            is_centered=raw.get("centered") is True,
         )
 
     def _markers(self, raw: object, where: str) -> tuple[Marker, ...]:
@@ -420,6 +431,7 @@ class _SceneParser:
                         left=self._read.text(item, "left", place) or "",
                         right=self._read.text(item, "right", place) or "",
                         flags=tuple(f for f in item.get("flags", []) if isinstance(f, str)),
+                        is_mono=item.get("mono") is True,
                     )
                 )
             sections.append(tuple(rows))
