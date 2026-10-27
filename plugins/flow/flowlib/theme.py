@@ -6,7 +6,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
-from .model import DEFAULT_THEME, Animation, LabelKind, Role, Shape, Tone
+from .model import DEFAULT_THEME, Animation, LabelKind, Role, Shape, Status, Tone
 
 DATA_DIR = Path(__file__).parent
 THEMES_KEY = "themes"  # in ``theme.json``: the overrides of each theme other than the default
@@ -26,6 +26,10 @@ C4_SIZE_KEYS = ("box_size", "system_size")
 CLOUD_SIZE_KEYS = ("part_size",)
 ARCHITECTURE_SIZE_KEYS = ("part_size", "card_size")
 UML_SIZE_KEYS = ("state_size", "case_size", "actor_size", "actor_card_size")
+GANTT_SIZE_KEYS = ("today_pill", "legend_swatch")
+ORG_SIZE_KEYS = ("card", "card_illustrated", "works_pill")
+MIND_SIZE_KEYS = ("centre", "branch", "group", "idea", "detail")
+MIND_SCALE_NAMES = ("illustrated", "plain", "large")
 
 
 @dataclass(frozen=True)
@@ -312,6 +316,140 @@ class UmlRules:
 
 
 @dataclass(frozen=True)
+class StatusColors:
+    """The colours of a task status: the bar, its outline and its second cue."""
+
+    fill: str
+    stroke: str
+    mark: str  # the check of a done bar, the progress fill, the reason of a blocked bar
+
+
+@dataclass(frozen=True)
+class MarkColors:
+    """A background and a text colour of a small mark on an idea of a mind map."""
+
+    fill: str
+    text: str
+
+
+@dataclass(frozen=True)
+class MilestoneColors:
+    """The fill and the outline of the diamond of a milestone."""
+
+    fill: str
+    stroke: str
+
+
+@dataclass(frozen=True)
+class GanttRules:
+    """Sizes of a Gantt chart (design 08 section 2). Lengths are in pixels."""
+
+    week_width: float
+    label_column: float
+    row_height: float
+    bar_height: float
+    bar_inset: float
+    bar_radius: float
+    band_height: float
+    month_height: float
+    week_height: float
+    header_radius: float
+    person_size: float
+    milestone_size: float
+    dependency_gap: float
+    label_pad: float
+    person_gap: float
+    today_pill: tuple[float, float]
+    today_gap: float
+    legend_gap: float
+    legend_swatch: tuple[float, float]
+    legend_item_gap: float
+    max_rows: int
+    grid_top_gap: float
+    name_font_size: float
+    week_font_size: float
+    month_font_size: float
+    reason_gap: float
+    check_size: float
+
+
+@dataclass(frozen=True)
+class OrgRules:
+    """Sizes of an org chart (design 08 section 3). Lengths are in pixels."""
+
+    card: tuple[float, float]
+    card_illustrated: tuple[float, float]
+    level_pitch: float
+    level_pitch_illustrated: float
+    card_pitch: float
+    subtree_gap: float
+    bus_drop: float
+    person_size: float
+    max_levels: int
+    pill_height: float
+    icon_size: float
+    pad: float
+    name_font_size: float
+    role_font_size: float
+    works_pill: tuple[float, float]
+    open_opacity: float
+    legend_gap: float
+    legend_line: float
+
+
+@dataclass(frozen=True)
+class MindScale:
+    """Sizes of one scale of mind map: illustrated, plain, or the large one with four levels."""
+
+    centre: tuple[float, float]
+    branch: tuple[float, float]
+    group: tuple[float, float]
+    idea: tuple[float, float]
+    detail: tuple[float, float]
+    centre_gap: float
+    column_gap: float
+    row_gap: float
+    subtree_gap: float
+    branch_pitch: float
+    branch_font: float
+    group_font: float
+    idea_font: float
+    detail_font: float
+    disc: float
+    leaf_icon: float
+
+
+@dataclass(frozen=True)
+class MindRules:
+    """Sizes and limits of a mind map (design 08 section 4)."""
+
+    illustrated: MindScale
+    plain: MindScale
+    large: MindScale
+    person_size: float
+    owner_size: float
+    max_leaf_words: int
+    max_links: int
+    link_bulge: float
+    link_pill_gap: float
+    bar_width: float
+    centre_pill_height: float
+
+
+@dataclass(frozen=True)
+class PlanningRules:
+    """The colours and sizes of Gantt, org chart and mind map (design 08)."""
+
+    status: dict[Status, StatusColors]
+    marks: dict[str, MarkColors]
+    milestone: MilestoneColors
+    accents: dict[Tone, str]  # the strong colour of each tone in a mind map: pills, bars, curves
+    gantt: GanttRules
+    org: OrgRules
+    mind: MindRules
+
+
+@dataclass(frozen=True)
 class CloudRules:
     """Sizes and gaps of a cloud diagram (design 13). Lengths are in pixels."""
 
@@ -469,6 +607,7 @@ class Theme:
     cloud: CloudRules
     architecture: ArchitectureRules
     uml: UmlRules
+    planning: PlanningRules
 
 
 def _line_style(raw: dict[str, Any]) -> LineStyle:
@@ -541,6 +680,35 @@ def _sized(raw: dict[str, Any], keys: tuple[str, ...]) -> dict[str, Any]:
     return {**raw, **{key: _pair(raw[key]) for key in keys}}
 
 
+def _planning_rules(raw: dict[str, Any], tones: dict[Tone, ToneColors]) -> PlanningRules:
+    """Build the planning rules; each size becomes a ``(width, height)`` tuple.
+
+    Args:
+        raw: The ``planning`` object of ``theme.json``.
+        tones: The tones of the theme, whose accent a mind map uses unless the rules name one.
+
+    Returns:
+        The status colours, mark colours and the sizes of the three planning diagrams.
+    """
+    marks = {
+        name: MarkColors(**colors) for name, colors in raw["marks"].items() if "text" in colors
+    }
+    mind = raw["mind"]
+    scales = {name: MindScale(**_sized(mind[name], MIND_SIZE_KEYS)) for name in MIND_SCALE_NAMES}
+    loose = {key: value for key, value in mind.items() if key not in MIND_SCALE_NAMES}
+    return PlanningRules(
+        status={Status(name): StatusColors(**colors) for name, colors in raw["status"].items()},
+        marks=marks,
+        milestone=MilestoneColors(**raw["marks"]["milestone"]),
+        accents={
+            tone: raw["accents"].get(tone.value, colors.accent) for tone, colors in tones.items()
+        },
+        gantt=GanttRules(**_sized(raw["gantt"], GANTT_SIZE_KEYS)),
+        org=OrgRules(**_sized(raw["org"], ORG_SIZE_KEYS)),
+        mind=MindRules(**loose, **scales),
+    )
+
+
 def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
     """Build a theme from the parsed ``theme.json``, with a theme's overrides already merged.
 
@@ -553,6 +721,7 @@ def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
     """
     style = StyleRules(**raw["style"])
     paint = {"stroke_width": style.stroke_width, "radius": style.corner_radius}
+    tones = {Tone(name): ToneColors(**colors) for name, colors in raw["tones"].items()}
     return Theme(
         name=name,
         fonts=Fonts(**raw["fonts"]),
@@ -572,7 +741,7 @@ def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
         shapes={
             Shape(shape): ShapeColors(**colors, **paint) for shape, colors in raw["shapes"].items()
         },
-        tones={Tone(name): ToneColors(**colors) for name, colors in raw["tones"].items()},
+        tones=tones,
         roles={Role(name): _line_style(style) for name, style in raw["roles"].items()},
         animations={
             Animation(name): AnimationSpeed(**speed) for name, speed in raw["animations"].items()
@@ -587,6 +756,7 @@ def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
         cloud=CloudRules(**_sized(raw["cloud"], CLOUD_SIZE_KEYS)),
         architecture=ArchitectureRules(**_sized(raw["architecture"], ARCHITECTURE_SIZE_KEYS)),
         uml=UmlRules(**_sized(raw["uml"], UML_SIZE_KEYS)),
+        planning=_planning_rules(raw["planning"], tones),
     )
 
 

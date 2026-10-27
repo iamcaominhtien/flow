@@ -71,6 +71,15 @@ def _marker_url(role: Role, head: Head) -> str:
     return f"url(#head-{role.value}-{head.value})"
 
 
+def _path_data(edge: Edge, gap: float) -> str:
+    """Return the ``d`` of a line: one cubic curve for a curved edge, else straight segments."""
+    if edge.is_curved:
+        start, *controls = edge.points
+        curve = " ".join(f"{fmt(x)} {fmt(y)}" for x, y in controls)
+        return f"M {fmt(start[0])} {fmt(start[1])} C {curve}"
+    return "M " + " L ".join(f"{fmt(x)} {fmt(y)}" for x, y in _route(edge, gap))
+
+
 def edge_html(edge: Edge, theme: Theme) -> str:
     """Draw one line as an SVG path, with its dash, animation class, head and tail.
 
@@ -82,10 +91,10 @@ def edge_html(edge: Edge, theme: Theme) -> str:
         A ``path`` element.
     """
     line = theme.roles[edge.role]
-    route = _route(edge, line.gap)
+    color = theme.planning.accents[edge.tone] if edge.tone else line.color
     attributes = {
-        "d": "M " + " L ".join(f"{fmt(x)} {fmt(y)}" for x, y in route),
-        "stroke": line.color,
+        "d": _path_data(edge, line.gap),
+        "stroke": color,
         "stroke-width": fmt(line.width),
         "fill": "none",
         "stroke-linejoin": "round",

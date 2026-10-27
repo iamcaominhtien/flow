@@ -52,6 +52,13 @@ class Shape(StrEnum):
     C4_BOX = "c4_box"  # a C4 system, container or component: icon, name, [Kind: technology], text
     C4_PERSON = "c4_person"  # the same box with rounder corners: a person of a C4 diagram
     WIDE_CARD = "wide_card"  # an illustrated architecture part: name pill, detail, large icon
+    PERSON = "person"  # a circle with initials, the tint of a person or a team
+    PERSON_CARD = "person_card"  # a card of an org chart: initials, name, role
+    PLAN_BAR = "plan_bar"  # a bar of a Gantt chart, coloured and filled by its status
+    MILESTONE = "milestone"  # the amber diamond of a Gantt chart
+    LABEL = "label"  # plain text with no outline: a row name or a header of a chart
+    BRANCH = "branch"  # a pill of a mind map: a branch or a group
+    LEAF = "leaf"  # a card or an underlined phrase of a mind map
 
 
 class Marker(StrEnum):
@@ -86,6 +93,17 @@ class Role(StrEnum):
     LIFELINE = "lifeline"
     LOGICAL = "logical"
     ASSOCIATION = "association"  # a dotted line from a task to a data store
+    GRID = "grid"  # a thin line of the grid of a Gantt chart
+    TODAY = "today"  # the red dashed line of today
+    REPORTS = "reports"  # the solid bus line of an org chart
+    WORKS_WITH = "works_with"  # a dashed line between two people without a reporting line
+    BRANCH = "branch"  # the thick curve from the centre of a mind map to a branch
+    TWIG = "twig"  # a thin curve from a branch to what hangs on it
+    LINK = "link"  # the dashed arc between two ideas of a mind map
+    KEY = "key"  # a line in a legend: the critical path, blue and dashed but not animated
+
+
+UNDERLAY_ROLES = (Role.LIFELINE, Role.GRID)  # lines drawn under the nodes
 
 
 class LabelKind(StrEnum):
@@ -103,6 +121,8 @@ class LabelKind(StrEnum):
     GUARD_OK = "guard_ok"
     GUARD_FAIL = "guard_fail"
     EFFECT = "effect"
+    TODAY = "today"  # the red pill of the today line
+    LINK = "link"  # the violet pill of a link between two ideas
 
 
 class Tone(StrEnum):
@@ -166,6 +186,8 @@ class FrameVariant(StrEnum):
     NETWORK = "network"  # a cloud frame: solid or dashed by kind, with a pill in its own colour
     SYSTEM = "system"  # a use case diagram's system: a white box with its name at the top left
     LAYER = "layer"  # an architecture frame: dashed and tinted, with a dark pill label
+    PANEL = "panel"  # a white rounded box with a thin outline, such as the header of a Gantt
+    BAND = "band"  # a grey row with its name in bold, such as a phase of a Gantt
 
 
 class Side(StrEnum):
@@ -249,6 +271,27 @@ class Layer(StrEnum):
 
     BASE = "base"
     OVERLAY = "overlay"
+
+
+class Status(StrEnum):
+    """How far a task is. Always drawn as a colour and a second cue (design 08 section 1.1)."""
+
+    DONE = "done"
+    IN_PROGRESS = "in_progress"
+    PLANNED = "planned"
+    BLOCKED = "blocked"
+
+
+class MindLevel(StrEnum):
+    """What an item of a mind map is, which decides how it is drawn."""
+
+    CENTRE = "centre"  # the topic in the middle
+    BRANCH = "branch"
+    GROUP = "group"  # the second level of a map with four levels
+    LEAF = "leaf"  # the second level of a map with two levels
+    IDEA = "idea"
+    DETAIL = "detail"
+    KEY = "key"  # a sample of the marks, in the legend
 
 
 class Direction(StrEnum):
@@ -347,6 +390,23 @@ class ScreenView:
 
 
 @dataclass(frozen=True)
+class PlanView:
+    """What a planning node shows besides its text: its status, its person or its mind map level."""
+
+    status: Status | None = None
+    progress: float = 0.0  # a bar that is in progress is filled this far, from 0 to 1
+    reason: str = ""  # why a blocked task is blocked, written after its bar
+    initials: str = ""  # a person, or the owner of an idea
+    person_tone: Tone | None = None  # the tint of that person, the same in every diagram
+    is_open: bool = False  # an open role: dashed and faded
+    is_bold: bool = False  # for a label
+    level: MindLevel | None = None
+    side: Side | None = None  # which side of the centre a mind map item is on
+    priority: int = 0  # 1 or 2 for P1 and P2, 0 for none
+    hidden: int = 0  # how many ideas below this one are left out (+N)
+
+
+@dataclass(frozen=True)
 class Node:
     """One box of the diagram."""
 
@@ -376,6 +436,7 @@ class Node:
     stereotype: str = ""  # the small ``«interface»`` line above the name of a class
     is_italic: bool = False  # the name is in italics, as the name of an abstract class
     is_centered: bool = False  # the header text of a table is centred, as in a class box
+    plan: PlanView | None = None  # what a planning node shows: status, person, mind map level
 
 
 @dataclass(frozen=True)
@@ -392,6 +453,8 @@ class Edge:
     tail: Head = Head.NONE
     dashed: bool = False
     extras: tuple[EdgeLabel, ...] = ()
+    tone: Tone | None = None  # the colour of a mind map curve, taken from its branch
+    is_curved: bool = False  # ``points`` are the four points of one cubic Bezier curve
 
 
 @dataclass(frozen=True)

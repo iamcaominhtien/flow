@@ -10,11 +10,13 @@ from enum import StrEnum
 from itertools import combinations, pairwise
 
 from .html_nodes import CAPTION_FONT_SIZE_PX, CAPTION_GAP_PX, CAPTION_WIDTH_PX
+from .html_plan import is_plan_node, plan_text_room
 from .model import Edge, EdgeLabel, Frame, LabelKind, Node, Point, Role, Scene, Shape
 from .sizing import LINE_HEIGHT_FACTOR, estimate_text_width
 from .text_area import text_area_width
-from .theme import LayoutRules, load_theme
+from .theme import LayoutRules, Theme, load_theme
 
+REFERENCE_ROLES = (Role.LIFELINE, Role.GRID, Role.TODAY)  # lines that are not content
 CAPTION_TEXT_PAD_PX = 8  # a caption rectangle is this much wider than its text
 BORDER_TOLERANCE_PX = 1.0  # a part this close to a frame's border counts as inside or outside
 NODE_CLEARANCE_PX = 4.0  # nodes closer than this count as touching
@@ -67,6 +69,11 @@ class Code(StrEnum):
     BPMN_TOO_MANY_ELEMENTS = "bpmn-too-many-elements"
     BPMN_ROUTE_BENDS = "bpmn-route-bends"
     BPMN_MAIN_PATH = "bpmn-main-path"
+    GANTT_TOO_MANY_ROWS = "gantt-too-many-rows"
+    ORG_TOO_MANY_LEVELS = "org-too-many-levels"
+    ORG_ROLE_SENTENCE = "org-role-sentence"
+    MIND_PHRASE_LONG = "mindmap-phrase-long"
+    MIND_TOO_MANY_LINKS = "mindmap-too-many-links"
 
 
 @dataclass(frozen=True)
@@ -175,6 +182,16 @@ def caption_rect(node: Node, rules: LayoutRules) -> Rect | None:
     return Rect(centre - half, top, centre + half, top + height)
 
 
+def _is_content(edge: Edge) -> bool:
+    """Tell a line that carries meaning from a reference line or a curve, which are not checked."""
+    return edge.role not in REFERENCE_ROLES and not edge.is_curved
+
+
+def _may_cross(edge: Edge, node: Node) -> bool:
+    """Tell a line that may pass a node: a dependency runs down the date line of a milestone."""
+    return node.shape is Shape.MILESTONE and edge.role in (Role.NEXT, Role.MAIN)
+
+
 def check_nodes_overlap(scene: Scene) -> list[Finding]:
     """Report every pair of nodes that touch or overlap."""
     findings = []
@@ -197,10 +214,10 @@ def check_lines_through_nodes(scene: Scene) -> list[Finding]:
     """Report every line that passes through a node it does not start or end at."""
     findings = []
     for edge in scene.edges:
-        if edge.role is Role.LIFELINE:
+        if edge.role in REFERENCE_ROLES or edge.is_curved:
             continue
         for node in scene.nodes:
-            if node.id in (edge.source, edge.target):
+            if node.id in (edge.source, edge.target) or _may_cross(edge, node):
                 continue
             rect = node_rect(node)
             if any(_segment_hits(start, end, rect) for start, end in pairwise(edge.points)):
@@ -317,12 +334,13 @@ def check_canvas(scene: Scene, rules: LayoutRules) -> list[Finding]:
 def check_text_fit(scene: Scene, rules: LayoutRules) -> list[Finding]:
     """Report nodes whose text probably does not fit, judging by the estimated text width."""
     findings = []
+    theme = load_theme(scene.theme)
     for node in scene.nodes:
         if not node.text or node.screen is not None:
             continue
-        room = text_area_width(node.shape, node.width, node.icon is not None)
-        if node.card:
-            room = node.width - 2 * (rules.card_padding + rules.card_pill_padding)
+        room = _text_room(node, rules, theme)
+        if room is None:
+            continue
         widest = max(
             (estimate_text_width(line, rules, node.font_size) for line in node.text), default=0
         )
@@ -337,6 +355,15 @@ def check_text_fit(scene: Scene, rules: LayoutRules) -> list[Finding]:
                 )
             )
     return findings
+
+
+def _text_room(node: Node, rules: LayoutRules, theme: Theme) -> float | None:
+    """Return how wide the text of a node may be, or None for a node whose text is not checked."""
+    if is_plan_node(node):
+        return plan_text_room(node, theme)
+    if node.card:
+        return node.width - 2 * (rules.card_padding + rules.card_pill_padding)
+    return text_area_width(node.shape, node.width, node.icon is not None)
 
 
 def check_label_length(scene: Scene) -> list[Finding]:
@@ -386,7 +413,7 @@ def _crosses(first: tuple[Point, Point], second: tuple[Point, Point]) -> bool:
 def check_crossings(scene: Scene) -> list[Finding]:
     """Report every pair of lines that cross each other."""
     findings = []
-    drawn = [edge for edge in scene.edges if edge.role is not Role.LIFELINE]
+    drawn = [edge for edge in scene.edges if _is_content(edge)]
     for first, second in combinations(drawn, 2):
         crossing = any(
             _crosses(a, b) for a in pairwise(first.points) for b in pairwise(second.points)
@@ -443,7 +470,7 @@ def check_overlaps(scene: Scene) -> list[Finding]:
     kinds (solid and dashed) may not share more than a junction.
     """
     findings = []
-    drawn = [edge for edge in scene.edges if edge.role is not Role.LIFELINE]
+    drawn = [edge for edge in scene.edges if _is_content(edge) and edge.role is not Role.REPORTS]
     for first, second in combinations(drawn, 2):
         shared = _longest_shared(first, second)
         limit = MIN_OVERLAP_PX

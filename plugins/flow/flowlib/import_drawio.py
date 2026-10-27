@@ -23,6 +23,7 @@ from .import_notation import (
     notation_frame,
     notation_node,
 )
+from .import_plan import is_plan_cell, is_plan_part, plan_node
 from .import_screen import (
     CHIP_PREFIX,
     attach_words,
@@ -377,7 +378,10 @@ class _Import:
         """Turn one vertex cell into a node or a frame, or note why it is left out."""
         style = parse_style(cell.get("style", ""))
         rows = [c for c in self.children(cell) if _is_table_row(c, self.cells)]
-        if "swimlane" in style and rows:
+        if is_plan_cell(style):
+            node = plan_node(_node(cell, style, self.box(cell)), style, cell, self.cells)
+            self.nodes[node.id] = node
+        elif "swimlane" in style and rows:
             node = _node(cell, style, self.box(cell))
             self.nodes[node.id] = replace(node, shape=Shape.TABLE, sections=(_table_rows(rows),))
         elif is_notation_frame(style):
@@ -477,6 +481,7 @@ def convert(path: Path) -> ImportResult:
         and not is_screen_part(c, cells, parse_style)
         and not is_edge_words(c)
         and not is_notation_part(c, cells)
+        and not is_plan_part(c, cells, parse_style)
     ]
     top_level = [c for c in drawn if c.get("parent") in LAYER_IDS]
     texts = {name: plain_lines(cells[name].get("value", "")) for name in text_ids if name in cells}

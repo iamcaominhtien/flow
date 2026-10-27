@@ -6,7 +6,8 @@ author may break a rule on purpose. Which rules apply depends on ``Scene.diagram
 """
 
 from .check import Code, Finding, Severity
-from .model import Edge, Node, Role, Scene, Shape
+from .model import Edge, FrameVariant, MindLevel, Node, Role, Scene, Shape
+from .theme import load_theme
 
 FLOWCHART = "flowchart"
 SEQUENCE = "sequence"
@@ -27,6 +28,8 @@ TEXT_SHAPES = (
 )  # outlines whose text the word limit applies to
 NOT_DRAWN_AS_NODES = (Shape.FORK, Shape.CONNECTOR)  # marks that do not count as steps
 NOTE_ROLES = (Role.LIFELINE,)
+MAX_ROLE_WORDS = 6  # a role longer than this is a sentence, not a noun phrase
+LEGEND_PREFIXES = ("legend", "key")  # the ids of the samples and the words of a legend
 
 
 def lint_scene(scene: Scene) -> list[Finding]:
@@ -42,7 +45,7 @@ def lint_scene(scene: Scene) -> list[Finding]:
         return lint_flowchart(scene)
     if scene.diagram == SEQUENCE:
         return lint_sequence(scene)
-    return []
+    return PLANNING_LINTS.get(scene.diagram, lambda _scene: [])(scene)
 
 
 def lint_flowchart(scene: Scene) -> list[Finding]:
@@ -174,3 +177,78 @@ def _placement_findings(scene: Scene) -> list[Finding]:
 def _is_before(node: Node, other: Node) -> bool:
     """Tell whether a node lies wholly above, or wholly left of, another."""
     return node.y + node.height <= other.y or node.x + node.width <= other.x
+
+
+def lint_gantt(scene: Scene) -> list[Finding]:
+    """Warn when a Gantt chart has more rows than a page holds (about 15)."""
+    rows = len([f for f in scene.frames if f.variant is FrameVariant.BAND])
+    rows += len(
+        [
+            n
+            for n in scene.nodes
+            if n.shape in (Shape.PLAN_BAR, Shape.MILESTONE) and not _is_legend(n)
+        ]
+    )
+    limit = load_theme(scene.theme).planning.gantt.max_rows
+    if rows <= limit:
+        return []
+    message = f"the chart has {rows} rows; about {limit} fit a page, so draw one Gantt per phase"
+    return [_warn(Code.GANTT_TOO_MANY_ROWS, message, ())]
+
+
+def lint_org(scene: Scene) -> list[Finding]:
+    """Warn when an org chart has more than four levels, or a role that is a sentence."""
+    cards = [n for n in scene.nodes if n.shape is Shape.PERSON_CARD and not _is_legend(n)]
+    levels = len({round(card.y) for card in cards})
+    limit = load_theme(scene.theme).planning.org.max_levels
+    findings = []
+    if levels > limit:
+        message = (
+            f"the chart has {levels} levels; {limit} fit a page, so draw one chart per department"
+        )
+        findings.append(_warn(Code.ORG_TOO_MANY_LEVELS, message, ()))
+    for card in cards:
+        role = " ".join(card.detail)
+        if len(role.split()) > MAX_ROLE_WORDS or role.endswith("."):
+            message = (
+                f"the role of '{card.id}' is a sentence; write a noun phrase such as "
+                "Mobile developer"
+            )
+            findings.append(_warn(Code.ORG_ROLE_SENTENCE, message, (card.id,)))
+    return findings
+
+
+def lint_mindmap(scene: Scene) -> list[Finding]:
+    """Warn about a phrase of more than four words, and about too many links between ideas."""
+    rules = load_theme(scene.theme).planning.mind
+    findings = []
+    for node in scene.nodes:
+        is_phrase = node.plan is not None and node.plan.level not in (
+            None,
+            MindLevel.CENTRE,
+            MindLevel.KEY,
+        )
+        if is_phrase and len(_words(node)) > rules.max_leaf_words:
+            message = (
+                f"'{node.id}' has {len(_words(node))} words; "
+                f"{rules.max_leaf_words} or fewer read at a glance"
+            )
+            findings.append(_warn(Code.MIND_PHRASE_LONG, message, (node.id,)))
+    links = [
+        edge for edge in scene.edges if edge.role is Role.LINK and not edge.id.startswith("key")
+    ]
+    if len(links) > rules.max_links:
+        message = (
+            f"the map has {len(links)} links; about {rules.max_links} is the most "
+            "before it turns into a tangle"
+        )
+        findings.append(_warn(Code.MIND_TOO_MANY_LINKS, message, ()))
+    return findings
+
+
+def _is_legend(node: Node) -> bool:
+    """Tell a sample or the words of a legend from a part of the diagram."""
+    return node.id.startswith(LEGEND_PREFIXES)
+
+
+PLANNING_LINTS = {"gantt": lint_gantt, "org": lint_org, "mindmap": lint_mindmap}
