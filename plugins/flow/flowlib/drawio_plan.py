@@ -67,12 +67,23 @@ def add_plan_frame(root: ET.Element, frame: Frame, theme: Theme) -> None:
         "arcSize": PANEL_ARC_PERCENT,
         "html": 1,
     }
-    if frame.variant is FrameVariant.PANEL:
+    if frame.variant is FrameVariant.COLUMN:
+        pairs.update(_column_pairs(frame, theme))
+    elif frame.variant is FrameVariant.PANEL:
         pairs.update({"fillColor": theme.paper, "strokeColor": theme.rule, "strokeWidth": 1})
     else:
         pairs.update(_band_pairs(frame, theme))
     cell = add_vertex(root, f"frame-{frame.id}", esc(frame.label or ""), style_string(pairs))
     add_geometry(cell, (frame.x, frame.y, frame.width, frame.height))
+
+
+def _column_pairs(frame: Frame, theme: Theme) -> dict[str, object]:
+    """Return the style of a column or a row: a tint with no outline and the column radius."""
+    return {
+        **rounded_pairs(theme.planning.kanban.column_radius),
+        "fillColor": theme.tones[frame.tone].lane,
+        "strokeColor": "none",
+    }
 
 
 def _band_pairs(frame: Frame, theme: Theme) -> dict[str, object]:

@@ -6,6 +6,7 @@ author may break a rule on purpose. Which rules apply depends on ``Scene.diagram
 """
 
 from .check import Code, Finding, Severity
+from .lint_board import lint_kanban, lint_roadmap
 from .model import Edge, FrameVariant, MindLevel, Node, Role, Scene, Shape
 from .theme import load_theme
 
@@ -251,4 +252,10 @@ def _is_legend(node: Node) -> bool:
     return node.id.startswith(LEGEND_PREFIXES)
 
 
-PLANNING_LINTS = {"gantt": lint_gantt, "org": lint_org, "mindmap": lint_mindmap}
+PLANNING_LINTS = {
+    "gantt": lint_gantt,
+    "org": lint_org,
+    "mindmap": lint_mindmap,
+    "kanban": lint_kanban,
+    "roadmap": lint_roadmap,
+}

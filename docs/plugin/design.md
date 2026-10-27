@@ -229,7 +229,7 @@ Command line, for example: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build 
 | E | Remaining types, family by family | Done in a simplified form: ER, architecture, cloud, C4, state, BPMN, use case, class, DFD, screen flow (all on the layered engine), org chart and mind map (tidy tree), Gantt and roadmap (timeline), Kanban, layers and wireframe (boards). The concept explainer (hub and spokes) is built too. Not built: per-type illustrated notation for ER, DFD and the planning types. A first illustrated style exists: `style: illustrated` turns boxes with an icon into cards (see decision 11) |
 | F | Editing existing files, publishing | Import and edit done. Publishing to a plugin directory: not done |
 
-Types that fit the layered engine are declared as data in `diagrams/catalog.py` (words, kinds and line styles) and read by `diagrams/graph.py`. Trees use `tidy.py`, because the layered engine merges the buses of different parents. Gantt and roadmap are in `diagrams/timeline.py`, and Kanban, layers and wireframe in `diagrams/boards.py`; both build the scene directly.
+Types that fit the layered engine are declared as data in `diagrams/catalog.py` (words, kinds and line styles) and read by `diagrams/graph.py`. Trees use `tidy.py`, because the layered engine merges the buses of different parents. Gantt is in `diagrams/gantt.py`, the roadmap in `diagrams/roadmap.py`, the Kanban work board in `diagrams/kanban.py`, and the Kanban comparison, layers and wireframe in `diagrams/boards.py`; all build the scene directly.
 
 ## 12. Decisions taken
 

@@ -1,19 +1,19 @@
 """Write and read what a planning node shows, in the JSON of a scene and in a draw.io style.
 
 The scene format of a planning node is ``"plan": {"status", "progress", "reason", "initials",
-"person_tone", "open", "bold", "level", "side", "priority", "hidden"}``; keys that hold their
-default are left out.
+"person_tone", "open", "bold", "level", "side", "priority", "hidden", "tag", "tag_tone",
+"pill"}``; keys that hold their default are left out.
 """
 
 import base64
 import json
 from typing import Any
 
-from .model import MindLevel, PlanView, Side, Status, Tone
+from .model import MindLevel, PillKind, PlanView, Side, Status, Tone
 from .reader import Reader
 
 PLAN_KEYS = {"status", "progress", "reason", "initials", "person_tone", "open", "bold", "level"}
-PLAN_KEYS |= {"side", "priority", "hidden"}
+PLAN_KEYS |= {"side", "priority", "hidden", "tag", "tag_tone", "pill"}
 
 
 def dump_plan(view: PlanView) -> dict[str, Any]:
@@ -37,6 +37,9 @@ def dump_plan(view: PlanView) -> dict[str, Any]:
         "side": view.side.value if view.side else None,
         "priority": view.priority,
         "hidden": view.hidden,
+        "tag": view.tag,
+        "tag_tone": view.tag_tone.value if view.tag_tone else None,
+        "pill": view.pill.value if view.pill else None,
     }
     return {key: value for key, value in optional.items() if value}
 
@@ -68,6 +71,9 @@ def parse_plan(raw: object, where: str, read: Reader) -> PlanView | None:
         side=read.enum(Side, raw, "side", where),
         priority=int(read.number(raw, "priority", where)) if "priority" in raw else 0,
         hidden=int(read.number(raw, "hidden", where)) if "hidden" in raw else 0,
+        tag=read.text(raw, "tag", where) or "",
+        tag_tone=read.enum(Tone, raw, "tag_tone", where),
+        pill=read.enum(PillKind, raw, "pill", where),
     )
 
 

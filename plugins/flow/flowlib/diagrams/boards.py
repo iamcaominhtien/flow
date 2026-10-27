@@ -9,8 +9,9 @@ The JSON formats::
     {"type": "wireframe", "screens": [{"label", "elements": [
         {"kind": "header|text|input|button|image|list", "label", "items": ["..."]}]}]}
 
-All three have ``title`` and ``desc``. A Kanban board also serves as a side-by-side comparison:
-make each option a column and each point a card.
+All three have ``title`` and ``desc``. A Kanban board with kinds, owners or limits is drawn by
+``kanban``; this module draws the side-by-side comparison (each option a column, each point a
+card, ``"use": "compare"``) and the layers and the wireframe.
 """
 
 from dataclasses import dataclass, field
@@ -21,6 +22,7 @@ from ..model import DEFAULT_FONT_SIZE_PX, Edge, Frame, Head, Node, Role, Scene, 
 from ..reader import Reader, SpecError
 from ..sizing import FittedNode, NodeContent, fit_card, fit_node
 from ..theme import LayoutRules, icon_names, load_theme
+from . import kanban, kanban_spec
 
 KANBAN = "kanban"
 LAYERS = "layers"
@@ -354,7 +356,7 @@ def layout_board(kind: str, raw: object) -> Scene:
 
 
 def layout_kanban(raw: object) -> Scene:
-    """Lay out a Kanban board.
+    """Lay out a Kanban board, or a comparison of options when the spec asks for one.
 
     Args:
         raw: The result of ``json.loads`` on a Kanban spec.
@@ -362,6 +364,10 @@ def layout_kanban(raw: object) -> Scene:
     Returns:
         The scene.
     """
+    if kanban_spec.is_board(raw):
+        return kanban.layout_raw(raw)
+    if isinstance(raw, dict):
+        raw = {key: value for key, value in raw.items() if key != "use"}
     return layout_board(KANBAN, raw)
 
 

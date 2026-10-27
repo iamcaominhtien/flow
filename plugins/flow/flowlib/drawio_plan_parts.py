@@ -55,7 +55,7 @@ def _child(root: ET.Element, node: Node, name: str, style: dict[str, object]) ->
     return cell
 
 
-def _image_style(svg: str) -> dict[str, object]:
+def image_style(svg: str) -> dict[str, object]:
     """Return the style of a cell that shows an SVG image."""
     return {
         "shape": "image",
@@ -63,7 +63,7 @@ def _image_style(svg: str) -> dict[str, object]:
     }
 
 
-def _icon_svg(name: str, size: float, stroke: str) -> str:
+def detailed_icon_markup(name: str, size: float, stroke: str) -> str:
     """Return an icon as standalone SVG, detailed when there is a detailed form."""
     attrs = f'xmlns="{SVG_NAMESPACE}"'
     if has_detailed_icon(name):
@@ -100,7 +100,7 @@ def _bar_children(root: ET.Element, node: Node, view: PlanView, theme: Theme) ->
             root,
             node,
             "check",
-            _image_style(check_svg(rules.check_size, colors.mark, f'xmlns="{SVG_NAMESPACE}"')),
+            image_style(check_svg(rules.check_size, colors.mark, f'xmlns="{SVG_NAMESPACE}"')),
         )
         add_geometry(
             image,
@@ -211,7 +211,7 @@ def _illustrated_card(root: ET.Element, node: Node, view: PlanView, theme: Theme
         node,
         "mk-icon",
         {
-            **_image_style(_icon_svg(node.icon or "user", rules.icon_size, tone.stroke)),
+            **image_style(detailed_icon_markup(node.icon or "user", rules.icon_size, tone.stroke)),
             **_faded(view),
         },
     )
@@ -239,7 +239,7 @@ def _small_icon(root: ET.Element, node: Node, theme: Theme) -> None:
     name_width = estimate_text_width(" ".join(node.text), theme.layout, node.font_size)
     left = node.width / 2 - size - 2 * LEAF_ICON_GAP_PX - name_width / 2
     icon = _child(
-        root, node, "mk-icon", _image_style(_flat_icon_svg(node.icon or "", size, theme.ink))
+        root, node, "mk-icon", image_style(_flat_icon_svg(node.icon or "", size, theme.ink))
     )
     add_geometry(icon, (left, (node.height - size) / 2, size, size))
 
@@ -252,7 +252,7 @@ def _round_icon(root: ET.Element, node: Node, theme: Theme) -> None:
     disc = _child(root, node, "disc", look)
     add_geometry(disc, (DISC_PAD_PX, (node.height - size) / 2, size, size))
     inner = size - 2 * BORDER_PX
-    image = _image_style(_icon_svg(node.icon or "", inner, accent_of(node, theme)))
+    image = image_style(detailed_icon_markup(node.icon or "", inner, accent_of(node, theme)))
     icon = _child(root, node, "mk-icon", image)
     add_geometry(icon, (DISC_PAD_PX + BORDER_PX, (node.height - inner) / 2, inner, inner))
 
@@ -264,7 +264,10 @@ def _centre_children(root: ET.Element, node: Node, theme: Theme) -> None:
     tone = theme.tones[node.tone or UNKNOWN_TONE]
     size = node.height * CENTRE_ICON_FRACTION
     icon = _child(
-        root, node, "mk-icon", _image_style(_icon_svg(node.icon or "idea", size, tone.stroke))
+        root,
+        node,
+        "mk-icon",
+        image_style(detailed_icon_markup(node.icon or "idea", size, tone.stroke)),
     )
     add_geometry(icon, ((node.width - size) / 2, CENTRE_PAD_PX, size, size))
     name = " ".join(node.text)
@@ -328,7 +331,7 @@ def _bar_and_icon(root: ET.Element, node: Node, theme: Theme) -> None:
         root,
         node,
         "mk-icon",
-        _image_style(_flat_icon_svg(node.icon, size, accent_of(node, theme))),
+        image_style(_flat_icon_svg(node.icon, size, accent_of(node, theme))),
     )
     add_geometry(icon, (rules.bar_width + LEAF_PAD_PX, (node.height - size) / 2, size, size))
 

@@ -14,6 +14,7 @@ from xml.etree import ElementTree as ET
 from .drawio_common import FLOW_SHAPE_KEY
 from .drawio_plan import PLAN_STYLE_KEY
 from .drawio_screen import TONE_STYLE_KEY
+from .html_board import BOARD_SHAPES
 from .model import MindLevel, Node, PlanView, Shape, Tone
 from .plan_scene import decode_plan
 
@@ -61,6 +62,8 @@ def plan_node(
         name: cells.get(f"{name}-{stem}")
         for name in ("pill", "detail", "mk-text", "disc", "bar", "line")
     }
+    if shape in BOARD_SHAPES:
+        return _board_words(node, shape, (style, cell), parts)
     if shape is Shape.PERSON_CARD:
         return _card_words(node, parts)
     if shape is Shape.BRANCH and view.level is MindLevel.CENTRE:
@@ -70,6 +73,27 @@ def plan_node(
     if shape is Shape.LEAF:
         return replace(node, card=parts["line"] is None and view.level is not MindLevel.KEY)
     return node
+
+
+def _board_words(
+    node: Node,
+    shape: Shape,
+    cells: tuple[dict[str, str], ET.Element],
+    parts: dict[str, ET.Element | None],
+) -> Node:
+    """Read the words of a card, a pill, a column header or a row head of a board or roadmap."""
+    style, cell = cells
+    if shape in (Shape.KANBAN_CARD, Shape.ROADMAP_CARD):
+        return replace(
+            node,
+            text=_words(parts["mk-text"]),
+            detail=_words(parts["detail"]),
+            dashed=style.get("dashed") == "1",
+        )
+    if shape is Shape.LANE_HEAD:
+        return replace(node, text=_words(parts["pill"]))
+    lines = _words(cell)
+    return replace(node, text=lines[:1], detail=lines[1:] if shape is Shape.PERIOD_HEAD else ())
 
 
 def _is_solid(style: dict[str, str]) -> bool:

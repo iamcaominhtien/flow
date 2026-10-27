@@ -9,6 +9,7 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from itertools import combinations, pairwise
 
+from .html_board import board_text_room, is_board_node
 from .html_nodes import CAPTION_FONT_SIZE_PX, CAPTION_GAP_PX, CAPTION_WIDTH_PX
 from .html_plan import is_plan_node, plan_text_room
 from .model import Edge, EdgeLabel, Frame, LabelKind, Node, Point, Role, Scene, Shape
@@ -74,6 +75,10 @@ class Code(StrEnum):
     ORG_ROLE_SENTENCE = "org-role-sentence"
     MIND_PHRASE_LONG = "mindmap-phrase-long"
     MIND_TOO_MANY_LINKS = "mindmap-too-many-links"
+    KANBAN_OVER_LIMIT = "kanban-over-limit"
+    KANBAN_CARD_FULL = "kanban-card-full"
+    ROADMAP_EXACT_DATE = "roadmap-exact-date"
+    ROADMAP_DEPENDENCIES = "roadmap-dependencies"
 
 
 @dataclass(frozen=True)
@@ -361,6 +366,8 @@ def _text_room(node: Node, rules: LayoutRules, theme: Theme) -> float | None:
     """Return how wide the text of a node may be, or None for a node whose text is not checked."""
     if is_plan_node(node):
         return plan_text_room(node, theme)
+    if is_board_node(node):
+        return board_text_room(node, theme)
     if node.card:
         return node.width - 2 * (rules.card_padding + rules.card_pill_padding)
     return text_area_width(node.shape, node.width, node.icon is not None)
