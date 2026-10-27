@@ -1,0 +1,65 @@
+{
+  "type": "wireframe",
+  "title": "Annotated wireframe: checkout on a phone",
+  "desc": "Three screens of one task, in grey with blue for the primary action. Numbers point at details, the red dot is the tap target, and the notes below say what each detail does.",
+  "screens": [
+    {
+      "id": "1",
+      "label": "Cart",
+      "blocks": [
+        {"kind": "navbar", "text": "Your order", "back": true},
+        {"kind": "card", "id": "line1", "image": "left", "text": "Pad thai", "detail": "No peanuts", "price": "$9.50", "stepper": "1"},
+        {"kind": "card", "image": "left", "text": "Spring rolls", "detail": "x2", "price": "$6.00", "stepper": "1"},
+        {"kind": "card", "image": "left", "text": "Iced tea", "detail": "Large", "price": "$3.50", "stepper": "1"},
+        {"kind": "form_field", "id": "promo", "text": "Promo code", "action": "Apply"},
+        {"kind": "rows", "items": ["Subtotal|$19.00", "Delivery|$2.50", "Total|$21.50"], "bold": true},
+        {"kind": "button", "id": "checkout", "text": "Checkout · $21.50", "anchor": "bottom", "tap": true}
+      ],
+      "annotations": [
+        {"target": "line1", "part": "stepper", "corner": "l", "title": "Quantity stepper", "text": "Changes the line and the total at once. Down to 0 removes the item."},
+        {"target": "line1", "part": "price", "corner": "tl", "title": "Price per line", "text": "Shows the price for the quantity chosen, not per unit."},
+        {"target": "promo", "part": "input", "corner": "tr", "title": "Promo code", "text": "Field and button on one row. Wrong code shows a rose message below."},
+        {"target": "checkout", "corner": "tr", "title": "Primary action", "text": "One per screen, at the bottom, with the total in the label."}
+      ]
+    },
+    {
+      "id": "2",
+      "label": "Address and payment",
+      "blocks": [
+        {"kind": "navbar", "text": "Checkout", "back": true},
+        {"kind": "text", "text": "Deliver to", "label": true},
+        {"kind": "list_item", "id": "address", "lead": "pin", "text": "Home", "detail": "12 Garden Street, flat 4", "trail": "Change"},
+        {"kind": "text", "text": "When", "label": true},
+        {"kind": "chip", "id": "when", "items": ["ASAP", "In 30 min", "Schedule"], "selected": 0},
+        {"kind": "text", "text": "Pay with", "label": true},
+        {"kind": "list_item", "id": "card", "lead": "radio", "text": "Card", "detail": "•••• 4242", "selected": 0},
+        {"kind": "list_item", "lead": "radio", "text": "Wallet", "detail": "Balance $12.00"},
+        {"kind": "list_item", "lead": "radio", "text": "Cash", "detail": "Pay the courier"},
+        {"kind": "button", "id": "place", "text": "Place order · $21.50", "anchor": "bottom", "tap": true}
+      ],
+      "annotations": [
+        {"target": "address", "corner": "tr", "title": "Address", "text": "Saved address first; Change opens a list in a bottom sheet."},
+        {"target": "when", "part": "item-0", "corner": "bl", "title": "Delivery time", "text": "One choice at a time. Schedule opens a date picker."},
+        {"target": "card", "corner": "tr", "title": "Payment", "text": "Selected method has a blue border. Cash hides the card fields."},
+        {"target": "place", "corner": "tr", "title": "Place order", "text": "Disabled until address and payment are set."}
+      ]
+    },
+    {
+      "id": "3",
+      "label": "Confirmation",
+      "blocks": [
+        {"kind": "success", "id": "done", "text": "Order placed", "detail": "Pad Thai House is preparing it"},
+        {"kind": "card", "id": "eta", "image": "top", "text": "Arriving in 25 to 35 min"},
+        {"kind": "list_item", "id": "courier", "lead": "avatar", "text": "Mai will deliver it", "detail": "Bike · arrives 11:02"},
+        {"kind": "button", "id": "track", "text": "Track order", "anchor": "bottom"},
+        {"kind": "button", "text": "Done", "style": "secondary", "anchor": "bottom"}
+      ],
+      "annotations": [
+        {"target": "done", "part": "icon", "corner": "tl", "title": "Success mark", "text": "Green check; no auto-redirect, so the person can read it."},
+        {"target": "eta", "corner": "tr", "title": "Live ETA", "text": "Map and time range update as the courier moves."},
+        {"target": "courier", "corner": "tr", "title": "Courier", "text": "Name, vehicle and arrival time. Tap opens the courier screen."},
+        {"target": "track", "corner": "tr", "title": "Next step", "text": "Track order is the main action, Done the quiet exit."}
+      ]
+    }
+  ]
+}

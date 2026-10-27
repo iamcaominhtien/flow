@@ -1,4 +1,4 @@
-"""Tests for the boards: Kanban, layers and wireframe."""
+"""Tests for the boards: Kanban and layers, and the older wireframe elements."""
 
 import copy
 import json
@@ -64,12 +64,13 @@ def test_layers_are_stacked_and_joined_only_when_asked() -> None:
     assert diagrams.layout(raw).edges == ()
 
 
-def test_wireframe_elements_follow_their_kind() -> None:
-    """A list becomes one row per item and a button is a pill."""
+def test_wireframe_elements_become_blocks() -> None:
+    """The older elements are stacked as blocks: a list is one item per entry."""
     scene = diagrams.layout(raw_of(WIREFRAME))
-    texts = [node.text for node in scene.nodes]
-    assert ("Orders",) in texts
-    assert ("[Email]",) in texts
+    screens = [node.screen for node in scene.nodes if node.screen and node.screen.blocks]
+    texts = [block.text for view in screens for block in view.blocks]
+    assert "Orders" in texts
+    assert any(block.detail == "Email" for view in screens for block in view.blocks)
 
 
 def test_wireframe_unknown_element_kind_is_refused() -> None:

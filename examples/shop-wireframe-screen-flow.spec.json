@@ -1,0 +1,32 @@
+{
+  "type": "screen",
+  "title": "Screen flow · Screens at L3 are wireframes",
+  "desc": "A screen at fidelity L3 is drawn with the wireframe blocks of the wireframe type, shrunk to fit the flow, with the same id and name. The same blocks can be copied to a wireframe spec.",
+  "screens": [
+    {
+      "id": "s01", "code": "S01", "label": "Cart", "at": [0, 0], "device": "phone", "fidelity": "L3",
+      "blocks": [
+        {"kind": "navbar", "text": "Your order", "back": true},
+        {"kind": "card", "image": "left", "text": "Pad thai", "detail": "No peanuts", "price": "$9.50", "stepper": "1"},
+        {"kind": "card", "image": "left", "text": "Iced tea", "detail": "Large", "price": "$3.50", "stepper": "1"},
+        {"kind": "rows", "items": ["Subtotal|$13.00", "Delivery|$2.50", "Total|$15.50"], "bold": true},
+        {"kind": "button", "text": "Checkout · $15.50", "anchor": "bottom", "tap": true}
+      ]
+    },
+    {
+      "id": "s02", "code": "S02", "label": "Payment", "at": [0, 1], "device": "phone", "fidelity": "L3",
+      "blocks": [
+        {"kind": "navbar", "text": "Checkout", "back": true},
+        {"kind": "text", "text": "Pay with", "label": true},
+        {"kind": "list_item", "lead": "radio", "text": "Card", "detail": "•••• 4242", "selected": 0},
+        {"kind": "list_item", "lead": "radio", "text": "Cash", "detail": "Pay the courier"},
+        {"kind": "button", "text": "Place order", "anchor": "bottom"}
+      ]
+    },
+    {"id": "s03", "code": "S03", "label": "Confirmation", "at": [0, 2], "device": "phone", "fidelity": "L2", "content": "success"}
+  ],
+  "taps": [
+    {"from": "s01", "to": "s02", "trigger": "tap Checkout"},
+    {"from": "s02", "to": "s03", "trigger": "tap Place order"}
+  ]
+}

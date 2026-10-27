@@ -28,6 +28,7 @@ from . import (
     sequence,
     state,
     usecase,
+    wireframe,
 )
 
 THEME_KEY = "theme"
@@ -52,7 +53,7 @@ LAYOUTS: dict[str, Layout] = {
     "explainer": explainer.layout_raw,
     "kanban": boards.layout_kanban,
     "layers": boards.layout_layers,
-    "wireframe": boards.layout_wireframe,
+    "wireframe": wireframe.layout_raw,
     "gantt": gantt.layout_raw,
     "roadmap": roadmap.layout_raw,
     "mindmap": mindmap.layout_raw,

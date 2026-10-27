@@ -1,0 +1,59 @@
+{
+  "type": "wireframe",
+  "title": "Responsive wireframe: one page, three widths",
+  "desc": "The same menu page at desktop, tablet and phone width. Columns drop from three to two to one, the filters move out of the way, and the links fold into a menu.",
+  "set": "responsive",
+  "screens": [
+    {
+      "device": "desktop",
+      "label": "Desktop",
+      "blocks": [
+        {"kind": "navbar", "id": "bar", "text": "Pad Thai House", "logo": true, "items": ["Menu", "Reviews", "Contact"], "selected": 0, "action": "Order"},
+        {"kind": "image", "text": "Fresh Thai, 25 minutes", "height": 108},
+        {"kind": "checklist", "id": "filters", "text": "Filters", "items": ["Vegan", "Spicy", "Under $10", "Gluten free"], "row": 2, "rows": 2, "span": 3},
+        {"kind": "card", "image": "top", "chip": "$9.50", "action": "+", "row": 2, "col": 4, "span": 3},
+        {"kind": "card", "image": "top", "chip": "$9.50", "action": "+", "row": 2, "col": 7, "span": 3},
+        {"kind": "card", "image": "top", "chip": "$9.50", "action": "+", "row": 2, "col": 10, "span": 3},
+        {"kind": "card", "image": "top", "chip": "$9.50", "action": "+", "row": 3, "col": 4, "span": 3},
+        {"kind": "card", "image": "top", "chip": "$9.50", "action": "+", "row": 3, "col": 7, "span": 3},
+        {"kind": "card", "image": "top", "chip": "$9.50", "action": "+", "row": 3, "col": 10, "span": 3}
+      ],
+      "annotations": [
+        {"target": "filters", "corner": "r", "number": 2, "title": "Filters", "text": "A side panel on desktop, a button that opens a sheet below that."},
+        {"target": "bar", "part": "item-0", "corner": "l", "number": 3, "title": "Navigation", "text": "Links on desktop, one menu button below 1024 px."}
+      ]
+    },
+    {
+      "device": "tablet",
+      "label": "Tablet",
+      "blocks": [
+        {"kind": "navbar", "id": "bar", "text": "Pad Thai House", "logo": true, "menu": true},
+        {"kind": "image", "text": "Fresh Thai, 25 minutes", "height": 108},
+        {"kind": "button", "text": "Filters", "style": "secondary", "icon": "pin", "span": 4},
+        {"kind": "card", "id": "first", "image": "top", "chip": "$9.50", "action": "+", "row": 3, "span": 6},
+        {"kind": "card", "image": "top", "chip": "$9.50", "action": "+", "row": 3, "col": 7, "span": 6},
+        {"kind": "card", "image": "top", "chip": "$9.50", "action": "+", "row": 4, "span": 6},
+        {"kind": "card", "image": "top", "chip": "$9.50", "action": "+", "row": 4, "col": 7, "span": 6}
+      ],
+      "annotations": [
+        {"target": "first", "corner": "tl", "number": 1, "title": "Columns", "text": "Three, two, one. The card shape changes from tall to wide at one column."}
+      ]
+    },
+    {
+      "device": "phone",
+      "label": "Phone",
+      "blocks": [
+        {"kind": "navbar", "id": "bar", "text": "Pad Thai House", "logo": true, "menu": true},
+        {"kind": "image", "text": "Fresh Thai, 25 minutes", "height": 90},
+        {"kind": "button", "text": "Filters", "style": "secondary", "icon": "pin", "span": 6},
+        {"kind": "card", "id": "first", "image": "left", "chip": "$9.50", "action": "+", "height": 130},
+        {"kind": "card", "image": "left", "chip": "$9.50", "action": "+", "height": 130},
+        {"kind": "card", "image": "left", "chip": "$9.50", "action": "+", "height": 130}
+      ],
+      "annotations": [
+        {"target": "first", "corner": "tl", "title": "Columns", "text": "Three, two, one. The card shape changes from tall to wide at one column."},
+        {"target": "bar", "part": "menu", "corner": "br", "title": "Navigation", "text": "Links on desktop, one menu button below 1024 px."}
+      ]
+    }
+  ]
+}

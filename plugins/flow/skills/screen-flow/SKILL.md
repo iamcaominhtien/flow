@@ -55,7 +55,7 @@ Top level: `type` (`screen`), `title`, `desc`, `theme` (see the flowchart skill)
   - `L0`: a rounded card with the id and the name.
   - `L1`: a frame with the same generic skeleton and "content TBD".
   - `L2`: only the elements that cause a transition are drawn and named, the rest is hatched. `elements` is a list; each is a string (a primary button with a red dot where it was tapped) or an object `{"text", "style": "primary|secondary|outline|danger|field", "at": "top|bottom", "on": "overlay", "hotspot": false}`. `hatch` is the text of the hatched block (default "other content"). `content` replaces it with `splash`, `success`, `error`, `loading` or `empty`. `tab: 1` draws a tab bar with the second tab active.
-  - `L3`: a full wireframe. It is drawn as L2 for now; the wireframe blocks are not placed inside a screen yet. Say so to the user.
+  - `L3`: a full wireframe. Give the screen `blocks` (the same blocks as the wireframe skill: navbar, card, list item, form field, button, table and so on, placed by row, column and span; a block with `"tap": true` gets the red dot). They are drawn at 0.6 of a phone (0.5 tablet, 0.35 desktop), so small text is a structure, not a reading size. Blocks are read only at L3. An L3 screen with `elements` and no `blocks` is drawn as L2.
   - `"undecided": true`: a dashed card with a TBD tag; the arrows into it are dashed.
 - **Overlays**: `overlay`, `overlay_title` (the title of a modal or the text of a toast); elements with `"on": "overlay"` belong to the overlay (the buttons of a modal, the rows of a sheet).
 
@@ -77,12 +77,12 @@ An arrow is written `trigger [guard] / effect`.
 - `zones`: `id`, `label`, `tone` (`blue`, `violet`, `amber`, `green`, `teal`, `gray`, `red`). Each is a dashed tinted frame with a pill; the id chip takes the zone colour. A zone is the box around its screens, so keep a zone's screens next to each other.
 - Rows of desktop screens are laid out in their own columns: the web flow goes in its own zone below the app flow.
 - **Tab bar**: one `tab` item per tab on one row, and `"buses": [{"trigger": "tap any tab", "to": ["tab1", "tab2"]}]`. The bar is drawn once as a bus. Then an arrow from each tab to the first screen of its stack. Screens that hide the bar go in their own zone.
-- Examples: `examples/shop-screen-flow.spec.json` (the complete shop app at mixed fidelity), `shop-highlight-screen-flow`, `shop-fidelity-screen-flow`, `shop-entry-screen-flow`, `shop-tabs-screen-flow`, `shop-overlays-screen-flow`, `shop-states-screen-flow`, `shop-coded-screen-flow`.
+- Examples: `examples/shop-screen-flow.spec.json` (the complete shop app at mixed fidelity), `shop-highlight-screen-flow`, `shop-fidelity-screen-flow`, `shop-entry-screen-flow`, `shop-tabs-screen-flow`, `shop-overlays-screen-flow`, `shop-states-screen-flow`, `shop-coded-screen-flow`, `shop-wireframe-screen-flow` (two screens at L3 with blocks).
 - Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart` and the others of the icon library. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
 
 ## Limits to tell the user
 
-- L3 is drawn as L2. The wireframe blocks are not placed inside a screen.
+- L3 blocks are shrunk to fit the flow: a screen at L3 is taller than one at L2 only by the device, but its text is small. Open the wireframe skill for a screen you want to read.
 - Elements are named, not laid out: the frame shows them in a fixed order (top ones, the hatched block, bottom ones, tab bar).
 - Routing follows the grid. If two arrows still share a corridor, the check says so; move a screen to another row or column.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor; the dark and slate chips are text with a background there, not pills.

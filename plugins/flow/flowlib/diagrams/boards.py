@@ -1,4 +1,4 @@
-"""Boards of cards: a Kanban board (columns), layers (bands) and a wireframe (screens).
+"""Boards of cards: a Kanban comparison (columns) and layers (bands).
 
 The JSON formats::
 
@@ -6,12 +6,10 @@ The JSON formats::
      "columns": [{"label", "tone", "cards": [{"label", "detail", "icon", "tone"}]}]}
     {"type": "layers", "flow": true,
      "layers": [{"label", "tone", "items": [{"label", "detail", "icon"}]}]}
-    {"type": "wireframe", "screens": [{"label", "elements": [
-        {"kind": "header|text|input|button|image|list", "label", "items": ["..."]}]}]}
 
-All three have ``title`` and ``desc``. A Kanban board with kinds, owners or limits is drawn by
+Both have ``title`` and ``desc``. A Kanban board with kinds, owners or limits is drawn by
 ``kanban``; this module draws the side-by-side comparison (each option a column, each point a
-card, ``"use": "compare"``) and the layers and the wireframe.
+card, ``"use": "compare"``) and the layers. The wireframe has its own module, ``wireframe``.
 """
 
 from dataclasses import dataclass, field
@@ -26,20 +24,15 @@ from . import kanban, kanban_spec
 
 KANBAN = "kanban"
 LAYERS = "layers"
-WIREFRAME = "wireframe"
 CARD_GAP_PX = 12.0
 FRAME_TOP_PX = 36.0
 FRAME_PAD_PX = 16.0
 FRAME_GAP_PX = 24.0
 LAYER_GAP_PX = 40.0
-SCREEN_WIDTH_PX = 260.0
-ELEMENT_GAP_PX = 10.0
 CARD_KEYS = {"label", "detail", "icon", "tone"}
 COLUMN_KEYS = {"label", "tone", "cards"}
 LAYER_KEYS = {"label", "tone", "items"}
-SCREEN_KEYS = {"label", "elements"}
-ELEMENT_KEYS = {"kind", "label", "items"}
-SPEC_KEYS = {"type", "title", "desc", "columns", "layers", "screens", "flow", "style"}
+SPEC_KEYS = {"type", "title", "desc", "columns", "layers", "flow", "style"}
 
 
 @dataclass
@@ -60,26 +53,6 @@ class _Group:
     label: str | None
     tone: Tone
     cards: list[_Card] = field(default_factory=list)
-
-
-@dataclass(frozen=True)
-class _ElementLook:
-    """How a wireframe element is drawn."""
-
-    shape: Shape
-    height: float
-    tone: Tone | None
-    prefix: str = ""
-
-
-ELEMENT_LOOKS = {
-    "header": _ElementLook(Shape.PROCESS, 48, Tone.GRAY),
-    "text": _ElementLook(Shape.NOTE, 40, None),
-    "input": _ElementLook(Shape.PROCESS, 40, None, "["),
-    "button": _ElementLook(Shape.TERMINATOR, 44, Tone.BLUE),
-    "image": _ElementLook(Shape.PROCESS, 110, Tone.GRAY, "image: "),
-    "list": _ElementLook(Shape.PROCESS, 36, None),
-}
 
 
 def _card(raw: object, where: str, read: Reader) -> _Card | None:
@@ -130,25 +103,6 @@ def _fit(card: _Card, rules: LayoutRules) -> FittedNode:
     if card.is_card:
         return fit_card(content, rules)
     return fit_node(Shape.PROCESS, content, rules)
-
-
-def _node(name: str, shape: Shape, box: tuple[float, float, float, float], card: _Card) -> Node:
-    """Build the scene node of a card placed at ``box`` (x, y, width, height)."""
-    x, y, width, height = box
-    return Node(
-        name,
-        shape,
-        x,
-        y,
-        width,
-        height,
-        (card.label,),
-        card.icon,
-        card.tone,
-        None,
-        DEFAULT_FONT_SIZE_PX,
-        detail=(card.detail,) if card.detail else (),
-    )
 
 
 def _wrapped(card: _Card, size: FittedNode, name: str, box: tuple[float, float, float]) -> Node:
@@ -250,76 +204,11 @@ def _illustrate(groups: list[_Group], illustrated: bool) -> list[_Group]:
     return groups
 
 
-def _element_nodes(raw: object, where: str, read: Reader) -> list[tuple[str, str, list[str]]]:
-    """Read the elements of a screen as (kind, label, items) triples."""
-    elements = []
-    for index, item in enumerate(raw if isinstance(raw, list) else []):
-        here = f"{where}.elements[{index}]"
-        if not isinstance(item, dict):
-            read.report(here, "must be an object")
-            continue
-        read.check_keys(item, ELEMENT_KEYS, here)
-        kind = item.get("kind")
-        if kind not in ELEMENT_LOOKS:
-            read.report(here, f"unknown kind '{kind}'; use one of: {', '.join(ELEMENT_LOOKS)}")
-            continue
-        items = item.get("items", [])
-        elements.append(
-            (
-                kind,
-                read.text(item, "label", here) or "",
-                [str(each) for each in items] if isinstance(items, list) else [],
-            )
-        )
-    return elements
-
-
-def _wireframe(
-    raw: dict[str, Any], rules: LayoutRules, top: float, read: Reader
-) -> tuple[list[Frame], list[Node]]:
-    """Lay the screens side by side; each is a frame with its elements stacked inside."""
-    frames, nodes = [], []
-    left = rules.margin
-    screens = raw.get("screens", [])
-    for index, screen in enumerate(screens if isinstance(screens, list) else []):
-        where = f"screens[{index}]"
-        if not isinstance(screen, dict):
-            read.report(where, "must be an object")
-            continue
-        read.check_keys(screen, SCREEN_KEYS, where)
-        y = top + FRAME_TOP_PX
-        for number, (kind, label, items) in enumerate(
-            _element_nodes(screen.get("elements"), where, read)
-        ):
-            look = ELEMENT_LOOKS[kind]
-            for part, text in enumerate(items or [label]):
-                shown = look.prefix + text + ("]" if look.prefix == "[" else "")
-                card = _Card(shown, "", None, look.tone)
-                box = (left + FRAME_PAD_PX, y, SCREEN_WIDTH_PX - 2 * FRAME_PAD_PX, look.height)
-                nodes.append(_node(f"s{index}-e{number}-{part}", look.shape, box, card))
-                y += look.height + ELEMENT_GAP_PX
-        frames.append(
-            Frame(
-                f"screen-{index}",
-                left,
-                top,
-                SCREEN_WIDTH_PX,
-                y - ELEMENT_GAP_PX + FRAME_PAD_PX - top,
-                read.text(screen, "label", where),
-                Tone.GRAY,
-            )
-        )
-        left += SCREEN_WIDTH_PX + FRAME_GAP_PX
-    if not frames:
-        read.report("spec", "'screens' must list at least one screen")
-    return frames, nodes
-
-
 def layout_board(kind: str, raw: object) -> Scene:
     """Check a board spec and lay it out.
 
     Args:
-        kind: ``kanban``, ``layers`` or ``wireframe``.
+        kind: ``kanban`` or ``layers``.
         raw: The result of ``json.loads`` on the spec.
 
     Returns:
@@ -337,9 +226,7 @@ def layout_board(kind: str, raw: object) -> Scene:
     illustrated = read.illustrated(raw, "spec")
     top = rules.margin + (rules.title_block_height if title else 0)
     edges: list[Edge] = []
-    if kind == WIREFRAME:
-        frames, nodes = _wireframe(raw, rules, top, read)
-    elif kind == KANBAN:
+    if kind == KANBAN:
         groups = _illustrate(_groups(raw, "columns", "cards", read), illustrated)
         frames, nodes = _kanban(groups, rules, top) if not read.problems else ([], [])
     else:
@@ -381,15 +268,3 @@ def layout_layers(raw: object) -> Scene:
         The scene.
     """
     return layout_board(LAYERS, raw)
-
-
-def layout_wireframe(raw: object) -> Scene:
-    """Lay out a wireframe.
-
-    Args:
-        raw: The result of ``json.loads`` on a wireframe spec.
-
-    Returns:
-        The scene.
-    """
-    return layout_board(WIREFRAME, raw)

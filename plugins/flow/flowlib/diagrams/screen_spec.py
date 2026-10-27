@@ -6,7 +6,8 @@ The JSON format (design 02)::
      "zones": [{"id", "label", "tone"}],
      "screens": [{"id", "label", "kind": "screen|decision|start|end|entry|flag|tab",
                   "code", "state", "overlay", "overlay_title", "device", "orientation", "size",
-                  "fidelity": "L0|L1|L2|L3", "content", "hatch", "elements", "tab", "undecided",
+                  "fidelity": "L0|L1|L2|L3", "content", "hatch", "elements", "blocks", "tab",
+                  "undecided",
                   "trigger", "system", "detail", "icon", "zone", "at": [row, column]}],
      "taps": [{"from", "to", "trigger", "system", "guard", "effect", "kind", "code", "route",
                "main": true}],
@@ -31,10 +32,12 @@ from ..model import (
     ScreenElement,
     ScreenView,
     Tone,
+    WireBlock,
 )
 from ..reader import Reader, SpecError, suggestion
 from ..spec import SpecZone
-from ..theme import icon_names
+from ..theme import icon_names, load_theme
+from ..wire_scene import parse_blocks
 
 SCREEN_FLOW = "screen"
 AT_LENGTH = 2
@@ -51,7 +54,7 @@ NEW_TOP_KEYS = {"zones", "buses", "conditions", "tab_count"}
 ITEM_KEYS = {"id", "label", "kind", "detail", "icon", "tone", "zone", "at"}
 NEW_ITEM_KEYS = {"code", "state", "overlay", "overlay_title", "device", "orientation", "size"}
 NEW_ITEM_KEYS |= {"fidelity", "content", "hatch", "elements", "tab", "undecided", "trigger"}
-NEW_ITEM_KEYS |= {"system"}
+NEW_ITEM_KEYS |= {"system", "blocks"}
 LINK_KEYS = {"from", "to", "label", "style", "main", "from_label", "to_label"}
 NEW_LINK_KEYS = {"trigger", "system", "guard", "effect", "kind", "code", "route"}
 ELEMENT_KEYS = {"text", "style", "at", "on", "hotspot"}
@@ -394,13 +397,16 @@ def _view(
     size = raw.get("size")
     if size is not None and size != MINI_SIZE:
         read.report(where, f"unknown size '{size}'; use '{MINI_SIZE}' or leave it out")
+    device = read.enum(Device, raw, "device", where) or Device.PHONE
+    fidelity = _fidelity(raw, where, read)
+    blocks = _blocks(raw, fidelity, where, read)
     return ScreenView(
         code=_chip_text(raw, identifier, where, read),
         title=name,
-        device=read.enum(Device, raw, "device", where) or Device.PHONE,
+        device=device,
         orientation=read.enum(Orientation, raw, "orientation", where) or Orientation.PORTRAIT,
         is_mini=size == MINI_SIZE,
-        fidelity=_fidelity(raw, where, read),
+        fidelity=fidelity,
         content=read.enum(Content, raw, "content", where) or Content.HATCH,
         hatch_label=read.text(raw, "hatch", where) or DEFAULT_HATCH_LABEL,
         elements=_elements(raw, where, read),
@@ -409,7 +415,26 @@ def _view(
         tab_active=tab if isinstance(tab, int) else None,
         tab_count=tab_count if isinstance(tab, int) else 0,
         is_undecided=raw.get("undecided") is True,
+        blocks=blocks,
+        scale=_block_scale(blocks, device),
     )
+
+
+def _blocks(
+    raw: dict[str, Any], fidelity: Fidelity, where: str, read: Reader
+) -> tuple[WireBlock, ...]:
+    """Read the wireframe blocks of an L3 screen: the same blocks as a wireframe (design 10)."""
+    if "blocks" not in raw:
+        return ()
+    if fidelity is not Fidelity.L3:
+        read.report(where, '\'blocks\' are drawn at fidelity L3; set "fidelity": "L3"')
+        return ()
+    return parse_blocks(raw["blocks"], f"{where}.blocks", read)
+
+
+def _block_scale(blocks: tuple[WireBlock, ...], device: Device) -> float:
+    """Return how much a wireframe is shrunk to stand in a flow: 1 when it has no blocks."""
+    return load_theme().wire.flow_scale[device.value] if blocks else 1.0
 
 
 def _kind_of(raw: dict[str, Any], where: str, read: Reader) -> TransitionKind:
