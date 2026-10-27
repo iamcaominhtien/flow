@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.0 (2026-10-27)
+
+Planning part 2: Kanban and roadmap brought up to `docs/design/08-planning.md`.
+
+- **Kanban:** work board with 360 px columns, 100 px cards, kind tags (Feature, Bug, Chore), owner circles, count and limit pills (`3 / 3`, red when full), done cards struck through. New keys: column `limit` and `done`, card `kind`, `owner` and `done`, top-level `people` and `use`. Plain only; the comparison use stays as `"use": "compare"`.
+- **Roadmap:** rows with detailed lane icons, Now/Next/Later or quarter headers with dates in words, committed (solid) and idea (dashed, "Exploring") cards, owner circles, one blue animated dependency arrow (`depends_on` or `blocks`; a second is an error) and a note below the chart. Exact dates give a warning. Items use `period`; `start` still works; a `tone` on an item is now an error.
+- New warnings: Kanban column over its limit, Kanban card text that does not fit, roadmap exact date.
+- Owner initials come from the shared people helper (Gantt, org chart, mind map, kanban, roadmap); tint matches across diagrams when each spec pins it with `people`.
+- Both types round-trip through scene.json and are read back from draw.io. Examples `delivery-kanban`, `delivery-roadmap`.
+- Not done: columns end after the last card (the design leaves spare room); initials are two letters; lane icons are not read back on import; real draw.io editor not used.
+
 ## 0.8.0 (2026-10-27)
 
 Planning part 1: Gantt, org chart and mind map brought up to `docs/design/08-planning.md`.

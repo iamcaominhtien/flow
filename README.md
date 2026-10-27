@@ -8,7 +8,7 @@
 Describe a diagram in plain language. Get a web page you can view and share, and a <code>.drawio</code> file you can keep editing.</p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.8.0-1D4ED8?style=flat-square">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.9.0-1D4ED8?style=flat-square">
   <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude_Code-plugin-D97757?style=flat-square">
   <img alt="Python" src="https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white">
   <img alt="Standard library only" src="https://img.shields.io/badge/dependencies-none-15803D?style=flat-square">
