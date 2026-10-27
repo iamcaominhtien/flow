@@ -1,6 +1,6 @@
 {
   "name": "flow",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Draw diagrams as animated HTML/SVG or draw.io files from a short brief, following one design system across every diagram type.",
   "author": {
     "name": "iamcaominhtien"
