@@ -6,6 +6,7 @@ A set of 25 briefs for testing the Flow plugin on harder, realistic subjects tha
 - `briefs/index.md`: the list, with the element and connection counts (exact for level C, the research tool's claims for A and B).
 - `briefs/CHECKS.md`: what `check_briefs.py` measured, and what a person found when reading. **Read it before trusting the counts.**
 - `briefs/research-notes.md`: the research tool's own notes and its works-cited list. Not verified.
+- `briefs/screen.md`: one level C brief for the screen flow (52 items, 77 connections). Written here, not by the research tool, and **not read by `check_briefs.py`** (the checker expects levels A, B and C for every type). Result: `results/2026-10-27-screen-C-01.md`.
 - `check_briefs.py`: checks the format and compares the claims with the text. `python3 benchmarks/check_briefs.py`.
 
 ## Format of a brief
