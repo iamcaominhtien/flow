@@ -14,6 +14,7 @@ from itertools import pairwise
 from pathlib import Path
 
 from . import check, render_drawio, render_html, scene
+from .author_words import EdgeWords, build_words
 from .canvas import fit_canvas
 from .labels import place_labels
 from .model import (
@@ -30,9 +31,11 @@ from .model import (
     Role,
     Row,
     Scene,
+    ScreenView,
     Shape,
     Tone,
 )
+from .screen_parts import screen_size
 from .sizing import (
     FittedNode,
     NodeContent,
@@ -168,7 +171,8 @@ class Canvas:
             shape: The outline: a terminator, a process, a decision and so on.
             text: The words in the node. Write them in sentence case; a decision is a question.
             options: Where the middle of the node goes, and optionally an icon, a tone, a number
-                chip, a detail line, or a size to force.
+                chip, a detail line, a size to force, or ``screen`` for a screen of a screen
+                flow (use it with ``Shape.SCREEN``; it is sized by the device table).
 
         Returns:
             The placed box, for attaching lines to.
@@ -180,6 +184,10 @@ class Canvas:
             raise ValueError(f"the id '{name}' is used twice")
         if LINE_ID.fullmatch(name):
             raise ValueError(f"the id '{name}' is kept for lines (e1, e2, ...); name the node else")
+        if options.screen is not None and shape is not Shape.SCREEN:
+            raise ValueError(f"'{name}': NodeOptions(screen=...) goes with Shape.SCREEN")
+        if options.screen is not None:
+            return self._add(_screen_node(name, text, options))
         rules = load_theme().layout
         is_gateway = shape is Shape.DECISION and options.icon in GATEWAY_ICONS
         captioned = shape in CAPTIONED_SHAPES or is_gateway
@@ -213,8 +221,12 @@ class Canvas:
             card=options.card,
             sections=(options.rows,) if options.rows else (),
         )
+        return self._add(placed)
+
+    def _add(self, placed: Node) -> Box:
+        """Keep a placed node under its id and return its box."""
         box = Box(placed)
-        self.boxes[name] = box
+        self.boxes[placed.id] = box
         return box
 
     def text(self, name: str, words: str, anchor: Point) -> Box:
@@ -279,16 +291,16 @@ class Canvas:
             second.port(arrive, route.arrive_along),
         ]
         points = _right_angled(corners)
-        label = None
-        if route.label:
-            label = EdgeLabel(
-                route.label, _middle(points), LABEL_KIND_OF_ROLE.get(route.role) or LabelKind.PLAIN
-            )
+        label, extras = self._label_of(route, points)
+        role = route.role
+        if route.words and route.words.is_failure and role is Role.NEXT:
+            role = Role.NO
         line = Edge(
             id=f"e{len(self.edges) + 1}",
-            role=route.role,
+            role=role,
             points=tuple(points),
             label=label,
+            extras=extras,
             source=source,
             target=target,
             head=route.head,
@@ -297,6 +309,19 @@ class Canvas:
         )
         self.edges.append(line)
         return line
+
+    def _label_of(
+        self, route: "Route", points: list[Point]
+    ) -> tuple[EdgeLabel | None, tuple[EdgeLabel, ...]]:
+        """Build the chip of a line: its short label, or the words of a screen flow arrow."""
+        if route.words is not None:
+            if route.label:
+                raise ValueError("use 'label' or 'words' on a route, not both")
+            return build_words(route.words, points)
+        if not route.label:
+            return None, ()
+        kind = LABEL_KIND_OF_ROLE.get(route.role) or LabelKind.PLAIN
+        return EdgeLabel(route.label, _middle(points), kind), ()
 
     def scene(self) -> Scene:
         """Return the finished scene: labels moved off boxes, canvas sized to hold everything.
@@ -352,6 +377,7 @@ class NodeOptions:
     rows: tuple[Row, ...] = ()
     width: float | None = None
     height: float | None = None
+    screen: ScreenView | None = None  # with ``Shape.SCREEN``: a device frame with an id chip
 
 
 @dataclass(frozen=True)
@@ -365,9 +391,33 @@ class Route:
     via: tuple[Point, ...] = ()
     role: Role = Role.NEXT
     label: str | None = None
+    words: EdgeWords | None = None  # trigger, guard and effect chips of a screen flow arrow
     dashed: bool = False
     head: Head = Head.FILLED
     tail: Head = Head.NONE
+
+
+def _screen_node(name: str, text: str, options: "NodeOptions") -> Node:
+    """Build a screen: a device frame sized by the device table, tinted by its tone."""
+    view = options.screen
+    assert view is not None
+    view = replace(view, title=view.title or text)
+    width, height = screen_size(view, load_theme())
+    width, height = options.width or width, options.height or height
+    return Node(
+        id=name,
+        shape=Shape.SCREEN,
+        x=options.centre[0] - width / 2,
+        y=options.centre[1] - height / 2,
+        width=width,
+        height=height,
+        text=(text,),
+        icon=None,
+        tone=options.tone,
+        number=None,
+        font_size=DEFAULT_FONT_SIZE_PX,
+        screen=view,
+    )
 
 
 def _fit(
