@@ -1,0 +1,27 @@
+{
+  "type": "roadmap",
+  "title": "Roadmap: now, next, later",
+  "desc": "Themes in rows, time in columns. Solid cards are committed, dashed cards are ideas under study. The blue arrow marks a dependency that decides the order.",
+  "periods": [
+    {"label": "Now", "detail": "March to April", "tone": "green"},
+    {"label": "Next", "detail": "May to June", "tone": "amber"},
+    {"label": "Later", "detail": "Second half", "tone": "gray"}
+  ],
+  "lanes": [
+    {"label": "Ordering", "tone": "blue", "icon": "cart", "items": [
+      {"id": "tracking", "label": "Live order tracking", "period": "Now"},
+      {"label": "Scheduled orders", "period": "Next"},
+      {"label": "Group orders", "period": "Later", "committed": false}
+    ]},
+    {"label": "Delivery", "tone": "teal", "icon": "courier", "items": [
+      {"label": "Smarter courier matching", "period": "Now"},
+      {"id": "tips", "label": "Courier tips", "period": "Next", "depends_on": "tracking"},
+      {"label": "Drone pilot", "period": "Later", "committed": false}
+    ]},
+    {"label": "Growth", "tone": "violet", "icon": "bell", "items": [
+      {"label": "Referral credits", "period": "Now"},
+      {"label": "Loyalty points", "period": "Next", "committed": false},
+      {"label": "New cities", "period": "Later", "committed": false}
+    ]}
+  ]
+}

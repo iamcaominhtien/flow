@@ -1,0 +1,34 @@
+{
+  "type": "kanban",
+  "title": "Kanban: the delivery app sprint",
+  "desc": "Work moves left to right through columns. A card is one piece of work, the tag says what kind, the circle says who. A column with a limit shows how full it is.",
+  "people": {
+    "Joy Adams": {"tone": "teal"},
+    "Ava Lopez": {"tone": "blue"},
+    "Kai Novak": {"tone": "green"},
+    "Lena Park": {"tone": "teal"},
+    "Max Rossi": {"tone": "teal"}
+  },
+  "columns": [
+    {"label": "Backlog", "tone": "gray", "cards": [
+      {"label": "Courier tips", "kind": "Feature", "owner": "Joy Adams"},
+      {"label": "Refund screen", "kind": "Feature", "owner": "Ava Lopez"},
+      {"label": "Slow map on old phones", "kind": "Bug", "owner": "Kai Novak"},
+      {"label": "Update libraries", "kind": "Chore", "owner": "Lena Park"}
+    ]},
+    {"label": "In progress", "tone": "blue", "limit": 3, "cards": [
+      {"label": "Live order tracking", "kind": "Feature", "owner": "Kai Novak"},
+      {"label": "Fix double charge", "kind": "Bug", "owner": "Joy Adams"},
+      {"label": "Restaurant menu editor", "kind": "Feature", "owner": "Ava Lopez"}
+    ]},
+    {"label": "In review", "tone": "amber", "cards": [
+      {"label": "Push notifications", "kind": "Feature", "owner": "Lena Park"},
+      {"label": "Crash on checkout", "kind": "Bug", "owner": "Max Rossi"}
+    ]},
+    {"label": "Done", "tone": "green", "done": true, "cards": [
+      {"label": "Sign-in with phone", "kind": "Feature", "owner": "Ava Lopez"},
+      {"label": "Order history", "kind": "Feature", "owner": "Kai Novak"},
+      {"label": "Rename API fields", "kind": "Chore", "owner": "Lena Park"}
+    ]}
+  ]
+}

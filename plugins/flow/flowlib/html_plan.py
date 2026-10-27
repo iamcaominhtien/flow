@@ -19,7 +19,7 @@ PLAN_SHAPES = (
     Shape.BRANCH,
     Shape.LEAF,
 )
-PLAN_FRAME_VARIANTS = (FrameVariant.PANEL, FrameVariant.BAND)
+PLAN_FRAME_VARIANTS = (FrameVariant.PANEL, FrameVariant.BAND, FrameVariant.COLUMN)
 PILL_RADIUS_PX = 999
 BORDER_PX = 2
 THIN_BORDER_PX = 1
@@ -118,6 +118,10 @@ def plan_frame_html(frame: Frame, theme: Theme) -> str:
     if frame.variant is FrameVariant.PANEL:
         area["background"] = theme.paper
         area["border"] = f"{px(THIN_BORDER_PX)} solid {theme.rule}"
+        return tag("div", area, data_id=frame.id)
+    if frame.variant is FrameVariant.COLUMN:
+        area["background"] = theme.tones[frame.tone].lane
+        area["border-radius"] = px(theme.planning.kanban.column_radius)
         return tag("div", area, data_id=frame.id)
     area.update(_band_style(frame, theme))
     return tag("div", area, esc(frame.label or ""), data_id=frame.id)
@@ -423,7 +427,7 @@ def _centre_html(node: Node, theme: Theme) -> str:
     card.update({"border-radius": px(CENTRE_RADIUS_PX), "display": "block"})
     size = node.height * CENTRE_ICON_FRACTION
     place = f'style="position:absolute;left:{px((node.width - size) / 2)};top:{px(CENTRE_PAD_PX)}"'
-    icon = _icon_markup(node.icon or "idea", size, accent_of(node, theme), place)
+    icon = icon_markup(node.icon or "idea", size, accent_of(node, theme), place)
     pill_top = CENTRE_PAD_PX + size + CENTRE_GAP_PX
     pill_row = {**ABSOLUTE, "left": "0", "right": "0", "top": px(pill_top), "display": "flex"}
     pill_row["justify-content"] = "center"
@@ -511,10 +515,10 @@ def _disc_html(node: Node, size: float, theme: Theme) -> str:
     inner = size - 2 * BORDER_PX
     place = 'style="position:absolute;left:0;top:0"'
     stroke = accent_of(node, theme)
-    return tag("div", style, _icon_markup(node.icon, inner, stroke, place))
+    return tag("div", style, icon_markup(node.icon, inner, stroke, place))
 
 
-def _icon_markup(name: str, size: float, stroke: str, place: str) -> str:
+def icon_markup(name: str, size: float, stroke: str, place: str) -> str:
     """Draw an icon in its detailed form when there is one, else in its flat form."""
     if has_detailed_icon(name):
         return detailed_icon_svg(name, size, stroke, place)

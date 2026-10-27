@@ -155,6 +155,26 @@
       "fill": "#DCEEFB",
       "stroke": "#0F172A"
     },
+    "kanban_card": {
+      "fill": "#FFFFFF",
+      "stroke": "#0F172A"
+    },
+    "roadmap_card": {
+      "fill": "#FFFFFF",
+      "stroke": "#0F172A"
+    },
+    "board_pill": {
+      "fill": "#FFFFFF",
+      "stroke": "#0F172A"
+    },
+    "lane_head": {
+      "fill": "#FFFFFF",
+      "stroke": "#0F172A"
+    },
+    "period_head": {
+      "fill": "#FFFFFF",
+      "stroke": "#0F172A"
+    },
     "plan_bar": {
       "fill": "#E2E8F0",
       "stroke": "#64748B"
@@ -917,6 +937,26 @@
           "fill": "#12263F",
           "stroke": "#60A5FA"
         },
+        "kanban_card": {
+          "fill": "#12263F",
+          "stroke": "#60A5FA"
+        },
+        "roadmap_card": {
+          "fill": "#12263F",
+          "stroke": "#60A5FA"
+        },
+        "board_pill": {
+          "fill": "#12263F",
+          "stroke": "#60A5FA"
+        },
+        "lane_head": {
+          "fill": "#12263F",
+          "stroke": "#60A5FA"
+        },
+        "period_head": {
+          "fill": "#12263F",
+          "stroke": "#60A5FA"
+        },
         "plan_bar": {
           "fill": "#1A2336",
           "stroke": "#64748B"
@@ -1533,6 +1573,83 @@
       "month_font_size": 12,
       "reason_gap": 8,
       "check_size": 14
+    },
+    "kanban": {
+      "column_width": 360,
+      "column_gap": 30,
+      "column_radius": 22,
+      "pad": 18,
+      "header_top": 16,
+      "pill_height": 26,
+      "pill_pad": 14,
+      "pill_font_size": 14,
+      "badge_height": 24,
+      "badge_min_width": 28,
+      "badge_pad": 10,
+      "badge_font_size": 12,
+      "badge_gap": 10,
+      "cards_top": 61,
+      "card_height": 100,
+      "card_gap": 28,
+      "card_radius": 14,
+      "card_pad": 15,
+      "title_font_size": 14,
+      "detail_font_size": 11,
+      "title_top": 14,
+      "title_lines": 2,
+      "tag_height": 18,
+      "tag_font_size": 11,
+      "tag_pad": 10,
+      "tag_bottom": 16,
+      "tag_radius": 9,
+      "owner_size": 28,
+      "owner_right": 13,
+      "owner_bottom": 12,
+      "done_opacity": 0.6,
+      "bottom_pad": 18
+    },
+    "roadmap": {
+      "lane_head": [
+        204,
+        200
+      ],
+      "lane_head_gap": 16,
+      "lane_gap": 24,
+      "lane_pad": 28,
+      "card_height": 144,
+      "card_inset": 20,
+      "row_gap": 24,
+      "card_radius": 14,
+      "card_pad": 20,
+      "column_max": 464,
+      "column_min": 232,
+      "column_budget": 1392,
+      "column_gap": 24,
+      "period_height": 64,
+      "period_radius": 14,
+      "period_font_size": 18,
+      "period_detail_font_size": 12,
+      "period_gap": 28,
+      "title_font_size": 15,
+      "title_top": 16,
+      "tag_top": 46,
+      "tag_gap": 8,
+      "detail_font_size": 12,
+      "lane_icon_size": 64,
+      "lane_icon_top": 22,
+      "lane_pill_height": 26,
+      "lane_pill_pad": 14,
+      "lane_pill_font_size": 14,
+      "lane_pill_bottom": 70,
+      "note_gap": 70,
+      "note_font_size": 13,
+      "entry_run": 16,
+      "exit_gap": 12,
+      "entry_offset": 60,
+      "owner_size": 28,
+      "owner_right": 16,
+      "owner_bottom": 14,
+      "exit_drop": 29
     },
     "org": {
       "card": [

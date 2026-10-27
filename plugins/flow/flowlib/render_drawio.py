@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 from collections.abc import Callable
 
 from .cards import card_parts
+from .drawio_board import add_board_node
 from .drawio_c4 import add_c4_icon, c4_style, c4_value
 from .drawio_common import (
     FONT_BOLD,
@@ -34,6 +35,7 @@ from .drawio_notation import (
 from .drawio_plan import add_plan_node
 from .drawio_screen import add_node_chip, add_screen_parts, screen_style
 from .drawio_wide import add_wide_parts, wide_style
+from .html_board import is_board_node
 from .html_c4 import is_c4_node
 from .html_dfd import is_dfd_node
 from .html_frames import BAND_VARIANTS
@@ -480,6 +482,9 @@ def add_node(root: ET.Element, node: Node, theme: Theme) -> None:
     """Add a node, its icon (as a child cell) and its number badge."""
     if is_plan_node(node):
         add_plan_node(root, node, theme)
+        return
+    if is_board_node(node):
+        add_board_node(root, node, theme)
         return
     cell = add_vertex(root, f"node-{node.id}", _node_value(node, theme), _node_style(node, theme))
     add_geometry(cell, (node.x, node.y, node.width, node.height))

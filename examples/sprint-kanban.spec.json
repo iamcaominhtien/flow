@@ -1,5 +1,6 @@
 {
   "type": "kanban",
+  "use": "compare",
   "title": "Kanban: this sprint",
   "desc": "Cards by status; the finished column is green.",
   "columns": [

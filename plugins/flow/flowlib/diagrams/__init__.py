@@ -22,10 +22,10 @@ from . import (
     graph,
     mindmap,
     org,
+    roadmap,
     screenflow,
     sequence,
     state,
-    timeline,
     usecase,
 )
 
@@ -52,7 +52,7 @@ LAYOUTS: dict[str, Layout] = {
     "layers": boards.layout_layers,
     "wireframe": boards.layout_wireframe,
     "gantt": gantt.layout_raw,
-    "roadmap": timeline.layout_roadmap,
+    "roadmap": roadmap.layout_raw,
     "mindmap": mindmap.layout_raw,
     **{name: graph.layout_with(each) for name, each in catalog.TYPES.items()},
     "screen": screenflow.layout_raw,

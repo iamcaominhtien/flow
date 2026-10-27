@@ -28,6 +28,7 @@ ARCHITECTURE_SIZE_KEYS = ("part_size", "card_size")
 UML_SIZE_KEYS = ("state_size", "case_size", "actor_size", "actor_card_size")
 GANTT_SIZE_KEYS = ("today_pill", "legend_swatch")
 ORG_SIZE_KEYS = ("card", "card_illustrated", "works_pill")
+ROADMAP_SIZE_KEYS = ("lane_head",)
 MIND_SIZE_KEYS = ("centre", "branch", "group", "idea", "detail")
 MIND_SCALE_NAMES = ("illustrated", "plain", "large")
 
@@ -398,6 +399,88 @@ class OrgRules:
 
 
 @dataclass(frozen=True)
+class KanbanRules:
+    """Sizes of a Kanban board (design 08 section 5). Lengths are in pixels."""
+
+    column_width: float
+    column_gap: float
+    column_radius: float
+    pad: float
+    header_top: float
+    pill_height: float
+    pill_pad: float
+    pill_font_size: float
+    badge_height: float
+    badge_min_width: float
+    badge_pad: float
+    badge_font_size: float
+    badge_gap: float
+    cards_top: float
+    card_height: float
+    card_gap: float
+    card_radius: float
+    card_pad: float
+    title_font_size: float
+    detail_font_size: float
+    title_top: float
+    title_lines: int
+    tag_height: float
+    tag_font_size: float
+    tag_pad: float
+    tag_bottom: float
+    tag_radius: float
+    owner_size: float
+    owner_right: float
+    owner_bottom: float
+    done_opacity: float
+    bottom_pad: float
+
+
+@dataclass(frozen=True)
+class RoadmapRules:
+    """Sizes of a roadmap (design 08 section 6). Lengths are in pixels."""
+
+    lane_head: tuple[float, float]
+    lane_head_gap: float
+    lane_gap: float
+    lane_pad: float
+    card_height: float
+    card_inset: float
+    row_gap: float
+    card_radius: float
+    card_pad: float
+    column_max: float
+    column_min: float
+    column_budget: float
+    column_gap: float
+    period_height: float
+    period_radius: float
+    period_font_size: float
+    period_detail_font_size: float
+    period_gap: float
+    title_font_size: float
+    title_top: float
+    tag_top: float
+    tag_gap: float
+    detail_font_size: float
+    lane_icon_size: float
+    lane_icon_top: float
+    lane_pill_height: float
+    lane_pill_pad: float
+    lane_pill_font_size: float
+    lane_pill_bottom: float
+    note_gap: float
+    note_font_size: float
+    entry_run: float
+    exit_gap: float
+    exit_drop: float
+    entry_offset: float
+    owner_size: float
+    owner_right: float
+    owner_bottom: float
+
+
+@dataclass(frozen=True)
 class MindScale:
     """Sizes of one scale of mind map: illustrated, plain, or the large one with four levels."""
 
@@ -438,13 +521,15 @@ class MindRules:
 
 @dataclass(frozen=True)
 class PlanningRules:
-    """The colours and sizes of Gantt, org chart and mind map (design 08)."""
+    """The colours and sizes of the planning diagrams (design 08)."""
 
     status: dict[Status, StatusColors]
     marks: dict[str, MarkColors]
     milestone: MilestoneColors
     accents: dict[Tone, str]  # the strong colour of each tone in a mind map: pills, bars, curves
     gantt: GanttRules
+    kanban: KanbanRules
+    roadmap: RoadmapRules
     org: OrgRules
     mind: MindRules
 
@@ -704,6 +789,8 @@ def _planning_rules(raw: dict[str, Any], tones: dict[Tone, ToneColors]) -> Plann
             tone: raw["accents"].get(tone.value, colors.accent) for tone, colors in tones.items()
         },
         gantt=GanttRules(**_sized(raw["gantt"], GANTT_SIZE_KEYS)),
+        kanban=KanbanRules(**raw["kanban"]),
+        roadmap=RoadmapRules(**_sized(raw["roadmap"], ROADMAP_SIZE_KEYS)),
         org=OrgRules(**_sized(raw["org"], ORG_SIZE_KEYS)),
         mind=MindRules(**loose, **scales),
     )

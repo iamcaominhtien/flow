@@ -59,6 +59,11 @@ class Shape(StrEnum):
     LABEL = "label"  # plain text with no outline: a row name or a header of a chart
     BRANCH = "branch"  # a pill of a mind map: a branch or a group
     LEAF = "leaf"  # a card or an underlined phrase of a mind map
+    KANBAN_CARD = "kanban_card"  # a card of a Kanban board: title, kind tag, owner circle
+    ROADMAP_CARD = "roadmap_card"  # a card of a roadmap: title, status tag, owner; dashed if open
+    BOARD_PILL = "board_pill"  # a pill in the header of a Kanban column: its name, count or limit
+    LANE_HEAD = "lane_head"  # the card at the left of a roadmap row: a large icon and the theme
+    PERIOD_HEAD = "period_head"  # the header of a roadmap column: a name and its dates in words
 
 
 class Marker(StrEnum):
@@ -188,6 +193,7 @@ class FrameVariant(StrEnum):
     LAYER = "layer"  # an architecture frame: dashed and tinted, with a dark pill label
     PANEL = "panel"  # a white rounded box with a thin outline, such as the header of a Gantt
     BAND = "band"  # a grey row with its name in bold, such as a phase of a Gantt
+    COLUMN = "column"  # a tinted rounded area with no outline: a Kanban column or a roadmap row
 
 
 class Side(StrEnum):
@@ -292,6 +298,15 @@ class MindLevel(StrEnum):
     IDEA = "idea"
     DETAIL = "detail"
     KEY = "key"  # a sample of the marks, in the legend
+
+
+class PillKind(StrEnum):
+    """What a pill of a Kanban column header says, which decides its colours."""
+
+    NAME = "name"  # the name of the column, in the tint of the column
+    COUNT = "count"  # how many cards the column holds: dark
+    LIMIT = "limit"  # ``2 / 3``: an outline, the column still has room
+    FULL = "full"  # ``3 / 3``: red, the column is full and nothing new should be started
 
 
 class Direction(StrEnum):
@@ -404,6 +419,9 @@ class PlanView:
     side: Side | None = None  # which side of the centre a mind map item is on
     priority: int = 0  # 1 or 2 for P1 and P2, 0 for none
     hidden: int = 0  # how many ideas below this one are left out (+N)
+    tag: str = ""  # the small tag on a card: its kind on a Kanban, its state on a roadmap
+    tag_tone: Tone | None = None  # the tint of that tag
+    pill: PillKind | None = None  # what a pill of a Kanban column header says
 
 
 @dataclass(frozen=True)

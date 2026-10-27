@@ -20,65 +20,41 @@ You write a short **spec**: columns, each with cards. A script sizes the cards, 
 ```json
 {
   "type": "kanban",
-  "title": "Kanban: this sprint",
-  "desc": "Cards by status; the finished column is green.",
+  "title": "Kanban: the delivery app sprint",
+  "people": {"Kai Novak": {"tone": "green"}},
   "columns": [
-    {
-      "label": "To do",
-      "tone": "gray",
-      "cards": [
-        {
-          "label": "Write the release notes"
-        },
-        {
-          "label": "Add dark mode",
-          "detail": "Design is ready"
-        }
-      ]
-    },
-    {
-      "label": "Doing",
-      "tone": "blue",
-      "cards": [
-        {
-          "label": "Fix the login timeout",
-          "icon": "bug"
-        }
-      ]
-    },
-    {
-      "label": "Done",
-      "tone": "green",
-      "cards": [
-        {
-          "label": "Upgrade the database",
-          "icon": "database"
-        },
-        {
-          "label": "Set up monitoring"
-        }
-      ]
-    }
+    {"label": "Backlog", "tone": "gray", "cards": [
+      {"label": "Courier tips", "kind": "Feature", "owner": "Joy Adams"},
+      {"label": "Slow map on old phones", "kind": "Bug", "owner": "Kai Novak"}
+    ]},
+    {"label": "In progress", "tone": "blue", "limit": 3, "cards": [
+      {"label": "Live order tracking", "kind": "Feature", "owner": "Kai Novak"}
+    ]},
+    {"label": "Done", "tone": "green", "done": true, "cards": [
+      {"label": "Order history", "kind": "Feature", "owner": "Kai Novak"}
+    ]}
   ]
 }
 ```
 
 - `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
-- **Column**: `label`, optional `tone`, `cards`.
-- **Card**: `label`, optional `detail` (a small second line), `icon`, `tone`.
-- For a comparison, make each option a column and each point a card.
-- Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
+- **Column**: `label`, optional `tone` (the tint of the column), `limit` (a work-in-progress limit, whole number), `done` (true: every card in it is finished), `cards`. Columns are 360 px wide, in the order work moves (Backlog, In progress, In review, Done).
+- **Card**: `label`, optional `kind` (a tag: `Feature` is blue, `Bug` red, `Chore` grey; any other word is grey, or set `tone`), `owner` (a name, drawn as a circle with initials), `detail` (a small second line), `done` (true: struck through), `tone` (the tint of the tag). A card is 100 px high: keep the title to two lines.
+- **Write the cards in priority order**: the first is drawn at the top of its column.
+- **Limit**: a column with a limit shows `2 / 3` instead of its count; the pill turns red when the column is full (`3 / 3`). More cards than the limit is a warning.
+- **People**: the circle takes its initials from the name and its tint from the name. To get the same tint as in a Gantt chart or an org chart, pin it: `"people": {"Kai Novak": {"tone": "green", "initials": "KN"}}` with the same values in each spec.
+- A board with a `kind`, `owner`, `limit` or `done` anywhere is a work board and is plain only: an `icon` or `"style": "illustrated"` is refused. Write `"use": "board"` to force this look.
 
-## Illustrated style
+## Comparison of options
 
-Add `"style": "illustrated"` at the top level to draw each box that has an `icon` as a card: a large icon on a tinted disc, the name in a pill, and the `detail` text under it. Boxes without an icon stay plain. Cards are bigger, so use it for a few boxes (about eight or fewer), give each a `tone` and a short `detail`, and keep names short: the name stays on one line. The default is `"style": "plain"`. Icons with a detailed drawing (shaded, with a highlight and a ground shadow) show it on a card in place of the disc: `bell calendar card cart chat cloud code database file folder globe key lock mail phone pot refund search server store user warn wifi`. More names that exist only in the detailed set and can be used in any spec: `admin api-gateway approved-doc backup-archive bar-chart batch-scheduler block-storage bot browser bucket cache cdn ci-cd cluster container container-registry containers courier cpu dashboard data-lake data-warehouse dns email-service error event event-stream file-storage firewall firewall-waf flag function gateway id-card idea identity-iam in-memory-cache info json kubernetes laptop launch load-balancer logging message-queue ml-model money monitoring nosql-database object-storage package pie-chart pipeline plugin private-network pub-sub pub-sub-topic queue region schedule secrets security serverless-function sql-database start stop success table target team terminal virtual-machine virtual-network workflow`.
+For a side-by-side comparison, make each option a column and each point a card. A board with none of `kind`, `owner`, `limit` and `done` is drawn this way (or write `"use": "compare"`): cards have `label`, `detail`, `icon`, `tone`, are sized to their text, and `"style": "illustrated"` draws a card for each box with an icon (large icon on a tinted disc, the name in a pill, the `detail` under it; use it for about eight boxes or fewer and keep names short). Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart`; the detailed set of the other skills (for example `courier`, `package`, `team`) also works on an illustrated card. To draw a missing icon, write `icons.local.json` next to the spec (see the flowchart skill).
 
 ## Limits to tell the user
 
-- Cards cannot be dragged or edited as a board in draw.io; they are plain boxes.
-- There are no counts, limits, assignees or dates.
+- Cards cannot be dragged or edited as a board in draw.io; they are plain boxes (with child cells for the tag and the circle).
+- There are no dates, and no automatic move of a card between columns.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor.
 
-Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.
+Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`, `red`. Any other value is refused by the build.
 
 For a large or dense diagram (more than about 15 elements, many groups, or a hub with many lines) the automatic layout gives long pages and bundled lines; use the `author` skill (`/flow:author`) instead, which lays the diagram out by hand and looks at the result.
