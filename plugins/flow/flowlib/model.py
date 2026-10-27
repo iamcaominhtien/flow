@@ -262,6 +262,7 @@ class ElementStyle(StrEnum):
     OUTLINE = "outline"
     DANGER = "danger"
     FIELD = "field"
+    DISABLED = "disabled"
 
 
 class Placement(StrEnum):
@@ -284,6 +285,76 @@ class Layer(StrEnum):
 
     BASE = "base"
     OVERLAY = "overlay"
+
+
+class BlockKind(StrEnum):
+    """The wireframe blocks of design 10 section 2: what a screen of a wireframe is made of."""
+
+    NAVBAR = "navbar"
+    SIDEBAR = "sidebar"
+    CARD = "card"
+    PANEL = "panel"
+    LIST_ITEM = "list_item"
+    FORM_FIELD = "form_field"
+    BUTTON = "button"
+    IMAGE = "image"
+    TAB_BAR = "tab_bar"
+    BOTTOM_NAV = "bottom_nav"
+    SEARCH_BAR = "search_bar"
+    TABLE = "table"
+    CHART = "chart"
+    MODAL = "modal"
+    SHEET = "sheet"
+    TOAST = "toast"
+    LOADING = "loading"
+    EMPTY = "empty"
+    ERROR = "error"
+    SUCCESS = "success"
+    CHIP = "chip"
+    STEPPER = "stepper"
+    FIGURE = "figure"
+    TEXT = "text"
+    ROWS = "rows"
+    CHECKLIST = "checklist"
+    NOTE = "note"  # a note below the screens: a numbered badge, a bold title and one line
+
+
+class BlockAnchor(StrEnum):
+    """Whether a block sits in the grid or is pinned to the foot of the screen."""
+
+    GRID = "grid"
+    BOTTOM = "bottom"
+
+
+class CellKind(StrEnum):
+    """How the cells of a table column are drawn."""
+
+    TEXT = "text"
+    BOLD = "bold"
+    CHIP = "chip"
+    BUTTON = "button"
+
+
+class Corner(StrEnum):
+    """The corner or side of a part where an annotation badge sits."""
+
+    TOP_LEFT = "tl"
+    TOP_RIGHT = "tr"
+    BOTTOM_LEFT = "bl"
+    BOTTOM_RIGHT = "br"
+    LEFT = "l"
+    RIGHT = "r"
+    TOP = "t"
+    BOTTOM = "b"
+
+
+class WireState(StrEnum):
+    """Which of its four faces a wireframe screen shows (design 10 section 4)."""
+
+    NORMAL = "normal"
+    LOADING = "loading"
+    EMPTY = "empty"
+    ERROR = "error"
 
 
 class Status(StrEnum):
@@ -380,6 +451,73 @@ class EdgeLabel:
 
 
 @dataclass(frozen=True)
+class WireColumn:
+    """A column of a wireframe table: its header, its relative width and how its cells look."""
+
+    label: str
+    weight: float = 1.0
+    kind: CellKind = CellKind.TEXT
+
+
+@dataclass(frozen=True)
+class WireCell:
+    """One cell of a wireframe table; ``style`` is the tone of a chip or the style of a button."""
+
+    text: str
+    style: str = ""
+
+
+@dataclass(frozen=True)
+class WireBlock:
+    """One block of a wireframe screen, placed on a grid by a row, a column and a span.
+
+    Which fields a kind reads is written in ``wire_blocks``; the others stay empty.
+    """
+
+    kind: BlockKind
+    id: str = ""  # what an annotation points at
+    text: str = ""
+    detail: str = ""
+    value: str = ""
+    chip: str = ""
+    price: str = ""
+    action: str = ""
+    hint: str = ""
+    stepper: str = ""
+    icon: str = ""
+    image: str = ""  # ``left`` or ``top`` on a card: where its crossed box sits
+    lead: str = ""  # what starts a list item: ``avatar``, ``radio``, ``pin`` or ``thumb``
+    trail: str = ""  # the link at the end of a list item
+    items: tuple[str, ...] = ()
+    icons: tuple[str, ...] = ()
+    selected: tuple[int, ...] = ()
+    values: tuple[float, ...] = ()
+    columns: tuple[WireColumn, ...] = ()
+    cells: tuple[tuple[WireCell, ...], ...] = ()
+    style: ElementStyle | None = None
+    tone: Tone | None = None
+    row: int = 0  # 1 based; 0 is the row after the one before
+    col: int = 0  # 1 based; 0 is the first column
+    span: int = 0  # columns wide; 0 is up to the last column
+    rows: int = 1  # rows tall
+    height: float = 0  # pixels; 0 is the height of the kind
+    bars: int = 0  # grey bars standing for lines of text
+    anchor: BlockAnchor = BlockAnchor.GRID
+    flags: tuple[str, ...] = ()  # ``back``, ``menu``, ``avatar``, ``bell``, ``bold``, ``tap``...
+    children: tuple["WireBlock", ...] = ()  # the blocks a panel holds, one below the other
+
+
+@dataclass(frozen=True)
+class WireBadge:
+    """A numbered badge on the corner of a block, or of a part of it."""
+
+    number: str
+    block: int  # the index of the block in the screen
+    part: str = ""  # the name of a part the block exposes, such as ``stepper``
+    corner: Corner = Corner.TOP_RIGHT
+
+
+@dataclass(frozen=True)
 class ScreenElement:
     """An element of a screen that causes a transition; a red dot marks the tapped one."""
 
@@ -409,6 +547,15 @@ class ScreenView:
     tab_count: int = 0
     is_undecided: bool = False
     chip_place: ChipPlace = ChipPlace.ABOVE  # moved when a line would run through the chip
+    blocks: tuple[WireBlock, ...] = ()  # a wireframe: the blocks of an L3 screen
+    badges: tuple[WireBadge, ...] = ()
+    state: WireState | None = None  # which of the four faces of a state set the screen shows
+    scale: float = 1.0  # how much a wireframe is shrunk: 1 is the real size of the device
+    caption_note: str = ""  # the small line under the name above a wireframe, such as a width
+    is_captioned: bool = False  # the name sits above the frame as ``code · name``, no id chip
+    address: str = ""  # the address in the browser bar of a desktop wireframe
+    is_bare: bool = False  # no device around the blocks: a note, which is a block on its own
+    is_plain: bool = False  # a frame only: no status bar, home bar or browser bar
 
 
 @dataclass(frozen=True)

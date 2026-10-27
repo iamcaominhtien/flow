@@ -9,6 +9,7 @@ from typing import Any
 from .model import DEFAULT_THEME, Animation, LabelKind, Role, Shape, Status, Tone
 
 DATA_DIR = Path(__file__).parent
+WIRE_PAIR_KEYS = ("device", "responsive")  # the wireframe sizes written as [width, height]
 THEMES_KEY = "themes"  # in ``theme.json``: the overrides of each theme other than the default
 SHAPE_PAINT_KEY = "shape_paint"  # an override that paints every shape the same way
 ICON_STROKE_WIDTH = 2  # line weight of a flat icon, in its 24 px grid
@@ -794,6 +795,283 @@ class ScreenRules:
 
 
 @dataclass(frozen=True)
+class WireColors:
+    """The grey palette of a wireframe and its few accents (design 10 section 1)."""
+
+    amber: str
+    amber_tint: str
+    bar: str
+    blue: str
+    blue_soft: str
+    blue_tint: str
+    chip_text: str
+    chrome: str
+    cross: str
+    fill: str
+    gray_tint: str
+    green: str
+    green_tint: str
+    hairline: str
+    image: str
+    ink: str
+    line: str
+    muted: str
+    on_blue: str
+    paper: str
+    rose: str
+    rose_tint: str
+    screen: str
+    skeleton: str
+    text: str
+
+
+@dataclass(frozen=True)
+class WireNotes:
+    """The notes below the screens of a wireframe: badge, title and one line. Lengths in pixels."""
+
+    title_font: float
+    text_font: float
+    pitch: float
+    text_left: float
+    max_lines: int
+    column_gap: float
+    notes_top: float
+    screen_gap: float
+    states_gap: float
+    responsive_gap: float
+    screens_left: float
+    badge_size: float
+    min_width: float
+    columns: int
+    line_height: float
+    title_height: float
+
+
+@dataclass(frozen=True)
+class WireRules:
+    """Sizes, gaps and type of the wireframe blocks, at the real size of a device (design 10)."""
+
+    colors: WireColors
+    notes: WireNotes
+    device: dict[str, tuple[float, float]]
+    radius: dict[str, float]
+    margin: dict[str, float]
+    gap: dict[str, float]
+    section_gap: dict[str, float]
+    content_top: dict[str, float]
+    flow_scale: dict[str, float]
+    responsive: dict[str, tuple[float, float]]
+    address_height: float
+    address_left: float
+    address_pad: float
+    address_width: float
+    anchor_gap: float
+    anchor_pad: float
+    anchor_pad_nav: float
+    avatar_icon: float
+    avatar_size: float
+    badge_ring: float
+    badge_size: float
+    bar_fraction: float
+    bar_gap: float
+    bar_headroom: float
+    bar_height: float
+    bar_radius: float
+    bell_size: float
+    border: float
+    bottom_icon: float
+    bottom_icon_top: float
+    bottom_label_gap: float
+    bottom_nav_height: float
+    browser_bar: float
+    browser_dot: float
+    button_border: float
+    button_font: float
+    button_height: float
+    button_height_phone: float
+    button_icon: float
+    button_radius: float
+    caption_gap: float
+    caption_height: float
+    caption_note_height: float
+    card_bar_title: float
+    card_bar_top: float
+    card_footer: float
+    card_image: float
+    card_pad: float
+    card_radius: float
+    card_row_height: float
+    badge_gap: float
+    price_pad: float
+    tap_edge: float
+    tap_narrow: float
+    card_text_gap: float
+    card_thumb: float
+    card_thumb_bars: float
+    chart_height: float
+    chart_pad: float
+    chart_top: float
+    check_fraction: float
+    check_gap: float
+    check_radius: float
+    check_size: float
+    check_stroke: float
+    checklist_row: float
+    checklist_title: float
+    chevron_inset: float
+    chevron_stroke: float
+    chip_font: float
+    chip_gap: float
+    chip_height: float
+    chip_pad: float
+    choice_font: float
+    choice_gap: float
+    choice_height: float
+    choice_pad: float
+    dot_amber: str
+    dot_green: str
+    dot_left: float
+    dot_radius: float
+    dot_red: str
+    dot_ring: float
+    dot_step: float
+    empty_icon_fraction: float
+    field_action_gap: float
+    field_action_width: float
+    figure_gap: float
+    figure_height: float
+    figure_pad: float
+    font_badge: float
+    font_body: float
+    font_brand: float
+    font_caption: float
+    font_error_mark: float
+    font_figure: float
+    font_header: float
+    font_heading: float
+    font_hero: float
+    font_hint: float
+    font_label: float
+    font_link: float
+    font_nav: float
+    font_navbar: float
+    font_small: float
+    font_state_title: float
+    font_time: float
+    font_title: float
+    foot: float
+    halo_radius: float
+    hamburger_size: float
+    hamburger_stroke: float
+    handle_height: float
+    handle_top: float
+    handle_width: float
+    hero_pad: float
+    hero_narrow: float
+    font_hero_small: float
+    hint_gap: float
+    home_bottom: float
+    home_height: float
+    home_width: float
+    icon_gap: float
+    image_height: float
+    input_height: float
+    input_pad: float
+    input_radius: float
+    item_gap: float
+    item_height: float
+    item_height_disc: float
+    item_pad: float
+    item_radius: float
+    label_gap: float
+    label_gap_below: float
+    lead_icon: float
+    lead_size: float
+    line_factor: float
+    link_gap: float
+    logo_gap: float
+    logo_radius: float
+    logo_size: float
+    mini_height: float
+    mini_width: float
+    modal_button: float
+    modal_fraction: float
+    modal_gap: float
+    modal_pad: float
+    modal_radius: float
+    nav_action_height: float
+    nav_action_width: float
+    nav_gap: float
+    nav_search_width: float
+    navbar_height: float
+    navbar_height_phone: float
+    navbar_pad: float
+    navbar_pad_phone: float
+    radio_size: float
+    radio_stroke: float
+    row_height: float
+    row_pad: float
+    row_value_start: float
+    scrim_opacity: float
+    search_height: float
+    search_icon: float
+    search_pad: float
+    selected_border: float
+    sheet_foot: float
+    sheet_radius: float
+    sheet_row: float
+    sheet_title: float
+    sheet_top: float
+    sidebar_icon: float
+    sidebar_icon_pad: float
+    sidebar_pad: float
+    sidebar_pitch: float
+    sidebar_row: float
+    sidebar_text_gap: float
+    sidebar_width: float
+    skeleton_bar: float
+    skeleton_bar_offset: float
+    skeleton_disc: float
+    skeleton_height: float
+    spinner_gap: float
+    spinner_room: float
+    spinner_size: float
+    spinner_stroke: float
+    spinner_top: float
+    state_button: float
+    state_button_gap: float
+    state_button_width: float
+    state_gap: float
+    state_icon: float
+    state_text_pad: float
+    state_top: float
+    status_height: float
+    stepper_height: float
+    stepper_pad: float
+    stepper_stroke: float
+    stepper_width: float
+    success_icon: float
+    symbol_stroke: float
+    tab_height: float
+    tab_underline: float
+    table_button_height: float
+    table_button_width: float
+    table_cell_pad: float
+    table_header: float
+    table_row: float
+    table_title: float
+    tap_inset: float
+    thumb_radius: float
+    time_left: float
+    time_top: float
+    time_width: float
+    title_inset: float
+    toast_height: float
+    toast_lift: float
+    toast_pad: float
+
+
+@dataclass(frozen=True)
 class Theme:
     """Every colour, line style and animation the renderers use."""
 
@@ -824,6 +1102,7 @@ class Theme:
     cloud: CloudRules
     architecture: ArchitectureRules
     explainer: ExplainerRules
+    wire: WireRules
     uml: UmlRules
     planning: PlanningRules
 
@@ -874,6 +1153,24 @@ def _screen_rules(raw: dict[str, Any]) -> ScreenRules:
     sizes = {name: (size[0], size[1]) for name, size in raw["sizes"].items()}
     tuples = {name: (raw[name][0], raw[name][1]) for name in pairs}
     return ScreenRules(**{**raw, **tuples, "sizes": sizes})
+
+
+def _wire_rules(raw: dict[str, Any]) -> WireRules:
+    """Build the wireframe rules from their JSON object.
+
+    Args:
+        raw: The ``wire`` object of ``theme.json``.
+
+    Returns:
+        The rules, with the palette and the notes as objects and each size as a pair.
+    """
+    pairs = {name: {key: _pair(size) for key, size in raw[name].items()} for name in WIRE_PAIR_KEYS}
+    loose = {
+        key: value for key, value in raw.items() if key not in (*WIRE_PAIR_KEYS, "colors", "notes")
+    }
+    return WireRules(
+        **loose, **pairs, colors=WireColors(**raw["colors"]), notes=WireNotes(**raw["notes"])
+    )
 
 
 def _pair(raw: list[float]) -> tuple[float, float]:
@@ -970,6 +1267,7 @@ def _build_theme(name: str, raw: dict[str, Any]) -> Theme:
         layout=_layout_rules(raw["layout"]),
         sequence=SequenceRules(**raw["sequence"]),
         screen=_screen_rules(raw["screen"]),
+        wire=_wire_rules(raw["wire"]),
         dfd=_dfd_rules(raw["dfd"]),
         bpmn=_bpmn_rules(raw["bpmn"]),
         c4=C4Rules(**_sized(raw["c4"], C4_SIZE_KEYS)),

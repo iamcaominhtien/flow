@@ -1,0 +1,50 @@
+{
+  "type": "wireframe",
+  "title": "Annotated wireframe: restaurant dashboard",
+  "desc": "A desktop screen built from the same blocks: top bar, side menu, figures, chart, a list and a table. Numbers point at details, notes are below.",
+  "screens": [
+    {
+      "device": "desktop",
+      "address": "console.padthai.example/orders",
+      "blocks": [
+        {"kind": "navbar", "id": "bar", "text": "Restaurant console", "logo": true, "detail": "Search orders, dishes, customers", "bell": true, "avatar": true},
+        {"kind": "sidebar", "id": "menu", "items": ["Orders", "Menu", "Reviews", "Payouts", "Settings"], "icons": ["cart", "doc", "star", "card", "gear"], "selected": 0},
+        {"kind": "text", "text": "Today", "heading": true, "chip": "Fri 24 Oct", "span": 10},
+        {"kind": "button", "id": "pause", "text": "Pause orders", "style": "danger", "col": 11, "span": 2},
+        {"kind": "figure", "id": "orders", "text": "Orders", "value": "42", "chip": "+8%", "tone": "green", "span": 3},
+        {"kind": "figure", "text": "Revenue", "value": "$1,280", "chip": "+5%", "tone": "green", "col": 4, "span": 3},
+        {"kind": "figure", "text": "Prep time", "value": "14 min", "chip": "+2 min", "tone": "amber", "col": 7, "span": 3},
+        {"kind": "figure", "text": "Rating", "value": "4.7", "chip": "0.0", "col": 10, "span": 3},
+        {"kind": "chart", "id": "chart", "text": "Orders per hour", "values": [4, 6, 9, 13, 15, 11, 8, 10, 6], "span": 7},
+        {"kind": "panel", "id": "attention", "text": "Needs attention", "col": 8, "span": 5, "children": [
+          {"kind": "list_item", "text": "Order #1043 late", "detail": "5 min over", "chip": "Late", "tone": "rose", "tinted": true},
+          {"kind": "list_item", "text": "Out of stock: tofu", "detail": "Hide dish?", "chip": "Stock", "tone": "amber", "tinted": true},
+          {"kind": "list_item", "text": "New review 2★", "detail": "Read it", "chip": "Review", "tone": "blue", "tinted": true}
+        ]},
+        {"kind": "table", "id": "live", "text": "Live orders", "tap": true,
+         "columns": [
+           {"label": "#", "weight": 0.6, "kind": "bold"},
+           {"label": "Customer", "weight": 1.6},
+           {"label": "Items", "weight": 3.4},
+           {"label": "Status", "weight": 1.4, "kind": "chip"},
+           {"label": "Due", "weight": 1.2},
+           {"label": "", "weight": 2.4, "kind": "button"}],
+         "data": [
+           ["1043", "Linh N.", "2 × Pad thai, Iced tea", {"text": "Preparing", "style": "amber"}, "11:05", {"text": "Details", "style": "secondary"}],
+           ["1044", "Marco R.", "Spring rolls", {"text": "New", "style": "blue"}, "11:12", {"text": "Accept", "style": "primary"}],
+           ["1045", "Aiko T.", "Green curry, Rice", {"text": "Ready", "style": "green"}, "11:14", {"text": "Details", "style": "secondary"}]]}
+      ],
+      "annotations": [
+        {"target": "bar", "part": "logo", "corner": "tl", "title": "Brand and place", "text": "The console name tells which restaurant is open."},
+        {"target": "bar", "part": "search", "corner": "r", "title": "Search", "text": "One box for orders, dishes and customers."},
+        {"target": "menu", "part": "item-0", "corner": "r", "title": "Current section", "text": "The active item is tinted blue and bold."},
+        {"target": "pause", "corner": "r", "title": "Pause orders", "text": "Rose outline: it has a cost. Asks for confirmation."},
+        {"target": "orders", "corner": "tr", "title": "Key figures", "text": "Value, then change since yesterday as a chip."},
+        {"target": "chart", "part": "bar-4", "corner": "t", "title": "Peak hour", "text": "The busiest bar is blue, the rest grey."},
+        {"target": "attention", "corner": "tl", "title": "Needs attention", "text": "Only problems, each with a short chip, newest first."},
+        {"target": "live", "corner": "tl", "title": "Live table", "text": "Status as a chip, sorted by due time."},
+        {"target": "live", "part": "action-1", "corner": "tr", "title": "Row action", "text": "The next step is primary: Accept for a new order."}
+      ]
+    }
+  ]
+}

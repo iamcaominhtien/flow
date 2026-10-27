@@ -1,6 +1,7 @@
 """Draw what is inside a device frame: the skeleton of L1, the key elements of L2, an overlay.
 
-L3 is drawn as L2 for now: the wireframe blocks of design 10 are not placed inside a screen yet.
+L3 with wireframe blocks is drawn by ``wire_layout``; an L3 screen with only named elements is
+drawn as L2.
 """
 
 from dataclasses import dataclass
@@ -376,6 +377,7 @@ def _element_colors(frame: BodyFrame, style: ElementStyle) -> tuple[str | None, 
         ElementStyle.OUTLINE: (theme.paper, blue.accent, blue.accent),
         ElementStyle.DANGER: (theme.paper, danger.accent, danger.accent),
         ElementStyle.FIELD: (theme.paper, theme.tones[Tone.GRAY].stroke, theme.slate),
+        ElementStyle.DISABLED: (theme.tones[Tone.GRAY].box, None, theme.slate),
     }
     return table[style]
 

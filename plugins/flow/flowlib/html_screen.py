@@ -15,6 +15,7 @@ HATCH_ANGLE_DEG = 135
 TEXT_LINE_HEIGHT = 1.2
 ARC_SPAN_FRACTION = 0.25  # of a full turn
 ARC_START_DEG = -90  # at the top of the circle
+JUSTIFY = {Align.LEFT: "flex-start", Align.CENTER: "center", Align.RIGHT: "flex-end"}
 
 
 def screen_html(node: Node, theme: Theme) -> str:
@@ -67,7 +68,7 @@ def _text_html(part: Part, theme: Theme) -> str:
         **_box_style(part),
         "display": "flex",
         "align-items": "center",
-        "justify-content": "flex-start" if part.align is Align.LEFT else "center",
+        "justify-content": JUSTIFY[part.align],
         "font-family": f"'{family}',{'monospace' if part.is_mono else 'sans-serif'}",
         "font-size": px(part.font_size),
         "font-weight": str(BOLD_WEIGHT if part.is_bold else REGULAR_WEIGHT),
@@ -103,10 +104,23 @@ def _arc_html(part: Part) -> str:
     sweep = f"A{fmt(radius)} {fmt(radius)} 0 0 1 {fmt(finish[0])} {fmt(finish[1])}"
     path = f"M{fmt(begin[0])} {fmt(begin[1])}{sweep}"
     svg = (
-        f'<svg width="{fmt(size)}" height="{fmt(size)}" viewBox="0 0 {fmt(size)} {fmt(size)}">'
+        f'<svg width="{fmt(size)}" height="{fmt(size)}" viewBox="0 0 {fmt(size)} {fmt(size)}" '
+        'style="display:block">'
         f'<path d="{path}" fill="none" stroke="{part.stroke}" '
         f'stroke-width="{fmt(part.stroke_width)}" stroke-linecap="round"/></svg>'
     )
+    return tag("div", {**_box_style(part)}, svg)
+
+
+def _path_html(part: Part) -> str:
+    """Draw an SVG path in its box: a chevron, a cross, a check or a hamburger."""
+    _, _, width, height = part.bounds
+    paint = (
+        f'fill="{part.fill or "none"}" stroke="{part.stroke or "none"}" '
+        f'stroke-width="{fmt(part.stroke_width)}" stroke-linecap="round" stroke-linejoin="round"'
+    )
+    size = f'width="{fmt(width)}" height="{fmt(height)}" viewBox="0 0 {fmt(width)} {fmt(height)}"'
+    svg = f'<svg {size} style="display:block"><path d="{part.path}" {paint}/></svg>'
     return tag("div", {**_box_style(part)}, svg)
 
 
@@ -118,6 +132,8 @@ def _part_html(part: Part, theme: Theme) -> str:
         return _hatch_html(part, theme)
     if part.kind is PartKind.ARC:
         return _arc_html(part)
+    if part.kind is PartKind.PATH:
+        return _path_html(part)
     if part.kind is PartKind.ICON:
         place = f'style="position:absolute;left:{px(part.bounds[0])};top:{px(part.bounds[1])}"'
         return icon_svg(part.icon, part.bounds[2], part.stroke or theme.ink, place)

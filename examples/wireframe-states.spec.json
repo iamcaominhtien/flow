@@ -1,0 +1,57 @@
+{
+  "type": "wireframe",
+  "title": "Wireframe states: one screen, four situations",
+  "desc": "Every screen that loads data has four faces: the list itself, loading, nothing yet, and an error. Design all four, not just the first.",
+  "set": "states",
+  "shared": [
+    {"kind": "navbar", "text": "My orders"},
+    {"kind": "bottom_nav", "items": ["Home", "Search", "Orders", "Me"], "icons": ["home", "pin", "cart", "user"], "selected": 2}
+  ],
+  "screens": [
+    {
+      "label": "Normal",
+      "state": "normal",
+      "blocks": [
+        {"kind": "list_item", "id": "first", "lead": "avatar", "text": "Pad Thai House", "detail": "2 items · $21.50", "chip": "On the way", "tone": "blue"},
+        {"kind": "list_item", "lead": "avatar", "text": "Green Bowl", "detail": "1 item · $12.00", "chip": "Delivered", "tone": "green"},
+        {"kind": "list_item", "lead": "avatar", "text": "Noodle Bar", "detail": "3 items · $30.20", "chip": "Cancelled", "tone": "red"}
+      ],
+      "annotations": [
+        {"target": "first", "part": "chip", "corner": "tr", "title": "Status chip", "text": "Colour and word, never colour alone."}
+      ]
+    },
+    {
+      "label": "Loading",
+      "state": "loading",
+      "blocks": [
+        {"kind": "loading", "id": "wait", "bars": 4, "text": "Loading your orders..."}
+      ],
+      "annotations": [
+        {"target": "wait", "part": "row-0", "corner": "tl", "title": "Skeleton", "text": "Grey bars in the shape of the real rows, so nothing jumps when data arrives."},
+        {"target": "wait", "part": "spinner", "corner": "tl", "title": "Spinner and text", "text": "Shown after about a second. The skeleton alone is enough before that."}
+      ]
+    },
+    {
+      "label": "Empty",
+      "state": "empty",
+      "blocks": [
+        {"kind": "empty", "id": "none", "text": "No orders yet", "detail": "When you order, it shows up here so you can track it.", "action": "Browse restaurants"}
+      ],
+      "annotations": [
+        {"target": "none", "part": "icon", "corner": "tl", "title": "Empty icon", "text": "Dashed, quiet. Nothing is wrong; there is just nothing yet."},
+        {"target": "none", "part": "action", "corner": "tl", "title": "One action", "text": "Empty states offer the next useful step, not a dead end."}
+      ]
+    },
+    {
+      "label": "Error",
+      "state": "error",
+      "blocks": [
+        {"kind": "error", "id": "failed", "text": "Something went wrong", "detail": "We could not load your orders. Check your connection and try again.", "action": "Try again", "items": ["Contact support"], "tap": true}
+      ],
+      "annotations": [
+        {"target": "failed", "part": "icon", "corner": "tr", "title": "Error icon", "text": "Rose, solid, with an exclamation mark. Plain words, no codes."},
+        {"target": "failed", "part": "action", "corner": "tl", "title": "Retry first", "text": "Retry is primary. A second route, such as support, is secondary."}
+      ]
+    }
+  ]
+}

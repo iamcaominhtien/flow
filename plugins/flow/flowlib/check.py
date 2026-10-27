@@ -84,6 +84,14 @@ class Code(StrEnum):
     EXPLAINER_TEXT_LONG = "explainer-text-long"
     EXPLAINER_JARGON = "explainer-jargon"
     EXPLAINER_NO_TITLE = "explainer-no-title"
+    WIREFRAME_TWO_PRIMARY = "wireframe-two-primary"
+    WIREFRAME_BADGE_ON_TEXT = "wireframe-badge-on-text"
+    WIREFRAME_PLACEHOLDER = "wireframe-placeholder-words"
+    WIREFRAME_STATE = "wireframe-state"
+    WIREFRAME_NOTE_LONG = "wireframe-note-long"
+    WIREFRAME_TOO_TALL = "wireframe-too-tall"
+    WIREFRAME_OVERLAP = "wireframe-blocks-overlap"
+    WIREFRAME_NO_NOTES = "wireframe-no-notes"
 
 
 @dataclass(frozen=True)

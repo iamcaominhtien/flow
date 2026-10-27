@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 from .drawio_common import FONT_BOLD, add_geometry, add_vertex, style_string
 from .markup import esc, fmt
 from .model import EdgeLabel, Node, Tone
-from .screen_part import Align, Part, PartKind
+from .screen_part import Part, PartKind
 from .screen_parts import screen_parts
 from .screen_scene import encode_screen
 from .theme import Theme, icon_svg
@@ -19,6 +19,7 @@ SVG_NAMESPACE = "http://www.w3.org/2000/svg"
 SCREEN_STYLE_KEY = "flowScreen"
 TONE_STYLE_KEY = "flowTone"  # the colour of the zone, which the id chip takes
 DASH_PATTERN = "4 3"
+IMAGE_KINDS = (PartKind.ICON, PartKind.PATH, PartKind.HATCH)  # parts drawn as one SVG picture
 ARC_START = 0.75  # of a full turn, measured clockwise from the right: the top of the circle
 ARC_END = 0.0
 HATCH_ANGLE_DEG = 45
@@ -140,11 +141,18 @@ def _part_style(part: Part, theme: Theme) -> str:
                 "strokeWidth": fmt(part.stroke_width),
             }
         )
-    if part.kind is PartKind.ICON:
-        return _image_style(_icon_uri(part))
-    if part.kind is PartKind.HATCH:
-        return _image_style(_hatch_uri(part, theme))
+    if part.kind in IMAGE_KINDS:
+        return _image_style(_part_uri(part, theme))
     return style_string({"html": 1, **_paint_pairs(part)})
+
+
+def _part_uri(part: Part, theme: Theme) -> str:
+    """Return the picture of an icon, a path or a hatched block as a data URI."""
+    if part.kind is PartKind.ICON:
+        return _icon_uri(part)
+    if part.kind is PartKind.PATH:
+        return _path_uri(part)
+    return _hatch_uri(part, theme)
 
 
 def _text_style(part: Part, theme: Theme) -> str:
@@ -154,7 +162,7 @@ def _text_style(part: Part, theme: Theme) -> str:
         {
             "text": "",
             "html": 1,
-            "align": "left" if part.align is Align.LEFT else "center",
+            "align": part.align.value,
             "verticalAlign": "middle",
             "whiteSpace": "nowrap",
             "spacing": 0,
@@ -176,6 +184,20 @@ def _image_style(uri: str) -> str:
 def _icon_uri(part: Part) -> str:
     """Return the image of an icon part as a data URI that has no semicolon."""
     svg = icon_svg(part.icon, part.bounds[2], part.stroke or "", f'xmlns="{SVG_NAMESPACE}"')
+    return "data:image/svg+xml," + base64.b64encode(svg.encode()).decode()
+
+
+def _path_uri(part: Part) -> str:
+    """Return a path part as an SVG image: a stroked outline in a box of its own size."""
+    _, _, width, height = part.bounds
+    paint = (
+        f'fill="{part.fill or "none"}" stroke="{part.stroke or "none"}" '
+        f'stroke-width="{fmt(part.stroke_width)}" stroke-linecap="round" stroke-linejoin="round"'
+    )
+    svg = (
+        f'<svg xmlns="{SVG_NAMESPACE}" width="{fmt(width)}" height="{fmt(height)}" '
+        f'viewBox="0 0 {fmt(width)} {fmt(height)}"><path d="{part.path}" {paint}/></svg>'
+    )
     return "data:image/svg+xml," + base64.b64encode(svg.encode()).decode()
 
 

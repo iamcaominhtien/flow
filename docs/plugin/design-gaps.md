@@ -4,22 +4,51 @@ Where each Flow type differs from its page in `docs/design/` (the frozen design)
 
 Status: **missing** = not built, **partial** = built but not to the page, **checked** = looked at in a picture.
 
+## Final status (phase 6b, the last)
+
+| Type | Status | What is left |
+| --- | --- | --- |
+| Foundations (themes, line weights, type scale, draw.io styles) | done | Real draw.io editor not used; border and contrast warnings in old examples not fixed |
+| Flowchart | done (phase 2) | Leftward failure branch, equal lane widths |
+| Sequence | done (phase 2): illustrated headers, 230 px pitch | Long activation bars of the picture |
+| ER | done (0.1.5) | none |
+| Architecture, cloud, C4 | done (phase 3b) | 40 px frame grid, `label_room` check, entry side of an architecture link |
+| DFD, BPMN | done (phase 3a) | none known |
+| State, use case, class | done (phase 4) | none known |
+| Gantt, org chart, mind map | done (phase 5a) | draw.io curves are sampled points |
+| Kanban, roadmap | done (phase 5b) | Roadmap columns end after the last card |
+| Explainer | done (phase 6a) | Link from a card to its detail page (dropped: the design has not decided it) |
+| Screen flow | done (phase 2); L3 now draws the wireframe blocks (phase 6b) | L3 text is small (0.6 of a phone), by design of the overview |
+| Wireframe | done (phase 6b), see below | Real draw.io editor not used; no live data in tables and charts (dropped) |
+
+Every row of the earlier lists is done or consciously dropped (named above). Nothing was checked in the real draw.io editor, only in the approximate viewer.
+
 ## Seen in a picture (ours next to the design)
 
 | Type | What differs |
 | --- | --- |
-| Screen flow | Missing: device frames, fidelity levels, S ids, trigger chips, guards, hotspots, zones, entry pills, tab bus, overlays. Ours is plain boxes. |
-| Sequence | Close: lifelines, bars, frames, notes, create and destroy, lost and found are there. Missing: illustrated headers; pitch is 270 px against 230. |
+| Screen flow | Done (phase 2): device frames, fidelity levels, S ids, trigger chips, guards, hotspots, zones, entry pills, tab bus, overlays. L3 with `blocks` draws the wireframe of phase 6b. |
+| Sequence | Done (phase 2): illustrated headers and the 230 px pitch were added to lifelines, bars, frames, notes, create and destroy, lost and found. |
 | Gantt, org chart, mind map | Brought up to the design (phase 5a, planning part 1): Gantt with dates or week numbers, month header, 88 px weeks, phase bands, owner circles, status colours with check, fill and blocked reason, amber milestones, finish-to-start arrows, one critical path, today line and legend; org chart with bus lines, plain and illustrated cards, open role and works-with line; radial mind map, illustrated, plain and large (four levels, P1/P2, check, owner, +N, violet arcs). Checked side by side with the design pictures; not verified in the real draw.io editor (curves are drawn through sampled points there). |
 | Kanban, roadmap | Brought up to the design (phase 5b, planning part 2): Kanban with 360 px columns, 100 px cards (title, kind tag, owner circle), count pill or `3 / 3` limit pill that turns red when full, done cards struck through, cards in written (priority) order, plain only; the comparison use (columns as options) is kept as `use: compare`. Roadmap with themes in rows (detailed lane icons), time in columns (Now, Next, Later or quarters), solid committed and dashed idea cards, owner circles, the one blue animated dependency arrow (`depends_on` or `blocks`, a second is an error) and a note below the chart; no exact dates (warning). Owner initials and tint come from the same helper as the Gantt and the org chart, taken from the name, so the tint matches across specs only when each pins it with `people`. Checked side by side with the design pictures; not verified in the real draw.io editor. Open: the design draws the columns taller than their cards (room to add more); ours end after the last card. |
 | Explainer | Brought up to the design (phase 6a): the new `explainer` type with the four shapes (layers, tree, comparison, concept) and sections on one page; the old `concept` and `layers` types are unchanged. Compared with the five pictures (layers, tree, compare, concept, payment). |
-| BPMN | Structure is close (pools, lanes, timers, gateways, message flows). Missing: start and end event types, boundary events, task markers, black-box pool, data store. |
-| DFD | Missing: Gane-Sarson shapes (numbered strip, open-ended store with id cell, square entity), ids, balancing, forbidden-link checks. Ours draws an ellipse and flat boxes. |
+| BPMN | Done (phase 3a): event types, boundary events, task markers, black-box pool, data store. |
+| DFD | Done (phase 3a): Gane-Sarson shapes, ids, balancing, forbidden-link checks. |
 | State, use case, class | Brought up to the design (phase 4, UML): `event [guard] / action` labels, entry/do/exit lines, composite frame, self loop above, several ends, left-to-right happy path; use case system frame, stick figures and illustrated cards, include and extend arrows, tint by actor; class boxes with stereotype, italic abstract names, mono members, multiplicities and all six line ends. Not verified in the real draw.io editor. |
 
-## Read in the docs and skills, not yet seen in a picture
+## Wireframe (phase 6b)
 
-Wireframe (real blocks, annotations, state and responsive sets), flowchart (parallel bars, connector notes, number letters, data role).
+Status: **built**, compared with Wireframe_Mobile, _Desktop, _States and _Responsive (HTML in a browser, the draw.io mobile file in the approximate viewer). Not checked in the real draw.io editor.
+
+- **New model.** A wireframe screen is a screen node (`Node.screen`) whose `ScreenView` has `blocks`, `badges`, `state`, `scale`, `is_captioned`, `is_plain`, `is_bare`. The drawing is a list of parts shared by HTML and draw.io (`screen_parts`), so both outputs agree and scene.json and the draw.io import keep the blocks (the view travels in the `flowScreen` style word). New part kind `path` (chevron, check, cross, hamburger). The palette and sizes are in `theme.json` under `wire` (read as `theme.wire`); the themes do not change them.
+- **Blocks** (25 kinds): navbar, sidebar, card, panel, list item, form field, buttons (primary blue, secondary and danger outlined, disabled), image (crossed box), tab bar, bottom nav, search bar, table, chart, figure, modal, sheet, toast, loading (skeleton and spinner), empty, error, success, status chip and choice chips, quantity stepper, key-value rows, checklist, text with grey bars. Placed by row, column and span of a 12 column grid; a bottom anchor pins the primary action. Rows are as tall as their tallest block; some kinds stretch to the row.
+- **Devices.** Phone 330 x 680 (3 px ink border, 38 px corners, status time and home bar), tablet 600 x 760, desktop 1320 x 760 with a browser bar; margins 28 (desktop) and 16 (phone), gap 16 between cards (desktop). Drawn at 1:1; flows draw them at 0.6, 0.5 and 0.35. The design says about 0.8 for phones: not used because the design pictures are 1:1 at 330 x 680.
+- **Annotations.** Badges (26 px, dark, teal mono digits) on a corner or side of a block or a named part, notes in columns below (per screen for a flow, four for a state set, three otherwise; the same title shares a number across screens). Red tap dot with halo from `tap`.
+- **Sets.** `set: states` needs the four states; `set: responsive` needs desktop, tablet and phone at the same height with their width ranges under the names.
+- **Checks.** Error: two primary actions on a screen (a modal counts apart). Warnings: badge over text, overlapping blocks, a screen taller than its device, stand-in words, long notes, missing state blocks, empty state without exactly one action, error without retry, responsive set without notes.
+- **Screen flow L3.** Done: `blocks` on an L3 screen use the same blocks and the same `id · name`.
+- **Differences from the pictures.** Notes of the mobile example sit 410 px apart and a few spacings differ by 2 to 8 px; the ETA card of the checkout has its words under the image instead of beside it; the responsive cards are 168 px against 175; the pictures' state set phones are 300 wide, ours 330. Text widths are estimated, so a long word can be cut.
+- **Dropped.** Free coordinates (the design says grid only), an illustrated style, animation, and live data in tables and charts.
 
 ## Foundations
 
