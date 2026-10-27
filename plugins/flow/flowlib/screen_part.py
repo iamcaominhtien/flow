@@ -13,6 +13,7 @@ class PartKind(StrEnum):
     ICON = "icon"
     HATCH = "hatch"
     ARC = "arc"
+    PATH = "path"  # a stroked outline drawn from an SVG path: a chevron, a cross, a check
 
 
 class Align(StrEnum):
@@ -20,6 +21,7 @@ class Align(StrEnum):
 
     LEFT = "left"
     CENTER = "center"
+    RIGHT = "right"
 
 
 Bounds = tuple[float, float, float, float]  # x, y, width, height, relative to the node
@@ -44,3 +46,4 @@ class Part:
     color: str = ""
     align: Align = Align.CENTER
     icon: str = ""
+    path: str = ""  # the ``d`` of an SVG path, in the units of the box of a PATH part

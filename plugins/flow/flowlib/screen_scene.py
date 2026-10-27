@@ -22,11 +22,23 @@ from .model import (
     Placement,
     ScreenElement,
     ScreenView,
+    WireState,
 )
-from .reader import Reader
+from .reader import Reader, is_number
+from .wire_scene import dump_badges, dump_blocks, parse_badges, parse_blocks
 
 SCREEN_KEYS = {"code", "title", "device", "orientation", "mini", "fidelity", "content", "hatch"}
 SCREEN_KEYS |= {"elements", "overlay", "overlay_title", "tab", "undecided", "chip_place"}
+SCREEN_KEYS |= {
+    "blocks",
+    "badges",
+    "state",
+    "scale",
+    "caption_note",
+    "captioned",
+    "address",
+    "bare",
+}
 ELEMENT_KEYS = {"text", "style", "at", "on", "hotspot"}
 TAB_LENGTH = 2
 DEFAULT_VIEW = ScreenView(code="")
@@ -57,6 +69,15 @@ def dump_screen(view: ScreenView) -> dict[str, Any]:
         "tab": [view.tab_active, view.tab_count] if view.tab_active is not None else None,
         "undecided": view.is_undecided,
         "chip_place": view.chip_place.value if view.chip_place is not ChipPlace.ABOVE else None,
+        "blocks": dump_blocks(view.blocks),
+        "badges": dump_badges(view.badges),
+        "state": view.state.value if view.state else None,
+        "scale": view.scale if view.scale != DEFAULT_VIEW.scale else None,
+        "caption_note": view.caption_note,
+        "captioned": view.is_captioned,
+        "address": view.address,
+        "bare": view.is_bare,
+        "plain": view.is_plain,
     }
     written.update({key: value for key, value in optional.items() if value})
     return written
@@ -106,6 +127,15 @@ def parse_screen(raw: object, where: str, read: Reader) -> ScreenView | None:
         tab_count=tab[1] if has_tab else 0,
         is_undecided=raw.get("undecided") is True,
         chip_place=read.enum(ChipPlace, raw, "chip_place", where) or ChipPlace.ABOVE,
+        blocks=parse_blocks(raw.get("blocks", []), f"{where}.blocks", read),
+        badges=parse_badges(raw.get("badges", []), f"{where}.badges", read),
+        state=read.enum(WireState, raw, "state", where),
+        scale=raw["scale"] if is_number(raw.get("scale")) and raw["scale"] > 0 else 1.0,
+        caption_note=read.text(raw, "caption_note", where) or "",
+        is_captioned=raw.get("captioned") is True,
+        address=read.text(raw, "address", where) or "",
+        is_bare=raw.get("bare") is True,
+        is_plain=raw.get("plain") is True,
     )
 
 

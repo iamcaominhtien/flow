@@ -9,6 +9,7 @@ from .model import ChipPlace, Device, Fidelity, Node, Orientation, ScreenView, T
 from .screen_body import BodyFrame, body_parts
 from .screen_part import Align, Bounds, Part, PartKind
 from .theme import ScreenRules, Theme
+from .wire_layout import natural_size, plan_screen, scale_parts
 
 CHIP_FONT_SIZE_PX = 10
 CHIP_CHAR_WIDTH_EM = 0.62  # of a mono font, with a margin
@@ -51,6 +52,9 @@ def screen_size(view: ScreenView, theme: Theme) -> tuple[float, float]:
         The size in pixels.
     """
     rules = theme.screen
+    if view.blocks and not is_card(view):
+        width, height = natural_size(view, theme)
+        return width * view.scale, height * view.scale
     width, height = rules.sizes[_size_key(view)]
     if is_card(view):
         return width, rules.card_height
@@ -70,12 +74,14 @@ def screen_parts(node: Node, theme: Theme) -> list[Part]:
         theme: The design tokens.
 
     Returns:
-        The parts. L3 is drawn as L2: the wireframe blocks are not placed yet.
+        The parts. L3 with ``blocks`` is a wireframe (design 10); without blocks it is L2.
     """
     view = node.screen
     assert view is not None
     if is_card(view):
         return _card_parts(node, view, theme)
+    if view.blocks:
+        return _wire_parts(node, view, theme)
     frame = BodyFrame(view, theme, node.width, node.height, _body_origin(view, theme))
     parts = [_frame_part(node, theme), *_chrome_parts(node, view, theme)]
     return [
@@ -84,6 +90,19 @@ def screen_parts(node: Node, theme: Theme) -> list[Part]:
         _chip_part(node, view, theme),
         _chip_text(node, view, theme),
     ]
+
+
+def _wire_parts(node: Node, view: ScreenView, theme: Theme) -> list[Part]:
+    """Draw a screen that has wireframe blocks: its device, its blocks and its badges.
+
+    The blocks are laid out at the real size of the device and shrunk to the node, so that a
+    screen of a flow at L3 and a screen of a wireframe are the same drawing at two sizes.
+    """
+    plan = plan_screen(view, theme, (node.width / view.scale, node.height / view.scale))
+    parts = scale_parts(plan.parts, view.scale)
+    if view.is_captioned or view.is_bare:
+        return parts
+    return [*parts, _chip_part(node, view, theme), _chip_text(node, view, theme)]
 
 
 def is_card(view: ScreenView) -> bool:
