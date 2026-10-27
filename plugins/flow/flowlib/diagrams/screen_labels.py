@@ -171,33 +171,3 @@ def text_labels(caption: Caption, centre: Point) -> tuple[EdgeLabel, ...]:
         at = (start + _effect_width(caption) / 2, centre[1])
         labels.append(EdgeLabel(_effect_text(caption), at, LabelKind.EFFECT))
     return tuple(labels)
-
-
-def place_caption(
-    segment: tuple[Point, Point], caption: Caption
-) -> tuple[EdgeLabel | None, tuple[EdgeLabel, ...]]:
-    """Place a caption on the longest segment of an arrow.
-
-    On a horizontal line the chip sits above the line and the guard and effect below it. On a
-    vertical line both sit to the right, the chip above the text.
-
-    Args:
-        segment: The two ends of the segment.
-        caption: What the arrow says.
-
-    Returns:
-        The chip, or None, and the guard and effect labels.
-    """
-    (x0, y0), (x1, y1) = segment
-    if y0 == y1:
-        middle = (x0 + x1) / 2
-        chip_at = (middle, y0 - CHIP_ABOVE_PX)
-        return trigger_label(caption, chip_at), text_labels(caption, (middle, y0 + TEXT_BELOW_PX))
-    middle_y = y0 + (y1 - y0) * VERTICAL_LABEL_FRACTION
-    has_chip = bool(caption.chip_text)
-    has_text = bool(line_width(caption))
-    chip_y = middle_y - (STACK_PX if has_text else 0)
-    text_y = middle_y + (STACK_PX if has_chip else 0)
-    chip_at = (x0 + SIDE_GAP_PX + chip_width(caption) / 2, chip_y)
-    text_centre = (x0 + SIDE_GAP_PX + line_width(caption) / 2, text_y)
-    return trigger_label(caption, chip_at), text_labels(caption, text_centre)

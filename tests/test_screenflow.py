@@ -318,7 +318,7 @@ def test_a_decision_is_a_diamond_with_no_id_and_a_system_chip() -> None:
     assert decision.chip.kind is LabelKind.SYSTEM and decision.chip.icon == "cloud"
 
 
-def test_a_loop_returns_round_the_outside_and_an_id_chip_moves_off_an_arrow() -> None:
+def test_a_retry_runs_round_the_outside_and_an_id_chip_moves_off_an_arrow() -> None:
     """A retry that cannot turn once runs outside the columns; the chip leaves the arrow's way."""
     screens = [
         screen("hub", [0, 1], code="S31", state="loading", size="mini", fidelity="L2"),
@@ -331,8 +331,8 @@ def test_a_loop_returns_round_the_outside_and_an_id_chip_moves_off_an_arrow() ->
         {"from": "data", "to": "hub", "kind": "retry", "trigger": "pull"},
     ]
     scene = flow(screens, taps)
-    loop = scene.edges[2]
-    assert min(x for x, _ in loop.points) < node_of(scene, "data").x
+    retry = scene.edges[2]
+    assert min(x for x, _ in retry.points) < node_of(scene, "data").x
     assert node_of(scene, "mid").screen.chip_place is ChipPlace.BELOW
 
 

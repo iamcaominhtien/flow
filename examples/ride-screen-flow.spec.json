@@ -1,0 +1,1090 @@
+{
+ "type": "screen",
+ "title": "Ride-hailing app: screen flow",
+ "zones": [
+  {
+   "id": "onb",
+   "label": "Onboarding",
+   "tone": "violet"
+  },
+  {
+   "id": "book",
+   "label": "Booking",
+   "tone": "blue"
+  },
+  {
+   "id": "trip",
+   "label": "Trip",
+   "tone": "amber"
+  },
+  {
+   "id": "pay",
+   "label": "Payments",
+   "tone": "teal"
+  },
+  {
+   "id": "acc",
+   "label": "Account",
+   "tone": "gray"
+  },
+  {
+   "id": "web",
+   "label": "Web Portal",
+   "tone": "red"
+  }
+ ],
+ "screens": [
+  {
+   "id": "AppIcon",
+   "kind": "entry",
+   "label": "App icon",
+   "detail": "AppIcon",
+   "at": [
+    0
+   ]
+  },
+  {
+   "id": "PushTripUpdate",
+   "kind": "entry",
+   "label": "Push",
+   "detail": "PushTripUpdate",
+   "at": [
+    5
+   ]
+  },
+  {
+   "id": "DeepLinkPromo",
+   "kind": "entry",
+   "label": "Deep link",
+   "detail": "DeepLinkPromo",
+   "at": [
+    4
+   ]
+  },
+  {
+   "id": "SplashScreen",
+   "label": "SplashScreen",
+   "zone": "onb",
+   "at": [
+    0,
+    0
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "HasSessionCheck",
+   "kind": "decision",
+   "label": "HasSessionCheck",
+   "trigger": "session?",
+   "system": "cloud",
+   "zone": "onb",
+   "at": [
+    0,
+    1
+   ]
+  },
+  {
+   "id": "WelcomeCarousel",
+   "label": "WelcomeCarousel",
+   "zone": "onb",
+   "at": [
+    0,
+    2
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "PhoneEntry",
+   "label": "PhoneEntry",
+   "zone": "onb",
+   "at": [
+    0,
+    3
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "OtpVerification",
+   "label": "OtpVerification",
+   "zone": "onb",
+   "at": [
+    0,
+    4
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "ProfileSetup",
+   "label": "ProfileSetup",
+   "zone": "onb",
+   "at": [
+    1,
+    4
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "LocationPermission",
+   "label": "LocationPermission",
+   "zone": "onb",
+   "at": [
+    1,
+    3
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "NotificationPermission",
+   "label": "NotificationPermission",
+   "zone": "onb",
+   "at": [
+    1,
+    2
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "HomeMap",
+   "label": "HomeMap",
+   "zone": "book",
+   "at": [
+    2,
+    1
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "DestinationSearch",
+   "label": "DestinationSearch",
+   "zone": "book",
+   "at": [
+    3,
+    2
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "SavedPlaces",
+   "label": "SavedPlaces",
+   "zone": "book",
+   "at": [
+    4,
+    2
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "RideOptions",
+   "label": "RideOptions",
+   "zone": "book",
+   "at": [
+    3,
+    3
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "FareEstimate",
+   "label": "FareEstimate",
+   "zone": "book",
+   "at": [
+    3,
+    4
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "PromoCodeSheet",
+   "label": "PromoCodeSheet",
+   "zone": "book",
+   "at": [
+    4,
+    4
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "ConfirmPickup",
+   "label": "ConfirmPickup",
+   "zone": "book",
+   "at": [
+    3,
+    5
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "FindingDriver",
+   "label": "FindingDriver",
+   "zone": "book",
+   "at": [
+    3,
+    6
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "DriverAssigned",
+   "label": "DriverAssigned",
+   "zone": "book",
+   "at": [
+    3,
+    8
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "NoDriversFound",
+   "label": "NoDriversFound",
+   "zone": "book",
+   "at": [
+    4,
+    7
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "DriverFoundCheck",
+   "kind": "decision",
+   "label": "DriverFoundCheck",
+   "trigger": "driver found?",
+   "system": "cloud",
+   "zone": "book",
+   "at": [
+    3,
+    7
+   ]
+  },
+  {
+   "id": "DriverArriving",
+   "label": "DriverArriving",
+   "zone": "trip",
+   "at": [
+    6,
+    5
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "ChatWithDriver",
+   "label": "ChatWithDriver",
+   "zone": "trip",
+   "at": [
+    6,
+    4
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "InTrip",
+   "label": "InTrip",
+   "zone": "trip",
+   "at": [
+    5,
+    6
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "ShareTripStatus",
+   "label": "ShareTripStatus",
+   "zone": "trip",
+   "at": [
+    6,
+    6
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "SosEmergency",
+   "label": "SosEmergency",
+   "zone": "trip",
+   "at": [
+    6,
+    7
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "SupportHelp",
+   "label": "SupportHelp",
+   "zone": "trip",
+   "at": [
+    6,
+    8
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "TripComplete",
+   "label": "TripComplete",
+   "zone": "trip",
+   "at": [
+    5,
+    7
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "RateDriver",
+   "label": "RateDriver",
+   "zone": "trip",
+   "at": [
+    5,
+    8
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "TipDriver",
+   "label": "TipDriver",
+   "zone": "trip",
+   "at": [
+    5,
+    9
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "PaymentApprovedCheck",
+   "kind": "decision",
+   "label": "PaymentApprovedCheck",
+   "trigger": "card approved?",
+   "system": "cloud",
+   "zone": "pay",
+   "at": [
+    7,
+    9
+   ]
+  },
+  {
+   "id": "ReceiptView",
+   "label": "ReceiptView",
+   "zone": "pay",
+   "at": [
+    7,
+    8
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "TripHistory",
+   "label": "TripHistory",
+   "zone": "pay",
+   "at": [
+    7,
+    7
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "PaymentFailed",
+   "label": "PaymentFailed",
+   "zone": "pay",
+   "at": [
+    8,
+    8
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "PaymentMethods",
+   "label": "PaymentMethods",
+   "zone": "pay",
+   "at": [
+    8,
+    7
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "WalletTopUp",
+   "label": "WalletTopUp",
+   "zone": "pay",
+   "at": [
+    9,
+    7
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "AddCard",
+   "label": "AddCard",
+   "zone": "pay",
+   "at": [
+    9,
+    8
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "ThreeDSecure",
+   "label": "ThreeDSecure",
+   "zone": "pay",
+   "at": [
+    8,
+    9
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "ProfileTab",
+   "label": "ProfileTab",
+   "zone": "acc",
+   "at": [
+    7,
+    1
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "SettingsScreen",
+   "label": "SettingsScreen",
+   "zone": "acc",
+   "at": [
+    7,
+    2
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "SafetyCenter",
+   "label": "SafetyCenter",
+   "zone": "acc",
+   "at": [
+    8,
+    1
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "TrustedContacts",
+   "label": "TrustedContacts",
+   "zone": "acc",
+   "at": [
+    8,
+    2
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "DeleteAccountConfirm",
+   "label": "DeleteAccountConfirm",
+   "zone": "acc",
+   "at": [
+    7,
+    3
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "SignOutConfirm",
+   "label": "SignOutConfirm",
+   "zone": "acc",
+   "at": [
+    8,
+    3
+   ],
+   "fidelity": "L1",
+   "device": "phone",
+   "size": "mini"
+  },
+  {
+   "id": "WebLogin",
+   "label": "WebLogin",
+   "zone": "web",
+   "at": [
+    11,
+    0
+   ],
+   "fidelity": "L1",
+   "device": "desktop"
+  },
+  {
+   "id": "WebTripList",
+   "label": "WebTripList",
+   "zone": "web",
+   "at": [
+    11,
+    1
+   ],
+   "fidelity": "L1",
+   "device": "desktop"
+  },
+  {
+   "id": "WebTripDetail",
+   "label": "WebTripDetail",
+   "zone": "web",
+   "at": [
+    11,
+    2
+   ],
+   "fidelity": "L1",
+   "device": "desktop"
+  },
+  {
+   "id": "WebInvoiceRequest",
+   "label": "WebInvoiceRequest",
+   "zone": "web",
+   "at": [
+    11,
+    3
+   ],
+   "fidelity": "L1",
+   "device": "desktop"
+  },
+  {
+   "id": "WebReceiptPdf",
+   "label": "WebReceiptPdf",
+   "zone": "web",
+   "at": [
+    12,
+    2
+   ],
+   "fidelity": "L1",
+   "device": "desktop"
+  },
+  {
+   "id": "WebProfile",
+   "label": "WebProfile",
+   "zone": "web",
+   "at": [
+    12,
+    1
+   ],
+   "fidelity": "L1",
+   "device": "desktop"
+  },
+  {
+   "id": "WebLogout",
+   "label": "WebLogout",
+   "zone": "web",
+   "at": [
+    12,
+    0
+   ],
+   "fidelity": "L1",
+   "device": "desktop"
+  }
+ ],
+ "taps": [
+  {
+   "from": "AppIcon",
+   "to": "SplashScreen",
+   "trigger": "launch the app",
+   "main": true
+  },
+  {
+   "from": "PushTripUpdate",
+   "to": "InTrip",
+   "trigger": "tap the push notification"
+  },
+  {
+   "from": "DeepLinkPromo",
+   "to": "PromoCodeSheet",
+   "trigger": "open the promo link"
+  },
+  {
+   "from": "SplashScreen",
+   "to": "HasSessionCheck",
+   "trigger": "timer ends after 2 s",
+   "system": "clock",
+   "main": true
+  },
+  {
+   "from": "HasSessionCheck",
+   "to": "HomeMap",
+   "guard": "session valid",
+   "main": true
+  },
+  {
+   "from": "HasSessionCheck",
+   "to": "WelcomeCarousel",
+   "guard": "no session"
+  },
+  {
+   "from": "WelcomeCarousel",
+   "to": "PhoneEntry",
+   "trigger": "tap Get started"
+  },
+  {
+   "from": "PhoneEntry",
+   "to": "OtpVerification",
+   "trigger": "tap Send code"
+  },
+  {
+   "from": "OtpVerification",
+   "to": "PhoneEntry",
+   "trigger": "tap Wrong number",
+   "kind": "back"
+  },
+  {
+   "from": "OtpVerification",
+   "to": "ProfileSetup",
+   "guard": "code valid"
+  },
+  {
+   "from": "ProfileSetup",
+   "to": "LocationPermission",
+   "trigger": "tap Continue"
+  },
+  {
+   "from": "LocationPermission",
+   "to": "NotificationPermission",
+   "trigger": "tap Allow"
+  },
+  {
+   "from": "LocationPermission",
+   "to": "HomeMap",
+   "route": "elbow",
+   "trigger": "tap Not now"
+  },
+  {
+   "from": "NotificationPermission",
+   "to": "HomeMap",
+   "route": "elbow",
+   "trigger": "tap Allow or Skip"
+  },
+  {
+   "from": "HomeMap",
+   "to": "DestinationSearch",
+   "trigger": "tap Where to",
+   "main": true
+  },
+  {
+   "from": "DestinationSearch",
+   "to": "SavedPlaces",
+   "trigger": "tap Saved"
+  },
+  {
+   "from": "SavedPlaces",
+   "to": "DestinationSearch",
+   "trigger": "tap Back",
+   "kind": "back"
+  },
+  {
+   "from": "DestinationSearch",
+   "to": "RideOptions",
+   "trigger": "tap a result",
+   "main": true
+  },
+  {
+   "from": "SavedPlaces",
+   "to": "RideOptions",
+   "trigger": "tap a place"
+  },
+  {
+   "from": "RideOptions",
+   "to": "FareEstimate",
+   "trigger": "tap Choose ride",
+   "main": true
+  },
+  {
+   "from": "FareEstimate",
+   "to": "PromoCodeSheet",
+   "trigger": "tap Add promo"
+  },
+  {
+   "from": "PromoCodeSheet",
+   "to": "FareEstimate",
+   "trigger": "tap Apply",
+   "kind": "back"
+  },
+  {
+   "from": "FareEstimate",
+   "to": "ConfirmPickup",
+   "trigger": "tap Confirm",
+   "main": true
+  },
+  {
+   "from": "ConfirmPickup",
+   "to": "FindingDriver",
+   "trigger": "tap Request ride",
+   "main": true
+  },
+  {
+   "from": "FindingDriver",
+   "to": "DriverFoundCheck",
+   "trigger": "the API answers",
+   "system": "cloud",
+   "main": true
+  },
+  {
+   "from": "DriverFoundCheck",
+   "to": "DriverAssigned",
+   "guard": "driver accepted",
+   "main": true
+  },
+  {
+   "from": "DriverFoundCheck",
+   "to": "NoDriversFound",
+   "guard": "no driver after 60 s",
+   "kind": "failure"
+  },
+  {
+   "from": "NoDriversFound",
+   "to": "FindingDriver",
+   "route": "elbow",
+   "trigger": "tap Try again",
+   "kind": "retry"
+  },
+  {
+   "from": "NoDriversFound",
+   "to": "RideOptions",
+   "route": "elbow",
+   "trigger": "tap Change ride",
+   "kind": "forward"
+  },
+  {
+   "from": "FindingDriver",
+   "to": "HomeMap",
+   "route": "elbow",
+   "trigger": "tap Cancel",
+   "kind": "forward"
+  },
+  {
+   "from": "DriverAssigned",
+   "to": "DriverArriving",
+   "trigger": "the screen advances on its own",
+   "system": "clock",
+   "main": true
+  },
+  {
+   "from": "HomeMap",
+   "to": "ProfileTab",
+   "trigger": "tap Profile tab"
+  },
+  {
+   "from": "DriverArriving",
+   "to": "ChatWithDriver",
+   "trigger": "tap Message"
+  },
+  {
+   "from": "ChatWithDriver",
+   "to": "DriverArriving",
+   "trigger": "tap Back",
+   "kind": "back"
+  },
+  {
+   "from": "DriverArriving",
+   "to": "InTrip",
+   "trigger": "the driver starts the trip",
+   "system": "bolt",
+   "main": true
+  },
+  {
+   "from": "DriverArriving",
+   "to": "HomeMap",
+   "route": "elbow",
+   "trigger": "tap Cancel ride",
+   "kind": "forward"
+  },
+  {
+   "from": "InTrip",
+   "to": "ShareTripStatus",
+   "trigger": "tap Share"
+  },
+  {
+   "from": "ShareTripStatus",
+   "to": "InTrip",
+   "trigger": "tap Done",
+   "kind": "back"
+  },
+  {
+   "from": "InTrip",
+   "to": "SosEmergency",
+   "trigger": "tap SOS"
+  },
+  {
+   "from": "SosEmergency",
+   "to": "InTrip",
+   "route": "elbow",
+   "trigger": "tap I am safe",
+   "kind": "forward"
+  },
+  {
+   "from": "SosEmergency",
+   "to": "SupportHelp",
+   "trigger": "tap Call support"
+  },
+  {
+   "from": "InTrip",
+   "to": "TripComplete",
+   "trigger": "the car reaches the drop-off",
+   "system": "bolt",
+   "main": true
+  },
+  {
+   "from": "TripComplete",
+   "to": "RateDriver",
+   "trigger": "tap Rate",
+   "main": true
+  },
+  {
+   "from": "RateDriver",
+   "to": "TipDriver",
+   "trigger": "tap Submit",
+   "main": true
+  },
+  {
+   "from": "TipDriver",
+   "to": "PaymentApprovedCheck",
+   "trigger": "tap Pay",
+   "main": true
+  },
+  {
+   "from": "PaymentApprovedCheck",
+   "to": "ReceiptView",
+   "guard": "card approved",
+   "main": true
+  },
+  {
+   "from": "PaymentApprovedCheck",
+   "to": "PaymentFailed",
+   "guard": "card declined",
+   "kind": "failure"
+  },
+  {
+   "from": "PaymentFailed",
+   "to": "PaymentMethods",
+   "trigger": "tap Change method"
+  },
+  {
+   "from": "PaymentFailed",
+   "to": "TipDriver",
+   "route": "elbow",
+   "trigger": "tap Retry",
+   "kind": "retry"
+  },
+  {
+   "from": "PaymentMethods",
+   "to": "AddCard",
+   "trigger": "tap Add card"
+  },
+  {
+   "from": "AddCard",
+   "to": "ThreeDSecure",
+   "trigger": "tap Save"
+  },
+  {
+   "from": "ThreeDSecure",
+   "to": "PaymentApprovedCheck",
+   "route": "elbow",
+   "trigger": "the bank answers",
+   "system": "cloud"
+  },
+  {
+   "from": "PaymentMethods",
+   "to": "WalletTopUp",
+   "trigger": "tap Top up"
+  },
+  {
+   "from": "WalletTopUp",
+   "to": "PaymentMethods",
+   "trigger": "tap Done",
+   "kind": "back"
+  },
+  {
+   "from": "ReceiptView",
+   "to": "TripHistory",
+   "trigger": "tap Done",
+   "main": true
+  },
+  {
+   "from": "TripHistory",
+   "to": "HomeMap",
+   "route": "elbow",
+   "trigger": "tap Home tab",
+   "kind": "forward"
+  },
+  {
+   "from": "ProfileTab",
+   "to": "SettingsScreen",
+   "trigger": "tap Settings"
+  },
+  {
+   "from": "ProfileTab",
+   "to": "SafetyCenter",
+   "trigger": "tap Safety"
+  },
+  {
+   "from": "SafetyCenter",
+   "to": "TrustedContacts",
+   "trigger": "tap Contacts"
+  },
+  {
+   "from": "TrustedContacts",
+   "to": "SafetyCenter",
+   "trigger": "tap Back",
+   "kind": "back"
+  },
+  {
+   "from": "ProfileTab",
+   "to": "SupportHelp",
+   "trigger": "tap Help"
+  },
+  {
+   "from": "ProfileTab",
+   "to": "TripHistory",
+   "trigger": "tap Your trips"
+  },
+  {
+   "from": "SettingsScreen",
+   "to": "PaymentMethods",
+   "trigger": "tap Payment"
+  },
+  {
+   "from": "SettingsScreen",
+   "to": "DeleteAccountConfirm",
+   "trigger": "tap Delete account"
+  },
+  {
+   "from": "DeleteAccountConfirm",
+   "to": "SplashScreen",
+   "route": "elbow",
+   "trigger": "tap Confirm"
+  },
+  {
+   "from": "DeleteAccountConfirm",
+   "to": "SettingsScreen",
+   "trigger": "tap Cancel",
+   "kind": "back"
+  },
+  {
+   "from": "SettingsScreen",
+   "to": "SignOutConfirm",
+   "trigger": "tap Sign out"
+  },
+  {
+   "from": "SignOutConfirm",
+   "to": "WelcomeCarousel",
+   "route": "elbow",
+   "trigger": "tap Confirm"
+  },
+  {
+   "from": "WebLogin",
+   "to": "WebTripList",
+   "trigger": "click Sign in",
+   "guard": "credentials valid"
+  },
+  {
+   "from": "WebTripList",
+   "to": "WebTripDetail",
+   "trigger": "click a trip"
+  },
+  {
+   "from": "WebTripDetail",
+   "to": "WebReceiptPdf",
+   "trigger": "click Receipt"
+  },
+  {
+   "from": "WebReceiptPdf",
+   "to": "WebTripDetail",
+   "trigger": "click Close",
+   "kind": "back"
+  },
+  {
+   "from": "WebTripDetail",
+   "to": "WebInvoiceRequest",
+   "trigger": "click Request invoice"
+  },
+  {
+   "from": "WebInvoiceRequest",
+   "to": "WebTripDetail",
+   "trigger": "click Back",
+   "kind": "back"
+  },
+  {
+   "from": "WebTripList",
+   "to": "WebProfile",
+   "trigger": "click Profile"
+  },
+  {
+   "from": "WebProfile",
+   "to": "WebLogout",
+   "trigger": "click Sign out"
+  },
+  {
+   "from": "WebLogout",
+   "to": "WebLogin",
+   "trigger": "the page reloads",
+   "system": "bolt"
+  }
+ ]
+}

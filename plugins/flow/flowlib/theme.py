@@ -755,6 +755,8 @@ class ScreenRules:
     gap_labelled: float
     channel_pitch: float
     channel_margin: float
+    lane_pitch: float
+    lane_edge: float
     chip_room: float
     chip_height: float
     chip_padding: float
