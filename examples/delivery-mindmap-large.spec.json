@@ -1,0 +1,406 @@
+{
+  "type": "mindmap",
+  "style": "illustrated",
+  "title": "Mind map: starting a food delivery company",
+  "desc": "Four levels, seven branches. Colour follows the branch, P1 and P2 mark priority, a check means done, a circle is the owner, +N hides more ideas, dashed arcs link ideas on different branches.",
+  "root": {
+    "label": "Start a delivery company",
+    "goal": "1,000 orders a day in a year",
+    "icon": "launch",
+    "children": [
+      {
+        "label": "Product",
+        "icon": "idea",
+        "tone": "blue",
+        "side": "right",
+        "children": [
+          {
+            "label": "Customer app",
+            "children": [
+              {
+                "label": "Browse menus",
+                "children": [
+                  {
+                    "label": "Search"
+                  },
+                  {
+                    "label": "Filters"
+                  },
+                  {
+                    "label": "Photos"
+                  }
+                ]
+              },
+              {
+                "label": "Checkout",
+                "id": "checkout",
+                "children": [
+                  {
+                    "label": "Cards",
+                    "priority": "P1"
+                  },
+                  {
+                    "label": "Wallets"
+                  },
+                  {
+                    "label": "Promo codes"
+                  }
+                ]
+              },
+              {
+                "label": "Tracking",
+                "children": [
+                  {
+                    "label": "Live map",
+                    "id": "livemap",
+                    "priority": "P1"
+                  },
+                  {
+                    "label": "Arrival time"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Restaurant tools",
+            "children": [
+              {
+                "label": "Menu editor",
+                "owner": "Ava Lopez"
+              },
+              {
+                "label": "Order screen",
+                "priority": "P1"
+              }
+            ]
+          },
+          {
+            "label": "Courier app",
+            "children": [
+              {
+                "label": "Job offers"
+              },
+              {
+                "label": "Navigation",
+                "id": "navigation",
+                "hidden": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Engineering",
+        "icon": "server",
+        "tone": "violet",
+        "side": "right",
+        "children": [
+          {
+            "label": "Platform",
+            "children": [
+              {
+                "label": "Backend API",
+                "done": true
+              },
+              {
+                "label": "Event bus",
+                "children": [
+                  {
+                    "label": "Order events",
+                    "id": "orderevents"
+                  },
+                  {
+                    "label": "Courier events",
+                    "id": "courierevents"
+                  }
+                ]
+              },
+              {
+                "label": "Data store",
+                "hidden": 4
+              }
+            ]
+          },
+          {
+            "label": "Quality",
+            "children": [
+              {
+                "label": "Tests",
+                "children": [
+                  {
+                    "label": "Unit"
+                  },
+                  {
+                    "label": "End to end"
+                  }
+                ]
+              },
+              {
+                "label": "Monitoring",
+                "children": [
+                  {
+                    "label": "Alerts"
+                  },
+                  {
+                    "label": "Dashboards"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Security",
+            "children": [
+              {
+                "label": "Login",
+                "done": true
+              },
+              {
+                "label": "Data protection",
+                "priority": "P2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Operations",
+        "icon": "courier",
+        "tone": "teal",
+        "side": "right",
+        "children": [
+          {
+            "label": "Couriers",
+            "children": [
+              {
+                "label": "Recruit",
+                "owner": "Lia Chen"
+              },
+              {
+                "label": "Train"
+              },
+              {
+                "label": "Pay"
+              }
+            ]
+          },
+          {
+            "label": "Restaurants",
+            "children": [
+              {
+                "label": "Sign up",
+                "owner": "Max Rossi"
+              },
+              {
+                "label": "Onboard"
+              }
+            ]
+          },
+          {
+            "label": "Support",
+            "children": [
+              {
+                "label": "Help desk"
+              },
+              {
+                "label": "Refunds",
+                "priority": "P2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Marketing",
+        "icon": "flag",
+        "tone": "amber",
+        "side": "left",
+        "children": [
+          {
+            "label": "Launch",
+            "children": [
+              {
+                "label": "Opening offer",
+                "priority": "P1"
+              },
+              {
+                "label": "Press kit",
+                "done": true
+              }
+            ]
+          },
+          {
+            "label": "Channels",
+            "children": [
+              {
+                "label": "Social media",
+                "children": [
+                  {
+                    "label": "Posts"
+                  },
+                  {
+                    "label": "Ads"
+                  }
+                ]
+              },
+              {
+                "label": "Email"
+              },
+              {
+                "label": "Referrals",
+                "priority": "P2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Money and law",
+        "icon": "money",
+        "tone": "green",
+        "side": "left",
+        "children": [
+          {
+            "label": "Licences",
+            "children": [
+              {
+                "label": "Business licence",
+                "done": true
+              },
+              {
+                "label": "Food safety",
+                "priority": "P1"
+              }
+            ]
+          },
+          {
+            "label": "Finance",
+            "children": [
+              {
+                "label": "Budget"
+              },
+              {
+                "label": "Pricing",
+                "children": [
+                  {
+                    "label": "Delivery fee"
+                  },
+                  {
+                    "label": "Commission"
+                  }
+                ]
+              },
+              {
+                "label": "Payouts",
+                "id": "payouts"
+              }
+            ]
+          },
+          {
+            "label": "Legal",
+            "children": [
+              {
+                "label": "Terms"
+              },
+              {
+                "label": "Privacy"
+              },
+              {
+                "label": "Insurance"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "People",
+        "icon": "team",
+        "tone": "red",
+        "side": "left",
+        "children": [
+          {
+            "label": "Hiring",
+            "children": [
+              {
+                "label": "Engineers",
+                "owner": "Sam Ortiz"
+              },
+              {
+                "label": "Support agents"
+              }
+            ]
+          },
+          {
+            "label": "Culture",
+            "children": [
+              {
+                "label": "Rituals"
+              },
+              {
+                "label": "Handbook"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Partners",
+        "icon": "cloud",
+        "tone": "gray",
+        "side": "left",
+        "children": [
+          {
+            "label": "Payments",
+            "children": [
+              {
+                "label": "Card provider",
+                "id": "cardprovider",
+                "priority": "P1"
+              }
+            ]
+          },
+          {
+            "label": "Maps",
+            "children": [
+              {
+                "label": "Routing"
+              },
+              {
+                "label": "Geocoding"
+              }
+            ]
+          },
+          {
+            "label": "Messaging",
+            "children": [
+              {
+                "label": "SMS"
+              },
+              {
+                "label": "Push"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "links": [
+    {
+      "from": "livemap",
+      "to": "orderevents",
+      "label": "needs"
+    },
+    {
+      "from": "navigation",
+      "to": "courierevents",
+      "label": "needs"
+    },
+    {
+      "from": "payouts",
+      "to": "cardprovider",
+      "label": "uses"
+    }
+  ]
+}

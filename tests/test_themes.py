@@ -114,6 +114,20 @@ def test_the_default_theme_is_not_written_to_a_scene_file() -> None:
     assert scene.parse(scene.dump(midnight)).theme == "midnight"
 
 
+@pytest.mark.parametrize("theme", THEMES)
+@pytest.mark.parametrize(
+    "name",
+    ["delivery-gantt", "delivery-org-illustrated", "delivery-mindmap", "delivery-mindmap-large"],
+)
+def test_planning_diagrams_render_in_every_theme(name: str, theme: str) -> None:
+    """The status colours, marks and curves have a value in each theme, in both outputs."""
+    laid_out = _themed(name, theme)
+    assert laid_out.theme == theme
+    page = render_html.render(laid_out)
+    assert load_theme(theme).ink in page
+    ET.fromstring(render_drawio.render(laid_out))
+
+
 @pytest.mark.parametrize("name", ["order-flow", "signin-sequence", "delivery-er", "refund-bpmn"])
 def test_every_spec_type_accepts_a_theme(name: str) -> None:
     """The ``theme`` key is read for every type, not only for flowcharts."""

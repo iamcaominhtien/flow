@@ -10,15 +10,14 @@ Status: **missing** = not built, **partial** = built but not to the page, **chec
 | --- | --- |
 | Screen flow | Missing: device frames, fidelity levels, S ids, trigger chips, guards, hotspots, zones, entry pills, tab bus, overlays. Ours is plain boxes. |
 | Sequence | Close: lifelines, bars, frames, notes, create and destroy, lost and found are there. Missing: illustrated headers; pitch is 270 px against 230. |
-| Gantt | Missing: month header, status colours and fill, today line, milestones, owner circles, phase bands, dates. Dependencies are drawn. |
+| Gantt, org chart, mind map | Brought up to the design (phase 5a, planning part 1): Gantt with dates or week numbers, month header, 88 px weeks, phase bands, owner circles, status colours with check, fill and blocked reason, amber milestones, finish-to-start arrows, one critical path, today line and legend; org chart with bus lines, plain and illustrated cards, open role and works-with line; radial mind map, illustrated, plain and large (four levels, P1/P2, check, owner, +N, violet arcs). Checked side by side with the design pictures; not verified in the real draw.io editor (curves are drawn through sampled points there). |
 | BPMN | Structure is close (pools, lanes, timers, gateways, message flows). Missing: start and end event types, boundary events, task markers, black-box pool, data store. |
 | DFD | Missing: Gane-Sarson shapes (numbered strip, open-ended store with id cell, square entity), ids, balancing, forbidden-link checks. Ours draws an ellipse and flat boxes. |
 | State, use case, class | Brought up to the design (phase 4, UML): `event [guard] / action` labels, entry/do/exit lines, composite frame, self loop above, several ends, left-to-right happy path; use case system frame, stick figures and illustrated cards, include and extend arrows, tint by actor; class boxes with stereotype, italic abstract names, mono members, multiplicities and all six line ends. Not verified in the real draw.io editor. |
-| Mind map | Missing: radial layout, curved coloured lines, icon pills, leaf cards, cross links, priority and owner marks. Ours is a plain tree. |
 
 ## Read in the docs and skills, not yet seen in a picture
 
-Concept and layers (explainer: comparison, concept hub, numbered badges, bands, closing line), org chart (bus, open role, works-with line), Kanban (limits, kind tags, owners), roadmap (committed and idea cards, dependency arrow), wireframe (real blocks, annotations, state and responsive sets), flowchart (parallel bars, connector notes, number letters, data role).
+Concept and layers (explainer: comparison, concept hub, numbered badges, bands, closing line), Kanban (limits, kind tags, owners), roadmap (committed and idea cards, dependency arrow), wireframe (real blocks, annotations, state and responsive sets), flowchart (parallel bars, connector notes, number letters, data role).
 
 ## Foundations
 

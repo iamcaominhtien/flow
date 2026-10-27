@@ -1,0 +1,145 @@
+{
+  "type": "mindmap",
+  "style": "illustrated",
+  "title": "Mind map: launching the delivery app",
+  "desc": "One topic in the middle, one colour per area of work, a few short ideas on each branch. Read it in any order. A mind map has no sequence, so nothing animates.",
+  "root": {
+    "label": "Launch the delivery app",
+    "goal": "first orders in May",
+    "icon": "launch",
+    "children": [
+      {
+        "label": "Product",
+        "icon": "idea",
+        "children": [
+          {
+            "label": "Menu and photos",
+            "icon": "store"
+          },
+          {
+            "label": "Checkout flow",
+            "icon": "cart"
+          },
+          {
+            "label": "Order tracking",
+            "icon": "pin"
+          },
+          {
+            "label": "Reviews",
+            "icon": "star"
+          }
+        ]
+      },
+      {
+        "label": "Engineering",
+        "icon": "server",
+        "children": [
+          {
+            "label": "Backend API",
+            "icon": "doc"
+          },
+          {
+            "label": "Mobile apps",
+            "icon": "phone"
+          },
+          {
+            "label": "Payments",
+            "icon": "card"
+          },
+          {
+            "label": "Monitoring",
+            "icon": "check"
+          }
+        ]
+      },
+      {
+        "label": "Marketing",
+        "icon": "flag",
+        "children": [
+          {
+            "label": "Launch offer",
+            "icon": "star"
+          },
+          {
+            "label": "Restaurant sign-ups",
+            "icon": "store"
+          },
+          {
+            "label": "Social media",
+            "icon": "bell"
+          },
+          {
+            "label": "Press kit",
+            "icon": "doc"
+          }
+        ]
+      },
+      {
+        "label": "Operations",
+        "icon": "courier",
+        "children": [
+          {
+            "label": "Courier onboarding",
+            "icon": "bike"
+          },
+          {
+            "label": "Support desk",
+            "icon": "user"
+          },
+          {
+            "label": "Restaurant onboarding",
+            "icon": "store"
+          },
+          {
+            "label": "Service areas",
+            "icon": "pin"
+          }
+        ]
+      },
+      {
+        "label": "Money and law",
+        "icon": "money",
+        "children": [
+          {
+            "label": "Payment licence",
+            "icon": "card"
+          },
+          {
+            "label": "Terms and privacy",
+            "icon": "doc"
+          },
+          {
+            "label": "Budget",
+            "icon": "clock"
+          },
+          {
+            "label": "Insurance",
+            "icon": "check"
+          }
+        ]
+      },
+      {
+        "label": "People",
+        "icon": "team",
+        "children": [
+          {
+            "label": "Hire a QA engineer",
+            "icon": "user"
+          },
+          {
+            "label": "Train couriers",
+            "icon": "bike"
+          },
+          {
+            "label": "Team rituals",
+            "icon": "clock"
+          },
+          {
+            "label": "Handbook",
+            "icon": "doc"
+          }
+        ]
+      }
+    ]
+  }
+}

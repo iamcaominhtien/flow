@@ -147,7 +147,7 @@ Flow aims to cover **nearly every common diagram type**, grouped into 8 categori
 
 ## Icons
 
-The icon library is 40 flat line icons plus 97 detailed icons (23 of them are the detailed form of a flat one). You can also add your own flat icons: Claude writes `icons.local.json` next to the spec, and the build checks it before use. The illustrated style is partial: add `"style": "illustrated"` and boxes with an icon become cards (large icon on a disc, name pill, detail line) in the flowchart, architecture, cloud, C4, BPMN, use case, DFD, screen flow, Kanban and layers skills, in both outputs. Cards use the 97 detailed 64 px icons from the design when the icon has one; the per-type illustrated notation of the design pages is not built. BPMN has pools as swimlanes, timer, message and error events, exclusive and parallel gateways and message flows, but no boundary events, data objects or checks that a message crosses pools. Not built: the illustrated notation specific to ER, DFD and the planning types, and restyling a whole existing diagram. The types above are simpler than the design pages describe (for example no device frames, no provider icons, no dates in the Gantt chart). Nothing has been tested in the draw.io editor, in claude.ai or in Cowork, or on Windows.
+The icon library is 40 flat line icons plus 97 detailed icons (23 of them are the detailed form of a flat one). You can also add your own flat icons: Claude writes `icons.local.json` next to the spec, and the build checks it before use. The illustrated style is partial: add `"style": "illustrated"` and boxes with an icon become cards (large icon on a disc, name pill, detail line) in the flowchart, architecture, cloud, C4, BPMN, use case, DFD, screen flow, Kanban and layers skills, in both outputs. Cards use the 97 detailed 64 px icons from the design when the icon has one; the per-type illustrated notation of the design pages is not built. BPMN has pools as swimlanes, timer, message and error events, exclusive and parallel gateways and message flows, but no boundary events, data objects or checks that a message crosses pools. Not built: the illustrated notation specific to ER, DFD, Kanban and the roadmap, and restyling a whole existing diagram. The types above are simpler than the design pages describe (for example no device frames, no provider icons). Nothing has been tested in the draw.io editor, in claude.ai or in Cowork, or on Windows.
 
 ## Roadmap
 
@@ -180,7 +180,7 @@ The icon library is 40 flat line icons plus 97 detailed icons (23 of them are th
 - claude.ai, Cowork, Windows (the command may need `python`) and Google Antigravity: not tested.
 - Text width is estimated, not measured.
 - The author path needs a way to look at the picture (a headless browser); one agent run per row; other models and types not run.
-- The type pages are simpler than the design pages (no device frames, no provider icons, no dates in the Gantt chart).
+- The type pages are simpler than the design pages (no device frames, no provider icons).
 
 ## Contributing
 
