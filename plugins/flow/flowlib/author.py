@@ -14,7 +14,7 @@ from itertools import pairwise
 from pathlib import Path
 
 from . import check, render_drawio, render_html, scene
-from .author_words import EdgeWords, build_words
+from .author_words import EdgeWords, build_words, stretch_of
 from .canvas import fit_canvas
 from .labels import place_labels
 from .model import (
@@ -54,6 +54,7 @@ LABEL_KIND_OF_ROLE = {Role.YES: LabelKind.YES, Role.NO: LabelKind.NO, Role.BACK:
 MIDDLE = 0.5
 LINE_ID = re.compile(r"e\d+")  # the ids the canvas gives to lines
 CONTENT_TOP_PX = 160  # the first y below the title and the description
+OFF_MIDDLE_PX = 1.0  # a line this close to the middle of a node runs down its middle
 GATEWAY_SIZE_PX = 56  # a BPMN gateway is a small diamond; its name goes under it
 GATEWAY_ICONS = {"x", "plus"}  # a diamond with one of these marks is a BPMN gateway
 TEXT_SLACK_PX = 48  # room added to the estimated width of free text, so it stays on one line
@@ -291,6 +292,9 @@ class Canvas:
             second.port(arrive, route.arrive_along),
         ]
         points = _right_angled(corners)
+        if route.words is not None and route.words.is_left is None:
+            side = _is_left_of_middle(stretch_of(route.words, points), (first, second))
+            route = replace(route, words=replace(route.words, is_left=side))
         label, extras = self._label_of(route, points)
         role = route.role
         if route.words and route.words.is_failure and role is Role.NEXT:
@@ -491,6 +495,18 @@ def _facing_side(box: Box, other: Box) -> str:
     if abs(delta_x) >= abs(delta_y):
         return Side.RIGHT if delta_x > 0 else Side.LEFT
     return Side.BOTTOM if delta_y > 0 else Side.TOP
+
+
+def _is_left_of_middle(stretch: tuple[Point, Point], ends: tuple[Box, Box]) -> bool:
+    """Tell whether a vertical stretch runs down the left half of the node it leaves or enters.
+
+    The words of such a line go on its left, outside a pair of lines that join the same two
+    nodes both ways. A line outside both nodes (in a channel) keeps its words on the right.
+    """
+    (start_x, _), (end_x, _) = stretch
+    if start_x != end_x:
+        return False
+    return any(box.node.x <= start_x < box.centre[0] - OFF_MIDDLE_PX for box in ends)
 
 
 def _right_angled(corners: list[Point]) -> list[Point]:

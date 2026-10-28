@@ -50,7 +50,7 @@ Top level: `type` (`screen`), `title`, `desc`, `theme` (see the flowchart skill)
 - **Item**: `id` (any name you use in `taps`), `label` (the name), `kind`, `at: [row, column]`, `zone`, `tone`.
 - **Kinds**: `screen` (default), `decision` (a diamond, no id), `start`, `end`, `entry` (a green pill in the left column; `label` is its source: App icon, Push, Deep link; `detail` a second line; `at` is `[row]`), `flag` (an off-page mark with `label` and `detail`, such as "To Checkout flow" and "diagram 02"), `tab` (one tab of a bar, with an `icon`).
 - **Screen id chip**: `code` is the id written on the chip, `S` and two digits (group digit: 0 onboarding, 1 browse, 2 checkout, 3 account), `W` for web (W01). Default: the `id`. A state of one screen shares its id: `"code": "S31", "state": "loading"` is `S31 · loading`. An overlay drawn on the screen it covers: `"overlay": "modal"` (or `sheet`, `toast`) gives `S12 + modal`. Give an overlay its own code only if it has onward arrows of its own.
-- **Device**: `device` is `phone` (default), `tablet`, `desktop` (a browser bar) or `watch`; `orientation` is `portrait` or `landscape`; `"size": "mini"` draws a phone at 120 × 240 for diagrams with many screens. Sizes: phone 156 × 324, tablet 164 × 236, desktop 240 × 170, watch 80 × 96 (landscape swaps them). Use the frame that matches the platform; never a badge.
+- **Device**: `device` is `phone` (default), `tablet`, `desktop` (a browser bar) or `watch`; `orientation` is `portrait` or `landscape`; `"size": "mini"` draws a phone at 120 × 240 for diagrams with many screens. Sizes: phone 156 × 324, tablet 164 × 236, desktop 240 × 170, watch 80 × 96 (landscape swaps them). Use the frame that matches the platform; never a badge. A title is drawn on one line and cut off when too wide: about 17 characters fit a mini phone, 24 a phone; the check warns `text-may-not-fit` when one is cut.
 - **Fidelity** `L0` to `L3`. Every level has the width of the device frame and the same centre line, so raising a screen never moves an arrow.
   - `L0`: a rounded card with the id and the name.
   - `L1`: a frame with the same generic skeleton and "content TBD".
@@ -89,7 +89,7 @@ An arrow is written `trigger [guard] / effect`.
 - Elements are named, not laid out: the frame shows them in a fixed order (top ones, the hatched block, bottom ones, tab bar).
 - Routing follows the grid. Long returns and arrows between far zones cross other lines (the check warns `lines-cross`): that is geometry, not a bug. Put the screens a flow goes through next to each other, and a hub that many screens return to near them.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor; the dark and slate chips are text with a background there, not pills.
-- The automatic arrangement orders by flow, not by how the diagram will look: it gives no errors on a large flow, but a hand-set `at` usually crosses fewer lines. The 52-screen benchmark gives about 30 `lines-cross` warnings with good `at` hints and more than 100 without.
+- The automatic arrangement orders by flow, not by how the diagram will look: it gives no errors on a large flow, but a hand-set `at` usually crosses far fewer lines.
 
 Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`, `red`. Any other value is refused by the build.
 

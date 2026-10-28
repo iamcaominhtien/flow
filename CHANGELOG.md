@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.11.3 (2026-10-28)
+
+Author kit and check: fixes from the third `screen-C-01` run, a Sonnet agent with the author kit (`benchmarks/results/2026-10-28-screen-C-01-author-sonnet.md`): 0 errors, 7 warnings.
+
+- Words beside a vertical line choose their side when `is_left` is not given: left of a line that runs down the left half of the screen it leaves or enters, else right. A back-and-forth pair at `0.3` and `0.7` carries its words outside the pair without settings.
+- Check: a title or an element name that a device frame cuts off warns `text-may-not-fit`. The estimate was compared with the widths Chromium draws for 14 titles on a mini phone and a phone; it flags every one cut by 3 px or more, and one of the two cut by 1 px. The ride example (three mini phone titles) and the overlay example (two modal buttons on a mini phone) now warn; both were already cut and are not changed.
+- Check messages: `crosses-border` says "the chip of" a line when its chip is on the border, not the line; `label-covers` on a node says no clear place exists and gives the chip's width.
+- Author skill: how `via` corners turn, the side of the words, the length of a screen title, the entry pill's detail and its left column, one zone per group, how to assign screens to groups when a brief lists only connections, and the gap a chip needs between two zones.
+- Screen flow skill: the title length; the benchmark's numbers are taken out, since a blind run reads the skill. Benchmarks README: a blind agent is told not to open `examples/` (the ride example is a solution of `screen-C-01`).
+- The ruff hook only touches files of this repository and keeps the `docs/` exclude, so it no longer rewrites a scratch script in a temporary folder.
+- Not done: zones other than rectangles; a check for very long lines; a way to stack modal buttons that do not fit. The changes were not tried by a new blind run.
+
 ## 0.11.2 (2026-10-27)
 
 Author kit: screen flows by hand. Found by the second `screen-C-01` benchmark run (`benchmarks/results/2026-10-27-screen-C-01-author.md`).

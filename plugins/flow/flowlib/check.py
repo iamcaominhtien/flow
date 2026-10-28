@@ -14,6 +14,8 @@ from .html_board import board_text_room, is_board_node
 from .html_nodes import CAPTION_FONT_SIZE_PX, CAPTION_GAP_PX, CAPTION_WIDTH_PX
 from .html_plan import is_plan_node, plan_text_room
 from .model import Edge, EdgeLabel, Frame, LabelKind, Node, Point, Role, Scene, Shape
+from .screen_part import Part, PartKind
+from .screen_parts import is_card, screen_parts
 from .sizing import LINE_HEIGHT_FACTOR, estimate_text_width
 from .text_area import text_area_width
 from .theme import LayoutRules, Theme, load_theme
@@ -35,6 +37,7 @@ WORDS_KINDS = (
 )  # the kinds that carry the words of a screen flow transition
 WRAPPING_CHARS = 2  # the brackets of a guard, or the slash and space of an effect
 MIN_SHARED_BUS_PX = 240.0  # lines of one kind that leave one node may share a bus this long
+SCREEN_TEXT_SLACK = 1.08  # the width estimate runs 2 to 10% over what Chromium draws in a screen
 
 
 class Severity(StrEnum):
@@ -121,6 +124,15 @@ class Rect:
             and self.top < other.bottom + margin
             and self.bottom > other.top - margin
         )
+
+
+@dataclass(frozen=True)
+class _BorderPart:
+    """Something a frame border must not cut: a node, or the chip of a line."""
+
+    id: str
+    name: str  # how a message names it: the quoted id, or "the chip of" a line
+    rect: Rect
 
 
 def node_rect(node: Node) -> Rect:
@@ -301,7 +313,8 @@ def _chips_on_nodes(scene: Scene, rules: LayoutRules) -> list[Finding]:
                 Finding(
                     Severity.ERROR,
                     Code.LABEL_COVERS,
-                    f"the label of '{edge.id}' covers '{node.id}'",
+                    f"the label of '{edge.id}' covers '{node.id}' and has no clear place on "
+                    f"its line; leave a gap wider than the chip ({rect.right - rect.left:.0f} px)",
                     (edge.id, node.id),
                 )
                 for node in scene.nodes
@@ -386,16 +399,10 @@ def check_text_fit(scene: Scene, rules: LayoutRules) -> list[Finding]:
     findings = []
     theme = load_theme(scene.theme)
     for node in scene.nodes:
-        if not node.text or node.screen is not None:
+        if node.screen is not None:
+            findings.extend(_screen_text_findings(node, theme))
             continue
-        room = _text_room(node, rules, theme)
-        if room is None:
-            continue
-        widest = max(
-            (estimate_text_width(line, rules, node.font_size) for line in node.text), default=0
-        )
-        height = len(node.text) * node.font_size * LINE_HEIGHT_FACTOR
-        if widest > room or height > node.height:
+        if node.text and not _text_fits(node, rules, theme):
             findings.append(
                 Finding(
                     Severity.WARNING,
@@ -405,6 +412,48 @@ def check_text_fit(scene: Scene, rules: LayoutRules) -> list[Finding]:
                 )
             )
     return findings
+
+
+def _text_fits(node: Node, rules: LayoutRules, theme: Theme) -> bool:
+    """Tell whether the text of a node fits its box, or is not checked."""
+    room = _text_room(node, rules, theme)
+    if room is None:
+        return True
+    widest = max(
+        (estimate_text_width(line, rules, node.font_size) for line in node.text), default=0
+    )
+    height = len(node.text) * node.font_size * LINE_HEIGHT_FACTOR
+    return widest <= room and height <= node.height
+
+
+def _screen_text_findings(node: Node, theme: Theme) -> list[Finding]:
+    """Report the words in a device frame that its box cuts off: the title or an element name.
+
+    A device frame draws each text on one line and hides what does not fit, so a long title on
+    a mini phone loses its end. Wireframe blocks are checked by the wireframe rules instead.
+    """
+    view = node.screen
+    if view is None or view.blocks or is_card(view):
+        return []
+    cut = [part.text for part in screen_parts(node, theme) if _is_cut(part, theme.layout)]
+    return [
+        Finding(
+            Severity.WARNING,
+            Code.TEXT_MAY_NOT_FIT,
+            f"\"{text}\" may be cut off on the screen '{node.id}'; shorten it or widen the screen",
+            (node.id,),
+        )
+        for text in cut
+    ]
+
+
+def _is_cut(part: Part, rules: LayoutRules) -> bool:
+    """Tell whether a text part of a screen is probably wider than its box."""
+    if part.kind is not PartKind.TEXT or not part.text:
+        return False
+    return (
+        estimate_text_width(part.text, rules, part.font_size) > part.bounds[2] * SCREEN_TEXT_SLACK
+    )
 
 
 def _text_room(node: Node, rules: LayoutRules, theme: Theme) -> float | None:
@@ -570,20 +619,21 @@ def _straddles(part: Rect, frame: Rect) -> bool:
     return not inside and not holds
 
 
-def _parts(scene: Scene, rules: LayoutRules) -> list[tuple[str, Rect]]:
+def _parts(scene: Scene, rules: LayoutRules) -> list[_BorderPart]:
     """Return what a frame border or a divider must not cut: nodes and the chips of lines.
 
-    An activation bar and the bar of a split are left out: they are long on purpose.
+    An activation bar and the bar of a split are left out: they are long on purpose. The line
+    itself may cross a border; only its words may not sit on one.
     """
     parts = [
-        (node.id, node_rect(node))
+        _BorderPart(node.id, f"'{node.id}'", node_rect(node))
         for node in scene.nodes
         if node.shape not in (Shape.BAR, Shape.FORK)
     ]
     for edge in scene.edges:
         rect = label_rect(edge, rules)
         if rect is not None:
-            parts.append((edge.id, rect))
+            parts.append(_BorderPart(edge.id, f"the chip of '{edge.id}'", rect))
     return parts
 
 
@@ -595,13 +645,13 @@ def check_borders(scene: Scene, rules: LayoutRules) -> list[Finding]:
     across a fragment. Both are warnings, since a long box may cross a frame on purpose.
     """
     findings = []
-    for part_id, rect in _parts(scene, rules):
+    for part in _parts(scene, rules):
         for frame in scene.frames:
             frame_box = frame_rect(frame)
-            if _straddles(rect, frame_box):
-                findings.append(_border_finding(part_id, frame, Code.CROSSES_BORDER))
-            if any(_on_divider(rect, frame_box, divider.y) for divider in frame.dividers):
-                findings.append(_border_finding(part_id, frame, Code.ON_DIVIDER))
+            if _straddles(part.rect, frame_box):
+                findings.append(_border_finding(part, frame, Code.CROSSES_BORDER))
+            if any(_on_divider(part.rect, frame_box, divider.y) for divider in frame.dividers):
+                findings.append(_border_finding(part, frame, Code.ON_DIVIDER))
     return findings
 
 
@@ -612,14 +662,14 @@ def _on_divider(part: Rect, frame: Rect, y: float) -> bool:
     return part.top + BORDER_TOLERANCE_PX < y < part.bottom - BORDER_TOLERANCE_PX
 
 
-def _border_finding(part_id: str, frame: Frame, code: Code) -> Finding:
+def _border_finding(part: _BorderPart, frame: Frame, code: Code) -> Finding:
     """Build the warning for a part that is cut by a frame border or a divider."""
     where = "straddles the border of" if code is Code.CROSSES_BORDER else "sits on a divider of"
     return Finding(
         Severity.WARNING,
         code,
-        f"'{part_id}' {where} the frame '{frame.id}'; move it inside or outside",
-        (part_id, frame.id),
+        f"{part.name} {where} the frame '{frame.id}'; move it inside or outside",
+        (part.id, frame.id),
     )
 
 

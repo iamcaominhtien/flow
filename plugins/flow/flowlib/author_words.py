@@ -39,7 +39,10 @@ class EdgeWords:
     segment: int | None = None  # which stretch of the line carries the words; default the longest
     along: float = MIDDLE  # how far along that stretch, from 0 to 1
     shift: Point = (0.0, 0.0)  # a last nudge of the words, in pixels
-    is_left: bool = False  # on a vertical stretch, put the words on the left of the line
+    # On a vertical stretch, put the words left of the line (True) or right (False). None lets
+    # the canvas choose: the side away from the middle of the screen the line runs along, so the
+    # two lines of a back-and-forth pair carry their words outside the pair.
+    is_left: bool | None = None
 
 
 def build_words(
@@ -58,7 +61,7 @@ def build_words(
     caption = _caption(words)
     if not caption.has_text:
         return None, ()
-    start, end = _stretch(words, points)
+    start, end = stretch_of(words, points)
     x = start[0] + (end[0] - start[0]) * words.along + words.shift[0]
     y = start[1] + (end[1] - start[1]) * words.along + words.shift[1]
     if abs(start[1] - end[1]) < FLAT_TOLERANCE_PX:
@@ -78,8 +81,16 @@ def _caption(words: EdgeWords) -> Caption:
     return Caption(trigger, None, words.guard, words.effect, words.is_failure)
 
 
-def _stretch(words: EdgeWords, points: list[Point]) -> tuple[Point, Point]:
-    """Return the stretch of the line that carries the words: the chosen one, else the longest."""
+def stretch_of(words: EdgeWords, points: list[Point]) -> tuple[Point, Point]:
+    """Return the stretch of the line that carries the words: the chosen one, else the longest.
+
+    Args:
+        words: What the arrow says; its ``segment`` picks a stretch.
+        points: The corners of the line.
+
+    Returns:
+        The start and the end of the stretch.
+    """
     stretches = list(pairwise(points))
     if words.segment is not None:
         return stretches[words.segment]

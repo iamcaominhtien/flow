@@ -246,6 +246,44 @@ def test_words_beside_a_vertical_line_sit_on_the_chosen_side() -> None:
     assert right.label.at[1] < right.extras[0].at[1]
 
 
+def test_a_back_and_forth_pair_carries_its_words_outside_the_pair() -> None:
+    """With no side given, each line of a vertical pair has its words on its outer side."""
+    canvas = Canvas()
+    view = ScreenView(code="S1", fidelity=Fidelity.L2)
+    canvas.node("top", Shape.SCREEN, "Top", NodeOptions((200, 300), screen=view))
+    canvas.node("low", Shape.SCREEN, "Low", NodeOptions((200, 800), screen=view))
+    down = canvas.edge(
+        "top", "low", Route(leave_along=0.3, arrive_along=0.3, words=EdgeWords("tap Next"))
+    )
+    up = canvas.edge(
+        "low", "top", Route(leave_along=0.7, arrive_along=0.7, words=EdgeWords("tap Back"))
+    )
+    assert down.label is not None and up.label is not None
+    assert down.label.at[0] < down.points[0][0] < up.points[0][0] < up.label.at[0]
+
+
+def test_a_title_too_long_for_a_mini_phone_is_reported() -> None:
+    """A mini phone cuts off a long title; the check says so, and a wider screen clears it."""
+    canvas = Canvas()
+    view = ScreenView(code="S1", fidelity=Fidelity.L1, is_mini=True)
+    canvas.node(
+        "cut", Shape.SCREEN, "Notification permission", NodeOptions((200, 300), screen=view)
+    )
+    canvas.node(
+        "wide",
+        Shape.SCREEN,
+        "Notification permission",
+        NodeOptions((500, 300), screen=view, width=160),
+    )
+    canvas.node("short", Shape.SCREEN, "Home map", NodeOptions((800, 300), screen=view))
+    cut = [
+        finding.items
+        for finding in check_scene(canvas.scene())
+        if finding.code is Code.TEXT_MAY_NOT_FIT
+    ]
+    assert cut == [("cut",)]
+
+
 def _blocked_canvas() -> tuple[Canvas, Edge]:
     """Return a canvas whose arrow has its chip over a small box beside the line."""
     canvas = _screen_canvas()
