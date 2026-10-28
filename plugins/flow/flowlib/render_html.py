@@ -7,6 +7,7 @@ from .html_explain import strip_frame_html
 from .html_frames import BAND_VARIANTS, frame_with_band_html
 from .html_lines import lines_layer
 from .html_nodes import node_html
+from .html_screen import SHOT_CLASS
 from .markup import esc, fmt, px, tag
 from .model import (
     MONO_LABEL_KINDS,
@@ -30,6 +31,8 @@ FONTS_URL = (
 
 # Text inside a node
 LINE_HEIGHT_FACTOR = 1.25
+SHOT_LAYER = 1000  # above every node, line and chip of the page
+SHOT_SHADE_PERCENT = 60  # how much ink darkens the page behind an opened screenshot
 NOTE_TEXT_WEIGHT = 400
 DOCUMENT_LABEL_TRIM_PX = 6  # the wavy bottom of a document leaves less room for text
 DOCUMENT_ICON_LIFT_PX = 3
@@ -404,7 +407,25 @@ def _stylesheet(theme: Theme) -> str:
         rules.append(f".{name}{{animation:{name} {fmt(speed.seconds)}s linear infinite}}")
     still = ",".join(f".{animation.value}" for animation in theme.animations)
     rules.append(f"@media (prefers-reduced-motion: reduce){{{still}{{animation:none}}}}")
+    rules.extend(_shot_rules(theme))
     return "\n".join(rules)
+
+
+def _shot_rules(theme: Theme) -> list[str]:
+    """Return the CSS that opens a screenshot of an L4 screen over the page while it has focus."""
+    shot = f".{SHOT_CLASS}"
+    shade = f"color-mix(in srgb,{theme.ink} {SHOT_SHADE_PERCENT}%,transparent)"
+    opened = (
+        "position:fixed!important;left:5vw!important;top:5vh!important;width:90vw!important;"
+        f"height:90vh!important;z-index:{SHOT_LAYER};background:{theme.paper}!important;"
+        f"box-shadow:0 0 0 100vmax {shade};"
+        "cursor:zoom-out!important;outline:none"
+    )
+    return [
+        f"{shot}:focus{{{opened}}}",
+        f"{shot}:focus img{{object-fit:contain!important}}",
+        f":has({shot}:focus){{z-index:{SHOT_LAYER}}}",  # lift the screen above later nodes
+    ]
 
 
 def render(scene: Scene) -> str:

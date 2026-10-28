@@ -35,7 +35,8 @@ THEME_KEY = "theme"
 SOURCE_AWARE: dict[str, Callable[[object, Path | None], Scene]] = {
     "dfd": dfd.layout_raw,
     "c4": c4.layout_raw,
-}  # the types whose layout needs the folder of the spec, to find the level above
+    "screen": screenflow.layout_raw,
+}  # the types whose layout needs the folder of the spec: the level above, the screenshots
 
 Layout = Callable[[object], Scene]
 
@@ -58,7 +59,6 @@ LAYOUTS: dict[str, Layout] = {
     "roadmap": roadmap.layout_raw,
     "mindmap": mindmap.layout_raw,
     **{name: graph.layout_with(each) for name, each in catalog.TYPES.items()},
-    "screen": screenflow.layout_raw,
     "bpmn": bpmn.layout_raw,
 }
 

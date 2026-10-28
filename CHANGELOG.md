@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.13.0 (2026-10-28)
+
+Screen flow L4, as built: phase 1 of `docs/plugin/l4-as-built.md`.
+
+- `"fidelity": "L4"` with `"capture": {"image", "source", "hotspots"}` draws a screenshot of the running app in the device frame, under the screen's name, fitted to the width of the body and cut at its bottom. Hotspot boxes, in the screenshot's pixels, get the red dot. Paths are read from the spec's folder; the author kit takes `ScreenView(capture=Capture(...))`.
+- The PNG is read with the standard library (its size from the header) and embedded as base64 in the HTML and the draw.io file. In the HTML a click on a screenshot opens it over the page with a stylesheet rule, no script. In draw.io a screenshot taller than the screen area is shrunk to fit, since draw.io cannot cut an image.
+- Checks: `capture-missing` and `capture-not-png` (errors; the screen is drawn as a hatch that says why), `capture-aspect`, `capture-stale` (the `source` file is newer than the screenshot), `hotspot-outside`, `capture-heavy` (over 8 MB of screenshots).
+- The line layer of the HTML no longer takes mouse clicks (`pointer-events: none`), so the screenshots under it can be clicked.
+- Example `notes-built-screen-flow`: three L4 screens beside an L2 and an L0 screen, with synthetic screenshots of a small HTML page taken by `examples/captures/notes/capture.js`.
+- Not done: phase 2 (the capture skill and the manifest read by the build) and phase 3 (the flow read from the code). RealWorld Conduit was not built here: installing its packages needs a permission the session did not have. The zoom was tried in Chromium only.
+
 ## 0.12.0 (2026-10-28)
 
 The rest of the gaps from the fourth `screen-C-01` run (`benchmarks/results/2026-10-28-screen-C-01-l0-sonnet.md`), and what was left from 0.11.3.

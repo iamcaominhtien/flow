@@ -7,6 +7,7 @@ draw.io renderer into a child cell, so both show the same screen (design 02 sect
 
 from .model import ChipPlace, Device, Fidelity, Node, Orientation, ScreenView, Tone
 from .screen_body import BodyFrame, body_parts
+from .screen_capture import capture_parts
 from .screen_part import Align, Bounds, Part, PartKind
 from .theme import ScreenRules, Theme
 from .wire_layout import natural_size, plan_screen, scale_parts
@@ -74,7 +75,8 @@ def screen_parts(node: Node, theme: Theme) -> list[Part]:
         theme: The design tokens.
 
     Returns:
-        The parts. L3 with ``blocks`` is a wireframe (design 10); without blocks it is L2.
+        The parts. L3 with ``blocks`` is a wireframe (design 10); without blocks it is L2. L4 shows
+        its screenshot (``screen_capture``).
     """
     view = node.screen
     assert view is not None
@@ -84,9 +86,10 @@ def screen_parts(node: Node, theme: Theme) -> list[Part]:
         return _wire_parts(node, view, theme)
     frame = BodyFrame(view, theme, node.width, node.height, _body_origin(view, theme))
     parts = [_frame_part(node, theme), *_chrome_parts(node, view, theme)]
+    body = capture_parts(frame) if view.fidelity is Fidelity.L4 else body_parts(frame)
     return [
         *parts,
-        *body_parts(frame),
+        *body,
         _chip_part(node, view, theme),
         _chip_text(node, view, theme),
     ]

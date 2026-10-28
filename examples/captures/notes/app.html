@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notes</title>
+<style>
+  body { margin: 0; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #fff; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 56px 24px 16px; }
+  h1 { font-size: 28px; margin: 0; }
+  .muted { color: #64748b; font-size: 15px; }
+  .field { display: block; width: 100%; box-sizing: border-box; margin: 12px 0; padding: 14px 16px;
+           border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 16px; color: #64748b; }
+  .primary { display: block; width: 100%; box-sizing: border-box; margin-top: 20px; padding: 15px;
+             border: 0; border-radius: 12px; background: #2563eb; color: #fff; font-size: 17px; font-weight: 600; }
+  .link { display: block; margin-top: 18px; text-align: center; color: #2563eb; font-size: 15px; }
+  main { padding: 8px 24px; }
+  .note { padding: 16px 0; border-bottom: 1px solid #e2e8f0; }
+  .note b { display: block; font-size: 17px; margin-bottom: 4px; }
+  .fab { position: fixed; right: 24px; bottom: 40px; width: 60px; height: 60px; border-radius: 30px; border: 0;
+         background: #2563eb; color: #fff; font-size: 32px; }
+  .add { font-size: 26px; color: #2563eb; border: 0; background: none; }
+  textarea { width: 100%; height: 420px; box-sizing: border-box; border: 0; font: 17px/1.5 Inter, sans-serif; color: #334155; }
+  .screen { display: none; } :target { display: block; }
+</style>
+</head>
+<body>
+<section id="sign-in" class="screen">
+  <header><h1>Sign in</h1></header>
+  <main>
+    <p class="muted">Welcome back. Your notes are waiting.</p>
+    <div class="field">Email</div>
+    <div class="field">Password</div>
+    <button class="primary" data-hotspot="Sign in">Sign in</button>
+    <a class="link">Forgot password?</a>
+  </main>
+</section>
+<section id="notes" class="screen">
+  <header><h1>Notes</h1><button class="add" data-hotspot="New note">+</button></header>
+  <main>
+    <div class="note" data-hotspot="Open a note"><b>Groceries</b><span class="muted">Milk, eggs, coffee, bread</span></div>
+    <div class="note"><b>Trip to Hanoi</b><span class="muted">Book the train, pack the camera</span></div>
+    <div class="note"><b>Ideas</b><span class="muted">A diagram tool that draws apps as built</span></div>
+    <div class="note"><b>Reading list</b><span class="muted">Three books for the autumn</span></div>
+  </main>
+</section>
+<section id="note" class="screen">
+  <header><button class="add" data-hotspot="Back">‹</button><span class="muted">Edited just now</span><button class="add" data-hotspot="Done">✓</button></header>
+  <main>
+    <h1>Groceries</h1>
+    <textarea>Milk
+Eggs
+Coffee
+Bread</textarea>
+  </main>
+</section>
+</body>
+</html>

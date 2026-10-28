@@ -1,6 +1,6 @@
 # Screen flow L4: screens as built
 
-Status: **proposal; phase 1 in progress.** Nothing on this page is in a release yet. It describes a fifth fidelity level for the screen flow, L4, where each screen is a real screenshot of the application, built and run from its own source code.
+Status: **phase 1 built (plugin 0.13.0); phases 2 and 3 are proposals.** This page describes a fifth fidelity level for the screen flow, L4, where each screen is a real screenshot of the application, built and run from its own source code.
 
 ## 1. Decisions
 
@@ -72,16 +72,17 @@ A screen at L4 names its capture:
 - `source`: the file that draws the screen. It is shown on hover in the HTML and used by the staleness check.
 - `hotspots`: optional. These are the boxes of the elements a transition starts from, in the screenshot's pixels, recorded by the capture script from the element's bounding box. The red dot of L2 is drawn on them, so the tapped element is marked on the real screen.
 
-A capture manifest (`captures/manifest.json`) written by the capture script holds the same fields for every screen. `"capture": "manifest"` makes the build read it, so a re-capture does not need a spec edit.
+A capture manifest (`captures/manifest.json`) written by the capture script holds the same fields for every screen. Phase 2: `"capture": "manifest"` makes the build read it, so a re-capture does not need a spec edit. In phase 1 the fields are copied into the spec.
 
 ## 5. Drawing
 
+- **Name.** The screen's name stays at the top of the body, as at L1 and L2; the screenshot starts under it.
 - **Size.** The frame keeps its device size (desktop 240 x 170, phone 156 x 324). A screenshot of a 1280 px wide page is shrunk about 5 times, so text is recognisable but not readable. Two answers:
-  - the HTML opens the full screenshot when a screen is clicked;
-  - an optional `"size": "large"` draws an L4 screen at twice the frame size, and the layout makes room as it does for any larger node.
+  - the HTML opens the full screenshot when a screen is clicked (built: the picture takes the focus and a stylesheet rule shows it over the page; no script);
+  - an optional `"size": "large"` draws an L4 screen at twice the frame size, and the layout makes room as it does for any larger node (not built).
 - **Capture size.** The capture script takes the screenshot at the viewport of the device (desktop 1280 x 800, phone 390 x 844) with a device scale factor of 1, so the embedded PNG stays small (about 100 to 300 KB per screen; not measured yet).
 - **Fit.** The image covers the screen area of the frame from the top, keeping its aspect ratio; what is below the frame's height is cut off. A full-page capture is for the zoom view, not for the frame.
-- **draw.io.** An image cell inside the frame cell, so the screenshot moves with the frame when the diagram is edited.
+- **draw.io.** An image cell inside the frame cell, so the screenshot moves with the frame when the diagram is edited. draw.io cannot cut an image, so a screenshot taller than the screen area is shrunk to fit inside it there.
 
 ## 6. Checks
 
@@ -150,7 +151,7 @@ What a run is scored on:
 
 | Phase | Content | Done when |
 | --- | --- | --- |
-| 1 | Plugin: `fidelity: "L4"` with `capture`; PNG embedding in HTML and draw.io; the checks in section 6; click to zoom in the HTML; an example built from synthetic captures | The tests pass with generated PNGs and an L4 example builds with no error |
+| 1 (built) | Plugin: `fidelity: "L4"` with `capture`; PNG embedding in HTML and draw.io; the checks in section 6; click to zoom in the HTML; an example built from synthetic captures (`examples/notes-built-screen-flow.spec.json`, screenshots of a small HTML page taken by `examples/captures/notes/capture.js`) | The tests pass with generated PNGs and an L4 example builds with no error |
 | 2 | Skill: how to build and run the app, the Playwright capture template, the manifest, hotspots from selectors | A blind agent captures Conduit and draws `screen-L4-A-01` |
 | 3 | Flow from code: routes and guards to a first spec; a check for drift between the diagram and the code | The drift check finds a transition removed from the code |
 

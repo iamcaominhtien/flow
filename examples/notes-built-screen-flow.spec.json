@@ -1,0 +1,188 @@
+{
+ "type": "screen",
+ "title": "Notes app: built and planned",
+ "desc": "The three built screens are screenshots of the running app (L4); sharing is planned (L2) and settings is only named (L0).",
+ "zones": [
+  {
+   "id": "auth",
+   "label": "Sign in",
+   "tone": "violet"
+  },
+  {
+   "id": "library",
+   "label": "Notes",
+   "tone": "blue"
+  }
+ ],
+ "screens": [
+  {
+   "id": "app",
+   "kind": "entry",
+   "label": "App icon",
+   "detail": "Launch",
+   "at": [
+    0
+   ]
+  },
+  {
+   "id": "sign_in",
+   "code": "S01",
+   "label": "Sign in",
+   "zone": "auth",
+   "fidelity": "L4",
+   "capture": {
+    "image": "captures/notes/sign-in.png",
+    "source": "captures/notes/app.html",
+    "hotspots": [
+     {
+      "text": "Sign in",
+      "box": [
+       24,
+       295,
+       342,
+       50
+      ]
+     }
+    ]
+   },
+   "at": [
+    0,
+    0
+   ]
+  },
+  {
+   "id": "notes",
+   "code": "S11",
+   "label": "Notes",
+   "zone": "library",
+   "fidelity": "L4",
+   "capture": {
+    "image": "captures/notes/notes.png",
+    "source": "captures/notes/app.html",
+    "hotspots": [
+     {
+      "text": "New note",
+      "box": [
+       339,
+       57,
+       27,
+       33
+      ]
+     },
+     {
+      "text": "Open a note",
+      "box": [
+       24,
+       114,
+       342,
+       77
+      ]
+     }
+    ]
+   },
+   "at": [
+    0,
+    1
+   ]
+  },
+  {
+   "id": "note",
+   "code": "S12",
+   "label": "Note",
+   "zone": "library",
+   "fidelity": "L4",
+   "capture": {
+    "image": "captures/notes/note.png",
+    "source": "captures/notes/app.html",
+    "hotspots": [
+     {
+      "text": "Back",
+      "box": [
+       24,
+       57,
+       21,
+       33
+      ]
+     },
+     {
+      "text": "Done",
+      "box": [
+       331,
+       56,
+       35,
+       34
+      ]
+     }
+    ]
+   },
+   "at": [
+    0,
+    2
+   ]
+  },
+  {
+   "id": "share",
+   "code": "S13",
+   "label": "Share note",
+   "zone": "library",
+   "fidelity": "L2",
+   "elements": [
+    {
+     "text": "Send",
+     "style": "primary"
+    }
+   ],
+   "at": [
+    0,
+    3
+   ]
+  },
+  {
+   "id": "settings",
+   "code": "S21",
+   "label": "Settings",
+   "zone": "library",
+   "at": [
+    1,
+    1
+   ]
+  }
+ ],
+ "taps": [
+  {
+   "from": "app",
+   "to": "sign_in",
+   "trigger": "launch the app"
+  },
+  {
+   "from": "sign_in",
+   "to": "notes",
+   "trigger": "tap Sign in",
+   "guard": "valid",
+   "main": true
+  },
+  {
+   "from": "notes",
+   "to": "note",
+   "trigger": "tap a note",
+   "main": true
+  },
+  {
+   "from": "note",
+   "to": "notes",
+   "trigger": "tap Done",
+   "kind": "back"
+  },
+  {
+   "from": "note",
+   "to": "share",
+   "trigger": "tap Share",
+   "main": true
+  },
+  {
+   "from": "notes",
+   "to": "settings",
+   "trigger": "tap Settings"
+  }
+ ]
+}

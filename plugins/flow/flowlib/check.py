@@ -97,6 +97,12 @@ class Code(StrEnum):
     WIREFRAME_TOO_TALL = "wireframe-too-tall"
     WIREFRAME_OVERLAP = "wireframe-blocks-overlap"
     WIREFRAME_NO_NOTES = "wireframe-no-notes"
+    CAPTURE_MISSING = "capture-missing"
+    CAPTURE_NOT_PNG = "capture-not-png"
+    CAPTURE_ASPECT = "capture-aspect"
+    CAPTURE_STALE = "capture-stale"
+    CAPTURE_HEAVY = "capture-heavy"
+    HOTSPOT_OUTSIDE = "hotspot-outside"
 
 
 @dataclass(frozen=True)
@@ -741,6 +747,7 @@ def check_scene(scene: Scene) -> list[Finding]:
     Returns:
         All findings, errors first.
     """
+    from .check_captures import check_captures
     from .check_notation import check_notation
     from .lint import lint_scene
 
@@ -759,6 +766,7 @@ def check_scene(scene: Scene) -> list[Finding]:
         *check_borders(scene, rules),
         *check_label_length(scene),
         *check_notation(scene),
+        *check_captures(scene),
     ]
     named = [_with_names(finding, scene) for finding in findings]
     return sorted(named, key=lambda finding: finding.severity is not Severity.ERROR)

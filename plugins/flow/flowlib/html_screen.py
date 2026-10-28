@@ -2,7 +2,7 @@
 
 import math
 
-from .markup import esc, fmt, px, tag
+from .markup import css, esc, fmt, px, tag
 from .model import Node, Tone
 from .screen_part import Align, Part, PartKind
 from .screen_parts import screen_parts
@@ -16,6 +16,7 @@ TEXT_LINE_HEIGHT = 1.2
 ARC_SPAN_FRACTION = 0.25  # of a full turn
 ARC_START_DEG = -90  # at the top of the circle
 JUSTIFY = {Align.LEFT: "flex-start", Align.CENTER: "center", Align.RIGHT: "flex-end"}
+SHOT_CLASS = "shot"  # a screenshot that opens over the page when it has the focus
 
 
 def screen_html(node: Node, theme: Theme) -> str:
@@ -80,6 +81,19 @@ def _text_html(part: Part, theme: Theme) -> str:
     return tag("div", style, esc(part.text))
 
 
+def _image_html(part: Part) -> str:
+    """Draw a screenshot: fitted to the width of its box, from the top, cut at the bottom.
+
+    The box can take the focus: clicking it shows the whole screenshot over the page, and
+    clicking elsewhere closes it. This needs no script; the rule is in the page's stylesheet.
+    """
+    box = {**_box_style(part), **_paint_style(part), "overflow": "hidden", "cursor": "zoom-in"}
+    picture = {"display": "block", "width": "100%", "height": "100%", "object-fit": "cover"}
+    source = f"data:image/png;base64,{part.image}"
+    image = f'<img alt="" src="{source}" style="{css({**picture, "object-position": "top"})}">'
+    return tag("div", box, image, tabindex="0", **{"class": SHOT_CLASS})
+
+
 def _hatch_html(part: Part, theme: Theme) -> str:
     """Draw the hatched block: grey diagonal stripes in a dashed outline."""
     stripe = theme.screen.hatch_stripe
@@ -124,16 +138,23 @@ def _path_html(part: Part) -> str:
     return tag("div", {**_box_style(part)}, svg)
 
 
+def _drawing_html(part: Part) -> str:
+    """Draw a part that needs no design token: an arc, a path or a screenshot."""
+    if part.kind is PartKind.ARC:
+        return _arc_html(part)
+    if part.kind is PartKind.PATH:
+        return _path_html(part)
+    return _image_html(part)
+
+
 def _part_html(part: Part, theme: Theme) -> str:
     """Draw one part of a screen."""
     if part.kind is PartKind.TEXT:
         return _text_html(part, theme)
     if part.kind is PartKind.HATCH:
         return _hatch_html(part, theme)
-    if part.kind is PartKind.ARC:
-        return _arc_html(part)
-    if part.kind is PartKind.PATH:
-        return _path_html(part)
+    if part.kind in (PartKind.ARC, PartKind.PATH, PartKind.IMAGE):
+        return _drawing_html(part)
     if part.kind is PartKind.ICON:
         place = f'style="position:absolute;left:{px(part.bounds[0])};top:{px(part.bounds[1])}"'
         return icon_svg(part.icon, part.bounds[2], part.stroke or theme.ink, place)

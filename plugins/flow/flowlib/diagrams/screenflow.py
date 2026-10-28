@@ -7,6 +7,7 @@ boxes, as in earlier versions.
 """
 
 from dataclasses import dataclass, replace
+from pathlib import Path
 
 from ..canvas import fit_canvas
 from ..check import chip_rect
@@ -61,6 +62,7 @@ from .screen_spec import (
     TransitionKind,
     parse_flow,
     uses_screen_features,
+    with_capture_paths,
 )
 from .screen_table import CodedArrow, condition_row, conditions_table
 
@@ -80,11 +82,13 @@ class Build:
     geometry: Geometry
 
 
-def layout_raw(raw: object) -> Scene:
+def layout_raw(raw: object, source_dir: Path | None = None) -> Scene:
     """Lay out a screen flow from a parsed JSON spec.
 
     Args:
         raw: The result of ``json.loads`` on the spec.
+        source_dir: The folder of the spec file; the screenshots of L4 screens are found from
+            it. The current folder when it is not given.
 
     Returns:
         The scene. A spec without the keys of design 02 is drawn as plain boxes.
@@ -94,7 +98,7 @@ def layout_raw(raw: object) -> Scene:
     """
     if not uses_screen_features(raw):
         return graph.layout_with(catalog.SCREEN)(raw)
-    return build_scene(parse_flow(raw))
+    return build_scene(with_capture_paths(parse_flow(raw), source_dir or Path()))
 
 
 def build_scene(spec: FlowSpec) -> Scene:

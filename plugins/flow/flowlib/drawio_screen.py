@@ -141,6 +141,8 @@ def _part_style(part: Part, theme: Theme) -> str:
                 "strokeWidth": fmt(part.stroke_width),
             }
         )
+    if part.kind is PartKind.IMAGE:
+        return _screenshot_style(part)
     if part.kind in IMAGE_KINDS:
         return _image_style(_part_uri(part, theme))
     return style_string({"html": 1, **_paint_pairs(part)})
@@ -179,6 +181,21 @@ def _text_style(part: Part, theme: Theme) -> str:
 def _image_style(uri: str) -> str:
     """Return the style of a cell that shows an image stretched over its box."""
     return style_string({"shape": "image", "image": uri, "imageAspect": 0})
+
+
+def _screenshot_style(part: Part) -> str:
+    """Return the style of a screenshot: the PNG kept in proportion, from the top, with a border.
+
+    draw.io cannot cut an image, so a screenshot taller than its box is shrunk to fit inside it.
+    """
+    pairs = {
+        "shape": "image",
+        "image": "data:image/png," + part.image,
+        "imageAspect": 1,
+        "imageVerticalAlign": "top",
+        "imageBorder": part.stroke or "none",
+    }
+    return style_string(pairs)
 
 
 def _icon_uri(part: Part) -> str:

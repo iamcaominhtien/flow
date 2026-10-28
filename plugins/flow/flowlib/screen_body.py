@@ -131,8 +131,12 @@ def _bold_text(frame: BodyFrame, bounds: Bounds, text: str, size: float) -> Part
     )
 
 
-def _title_parts(frame: BodyFrame, top: float) -> tuple[list[Part], float]:
+def title_parts(frame: BodyFrame, top: float) -> tuple[list[Part], float]:
     """Draw the name of the screen at the top left of its body.
+
+    Args:
+        frame: The screen being drawn.
+        top: The y of the top of the name.
 
     Returns:
         The part, and the y below it.
@@ -159,7 +163,7 @@ def _bar(frame: BodyFrame, bounds: Bounds, fill: str) -> Part:
 def _skeleton_parts(frame: BodyFrame) -> list[Part]:
     """Draw L1: the same generic content on every screen, and "content TBD"."""
     rules, theme = frame.rules, frame.theme
-    parts, top = _title_parts(frame, frame.origin[1])
+    parts, top = title_parts(frame, frame.origin[1])
     for fraction in SKELETON_BAR_WIDTHS:
         bounds = (frame.left, top, frame.span * fraction, rules.bar_height)
         parts.append(_bar(frame, bounds, theme.rule))
@@ -190,7 +194,7 @@ def _key_parts(frame: BodyFrame) -> list[Part]:
     parts: list[Part] = []
     top = frame.origin[1]
     if view.content not in (Content.SPLASH, Content.SUCCESS, Content.ERROR):
-        parts, top = _title_parts(frame, top)
+        parts, top = title_parts(frame, top)
     tops = [e for e in elements if e.placement is Placement.TOP]
     bottoms = [e for e in elements if e.placement is Placement.BOTTOM]
     for element in tops:
@@ -427,12 +431,20 @@ def _box_parts(frame: BodyFrame, box: Bounds, element: ScreenElement) -> list[Pa
         )
     )
     if has_dot:
-        parts.extend(_hotspot_parts(frame, box))
+        parts.extend(hotspot_parts(frame, box))
     return parts
 
 
-def _hotspot_parts(frame: BodyFrame, box: Bounds) -> list[Part]:
-    """Draw the red dot with a halo on the right end of the element that was tapped."""
+def hotspot_parts(frame: BodyFrame, box: Bounds) -> list[Part]:
+    """Draw the red dot with a halo on the right end of the element that was tapped.
+
+    Args:
+        frame: The screen being drawn.
+        box: The element, relative to the screen.
+
+    Returns:
+        The halo and the dot.
+    """
     rules = frame.rules
     centre_x = box[0] + box[2] - rules.halo_radius - 2
     centre_y = box[1] + box[3] / 2
