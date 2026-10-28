@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.1 (2026-10-28)
+
+- Author skill: how `segment=` counts the stretches of a line with `via` points, how to nest two L-shaped lines between diagonal neighbours, and `Role.NO` in the legend example. Found by the fifth `screen-C-01` run (`benchmarks/results/2026-10-28-screen-C-01-l0-sonnet-2.md`): 0 errors, 9 warnings, all crossings.
+
 ## 0.13.0 (2026-10-28)
 
 Screen flow L4, as built: phase 1 of `docs/plugin/l4-as-built.md`.
