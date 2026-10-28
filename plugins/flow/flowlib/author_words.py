@@ -36,6 +36,9 @@ class EdgeWords:
     guard: str | None = None  # written without the brackets
     effect: str | None = None  # written without the slash
     is_failure: bool = False  # the guard is rose, and the line is a "no" line unless a role is set
+    # A code such as ``C1``: the arrow shows only the code, and its words go in the conditions
+    # table (``Canvas.conditions``). Use it when the words are longer than about 20 characters.
+    code: str | None = None
     segment: int | None = None  # which stretch of the line carries the words; default the longest
     along: float = MIDDLE  # how far along that stretch, from 0 to 1
     shift: Point = (0.0, 0.0)  # a last nudge of the words, in pixels
@@ -76,8 +79,13 @@ def build_words(
 
 
 def _caption(words: EdgeWords) -> Caption:
-    """Build the caption the screen flow modules draw from the words of an arrow."""
+    """Build the caption the screen flow modules draw from the words of an arrow.
+
+    A coded arrow keeps only its code on the line; its words go in the conditions table.
+    """
     trigger = Trigger(words.trigger, words.system_icon) if words.trigger else None
+    if words.code:
+        return Caption(trigger, words.code, None, None, words.is_failure)
     return Caption(trigger, None, words.guard, words.effect, words.is_failure)
 
 

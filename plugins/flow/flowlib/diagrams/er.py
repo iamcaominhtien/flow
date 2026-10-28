@@ -20,6 +20,7 @@ from itertools import pairwise
 from typing import Any
 
 from ..canvas import fit_canvas
+from ..labels import place_labels
 from ..model import (
     Direction,
     Edge,
@@ -400,7 +401,8 @@ def layout_raw(raw: object) -> Scene:
         gap_horizontal=TABLE_GAP_PX,
         gap_horizontal_labelled=TABLE_GAP_PX,
     )
-    scene = _attach_to_rows(flowchart.layout(to_spec(raw), wide), raw)
+    # Lines moved to their rows carry their labels back to the middle; place them again.
+    scene = place_labels(_attach_to_rows(flowchart.layout(to_spec(raw), wide), raw))
     if isinstance(raw, dict) and raw.get("domain_frames") is True:
         return _with_domain_frames(scene, raw)
     return scene

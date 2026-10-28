@@ -6,6 +6,7 @@ drawn as L2.
 
 from dataclasses import dataclass
 
+from .glyph_widths import FontWeight, inter_width
 from .model import (
     Content,
     ElementStyle,
@@ -486,15 +487,23 @@ def _scrim_part(frame: BodyFrame) -> Part:
 
 
 def _modal_parts(frame: BodyFrame, buttons: list[ScreenElement]) -> list[Part]:
-    """Draw a modal: a white card with a title, two grey lines and a row of buttons."""
+    """Draw a modal: a white card with a title, two grey lines and its buttons.
+
+    The buttons sit side by side when their names fit, else one under the other, so that a
+    modal on a mini phone does not cut its button names.
+    """
     rules, theme = frame.rules, frame.theme
     pad = rules.inner_pad
     width = frame.width * MODAL_WIDTH_FRACTION
+    inner = width - 2 * pad
+    is_row = _buttons_fit_in_a_row(frame, buttons, inner)
+    rows = 1 if is_row else max(len(buttons), 1)
     height = (
         2 * pad
         + MODAL_TITLE_HEIGHT_PX
         + 2 * (rules.bar_height + rules.bar_gap)
-        + rules.element_height
+        + rows * rules.element_height
+        + (rows - 1) * MODAL_BUTTON_GAP_PX
     )
     left, top = (frame.width - width) / 2, (frame.height - height) / 2
     parts = [
@@ -502,7 +511,7 @@ def _modal_parts(frame: BodyFrame, buttons: list[ScreenElement]) -> list[Part]:
             PartKind.RECT, (left, top, width, height), fill=theme.paper, radius=rules.element_radius
         )
     ]
-    title = (left + pad, top + pad, width - 2 * pad, MODAL_TITLE_HEIGHT_PX)
+    title = (left + pad, top + pad, inner, MODAL_TITLE_HEIGHT_PX)
     parts.append(
         Part(
             PartKind.TEXT,
@@ -516,18 +525,43 @@ def _modal_parts(frame: BodyFrame, buttons: list[ScreenElement]) -> list[Part]:
     )
     line_top = title[1] + MODAL_TITLE_HEIGHT_PX
     for _ in range(2):
-        parts.append(
-            _bar(frame, (left + pad, line_top, width - 2 * pad, rules.bar_height), theme.rule)
-        )
+        parts.append(_bar(frame, (left + pad, line_top, inner, rules.bar_height), theme.rule))
         line_top += rules.bar_height + rules.bar_gap
-    count = max(len(buttons), 1)
-    each = (width - 2 * pad - (count - 1) * MODAL_BUTTON_GAP_PX) / count
-    for index, element in enumerate(buttons):
-        x = left + pad + index * (each + MODAL_BUTTON_GAP_PX)
-        parts.extend(
-            _box_parts(frame, (x, line_top + rules.bar_gap, each, rules.element_height), element)
-        )
+    area = (left + pad, line_top + rules.bar_gap, inner, rules.element_height)
+    boxes = _row_boxes(area, len(buttons)) if is_row else _column_boxes(area, len(buttons))
+    for box, element in zip(boxes, buttons, strict=True):
+        parts.extend(_box_parts(frame, box, element))
     return parts
+
+
+def _buttons_fit_in_a_row(frame: BodyFrame, buttons: list[ScreenElement], width: float) -> bool:
+    """Tell whether every button name fits when the buttons share one row of a given width."""
+    if not buttons:
+        return True
+    each = (width - (len(buttons) - 1) * MODAL_BUTTON_GAP_PX) / len(buttons)
+    room = each - 2 * ELEMENT_TEXT_INSET_PX
+    return all(
+        inter_width(button.text, frame.rules.text_size, FontWeight.BOLD) <= room
+        for button in buttons
+    )
+
+
+def _row_boxes(area: Bounds, count: int) -> list[Bounds]:
+    """Split the first row of an area into ``count`` boxes side by side."""
+    left, top, width, height = area
+    each = (width - (count - 1) * MODAL_BUTTON_GAP_PX) / max(count, 1)
+    return [
+        (left + index * (each + MODAL_BUTTON_GAP_PX), top, each, height) for index in range(count)
+    ]
+
+
+def _column_boxes(area: Bounds, count: int) -> list[Bounds]:
+    """Stack ``count`` boxes as wide as the area, one under the other."""
+    left, top, width, height = area
+    return [
+        (left, top + index * (height + MODAL_BUTTON_GAP_PX), width, height)
+        for index in range(count)
+    ]
 
 
 def _sheet_parts(frame: BodyFrame, rows: list[ScreenElement]) -> list[Part]:

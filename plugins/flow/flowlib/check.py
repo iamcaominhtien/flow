@@ -54,6 +54,7 @@ class Code(StrEnum):
     NODES_OVERLAP = "nodes-overlap"
     LINE_THROUGH_NODE = "line-through-node"
     LABEL_COVERS = "label-covers"
+    LABEL_ON_LINE = "label-on-line"
     OUTSIDE_CANVAS = "outside-canvas"
     TEXT_MAY_NOT_FIT = "text-may-not-fit"
     LINES_CROSS = "lines-cross"
@@ -294,6 +295,61 @@ def check_labels(scene: Scene, rules: LayoutRules) -> list[Finding]:
     return findings
 
 
+def check_labels_on_lines(scene: Scene, rules: LayoutRules) -> list[Finding]:
+    """Report a chip that sits on another line, where a reader cannot tell which line it names.
+
+    Reference lines (lifelines, grid lines) are left out: words cross them by design.
+    """
+    drawn = [edge for edge in scene.edges if _is_content(edge)]
+    pairs: dict[tuple[str, str], None] = {}
+    for edge in drawn:
+        for label in _chips_of(edge):
+            rect = chip_rect(label, rules)
+            pairs.update(
+                ((edge.id, other.id), None)
+                for other in drawn
+                if other.id != edge.id and _covers_line(rect, other)
+            )
+    return [
+        Finding(
+            Severity.WARNING,
+            Code.LABEL_ON_LINE,
+            f"the chip of '{chip_id}' sits on the line '{line_id}'; move it along its line",
+            (chip_id, line_id),
+        )
+        for chip_id, line_id in pairs
+    ]
+
+
+def _covers_line(rect: Rect, edge: Edge) -> bool:
+    """Tell whether any segment of a line passes through a rectangle."""
+    return any(_segment_hits(start, end, rect) for start, end in pairwise(edge.points))
+
+
+def line_rects(edge: Edge) -> list[Rect]:
+    """Return the rectangles a chip must keep out of so as not to sit on a line.
+
+    Args:
+        edge: A line.
+
+    Returns:
+        One rectangle around each segment of a content line, as wide as the clearance the check
+        allows on each side; none for a reference line (a lifeline or a grid line), which words
+        may cross.
+    """
+    if not _is_content(edge):
+        return []
+    return [
+        Rect(
+            min(start[0], end[0]) - LINE_CLEARANCE_PX,
+            min(start[1], end[1]) - LINE_CLEARANCE_PX,
+            max(start[0], end[0]) + LINE_CLEARANCE_PX,
+            max(start[1], end[1]) + LINE_CLEARANCE_PX,
+        )
+        for start, end in pairwise(edge.points)
+    ]
+
+
 def _chips_of(edge: Edge) -> list[EdgeLabel]:
     """Return the main chip of a line and its extra chips."""
     return [edge.label, *edge.extras] if edge.label else []
@@ -486,7 +542,9 @@ def check_label_length(scene: Scene) -> list[Finding]:
                     Severity.WARNING,
                     Code.LABEL_TOO_LONG,
                     f"the words on '{edge.id}' are longer than {INLINE_LABEL_MAX_CHARS} "
-                    "characters; use conditions: coded",
+                    "characters; shorten them, or write a code on the arrow and the words in the "
+                    "conditions table (a spec: conditions: coded; the author kit: "
+                    "EdgeWords(code=...) and Canvas.conditions)",
                     (edge.id,),
                 )
             )
@@ -692,6 +750,7 @@ def check_scene(scene: Scene) -> list[Finding]:
         *check_nodes_overlap(scene),
         *check_lines_through_nodes(scene),
         *check_labels(scene, rules),
+        *check_labels_on_lines(scene, rules),
         *check_captions(scene, rules),
         *check_canvas(scene, rules),
         *check_text_fit(scene, rules),

@@ -17,13 +17,10 @@ from ..model import (
     Node,
     Point,
     Role,
-    Row,
     Scene,
-    Shape,
     Tone,
 )
-from ..sizing import estimate_text_width, key_room
-from ..theme import LayoutRules, Theme, load_theme
+from ..theme import Theme, load_theme
 from . import catalog, graph
 from .screen_chips import Crowd, blocks_of, choose_spot, lines_of
 from .screen_geometry import Geometry, Sizing, compute_geometry
@@ -65,15 +62,10 @@ from .screen_spec import (
     parse_flow,
     uses_screen_features,
 )
+from .screen_table import CodedArrow, condition_row, conditions_table
 
 ENTRY_ZONE_LABEL = "Entry points"
-CONDITIONS_TITLE = "Conditions"
-CONDITIONS_ID = "conditions"
-ARROW_JOIN = " → "
-TEXT_JOIN = " · "
 BUS_CHIP_RISE_PX = 18
-MONO_CHAR_EM = 0.62
-TABLE_TEXT_MARGIN = 1.12  # the width of a row is estimated, so it gets some room to spare
 
 
 @dataclass(frozen=True)
@@ -354,47 +346,22 @@ def _conditions_table(
     rules = build.theme.layout
     items = {item.id: item for item in build.spec.items}
     rows = tuple(
-        _table_row(build.spec.transitions[index], code, items) for index, code in codes.items()
+        condition_row(_coded_arrow(build.spec.transitions[index], code, items))
+        for index, code in codes.items()
     )
     bottoms = [n.y + n.height for n in nodes.values()] + [f.y + f.height for f in frames]
     rights = [n.x + n.width for n in nodes.values()] + [f.x + f.width for f in frames]
-    width = max(_table_width(rows, rules), max(rights) - rules.margin)
-    height = rules.table_header_height + len(rows) * rules.table_row_height + rules.table_bottom_pad
     top = max(bottoms) + build.theme.screen.table_gap
-    return [
-        Node(
-            id=CONDITIONS_ID,
-            shape=Shape.TABLE,
-            x=rules.margin,
-            y=top,
-            width=width,
-            height=height,
-            text=(CONDITIONS_TITLE,),
-            icon=None,
-            tone=Tone.GRAY,
-            number=None,
-            font_size=rules.table_name_font_size,
-            sections=(rows,),
-        )
-    ]
+    return [conditions_table(rows, (rules.margin, top), max(rights) - rules.margin, rules)]
 
 
-def _table_width(rows: tuple[Row, ...], rules: LayoutRules) -> float:
-    """Estimate the width the longest row of the conditions table needs."""
-    mono = MONO_CHAR_EM * rules.detail_font_size
-    widest = max(
-        estimate_text_width(row.left, rules, rules.table_name_font_size) + len(row.right) * mono
-        for row in rows
+def _coded_arrow(transition: Transition, code: str, items: dict[str, Item]) -> CodedArrow:
+    """Describe a coded transition for its row of the conditions table."""
+    return CodedArrow(
+        code=code,
+        source=_name_of(items[transition.source]),
+        target=_name_of(items[transition.target]),
+        trigger=transition.trigger.text if transition.trigger else "",
+        guard=transition.guard,
+        effect=transition.effect,
     )
-    room = 2 * rules.table_padding_x + key_room((rows,), rules) + rules.table_row_gap
-    return max(rules.table_min_width, widest * TABLE_TEXT_MARGIN + room)
-
-
-def _table_row(transition: Transition, code: str, items: dict[str, Item]) -> Row:
-    """Build a row of the conditions table: the code, the arrow, the guard and the effect."""
-    route = _name_of(items[transition.source]) + ARROW_JOIN + _name_of(items[transition.target])
-    trigger = transition.trigger.text if transition.trigger else ""
-    left = TEXT_JOIN.join(part for part in (route, trigger) if part)
-    guard = f"[{transition.guard}]" if transition.guard else ""
-    effect = f"/ {transition.effect}" if transition.effect else ""
-    return Row(left=left, right=" ".join(part for part in (guard, effect) if part), flags=(code,))

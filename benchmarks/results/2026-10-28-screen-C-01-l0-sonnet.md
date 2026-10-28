@@ -29,4 +29,4 @@ Four bands: Onboarding; Booking; Account (left) and Trip (right); Payments (left
 5. The legend has no sample for the dark (person) and slate (system) chips.
 6. "One column at the left, each pill at the height of its screen" cannot hold when the screens are far apart.
 
-Items 1 and 2 are fixed in 0.11.4. Files of the run (scratchpad, not in the repo): `run4/make.py`, `ride.html`, `ride.drawio`, `ride_final.png`.
+Items 1 and 2 are fixed in 0.11.4, items 3 to 6 in 0.12.0. Files of the run (scratchpad, not in the repo): `run4/make.py`, `ride.html`, `ride.drawio`, `ride_final.png`.

@@ -100,9 +100,12 @@ def _project_on_path(points: tuple[Point, ...], target: Point) -> tuple[float, P
 
     Returns:
         The fraction of the path length at which the nearest point lies (0 at the start, 1 at
-        the end), and that point.
+        the end), and that point. A path of no length (a chip that stands alone, in a legend)
+        gives 0 and its point.
     """
     total = sum(math.dist(start, end) for start, end in pairwise(points))
+    if total == 0:
+        return 0.0, points[0]
     best: tuple[float, Point, float] = (math.inf, points[0], 0.0)
     travelled = 0.0
     for start, end in pairwise(points):

@@ -38,6 +38,7 @@ SCREEN_KEYS |= {
     "captioned",
     "address",
     "bare",
+    "plain",
 }
 ELEMENT_KEYS = {"text", "style", "at", "on", "hotspot"}
 TAB_LENGTH = 2

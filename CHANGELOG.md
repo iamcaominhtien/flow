@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.12.0 (2026-10-28)
+
+The rest of the gaps from the fourth `screen-C-01` run (`benchmarks/results/2026-10-28-screen-C-01-l0-sonnet.md`), and what was left from 0.11.3.
+
+- Labels keep off other lines: `place_labels` slides a chip off any other content line when a clear place exists on its own line, and keeps the old place otherwise. New check `label-on-line` (warning) for a chip left on another line. Lifelines and grid lines are left out. ER diagrams place their labels again after moving lines to their rows. Over the 78 example specs, the new check found 17 chips on other lines in 9 examples before the change and none after; no other warning changed except in the two examples changed below.
+- Author kit, coded conditions: `EdgeWords(code="C1")` draws only the code on the arrow, and `Canvas.conditions(corner)` adds the Conditions table, the same table the automatic screen flow draws (now in `diagrams/screen_table.py`). The `label-too-long` message names both ways.
+- Author kit, legend: `Canvas.legend(corner, roles, chips)` adds samples of the words on arrows (person, system, guards, effect, code) with what each means. A chip in the legend stands alone; a line of no length is written to draw.io without an error.
+- Modal buttons that do not fit side by side are stacked, so a modal on a mini phone does not cut their names (the overlay example).
+- Ride example: screen names in sentence case and decisions as questions, so no name is cut and every diamond's text fits; the five arrows with words over 20 characters carry codes C1 to C5 and a Conditions table.
+- A scene with a plain-frame screen (`wireframe-responsive`) can be read back: the scene reader did not know the `plain` field.
+- Author skill: plan rows so each screen an entry opens is first in its row; codes and the Conditions table; chips on other lines; the legend of words.
+- Not done: zones that are not rectangles (the design draws zones as rectangles, and a new shape would need the renderers, draw.io and the border checks); a warning for very long lines (it would fire on six automatic-layout examples that cannot avoid it). The changes were not tried by a new blind run.
+
 ## 0.11.4 (2026-10-28)
 
 Screen text check and L0 cards. Found by the fourth `screen-C-01` run, at L0 (`benchmarks/results/2026-10-28-screen-C-01-l0-sonnet.md`): 0 errors, 9 warnings.
