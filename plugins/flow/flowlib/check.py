@@ -10,12 +10,13 @@ from enum import StrEnum
 from itertools import combinations, pairwise
 
 from .explain_parts import is_explain_node
+from .glyph_widths import FontWeight, inter_width
 from .html_board import board_text_room, is_board_node
 from .html_nodes import CAPTION_FONT_SIZE_PX, CAPTION_GAP_PX, CAPTION_WIDTH_PX
 from .html_plan import is_plan_node, plan_text_room
 from .model import Edge, EdgeLabel, Frame, LabelKind, Node, Point, Role, Scene, Shape
 from .screen_part import Part, PartKind
-from .screen_parts import is_card, screen_parts
+from .screen_parts import screen_parts
 from .sizing import LINE_HEIGHT_FACTOR, estimate_text_width
 from .text_area import text_area_width
 from .theme import LayoutRules, Theme, load_theme
@@ -37,7 +38,7 @@ WORDS_KINDS = (
 )  # the kinds that carry the words of a screen flow transition
 WRAPPING_CHARS = 2  # the brackets of a guard, or the slash and space of an effect
 MIN_SHARED_BUS_PX = 240.0  # lines of one kind that leave one node may share a bus this long
-SCREEN_TEXT_SLACK = 1.08  # the width estimate runs 2 to 10% over what Chromium draws in a screen
+CUT_TOLERANCE_PX = 2.0  # words this much wider than their box lose less than a letter's edge
 
 
 class Severity(StrEnum):
@@ -429,13 +430,14 @@ def _text_fits(node: Node, rules: LayoutRules, theme: Theme) -> bool:
 def _screen_text_findings(node: Node, theme: Theme) -> list[Finding]:
     """Report the words in a device frame that its box cuts off: the title or an element name.
 
-    A device frame draws each text on one line and hides what does not fit, so a long title on
-    a mini phone loses its end. Wireframe blocks are checked by the wireframe rules instead.
+    A device frame or an L0 card draws each text on one line and hides what does not fit, so a
+    long name on a mini phone or a card loses its end. Wireframe blocks are checked by the
+    wireframe rules instead. The id chip (mono type) is sized to its code and is left out.
     """
     view = node.screen
-    if view is None or view.blocks or is_card(view):
+    if view is None or view.blocks:
         return []
-    cut = [part.text for part in screen_parts(node, theme) if _is_cut(part, theme.layout)]
+    cut = [part.text for part in screen_parts(node, theme) if _is_cut(part)]
     return [
         Finding(
             Severity.WARNING,
@@ -447,13 +449,12 @@ def _screen_text_findings(node: Node, theme: Theme) -> list[Finding]:
     ]
 
 
-def _is_cut(part: Part, rules: LayoutRules) -> bool:
-    """Tell whether a text part of a screen is probably wider than its box."""
-    if part.kind is not PartKind.TEXT or not part.text:
+def _is_cut(part: Part) -> bool:
+    """Tell whether a text part of a screen is wider than its box, measured in Inter."""
+    if part.kind is not PartKind.TEXT or not part.text or part.is_mono:
         return False
-    return (
-        estimate_text_width(part.text, rules, part.font_size) > part.bounds[2] * SCREEN_TEXT_SLACK
-    )
+    weight = FontWeight.BOLD if part.is_bold else FontWeight.REGULAR
+    return inter_width(part.text, part.font_size, weight) > part.bounds[2] + CUT_TOLERANCE_PX
 
 
 def _text_room(node: Node, rules: LayoutRules, theme: Theme) -> float | None:

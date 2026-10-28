@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.4 (2026-10-28)
+
+Screen text check and L0 cards. Found by the fourth `screen-C-01` run, at L0 (`benchmarks/results/2026-10-28-screen-C-01-l0-sonnet.md`): 0 errors, 9 warnings.
+
+- The check of cut-off words in a screen now covers L0 cards too; 0.11.3 left them out, and two cut names went unreported.
+- Words in a screen are measured with the widths of Inter's characters (`glyph_widths.py`, `inter_widths.json`), measured in Chromium at weights 500 and 700. The character-count estimate was off by up to 10% either way for one bold line. Compared with Chromium on 51 L0 cards (17 names on a phone, a mini phone and a desktop), 28 frames (14 names on a phone and a mini phone) and the ten screen flow examples: every name cut by more than 2 px is reported; two cut by exactly 2 px are reported too.
+- Author skill: what an L0 card shows and its size, that every screen needs a `code` (S and W with two digits), and how many characters fit a phone, mini and desktop card. Screen flow skill: the card's size and name length.
+- Not done: the other gaps of the run (chips on other lines, the 20-character limit in the author kit, a legend sample for trigger chips, entry pills far from their screens).
+
 ## 0.11.3 (2026-10-28)
 
 Author kit and check: fixes from the third `screen-C-01` run, a Sonnet agent with the author kit (`benchmarks/results/2026-10-28-screen-C-01-author-sonnet.md`): 0 errors, 7 warnings.

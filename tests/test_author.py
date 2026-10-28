@@ -11,6 +11,7 @@ sys.path.insert(0, str(PLUGIN_DIR))
 import pytest  # noqa: E402
 from flowlib.author import Canvas, EdgeWords, NodeOptions, Route, Side, sentence_case  # noqa: E402
 from flowlib.check import Code, Severity, check_scene  # noqa: E402
+from flowlib.glyph_widths import FontWeight, inter_width  # noqa: E402
 from flowlib.labels import place_labels  # noqa: E402
 from flowlib.model import (  # noqa: E402
     Device,
@@ -284,6 +285,20 @@ def test_a_title_too_long_for_a_mini_phone_is_reported() -> None:
     assert cut == [("cut",)]
 
 
+def test_a_name_too_long_for_an_l0_card_is_reported() -> None:
+    """An L0 card draws its name in large bold type; a long one is cut and reported."""
+    canvas = Canvas()
+    card = ScreenView(code="S1")
+    canvas.node("cut", Shape.SCREEN, "DeleteAccountConfirm", NodeOptions((200, 300), screen=card))
+    canvas.node("fits", Shape.SCREEN, "Delete account", NodeOptions((500, 300), screen=card))
+    cut = [
+        finding.items
+        for finding in check_scene(canvas.scene())
+        if finding.code is Code.TEXT_MAY_NOT_FIT
+    ]
+    assert cut == [("cut",)]
+
+
 def _blocked_canvas() -> tuple[Canvas, Edge]:
     """Return a canvas whose arrow has its chip over a small box beside the line."""
     canvas = _screen_canvas()
@@ -326,3 +341,9 @@ def test_a_screen_flow_scene_is_written_and_has_no_error(tmp_path: Path) -> None
     findings = canvas.write(tmp_path, "screens")
     assert not [finding for finding in findings if finding.severity is Severity.ERROR]
     assert "S1" in (tmp_path / "screens.html").read_text(encoding="utf-8")
+
+
+def test_inter_widths_match_what_a_browser_draws() -> None:
+    """The measured widths give a bold name within 1% of Chromium (115 px at 13 px)."""
+    width = inter_width("Payment methods", 13, FontWeight.BOLD)
+    assert 114 <= width <= 116
