@@ -13,7 +13,9 @@
 // session). It runs code of the app being drawn: run it only on an app you are allowed to run,
 // with seeded or demo data.
 //
-// A screen is {"code", "goto" or "steps", "session", "wait", "source", "hotspots", "mask"}:
+// A screen is {"code", "goto" or "steps", "session", "wait", "source", "hotspots", "mask",
+// "full_page"}. "full_page": true takes the whole page, not only the viewport, so hotspots
+// below the fold are kept (the frame still shows the top of the page; the zoom shows it all).
 // "hotspots" maps the words of each element a transition starts from to a selector, "mask"
 // lists selectors of parts that change on every run (dates, random avatars).
 //
@@ -31,7 +33,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const { chromium } = require('playwright');
+const { execSync } = require('child_process');
+
+const { chromium } = loadPlaywright();
 
 const SETTLE_MS = 300; // after the network is idle, for fonts and late layout
 
@@ -80,7 +84,8 @@ async function shoot(browser, plan, screen, run) {
     await page.waitForTimeout(SETTLE_MS);
     const image = `${screen.code}.png`;
     const mask = (screen.mask || []).map((selector) => page.locator(selector));
-    await page.screenshot({ path: path.join(run.out, image), animations: 'disabled', caret: 'hide', mask });
+    const shot = { path: path.join(run.out, image), animations: 'disabled', caret: 'hide', mask, fullPage: Boolean(screen.full_page) };
+    await page.screenshot(shot);
     const hotspots = [];
     const missing = [];
     for (const [text, selector] of Object.entries(screen.hotspots || {})) {
@@ -104,6 +109,16 @@ async function runSteps(page, plan, steps, values) {
     else if (step.wait_url !== undefined) await page.waitForURL(new RegExp(fill(step.wait_url, values)));
     else if (step.remember !== undefined) values[step.remember] = remembered(page.url(), step.pattern);
     else throw new Error(`unknown step: ${JSON.stringify(step)}`);
+  }
+}
+
+function loadPlaywright() {
+  // The project's own Playwright first, then the one installed for the whole machine.
+  try {
+    return require('playwright');
+  } catch (error) {
+    const root = execSync('npm root -g', { encoding: 'utf8' }).trim();
+    return require(path.join(root, 'playwright'));
   }
 }
 

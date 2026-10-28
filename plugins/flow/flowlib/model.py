@@ -555,6 +555,7 @@ class ScreenView:
     device: Device = Device.PHONE
     orientation: Orientation = Orientation.PORTRAIT
     is_mini: bool = False
+    is_large: bool = False  # twice the device size, for an L4 screenshot to be read
     fidelity: Fidelity = Fidelity.L0
     content: Content = Content.HATCH
     hatch_label: str = ""

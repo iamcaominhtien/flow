@@ -1,6 +1,6 @@
 # Screen flow L4: screens as built
 
-Status: **phase 1 built (plugin 0.13.0); phases 2 and 3 are proposals.** This page describes a fifth fidelity level for the screen flow, L4, where each screen is a real screenshot of the application, built and run from its own source code.
+Status: **phases 1 and 2 built (plugin 0.13.0 and 0.14.0); phase 3 is a proposal.** This page describes a fifth fidelity level for the screen flow, L4, where each screen is a real screenshot of the application, built and run from its own source code.
 
 ## 1. Decisions
 
@@ -79,7 +79,7 @@ A capture manifest (`captures/manifest.json`), written by `skills/screen-flow/ca
 - **Name.** The screen's name stays at the top of the body, as at L1 and L2; the screenshot starts under it.
 - **Size.** The frame keeps its device size (desktop 240 x 170, phone 156 x 324). A screenshot of a 1280 px wide page is shrunk about 5 times, so text is recognisable but not readable. Two answers:
   - the HTML opens the full screenshot when a screen is clicked (built: the picture takes the focus and a stylesheet rule shows it over the page; no script);
-  - an optional `"size": "large"` draws an L4 screen at twice the frame size, and the layout makes room as it does for any larger node (not built).
+  - an optional `"size": "large"` draws an L4 screen at twice the frame size, and the layout makes room as it does for any larger node (built in 0.14.0).
 - **Capture size.** The capture script takes the screenshot at the viewport of the device (desktop 1280 x 800, phone 390 x 844) with a device scale factor of 1, so the embedded PNG stays small. Measured on Conduit's twelve desktop screens: 25 to 125 KB each, 700 KB in all.
 - **Fit.** The image covers the screen area of the frame from the top, keeping its aspect ratio; what is below the frame's height is cut off. A full-page capture is for the zoom view, not for the frame.
 - **draw.io.** An image cell inside the frame cell, so the screenshot moves with the frame when the diagram is edited. draw.io cannot cut an image, so a screenshot taller than the screen area is shrunk to fit inside it there.
@@ -90,7 +90,7 @@ A capture manifest (`captures/manifest.json`), written by `skills/screen-flow/ca
 | --- | --- | --- |
 | `capture-missing` | error | `image` does not exist |
 | `capture-not-png` | error | the file is not a PNG |
-| `capture-aspect` | warning | the image's aspect ratio is far from the device's (a phone screenshot in a desktop frame) |
+| `capture-width` | warning | the image's width is far from the width of the device's viewport (a phone screenshot in a desktop frame); the height is free, so a whole-page capture passes |
 | `capture-stale` | warning | the `source` file is newer than the image |
 | `capture-heavy` | warning | the images of one diagram add up to more than a set budget (about 8 MB) |
 | `hotspot-outside` | warning | a hotspot box lies outside the image |
@@ -117,7 +117,7 @@ RealWorld (`github.com/gothinkster/realworld`, MIT) is a Medium-like app, "Condu
 - The hosted API `api.realworld.show` and the Angular demo `demo.realworld.show` answered on that day.
 - The Angular implementation (`github.com/realworld-apps/angular-realworld-example-app`, MIT, Angular 21) calls the hosted API, and declares its routes and guards in `src/app/app.routes.ts`.
 
-Not done yet: **the app was not built or run here.** Installing its packages needs the session's permission to run code from outside the repository. That permission was not granted in the session that wrote this page.
+Built and run here on 2026-10-28, with the user's permission to run its code: `bun install`, the `realworld` submodule (the shared CSS theme), `ng build`, and the build served by a small static server that answers every path with `index.html`. Its icon font loads over plain `http://`, which this environment does not reach, so icons are missing from the screenshots.
 
 ### Brief `screen-L4-A-01` (draft)
 
@@ -152,7 +152,7 @@ What a run is scored on:
 | Phase | Content | Done when |
 | --- | --- | --- |
 | 1 (built) | Plugin: `fidelity: "L4"` with `capture`; PNG embedding in HTML and draw.io; the checks in section 6; click to zoom in the HTML; an example built from synthetic captures (`examples/notes-built-screen-flow.spec.json`, screenshots of a small HTML page taken by `examples/captures/notes/capture.js`) | The tests pass with generated PNGs and an L4 example builds with no error |
-| 2 | Skill: how to build and run the app, the Playwright capture template, the manifest, hotspots from selectors | A blind agent captures Conduit and draws `screen-L4-A-01` |
+| 2 (built) | Skill: how to build and run the app, the Playwright capture template (`skills/screen-flow/capture.js`), the manifest, hotspots from selectors | A blind agent captures Conduit and draws `screen-L4-A-01`: done, `benchmarks/results/2026-10-28-screen-L4-A-01.md` |
 | 3 | Flow from code: routes and guards to a first spec; a check for drift between the diagram and the code | The drift check finds a transition removed from the code |
 
 ## 11. Open questions

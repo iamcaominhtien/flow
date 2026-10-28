@@ -22,6 +22,7 @@ TAG_HEIGHT_PX = 14
 TAG_PADDING_PX = 6
 TAG_GAP_PX = 8
 TBD_TEXT = "TBD"
+LARGE_SCALE = 2  # a large screen is drawn at twice its device size
 CARD_STROKE_PX = 2
 DESKTOP_DOT_RADIUS_PX = 3
 DESKTOP_DOT_FIRST_PX = 12
@@ -59,6 +60,8 @@ def screen_size(view: ScreenView, theme: Theme) -> tuple[float, float]:
     width, height = rules.sizes[_size_key(view)]
     if is_card(view):
         return width, rules.card_height
+    if view.is_large:
+        return width * LARGE_SCALE, height * LARGE_SCALE
     return width, height
 
 

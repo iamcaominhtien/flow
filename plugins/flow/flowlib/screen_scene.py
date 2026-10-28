@@ -42,6 +42,7 @@ SCREEN_KEYS |= {
     "bare",
     "plain",
     "capture",
+    "large",
 }
 CAPTURE_KEYS = {"image", "source", "hotspots"}
 HOTSPOT_KEYS = {"text", "box"}
@@ -68,6 +69,7 @@ def dump_screen(view: ScreenView) -> dict[str, Any]:
         if view.orientation != DEFAULT_VIEW.orientation
         else None,
         "mini": view.is_mini,
+        "large": view.is_large,
         "content": view.content.value if view.content is not Content.HATCH else None,
         "hatch": view.hatch_label,
         "elements": [_dump_element(element) for element in view.elements],
@@ -125,6 +127,7 @@ def parse_screen(raw: object, where: str, read: Reader) -> ScreenView | None:
         device=read.enum(Device, raw, "device", where) or Device.PHONE,
         orientation=read.enum(Orientation, raw, "orientation", where) or Orientation.PORTRAIT,
         is_mini=raw.get("mini") is True,
+        is_large=raw.get("large") is True,
         fidelity=read.enum(Fidelity, raw, "fidelity", where) or Fidelity.L0,
         content=read.enum(Content, raw, "content", where) or Content.HATCH,
         hatch_label=read.text(raw, "hatch", where) or "",

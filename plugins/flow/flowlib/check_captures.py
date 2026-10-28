@@ -1,18 +1,26 @@
 """Checks of the screenshots of L4 screens: that they exist, fit their device and are current.
 
 An L4 screen shows a screenshot of the running app (``docs/plugin/l4-as-built.md``). A missing
-or broken file is an error, since the screen cannot be drawn. A screenshot of the wrong shape,
+or broken file is an error, since the screen cannot be drawn. A screenshot of the wrong width,
 one older than the code that draws the screen, a hotspot outside the picture and a diagram that
 carries too many bytes of pictures are warnings.
 """
 
 from .captures import CaptureProblem, PngImage, is_newer, read_png
 from .check import Code, Finding, Severity
-from .model import Capture, Fidelity, Node, Scene
-from .screen_parts import screen_size
-from .theme import load_theme
+from .model import Capture, Device, Fidelity, Node, Orientation, Scene
 
-ASPECT_TOLERANCE = 1.5  # a screenshot may be this much wider or narrower than its device
+WIDTH_TOLERANCE = 1.6  # a screenshot may be this much wider or narrower than its device's viewport
+VIEWPORT_WIDTHS: dict[tuple[Device, Orientation], int] = {
+    (Device.PHONE, Orientation.PORTRAIT): 390,
+    (Device.PHONE, Orientation.LANDSCAPE): 844,
+    (Device.TABLET, Orientation.PORTRAIT): 820,
+    (Device.TABLET, Orientation.LANDSCAPE): 1180,
+    (Device.DESKTOP, Orientation.PORTRAIT): 1280,
+    (Device.DESKTOP, Orientation.LANDSCAPE): 1280,
+    (Device.WATCH, Orientation.PORTRAIT): 200,
+    (Device.WATCH, Orientation.LANDSCAPE): 200,
+}  # the width of a typical viewport, at a scale factor of 1
 CAPTURE_BUDGET_BYTES = 8 * 1024 * 1024  # the screenshots of one diagram, before base64
 PROBLEM_CODES = {
     CaptureProblem.MISSING: Code.CAPTURE_MISSING,
@@ -61,14 +69,15 @@ def _problem(node: Node, problem: CaptureProblem) -> Finding:
 
 
 def _image_findings(node: Node, capture: Capture, image: PngImage) -> list[Finding]:
-    """Report a screenshot of the wrong shape, an old one, and hotspots outside it."""
+    """Report a screenshot of the wrong width, an old one, and hotspots outside it."""
     findings = []
-    if not _has_device_shape(node, image):
+    expected = _viewport_width(node)
+    if not expected / WIDTH_TOLERANCE <= image.width <= expected * WIDTH_TOLERANCE:
         findings.append(
             _warn(
-                Code.CAPTURE_ASPECT,
-                f"the screenshot of '{node.id}' ({image.width} x {image.height}) does not have "
-                "the shape of its device; capture it at the device's viewport",
+                Code.CAPTURE_WIDTH,
+                f"the screenshot of '{node.id}' is {image.width} px wide; the viewport of its "
+                f"device is about {expected} px. Capture it at that width, scale factor 1",
                 node,
             )
         )
@@ -94,12 +103,14 @@ def _image_findings(node: Node, capture: Capture, image: PngImage) -> list[Findi
     return findings
 
 
-def _has_device_shape(node: Node, image: PngImage) -> bool:
-    """Tell whether a screenshot has about the width-to-height ratio of the node's device."""
+def _viewport_width(node: Node) -> int:
+    """Return the width of a typical viewport of the node's device, in pixels.
+
+    The width, not the shape, is checked: a page taken whole (``full_page``) is taller than the
+    device, but a phone screenshot in a desktop frame is far too narrow.
+    """
     assert node.screen is not None
-    width, height = screen_size(node.screen, load_theme())
-    ratio = (image.width / image.height) / (width / height)
-    return 1 / ASPECT_TOLERANCE <= ratio <= ASPECT_TOLERANCE
+    return VIEWPORT_WIDTHS[(node.screen.device, node.screen.orientation)]
 
 
 def _heavy(total: int) -> Finding:

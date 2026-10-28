@@ -99,7 +99,7 @@ class Code(StrEnum):
     WIREFRAME_NO_NOTES = "wireframe-no-notes"
     CAPTURE_MISSING = "capture-missing"
     CAPTURE_NOT_PNG = "capture-not-png"
-    CAPTURE_ASPECT = "capture-aspect"
+    CAPTURE_WIDTH = "capture-width"
     CAPTURE_STALE = "capture-stale"
     CAPTURE_HEAVY = "capture-heavy"
     HOTSPOT_OUTSIDE = "hotspot-outside"
@@ -809,11 +809,15 @@ def format_report(findings: list[Finding]) -> str:
         findings: The result of ``check_scene``.
 
     Returns:
-        One line per finding, or a single line saying that nothing was found.
+        One line per finding and a last line with the number of errors and warnings, or a
+        single line saying that nothing was found.
     """
     if not findings:
         return "check: no problems found"
-    return "\n".join(
+    lines = [
         f"{finding.severity.value.upper()} {finding.code.value}: {finding.message}"
         for finding in findings
-    )
+    ]
+    errors = sum(1 for finding in findings if finding.severity is Severity.ERROR)
+    lines.append(f"check: {errors} errors, {len(findings) - errors} warnings")
+    return "\n".join(lines)

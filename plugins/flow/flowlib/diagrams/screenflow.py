@@ -97,7 +97,7 @@ def layout_raw(raw: object, source_dir: Path | None = None) -> Scene:
     Raises:
         SpecError: If the spec is not valid.
     """
-    folder = source_dir or Path()
+    folder = (source_dir or Path()).resolve()
     raw = with_manifest(raw, folder)
     if not uses_screen_features(raw):
         return graph.layout_with(catalog.SCREEN)(raw)

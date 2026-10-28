@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.14.0 (2026-10-28)
+
+Screen flow L4, phase 2: screenshots taken from the running app. Tried on RealWorld Conduit (Angular), built from its source here, and by a blind agent on the brief `screen-L4-A-01` (`benchmarks/results/2026-10-28-screen-L4-A-01.md`): 12 screenshots, 43 transitions read from the code, 0 errors.
+
+- `skills/screen-flow/capture.js` takes the screenshots from a plan: sessions made once (register, publish), steps (`goto`, `fill`, `click`, `press`, `wait`, `wait_url`, `remember`), hotspots by selector, masks, `full_page`. It writes `manifest.json` with the hotspots it did not find. It finds Playwright in the project or in the global `npm root`.
+- A spec names the manifest with `"captures"` and each L4 screen with `"capture": "<code>"`.
+- `"size": "large"` draws a screen at twice its device size, so a screenshot can be read on the page.
+- `capture-width` replaces `capture-aspect`: the width of a screenshot is checked against the device's viewport, so a whole-page capture passes.
+- Capture paths are made absolute, so a scene can be checked from any folder.
+- The check report ends with a line `check: N errors, M warnings`.
+- The screen-flow skill has a section "Screens as built (L4)"; the brief `screen-L4-A-01` and the capture plan used to check it are in `benchmarks/`.
+- Not done: phase 3 (the flow read from the code). The Conduit screenshots are not in the repository: they show the demo API's content.
+
 ## 0.13.1 (2026-10-28)
 
 - Author skill: how `segment=` counts the stretches of a line with `via` points, how to nest two L-shaped lines between diagonal neighbours, and `Role.NO` in the legend example. Found by the fifth `screen-C-01` run (`benchmarks/results/2026-10-28-screen-C-01-l0-sonnet-2.md`): 0 errors, 9 warnings, all crossings.

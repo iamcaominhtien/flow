@@ -141,10 +141,10 @@ def test_a_screenshot_of_the_wrong_device_and_a_far_hotspot_are_warned(tmp_path:
     write_png(tmp_path / "home.png", DESKTOP)
     capture = {"image": "home.png", "hotspots": [{"text": "Out", "box": [1200, 700, 200, 50]}]}
     found = codes(layout(flow_with(capture), tmp_path))
-    assert Code.CAPTURE_ASPECT in found
+    assert Code.CAPTURE_WIDTH in found
     assert Code.HOTSPOT_OUTSIDE in found
     write_png(tmp_path / "desk.png", DESKTOP)
-    assert Code.CAPTURE_ASPECT not in codes(
+    assert Code.CAPTURE_WIDTH not in codes(
         layout(flow_with({"image": "desk.png"}, device="desktop"), tmp_path)
     )
 
@@ -219,3 +219,23 @@ def test_a_code_missing_from_the_manifest_or_no_manifest_is_a_spec_error(tmp_pat
     spec["captures"] = "none.json"
     with pytest.raises(SpecError, match=r"run capture\.js first"):
         layout(spec, tmp_path)
+
+
+def test_capture_paths_are_absolute_when_the_spec_folder_is_relative(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A scene built from a relative folder can be checked from any folder."""
+    write_png(tmp_path / "home.png", PHONE)
+    monkeypatch.chdir(tmp_path)
+    capture = home(layout(flow_with({"image": "home.png"}), Path())).screen.capture
+    assert capture is not None and Path(capture.image).is_absolute()
+
+
+def test_a_large_screen_is_twice_its_device_and_its_screenshot_follows(tmp_path: Path) -> None:
+    """``"size": "large"`` doubles the frame; the screenshot fills the wider body."""
+    write_png(tmp_path / "home.png", PHONE)
+    normal = home(layout(flow_with({"image": "home.png"}), tmp_path))
+    large = home(layout(flow_with({"image": "home.png"}, size="large"), tmp_path))
+    assert (large.width, large.height) == (2 * normal.width, 2 * normal.height)
+    shown = [p for p in screen_parts(large, load_theme()) if p.kind is PartKind.IMAGE]
+    assert shown[0].bounds[2] > normal.width

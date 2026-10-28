@@ -51,6 +51,7 @@ DEFAULT_TAB_COUNT = 4
 DEFAULT_ZONE_TONE = Tone.GRAY
 DEFAULT_HATCH_LABEL = "other content"
 MINI_SIZE = "mini"
+LARGE_SIZE = "large"
 STATE_SEPARATOR = " · "
 OVERLAY_SEPARATOR = " + "
 TOP_KEYS = {"type", "title", "desc", "direction", "style", "screens", "taps", "zones", "buses"}
@@ -400,8 +401,10 @@ def _view(
         read.report(where, f"'tab' must be a whole number below tab_count ({tab_count})")
         tab = None
     size = raw.get("size")
-    if size is not None and size != MINI_SIZE:
-        read.report(where, f"unknown size '{size}'; use '{MINI_SIZE}' or leave it out")
+    if size is not None and size not in (MINI_SIZE, LARGE_SIZE):
+        read.report(
+            where, f"unknown size '{size}'; use '{MINI_SIZE}', '{LARGE_SIZE}' or leave it out"
+        )
     device = read.enum(Device, raw, "device", where) or Device.PHONE
     fidelity = _fidelity(raw, where, read)
     blocks = _blocks(raw, fidelity, where, read)
@@ -412,6 +415,7 @@ def _view(
         device=device,
         orientation=read.enum(Orientation, raw, "orientation", where) or Orientation.PORTRAIT,
         is_mini=size == MINI_SIZE,
+        is_large=size == LARGE_SIZE,
         fidelity=fidelity,
         content=read.enum(Content, raw, "content", where) or Content.HATCH,
         hatch_label=read.text(raw, "hatch", where) or DEFAULT_HATCH_LABEL,
