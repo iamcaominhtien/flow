@@ -181,6 +181,11 @@ def parse_capture(raw: object, where: str, read: Reader) -> Capture | None:
     Returns:
         The capture, or None when it has no image.
     """
+    if isinstance(raw, str):
+        read.report(
+            where, f'\'{raw}\' names a screen of a manifest; add "captures": "<manifest.json>"'
+        )
+        return None
     if not isinstance(raw, dict):
         read.report(where, "'capture' must be an object with an 'image'")
         return None

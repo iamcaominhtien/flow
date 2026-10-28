@@ -1,0 +1,60 @@
+{
+  "base_url": "http://127.0.0.1:4200",
+  "viewport": [1280, 800],
+  "sessions": {
+    "signed-in": {
+      "steps": [
+        {"goto": "/register"},
+        {"fill": "input[name=\"username\"]", "value": "flow${run}"},
+        {"fill": "input[name=\"email\"]", "value": "flow${run}@example.com"},
+        {"fill": "input[name=\"password\"]", "value": "flow-demo-${run}"},
+        {"click": "button[type=\"submit\"]"},
+        {"wait": "a[href=\"/editor\"]"},
+        {"goto": "/editor"},
+        {"fill": "input[name=\"title\"]", "value": "Drawing apps as built ${run}"},
+        {"fill": "input[name=\"description\"]", "value": "A test article written by the Flow capture script"},
+        {"fill": "textarea[name=\"body\"]", "value": "This article exists so that the screens of its author can be captured."},
+        {"click": "button:has-text(\"Publish Article\")"},
+        {"wait_url": "/article/"},
+        {"remember": "slug", "pattern": "/article/([^/?#]+)"}
+      ]
+    }
+  },
+  "screens": [
+    {"code": "W01", "goto": "/", "wait": ".article-preview",
+     "hotspots": {"Sign in": "a.nav-link[href=\"/login\"]", "Sign up": "a.nav-link[href=\"/register\"]",
+                  "Read more": ".preview-link", "A tag": ".sidebar .tag-pill"}},
+    {"code": "W02", "goto": "/login", "wait": "button[type=\"submit\"]",
+     "hotspots": {"Sign in": "button[type=\"submit\"]", "Need an account?": "a[href=\"/register\"]:not(.nav-link)"}},
+    {"code": "W03", "goto": "/register", "wait": "button[type=\"submit\"]",
+     "hotspots": {"Sign up": "button[type=\"submit\"]", "Have an account?": "a[href=\"/login\"]:not(.nav-link)"}},
+    {"code": "W04",
+     "steps": [
+       {"goto": "/login"},
+       {"fill": "input[name=\"email\"]", "value": "nobody${run}@example.com"},
+       {"fill": "input[name=\"password\"]", "value": "wrong-password"},
+       {"click": "button[type=\"submit\"]"},
+       {"wait": ".error-messages"}
+     ],
+     "hotspots": {"Sign in": "button[type=\"submit\"]"}},
+    {"code": "W05", "session": "signed-in", "goto": "/", "wait": ".feed-toggle",
+     "hotspots": {"New Article": "a[href=\"/editor\"]", "Settings": "a[href=\"/settings\"]",
+                  "Profile": "a.nav-link[href^=\"/profile\"]", "Global Feed": ".feed-toggle a:has-text(\"Global Feed\")"}},
+    {"code": "W06", "goto": "/tag/javascript", "wait": ".article-preview",
+     "hotspots": {"Read more": ".preview-link", "Global Feed": ".feed-toggle a:has-text(\"Global Feed\")"}},
+    {"code": "W07",
+     "steps": [{"goto": "/"}, {"click": ".preview-link"}, {"wait": ".article-page"}],
+     "hotspots": {"Author": ".article-page .banner .author", "Sign in": ".article-page a[href=\"/login\"]"}},
+    {"code": "W08", "session": "signed-in", "goto": "/article/${slug}", "wait": "button:has-text(\"Delete Article\")",
+     "hotspots": {"Edit Article": ".banner a:has-text(\"Edit Article\")", "Delete Article": ".banner button:has-text(\"Delete Article\")",
+                  "Post Comment": "button:has-text(\"Post Comment\")"}},
+    {"code": "W09", "session": "signed-in", "goto": "/editor", "wait": "input[name=\"title\"]",
+     "hotspots": {"Publish Article": "button:has-text(\"Publish Article\")"}},
+    {"code": "W10", "session": "signed-in", "goto": "/editor/${slug}", "wait": "input[name=\"title\"]",
+     "hotspots": {"Publish Article": "button:has-text(\"Publish Article\")"}},
+    {"code": "W11", "session": "signed-in", "goto": "/profile/flow${run}", "wait": ".profile-page",
+     "hotspots": {"Edit Profile Settings": "a:has-text(\"Edit Profile Settings\")", "Favorited": "a:has-text(\"Favorited\")"}},
+    {"code": "W12", "session": "signed-in", "goto": "/settings", "wait": "button:has-text(\"Update Settings\")",
+     "hotspots": {"Update Settings": "button:has-text(\"Update Settings\")", "Logout": "button:has-text(\"Or click here to logout\")"}}
+  ]
+}

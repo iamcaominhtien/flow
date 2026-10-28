@@ -27,6 +27,7 @@ from .screen_chips import Crowd, blocks_of, choose_spot, lines_of
 from .screen_geometry import Geometry, Sizing, compute_geometry
 from .screen_items import assign_cells, build_nodes, densify
 from .screen_labels import Caption, assign_codes, caption_of, trigger_label
+from .screen_manifest import with_manifest
 from .screen_plan import (
     ENTRY_STACK_GAP_PX,
     ENTRY_ZONE_ID,
@@ -87,8 +88,8 @@ def layout_raw(raw: object, source_dir: Path | None = None) -> Scene:
 
     Args:
         raw: The result of ``json.loads`` on the spec.
-        source_dir: The folder of the spec file; the screenshots of L4 screens are found from
-            it. The current folder when it is not given.
+        source_dir: The folder of the spec file; the screenshots of L4 screens and their
+            manifest are found from it. The current folder when it is not given.
 
     Returns:
         The scene. A spec without the keys of design 02 is drawn as plain boxes.
@@ -96,9 +97,11 @@ def layout_raw(raw: object, source_dir: Path | None = None) -> Scene:
     Raises:
         SpecError: If the spec is not valid.
     """
+    folder = source_dir or Path()
+    raw = with_manifest(raw, folder)
     if not uses_screen_features(raw):
         return graph.layout_with(catalog.SCREEN)(raw)
-    return build_scene(with_capture_paths(parse_flow(raw), source_dir or Path()))
+    return build_scene(with_capture_paths(parse_flow(raw), folder))
 
 
 def build_scene(spec: FlowSpec) -> Scene:

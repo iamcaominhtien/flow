@@ -3,11 +3,12 @@
 The JSON format (design 02)::
 
     {"type": "screen", "title": "...", "desc": "...", "conditions": "inline|coded", "tab_count": 4,
+     "captures": "captures/manifest.json",
      "zones": [{"id", "label", "tone"}],
      "screens": [{"id", "label", "kind": "screen|decision|start|end|entry|flag|tab",
                   "code", "state", "overlay", "overlay_title", "device", "orientation", "size",
                   "fidelity": "L0|L1|L2|L3|L4", "content", "hatch", "elements", "blocks", "tab",
-                  "capture": {"image", "source", "hotspots": [{"text", "box"}]},
+                  "capture": {"image", "source", "hotspots": [{"text", "box"}]} or "<code>",
                   "undecided",
                   "trigger", "system", "detail", "icon", "zone", "at": [row, column]}],
      "taps": [{"from", "to", "trigger", "system", "guard", "effect", "kind", "code", "route",

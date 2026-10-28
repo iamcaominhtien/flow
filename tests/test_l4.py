@@ -56,7 +56,7 @@ def write_png(path: Path, size: tuple[int, int]) -> Path:
     return path
 
 
-def flow_with(capture: dict, **keys: object) -> dict:
+def flow_with(capture: dict | str, **keys: object) -> dict:
     """Make a two-screen flow whose first screen is at L4 with a given capture."""
     first = {"id": "home", "code": "S01", "label": "Home", "fidelity": "L4", "capture": capture}
     second = {"id": "next", "code": "S02", "label": "Next", "fidelity": "L2"}
@@ -184,3 +184,38 @@ def test_the_notes_example_builds_with_no_problem(tmp_path: Path) -> None:
     scene = scene_io.load(result.scene_path)
     levels = [n.screen.fidelity.value for n in scene.nodes if n.screen]
     assert levels.count("L4") == 3
+
+
+def test_a_manifest_names_the_captures_by_code(tmp_path: Path) -> None:
+    """A spec that names its manifest takes each screen's image, source and hotspots from it."""
+    folder = tmp_path / "captures"
+    folder.mkdir()
+    write_png(folder / "S01.png", PHONE)
+    entry = {
+        "image": "S01.png",
+        "source": "home.ts",
+        "hotspots": [{"text": "Go", "box": [1, 2, 3, 4]}],
+    }
+    manifest = {"viewport": list(PHONE), "screens": {"S01": {**entry, "url": "http://x/"}}}
+    (folder / "manifest.json").write_text(json.dumps(manifest))
+    spec = flow_with("S01")
+    spec["captures"] = "captures/manifest.json"
+    capture = home(layout(spec, tmp_path)).screen.capture
+    assert capture is not None
+    assert capture.image == str(tmp_path / "captures" / "S01.png")
+    assert capture.source == str(tmp_path / "home.ts")
+    assert capture.hotspots[0].text == "Go"
+
+
+def test_a_code_missing_from_the_manifest_or_no_manifest_is_a_spec_error(tmp_path: Path) -> None:
+    """Both say what to do."""
+    spec = flow_with("S09")
+    with pytest.raises(SpecError, match="names a screen of a manifest"):
+        layout(spec, tmp_path)
+    (tmp_path / "manifest.json").write_text(json.dumps({"screens": {}}))
+    spec["captures"] = "manifest.json"
+    with pytest.raises(SpecError, match=r"'S09' is not in manifest\.json"):
+        layout(spec, tmp_path)
+    spec["captures"] = "none.json"
+    with pytest.raises(SpecError, match=r"run capture\.js first"):
+        layout(spec, tmp_path)

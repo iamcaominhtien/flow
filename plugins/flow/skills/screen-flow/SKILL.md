@@ -43,7 +43,7 @@ You write a short **spec**. A script places the screens in device frames, routes
 }
 ```
 
-Top level: `type` (`screen`), `title`, `desc`, `theme` (see the flowchart skill), `zones`, `screens`, `taps`, `buses`, `conditions` (`inline` default, or `coded`), `tab_count` (tabs in a tab bar, default 4).
+Top level: `type` (`screen`), `title`, `desc`, `theme` (see the flowchart skill), `zones`, `screens`, `taps`, `buses`, `conditions` (`inline` default, or `coded`), `tab_count` (tabs in a tab bar, default 4), `captures` (the manifest of L4 screenshots).
 
 ### Screens and ids
 
@@ -56,7 +56,7 @@ Top level: `type` (`screen`), `title`, `desc`, `theme` (see the flowchart skill)
   - `L1`: a frame with the same generic skeleton and "content TBD".
   - `L2`: only the elements that cause a transition are drawn and named, the rest is hatched. `elements` is a list; each is a string (a primary button with a red dot where it was tapped) or an object `{"text", "style": "primary|secondary|outline|danger|field", "at": "top|bottom", "on": "overlay", "hotspot": false}`. `hatch` is the text of the hatched block (default "other content"). `content` replaces it with `splash`, `success`, `error`, `loading` or `empty`. `tab: 1` draws a tab bar with the second tab active.
   - `L3`: a full wireframe. Give the screen `blocks` (the same blocks as the wireframe skill: navbar, card, list item, form field, button, table and so on, placed by row, column and span; a block with `"tap": true` gets the red dot). They are drawn at 0.6 of a phone (0.5 tablet, 0.35 desktop), so small text is a structure, not a reading size. Blocks are read only at L3. An L3 screen with `elements` and no `blocks` is drawn as L2.
-  - `L4` (as built): a screenshot of the running app in the frame, under the screen's name. Give `"capture": {"image": "captures/S01.png", "source": "src/pages/Login.tsx", "hotspots": [{"text": "Sign in", "box": [24, 295, 342, 50]}]}`; paths are read from the spec's folder. The screenshot is fitted to the width of the body and cut at its bottom; each hotspot (left, top, width, height in the screenshot's pixels) gets the red dot. In the HTML a click on the screenshot opens it full size. Take screenshots at the device's viewport with a scale factor of 1 (phone 390 × 844, desktop 1280 × 800), with seeded or demo data only. `examples/captures/notes/capture.js` is a Playwright script that takes the screenshots and records the hotspot boxes from the page; `examples/notes-built-screen-flow.spec.json` mixes L4, L2 and L0. The check reports a missing or broken file (error), a screenshot of the wrong shape, one older than its `source`, a hotspot outside it, and more than 8 MB of screenshots (warnings). Plan: `docs/plugin/l4-as-built.md`.
+  - `L4` (as built): a screenshot of the running app in the frame, under the screen's name. Take the screenshots with `capture.js` (see "Screens as built" below), then name the manifest once at the top of the spec, `"captures": "captures/manifest.json"`, and each L4 screen by its code, `"capture": "W02"`. A capture can also be written out: `"capture": {"image": "captures/S01.png", "source": "src/pages/Login.tsx", "hotspots": [{"text": "Sign in", "box": [24, 295, 342, 50]}]}`; paths are read from the spec's folder. The screenshot is fitted to the width of the body and cut at its bottom; each hotspot (left, top, width, height in the screenshot's pixels) gets the red dot. In the HTML a click on the screenshot opens it full size. The check reports a missing or broken file (error), a screenshot of the wrong shape, one older than its `source`, a hotspot outside it, and more than 8 MB of screenshots (warnings).
   - `"undecided": true`: a dashed card with a TBD tag; the arrows into it are dashed.
 - **Overlays**: `overlay`, `overlay_title` (the title of a modal or the text of a toast); elements with `"on": "overlay"` belong to the overlay (the buttons of a modal, the rows of a sheet).
 
@@ -83,6 +83,32 @@ An arrow is written `trigger [guard] / effect`.
 - **Tab bar**: one `tab` item per tab on one row, and `"buses": [{"trigger": "tap any tab", "to": ["tab1", "tab2"]}]`. The bar is drawn once as a bus. Then an arrow from each tab to the first screen of its stack. Screens that hide the bar go in their own zone.
 - Examples: `examples/ride-screen-flow.spec.json` (52 screens, 6 zones, 77 arrows; take the `at` keys out and it still builds with no error), `examples/shop-screen-flow.spec.json` (the complete shop app at mixed fidelity), `shop-highlight-screen-flow`, `shop-fidelity-screen-flow`, `shop-entry-screen-flow`, `shop-tabs-screen-flow`, `shop-overlays-screen-flow`, `shop-states-screen-flow`, `shop-coded-screen-flow`, `shop-wireframe-screen-flow` (two screens at L3 with blocks).
 - Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart` and the others of the icon library. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
+
+## Screens as built (L4)
+
+When the user wants the screens as the app shows them now, draw them at L4 from screenshots of the app, built and run from its own source. Plan: `docs/plugin/l4-as-built.md`.
+
+1. **Run the app** with the project's own commands (its README, `package.json` scripts), against seeded or demo data, never a real user's. If the app cannot run here, say so and draw L2 or L3 instead; do not invent screenshots.
+2. **Read the flow from the code**: the routes (and their guards, which are decisions such as "Signed in?") and the links and navigation calls of each page. Each screen is a route in a state: signed in or out, empty, an error.
+3. **Write a plan** for `${CLAUDE_PLUGIN_ROOT}/skills/screen-flow/capture.js` (the steps it knows are at the top of the file):
+
+```json
+{"base_url": "http://127.0.0.1:4200", "viewport": [1280, 800],
+ "sessions": {"signed-in": {"steps": [
+   {"goto": "/register"}, {"fill": "input[name=\"username\"]", "value": "demo${run}"},
+   {"fill": "input[name=\"email\"]", "value": "demo${run}@example.com"},
+   {"fill": "input[name=\"password\"]", "value": "demo-${run}"},
+   {"click": "button[type=\"submit\"]"}, {"wait": "a[href=\"/settings\"]"}]}},
+ "screens": [
+   {"code": "W02", "goto": "/login", "wait": "form", "source": "../src/app/auth/auth.component.ts",
+    "hotspots": {"Sign in": "button[type=\"submit\"]"}},
+   {"code": "W12", "session": "signed-in", "goto": "/settings", "wait": "form",
+    "hotspots": {"Update Settings": "button:has-text(\"Update Settings\")"}}]}
+```
+
+   A session is made once and shared by the screens that name it; every screen is shot in a fresh browser. Steps reach a state (fill a form, click, wait); `remember` keeps a part of the address (a new article's slug) for later screens as `${name}`. A hotspot is the element a transition starts from, found by a stable selector (a test id, a form field's name, a button's text). `source` is the file that draws the screen, relative to the spec's folder; the check warns when it is newer than the screenshot. Viewports: desktop `[1280, 800]`, phone `[390, 844]`.
+4. **Run it**: `node ${CLAUDE_PLUGIN_ROOT}/skills/screen-flow/capture.js plan.json captures`. It needs Playwright and Chromium. It writes `captures/<code>.png` and `captures/manifest.json`; each entry lists the hotspots it found and the ones it did not (`missing`): fix a missing selector and run it again. Look at every screenshot before you draw: right page, right state, nothing still loading.
+5. **Write the spec** with `"captures"` and `"capture": "<code>"`, the transitions you read from the code, and build. Screens that are not built yet can stay at L0 to L2 in the same diagram.
 
 ## Limits to tell the user
 
