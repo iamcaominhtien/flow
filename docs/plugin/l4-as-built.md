@@ -72,7 +72,7 @@ A screen at L4 names its capture:
 - `source`: the file that draws the screen. It is shown on hover in the HTML and used by the staleness check.
 - `hotspots`: optional. These are the boxes of the elements a transition starts from, in the screenshot's pixels, recorded by the capture script from the element's bounding box. The red dot of L2 is drawn on them, so the tapped element is marked on the real screen.
 
-A capture manifest (`captures/manifest.json`) written by the capture script holds the same fields for every screen. Phase 2: `"capture": "manifest"` makes the build read it, so a re-capture does not need a spec edit. In phase 1 the fields are copied into the spec.
+A capture manifest (`captures/manifest.json`), written by `skills/screen-flow/capture.js`, holds the same fields for every screen code. A spec names it once, `"captures": "captures/manifest.json"`, and each L4 screen by its code, `"capture": "W02"`, so taking the screenshots again needs no edit of the spec.
 
 ## 5. Drawing
 
@@ -80,7 +80,7 @@ A capture manifest (`captures/manifest.json`) written by the capture script hold
 - **Size.** The frame keeps its device size (desktop 240 x 170, phone 156 x 324). A screenshot of a 1280 px wide page is shrunk about 5 times, so text is recognisable but not readable. Two answers:
   - the HTML opens the full screenshot when a screen is clicked (built: the picture takes the focus and a stylesheet rule shows it over the page; no script);
   - an optional `"size": "large"` draws an L4 screen at twice the frame size, and the layout makes room as it does for any larger node (not built).
-- **Capture size.** The capture script takes the screenshot at the viewport of the device (desktop 1280 x 800, phone 390 x 844) with a device scale factor of 1, so the embedded PNG stays small (about 100 to 300 KB per screen; not measured yet).
+- **Capture size.** The capture script takes the screenshot at the viewport of the device (desktop 1280 x 800, phone 390 x 844) with a device scale factor of 1, so the embedded PNG stays small. Measured on Conduit's twelve desktop screens: 25 to 125 KB each, 700 KB in all.
 - **Fit.** The image covers the screen area of the frame from the top, keeping its aspect ratio; what is below the frame's height is cut off. A full-page capture is for the zoom view, not for the frame.
 - **draw.io.** An image cell inside the frame cell, so the screenshot moves with the frame when the diagram is edited. draw.io cannot cut an image, so a screenshot taller than the screen area is shrunk to fit inside it there.
 
