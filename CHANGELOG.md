@@ -2,7 +2,7 @@
 
 ## 0.15.0 (2026-10-29)
 
-Screen flow: tidier lines. Measured on the screen flow examples and the Conduit spec of `benchmarks/results/2026-10-28-screen-L4-A-01.md`: crossings 55 to 44 with no spec change, small jogs 5 to 1; the ride example goes from 33 to 14 crossings with three of its returns made jumps, and the Conduit spec from 22 to 8 with its logout made a jump.
+Screen flow: tidier lines. Measured on the screen flow examples and the Conduit spec of `benchmarks/results/2026-10-28-screen-L4-A-01.md`: crossings 55 to 44 with no spec change, small jogs 5 to 1; the ride example goes from 33 to 14 crossings with three of its returns made jumps, and the Conduit spec from 22 to 9 with its logout made a jump.
 
 - Arrows that share a frame side swap ports when that removes crossings. The first order guessed from where each arrow heads; it did not know the channel each runs in, so two arrows turning into one side from different heights crossed just before the frame (`diagrams/screen_untangle.py`).
 - A frame and a decision right above or below it, joined both ways, no longer share the decision's tip and make a hook: the arrow back to the frame leaves a free side tip, and the one into the decision is straight (`diagrams/screen_tips.py`).
