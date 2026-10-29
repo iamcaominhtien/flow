@@ -810,6 +810,7 @@
     "table_gap": 56,
     "port_pitch": 16,
     "port_clear": 12,
+    "port_spread": 26,
     "inner_pad": 10,
     "title_size": 11,
     "text_size": 9,

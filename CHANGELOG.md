@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.15.0 (2026-10-29)
+
+Screen flow: tidier lines. Measured on the screen flow examples and the Conduit spec of `benchmarks/results/2026-10-28-screen-L4-A-01.md`: crossings 55 to 44 with no spec change, small jogs 5 to 1; the ride example goes from 33 to 14 crossings with three of its returns made jumps, and the Conduit spec from 22 to 8 with its logout made a jump.
+
+- Arrows that share a frame side swap ports when that removes crossings. The first order guessed from where each arrow heads; it did not know the channel each runs in, so two arrows turning into one side from different heights crossed just before the frame (`diagrams/screen_untangle.py`).
+- A frame and a decision right above or below it, joined both ways, no longer share the decision's tip and make a hook: the arrow back to the frame leaves a free side tip, and the one into the decision is straight (`diagrams/screen_tips.py`).
+- Arrows that turn into a long top or bottom edge sit up to 26 px apart (`port_spread` in the theme), so their heads can be told apart; a lone arrow stays where it was.
+- `"route": "jump"` cuts a long arrow into two short ones that meet at a pair of circles with one letter (the off-page connector of the flowchart design, on one page). Each circle sits by the side of its frame where it touches least (`diagrams/screen_jumps.py`). The ride example uses it for logout-like returns.
+- The words of an arrow are kept inside the page; a chip left of a line at the page's edge made the state example fail its check after the change above.
+- Not done: the lane router still lets a long line cross many others when no other lane exists; the skill says to use a jump there. Two entry decisions in one column, and two arrows between the same two screens, are as they were.
+
 ## 0.14.0 (2026-10-28)
 
 Screen flow L4, phase 2: screenshots taken from the running app. Tried on RealWorld Conduit (Angular), built from its source here, and by a blind agent on the brief `screen-L4-A-01` (`benchmarks/results/2026-10-28-screen-L4-A-01.md`): 12 screenshots, 43 transitions read from the code, 0 errors.

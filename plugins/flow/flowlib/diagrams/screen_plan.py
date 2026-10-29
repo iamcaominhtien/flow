@@ -43,6 +43,7 @@ class RouteType(StrEnum):
     ELBOW = "elbow"
     ROUTED = "routed"
     STRIP = "strip"
+    JUMP = "jump"  # two short arrows and a pair of lettered circles, for a very long return
 
 
 CHANNEL_ROUTES = (RouteType.ZIG, RouteType.STRIP)  # the shapes that run in a channel
@@ -126,7 +127,9 @@ def _plan(index: int, transition: Transition, grid: Grid, entries: frozenset[str
     (row_a, column_a), (row_b, column_b) = source, target
     span = abs(column_b - column_a)
     is_down = row_b >= row_a
-    if transition.source in entries and not _is_clear_row(
+    if transition.route is Route.JUMP:
+        route, gap = RouteType.JUMP, 0
+    elif transition.source in entries and not _is_clear_row(
         grid, row_a, range(column_a + 1, column_b)
     ):
         route, gap = RouteType.ROUTED, 0
@@ -226,7 +229,8 @@ def sides_of(plan: Plan, cells: tuple[Cell, Cell]) -> tuple[PortSide, PortSide]:
     facing = PortSide.NORTH if goes_down else PortSide.SOUTH
     if plan.lanes is not None:
         return plan.lanes.start_side, plan.lanes.end_side
-    if plan.route is RouteType.HORIZONTAL:
+    is_jump_in_row = plan.route is RouteType.JUMP and row_a == row_b
+    if plan.route is RouteType.HORIZONTAL or is_jump_in_row:
         return sideways, opposite
     if plan.route is RouteType.STRIP:
         return PortSide.NORTH, PortSide.NORTH

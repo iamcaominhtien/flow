@@ -973,7 +973,7 @@
   {
    "from": "TripHistory",
    "to": "HomeMap",
-   "route": "elbow",
+   "route": "jump",
    "trigger": "tap Home tab",
    "kind": "forward"
   },
@@ -1021,7 +1021,7 @@
   {
    "from": "DeleteAccountConfirm",
    "to": "SplashScreen",
-   "route": "elbow",
+   "route": "jump",
    "trigger": "tap Confirm"
   },
   {
@@ -1038,7 +1038,7 @@
   {
    "from": "SignOutConfirm",
    "to": "WelcomeCarousel",
-   "route": "elbow",
+   "route": "jump",
    "trigger": "tap Confirm"
   },
   {

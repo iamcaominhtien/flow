@@ -134,9 +134,10 @@ def choose_spot(
 
 
 def _cost(spot: Spot, crowd: Crowd, owner: int) -> int:
-    """Count what the words of a spot cover: frames and words cost far more than a line."""
+    """Count what the words of a spot cover: frames, words and the page's edge cost far more."""
     cost = 0
     for rect in spot.rects:
+        cost += BLOCK_COST * (rect.left < 0 or rect.top < 0)
         cost += BLOCK_COST * sum(rect.overlaps(block) for block in crowd.blocks)
         cost += LINE_COST * sum(
             rect.overlaps(line, LINE_CLEAR_PX) for who, line in crowd.lines if who != owner

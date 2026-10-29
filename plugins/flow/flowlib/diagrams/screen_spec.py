@@ -99,6 +99,7 @@ class Route(StrEnum):
     STRIP = "strip"
     DIRECT = "direct"
     ELBOW = "elbow"
+    JUMP = "jump"  # cut into two short arrows that meet at a pair of lettered circles
 
 
 class Conditions(StrEnum):

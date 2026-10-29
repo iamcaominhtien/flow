@@ -68,7 +68,7 @@ An arrow is written `trigger [guard] / effect`.
 - `guard`: lower case, in brackets. Green on the success path, rose when `kind` is `failure`.
 - `effect`: grey, after a slash.
 - `kind`: `forward` (default), `main` (the happy path: blue, thick, animated; or `"main": true`; only one route per diagram), `failure` (rose), `back` (dashed slate, runs in a strip above the row), `retry` (dashed slate, returns to an earlier screen).
-- `route` (optional): `direct` keeps a back arrow straight between two frames, `elbow` leaves the top or bottom of the source and turns once into the side of the target.
+- `route` (optional): `direct` keeps a back arrow straight between two frames, `elbow` leaves the top or bottom of the source and turns once into the side of the target. `jump` cuts a long arrow in two: it leaves the source into a circle with a letter (A, B, ...), and a circle with the same letter beside the target leads into it (the off-page connector of the flowchart design, on one page). Use it for an arrow that would run across most of the page or cross many lines (a logout back to the home page, a start decision far from its screen); the words stay on the first part. The check names the lines that cross most: those are the ones to jump.
 - `code`, `conditions: "coded"`: a label longer than about 20 characters, or shared by several arrows, becomes a code (C1, C2) on the arrow and a table below the diagram. The check warns about a long label.
 - Old specs still work: a spec with only `label` and `style` (`tap`, `back`) is drawn as plain boxes as before.
 

@@ -19,6 +19,7 @@ from ..model import (
     Point,
     Role,
     Scene,
+    Shape,
     Tone,
 )
 from ..theme import Theme, load_theme
@@ -26,6 +27,7 @@ from . import catalog, graph
 from .screen_chips import Crowd, blocks_of, choose_spot, lines_of
 from .screen_geometry import Geometry, Sizing, compute_geometry
 from .screen_items import assign_cells, build_nodes, densify
+from .screen_jumps import Jump, split_jumps
 from .screen_labels import Caption, assign_codes, caption_of, trigger_label
 from .screen_manifest import with_manifest
 from .screen_plan import (
@@ -66,6 +68,8 @@ from .screen_spec import (
     with_capture_paths,
 )
 from .screen_table import CodedArrow, condition_row, conditions_table
+from .screen_tips import part_tip_pairs
+from .screen_untangle import untangle
 
 ENTRY_ZONE_LABEL = "Entry points"
 BUS_CHIP_RISE_PX = 18
@@ -125,7 +129,10 @@ def build_scene(spec: FlowSpec) -> Scene:
     placed = _place_nodes(nodes, build)
     frames = _zone_frames(placed, build)
     routes, placed = _routes(placed, build)
+    routes, jumps = split_jumps(routes, placed, (build.grid.cells, theme))
+    placed.update({mark.id: mark for jump in jumps for mark in jump.marks})
     edges = _labelled(routes, _bus_edges(placed, build), (placed, frames), build)
+    edges.extend(_jump_edge(jump, placed) for jump in jumps)
     table = _conditions_table(placed, frames, build, codes)
     scene = Scene(
         0, 0, spec.title, spec.description, tuple(frames), (*placed.values(), *table), tuple(edges)
@@ -197,7 +204,17 @@ def _routes(
     uses = collect_uses(build.plans, build.grid.cells)
     offsets = port_offsets(uses, nodes, build.theme)
     nodes, offsets = place_chips(nodes, uses, offsets, build.theme)
-    return [(plan, _points(plan, (nodes, offsets), build)) for plan in build.plans], nodes
+    by_index = {plan.index: plan for plan in build.plans}
+    groups = [
+        [(use.index, use.end) for use in group]
+        for (node_id, _), group in uses.items()
+        if len(group) > 1 and nodes[node_id].shape is not Shape.DECISION
+    ]
+    offsets = untangle(
+        groups, offsets, lambda index, trial: _points(by_index[index], (nodes, trial), build)
+    )
+    routes = [(plan, _points(plan, (nodes, offsets), build)) for plan in build.plans]
+    return part_tip_pairs(routes, nodes, build.theme.screen.port_clear), nodes
 
 
 def _points(
@@ -254,6 +271,21 @@ def _labelled(
             )
         )
     return edges + buses
+
+
+def _jump_edge(jump: Jump, nodes: dict[str, Node]) -> Edge:
+    """Draw the second part of a jump: from the circle by the target into the target."""
+    transition = jump.plan.transition
+    return Edge(
+        id=f"{transition.source}>{transition.target}~{jump.marks[1].text[0]}",
+        role=_role_of(transition),
+        points=jump.points,
+        label=None,
+        source=jump.marks[1].id,
+        target=transition.target,
+        head=Head.FILLED,
+        dashed=_is_undecided(nodes[transition.target]),
+    )
 
 
 def _unique_id(wanted: str, seen: set[str]) -> str:
