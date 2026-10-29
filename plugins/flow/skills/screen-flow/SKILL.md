@@ -43,7 +43,7 @@ You write a short **spec**. A script places the screens in device frames, routes
 }
 ```
 
-Top level: `type` (`screen`), `title`, `desc`, `theme` (see the flowchart skill), `zones`, `screens`, `taps`, `buses`, `conditions` (`inline` default, or `coded`), `tab_count` (tabs in a tab bar, default 4), `captures` (the manifest of L4 screenshots).
+Top level: `type` (`screen`), `title`, `desc` (two lines under the title, about 250 characters; a longer one runs into the diagram and the check warns `description-too-long`), `theme` (see the flowchart skill), `zones`, `screens`, `taps`, `buses`, `conditions` (`inline` default, or `coded`), `tab_count` (tabs in a tab bar, default 4), `captures` (the manifest of L4 screenshots).
 
 ### Screens and ids
 
@@ -70,7 +70,7 @@ An arrow is written `trigger [guard] / effect`.
 - `kind`: `forward` (default), `main` (the happy path: blue, thick, animated; or `"main": true`; only one route per diagram), `failure` (rose), `back` (dashed slate, runs in a strip above the row), `retry` (dashed slate, returns to an earlier screen).
 - `route` (optional): `direct` keeps a back arrow straight between two frames, `elbow` leaves the top or bottom of the source and turns once into the side of the target. `jump` cuts a long arrow in two: it leaves the source into a circle with a letter (A, B, ...), and a circle with the same letter beside the target leads into it (the off-page connector of the flowchart design, on one page). Use it for an arrow that would run across most of the page or cross many lines (a logout back to the home page, a start decision far from its screen); the words stay on the first part. The check names each line that crosses 4 or more others (`crosses-many`): those are the ones to jump.
 - Two taps between the same two items that differ only in their trigger (`click Sign up` and `click the heart`, both to Sign up) are drawn as one arrow with both triggers, `click Sign up, click the heart`, as UML writes a transition with several triggers. Each trigger is held to the 20-character limit on its own. Give one of them a `code` to keep them apart.
-- `code`, `conditions: "coded"`: a label longer than about 20 characters, or shared by several arrows, becomes a code (C1, C2) on the arrow and a table below the diagram. The check warns about a long label.
+- `code`: a label longer than about 20 characters, or shared by several arrows, becomes a code (C1, C2) on the arrow and a row in a table below the diagram: write `"code": "C1"` on that tap only. `"conditions": "coded"` at the top level codes **every** arrow that has words, which suits a diagram whose arrows are mostly long conditions, not a flow of short clicks. The check warns about a long label.
 - Old specs still work: a spec with only `label` and `style` (`tap`, `back`) is drawn as plain boxes as before.
 
 ### Layout
@@ -82,7 +82,17 @@ An arrow is written `trigger [guard] / effect`.
 - `zones`: `id`, `label`, `tone` (`blue`, `violet`, `amber`, `green`, `teal`, `gray`, `red`). Each is a dashed tinted frame with a pill; the id chip takes the zone colour. A zone is the box around its screens, so keep a zone's screens next to each other.
 - Rows of desktop screens are laid out in their own columns: the web flow goes in its own zone below the app flow.
 - **Tab bar**: one `tab` item per tab on one row, and `"buses": [{"trigger": "tap any tab", "to": ["tab1", "tab2"]}]`. The bar is drawn once as a bus. Then an arrow from each tab to the first screen of its stack. Screens that hide the bar go in their own zone.
-- **Top bar or side menu of a web app**: the same pattern. One `tab` item per link (`Home`, `New Article`, `Settings`), on one row inside the zone whose pages show the bar, `"buses": [{"trigger": "click a top bar link", "to": [...]}]`, and an arrow from each link to its page. A link's box widens to fit its name. Put each link above the column of its page, so its arrow stays short, and say in `desc` that every page of the zone has the bar. Do not draw the bar's links again from each page.
+- **Top bar or side menu of a web app**: the same pattern. One `tab` item per link (`Home`, `New Article`, `Settings`), on one row inside the zone whose pages show the bar, `"buses": [{"trigger": "click a top bar link", "to": [...]}]`, and an arrow from each link to its page. A link's box widens to fit its name. Put each link above the column of its page, so its arrow stays short, and say in `desc` that every page of the zone has the bar. Do not draw the bar's links again from each page. A group of pages with another bar (signed out and signed in) gets its own row of links and its own bus. For example, in the zone `in`:
+
+  ```json
+  {"id": "t-home", "kind": "tab", "label": "Home", "zone": "in", "at": [4, 0]},
+  {"id": "t-new", "kind": "tab", "label": "New Article", "zone": "in", "at": [4, 1]}
+  ...
+  "buses": [{"trigger": "click a top bar link", "to": ["t-home", "t-new"]}],
+  "taps": [{"from": "t-home", "to": "home-in"}, {"from": "t-new", "to": "editor"}]
+  ```
+
+  The tap from a link has no trigger of its own: the bus carries it.
 - Examples: `examples/ride-screen-flow.spec.json` (52 screens, 6 zones, 77 arrows; take the `at` keys out and it still builds with no error), `examples/shop-screen-flow.spec.json` (the complete shop app at mixed fidelity), `shop-highlight-screen-flow`, `shop-fidelity-screen-flow`, `shop-entry-screen-flow`, `shop-tabs-screen-flow`, `shop-overlays-screen-flow`, `shop-states-screen-flow`, `shop-coded-screen-flow`, `shop-wireframe-screen-flow` (two screens at L3 with blocks).
 - Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart` and the others of the icon library. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
 

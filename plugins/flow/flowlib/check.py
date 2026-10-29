@@ -9,7 +9,7 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from itertools import combinations, pairwise
 
-from .explain_parts import is_explain_node
+from .explain_parts import EXPLAINER, is_explain_node
 from .glyph_widths import FontWeight, inter_width
 from .html_board import board_text_room, is_board_node
 from .html_nodes import CAPTION_FONT_SIZE_PX, CAPTION_GAP_PX, CAPTION_WIDTH_PX
@@ -26,6 +26,7 @@ from .model import (
     Scene,
     Shape,
 )
+from .render_html import DESCRIPTION_FONT_SIZE_PX, DESCRIPTION_MAX_WIDTH_PX, TITLE_LEFT_PX
 from .screen_part import Part, PartKind
 from .screen_parts import screen_parts
 from .sizing import LINE_HEIGHT_FACTOR, estimate_text_width
@@ -50,6 +51,8 @@ WORDS_KINDS = (
 )  # the kinds that carry the words of a screen flow transition
 WRAPPING_CHARS = 2  # the brackets of a guard, or the slash and space of an effect
 MIN_SHARED_BUS_PX = 240.0  # lines of one kind that leave one node may share a bus this long
+DESCRIPTION_LINES = 2  # the title block holds the title and two lines of the description
+DESCRIPTION_SCALE = 0.98  # the description is set at 400, about 2% narrower than the 500 widths
 CUT_TOLERANCE_PX = 2.0  # words this much wider than their box lose less than a letter's edge
 
 
@@ -76,6 +79,7 @@ class Code(StrEnum):
     CROSSES_BORDER = "crosses-border"
     ON_DIVIDER = "on-divider"
     LABEL_TOO_LONG = "label-too-long"
+    DESCRIPTION_TOO_LONG = "description-too-long"
     TEXT_TOO_LONG = "text-too-long"
     DECISION_NOT_QUESTION = "decision-not-question"
     DECISION_FEW_EXITS = "decision-few-exits"
@@ -549,6 +553,44 @@ def _text_room(node: Node, rules: LayoutRules, theme: Theme) -> float | None:
     return text_area_width(node.shape, node.width, node.icon is not None)
 
 
+def check_description(scene: Scene) -> list[Finding]:
+    """Report a description longer than the title block holds: it runs into the diagram.
+
+    The block above a diagram has room for the title and two lines of the description; an
+    explainer sizes its own header and is left out.
+    """
+    if not scene.title or not scene.description or scene.diagram == EXPLAINER:
+        return []
+    width = min(scene.width - 2 * TITLE_LEFT_PX, DESCRIPTION_MAX_WIDTH_PX)
+    lines = _wrapped_lines(scene.description, width)
+    if lines <= DESCRIPTION_LINES:
+        return []
+    room = int(len(scene.description) * DESCRIPTION_LINES / lines)
+    return [
+        Finding(
+            Severity.WARNING,
+            Code.DESCRIPTION_TOO_LONG,
+            f"the description takes about {lines} lines and the title block holds "
+            f"{DESCRIPTION_LINES}, so it runs into the diagram; keep it under about {room} "
+            "characters, and put the rest in a note or the text around the diagram",
+            (),
+        )
+    ]
+
+
+def _wrapped_lines(text: str, width: float) -> int:
+    """Return how many lines a text takes in the description's type, wrapped at word breaks."""
+    space = inter_width(" ", DESCRIPTION_FONT_SIZE_PX, FontWeight.REGULAR) * DESCRIPTION_SCALE
+    lines, used = 1, 0.0
+    for word in text.split():
+        size = inter_width(word, DESCRIPTION_FONT_SIZE_PX, FontWeight.REGULAR) * DESCRIPTION_SCALE
+        if used and used + space + size > width:
+            lines, used = lines + 1, size
+            continue
+        used += (space if used else 0.0) + size
+    return lines
+
+
 def check_label_length(scene: Scene) -> list[Finding]:
     """Report words on an arrow that are longer than a screen flow allows inline.
 
@@ -829,6 +871,7 @@ def check_scene(scene: Scene) -> list[Finding]:
         *check_overlaps(scene),
         *check_borders(scene, rules),
         *check_label_length(scene),
+        *check_description(scene),
         *check_notation(scene),
         *check_captures(scene),
     ]

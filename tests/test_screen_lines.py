@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "plugins" / "flow"))
 
-from flowlib.check import Code, check_busy_lines, check_scene  # noqa: E402
+from flowlib.check import Code, check_busy_lines, check_description, check_scene  # noqa: E402
 from flowlib.diagrams import layout  # noqa: E402
 from flowlib.model import Edge, Role, Scene  # noqa: E402
 
@@ -126,3 +126,41 @@ def test_a_top_bar_link_widens_to_fit_its_name() -> None:
     nodes = {node.id: node for node in scene.nodes}
     assert nodes["t-new"].width > nodes["t-home"].width
     assert Code.TEXT_MAY_NOT_FIT not in [f.code for f in check_scene(scene)]
+
+
+def test_a_description_longer_than_two_lines_is_reported() -> None:
+    """The title block holds two lines of description; a third runs into the diagram."""
+    short = Scene(1600, 800, "Title", "One short line.", (), (), ())
+    long_text = " ".join(["A description that goes on and on about the diagram."] * 12)
+    long = Scene(1600, 800, "Title", long_text, (), (), ())
+    assert not check_description(short)
+    assert [finding.code for finding in check_description(long)] == [Code.DESCRIPTION_TOO_LONG]
+
+
+def test_a_zone_in_a_row_with_no_entry_stays_clear_of_the_entries() -> None:
+    """A top bar row inside a zone starts right of the entries' column, as the rows below do.
+
+    The bar's row has no screen, so it is laid out apart from the rows of desktop screens.
+    """
+    scene = layout(
+        {
+            "type": "screen",
+            "zones": [{"id": "out", "label": "Signed out", "tone": "blue"}],
+            "screens": [
+                {"id": "t-home", "kind": "tab", "label": "Home", "zone": "out", "at": [0, 0]},
+                {"id": "t-in", "kind": "tab", "label": "Sign in", "zone": "out", "at": [0, 1]},
+                {**_screen("home", [1, 0]), "zone": "out", "device": "desktop"},
+                {**_screen("login", [1, 1]), "zone": "out", "device": "desktop"},
+                {"id": "open", "kind": "entry", "label": "Open the site", "at": [1]},
+            ],
+            "buses": [{"trigger": "click a top bar link", "to": ["t-home", "t-in"]}],
+            "taps": [
+                {"from": "open", "to": "home", "trigger": "open"},
+                {"from": "t-home", "to": "home"},
+                {"from": "t-in", "to": "login"},
+            ],
+        }
+    )
+    entry = next(node for node in scene.nodes if node.id == "open")
+    zone = next(frame for frame in scene.frames if frame.id == "zone-out")
+    assert zone.x > entry.x + entry.width

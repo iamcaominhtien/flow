@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.16.1 (2026-10-29)
+
+From the second blind run of `screen-L4-A-01` on 0.16.0 (`benchmarks/results/2026-10-29-screen-L4-A-01.md`): 0 errors, 15 warnings (the first run had 30), 13 crossings (22), the top bars drawn as buses, two jumps, the drift check run with no `tap-not-in-code`.
+
+- New check `description-too-long`: the title block holds the title and two lines of the description; a longer one runs into the diagram. Measured with Inter's widths, wrapped at word breaks. None of the examples has one.
+- A band of rows with no entry point starts right of the entries' column, so a zone in it (a top bar row) no longer reaches over the entries and hides their frame.
+- Entries, flags and tabs widen to fit their second line as well as their name.
+- Screen-flow skill: `"conditions": "coded"` codes every arrow with words, and a few long ones take `"code"`; an example of a top bar's links, bus and taps, and of two bars for two groups; the length of `desc`.
+
 ## 0.16.0 (2026-10-29)
 
 Screen flow: the open items of 0.15.0, and L4 phase 3, the flow read from the code.

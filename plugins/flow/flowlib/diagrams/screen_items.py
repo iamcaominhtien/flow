@@ -64,7 +64,7 @@ def _size_of(item: Item, shape: Shape, theme: Theme) -> tuple[float, float]:
     """Return the size of an entry, a flag or a tab: its design size, wider when its name is.
 
     A top bar link of a web app (``New Article``) is longer than a phone's tab name, and the
-    name is drawn on one line.
+    name and the second line are each drawn on one line.
     """
     rules = theme.screen
     width, height = {
@@ -73,6 +73,9 @@ def _size_of(item: Item, shape: Shape, theme: Theme) -> tuple[float, float]:
         ItemKind.TAB: rules.tab,
     }[item.kind]
     needed = estimate_text_width(item.name, theme.layout, DEFAULT_FONT_SIZE_PX)
+    if item.detail:
+        detail_size = theme.layout.detail_font_size
+        needed = max(needed, estimate_text_width(item.detail, theme.layout, detail_size))
     while text_area_width(shape, width, item.icon is not None) < needed:
         width += GROW_STEP_PX
     return width, height
