@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.16.0 (2026-10-29)
+
+Screen flow: the open items of 0.15.0, and L4 phase 3, the flow read from the code.
+
+Lines. On 80 random screen flows with one to three entry decisions in the entry column (a test written for this change, not in the repository): lines on top of each other 110 to 11, of which 9 are two arrows leaving one decision tip; check errors 3 to 0; crossings 861 to 812. On the screen flow examples and the Conduit spec of the first L4 run, crossings 30 to 31 and no other change in lines.
+
+- The untangling also swaps and moves the channels of the zigs in a gap between rows, and tries a move of one port or channel past several others as well as a swap of two.
+- A zig whose leg would run on the leg of another decision in the same column (the guards of two entry points) is routed in the free lanes, and the tip that faces the clash is closed to it.
+- A last pass moves a stretch of an arrow a few pixels sideways where it still runs on another arrow, with its port along the frame side (`diagrams/screen_nudge.py`).
+- Taps between the same two items that differ only in their trigger are drawn as one arrow with both triggers, `click Sign up, click the heart`, as UML writes a transition with several triggers (`diagrams/screen_merge.py`). `label-too-long` counts each trigger on its own.
+- New check `crosses-many` names a line that crosses 4 or more others; in a screen flow it suggests `"route": "jump"`.
+- Entry, flag and tab boxes widen to fit their names. The skill shows a web app's top bar as the tab bar pattern: one `tab` per link and a bus into them.
+
+Flow from the code (`docs/plugin/l4-as-built.md`, section 8):
+
+- `flow.py code <src> -o code.json` reads a web app's router (Angular, Vue Router, React Router), links and navigation calls, and imports, with regular expressions, into a code map.
+- `flow.py draft code.json [--manifest m]` writes a first spec: a screen per page, a tap per link, the top bar as a bus, a decision per guard.
+- `flow.py drift spec.json code.json` reports `tap-not-in-code`, `link-not-drawn`, `guard-not-drawn` and `page-not-drawn`. A screen is tied to its page by the new `"path"` key or by the address of its screenshot. On Conduit, a tap whose link was taken out of the source is reported.
+- Not done: no parser, so a route table built at run time is missed; a link that shows in one state only is reported for every screen of its page. Tried on Conduit's Angular source and on small test apps (Angular and React Router), not on a Vue app.
+
 ## 0.15.0 (2026-10-29)
 
 Screen flow: tidier lines. Measured on the screen flow examples and the Conduit spec of `benchmarks/results/2026-10-28-screen-L4-A-01.md`: crossings 55 to 44 with no spec change, small jogs 5 to 1; the ride example goes from 33 to 14 crossings with three of its returns made jumps, and the Conduit spec from 22 to 9 with its logout made a jump.

@@ -1,6 +1,6 @@
 # Screen flow L4: screens as built
 
-Status: **phases 1 and 2 built (plugin 0.13.0 and 0.14.0); phase 3 is a proposal.** This page describes a fifth fidelity level for the screen flow, L4, where each screen is a real screenshot of the application, built and run from its own source code.
+Status: **phases 1, 2 and 3 built (plugin 0.13.0, 0.14.0 and 0.16.0).** This page describes a fifth fidelity level for the screen flow, L4, where each screen is a real screenshot of the application, built and run from its own source code.
 
 ## 1. Decisions
 
@@ -104,9 +104,19 @@ The capture script has to give the same picture every run:
 - **Stability.** Wait for the network to be idle, turn off animations, and hide or mask what changes on every run (dates, avatars from a random service).
 - **Hotspots.** Get each element by a stable selector (RealWorld's `SELECTORS.md` is a contract every implementation keeps) and record its bounding box.
 
-## 8. Later: the flow from the code
+## 8. The flow from the code
 
-The code holds the flow as well as the screens: routes, guards and navigation calls. In Conduit's `app.routes.ts`, `/settings` and `/editor` have a `requireAuth` guard that redirects to `/login`. That is a decision diamond "Signed in?" in the flow. Phase 3 reads the router and the navigation calls, builds a first spec from them, and adds a check that reports where the drawn flow and the code differ.
+The code holds the flow as well as the screens: routes, guards and navigation calls. In Conduit's `app.routes.ts`, `/settings` and `/editor` have a `requireAuth` guard that redirects to `/login`. That is a decision diamond "Signed in?" in the flow.
+
+Three commands of `scripts/flow.py` read it (plugin 0.16.0):
+
+- `flow.py code <src> -o code.json` writes a code map (`flowlib/code_map.py`): each page with its path, the files that draw it (its components and the components of the routes around it), its guards and where a guard sends the user instead; each link and navigation call with its file, line, target and words; the static imports of every file; and the files every page shows (reached from `main.ts` or the root component, not from a route), such as the top bar. Route objects (Angular, Vue Router, React Router data routers, with `children` and `loadChildren`), JSX `<Route>` elements, `routerLink`, `[routerLink]` arrays, `href`, `to`, `navigate`, `navigateByUrl`, `router.push`, `redirect` and `createUrlTree` are read with regular expressions (`code_routes.py`, `code_links.py`). A part the code computes becomes `*` (`/profile/*`).
+- `flow.py draft code.json [--manifest m] -o spec.json` writes a first spec: one screen per page (at L4 when the manifest has its address), one tap per link of the page's own view files, the shared links as a top bar bus, a decision per set of guards with its two exits, and a zone per set of guards.
+- `flow.py drift spec.json code.json` ties each screen to a page by its `path` key or the address of its screenshot, and reports `tap-not-in-code`, `link-not-drawn`, `guard-not-drawn` and `page-not-drawn` (`code_drift.py`). A tap into a decision is checked against the pages the decision leads to; a tap between two screens of one page (a change of state) is not checked; a tap from a top bar tab is checked against the shared links.
+
+Checked on Conduit's Angular source: 10 pages, 41 links, the header and the footer as shared. The spec of the first blind run (`run6`) gets no `tap-not-in-code`; 22 of its 43 taps are checked (the rest leave decisions or entries). It gets 17 `link-not-drawn`, most of them links that show in one state only (Edit for the author, Sign in for a visitor) or that the run left out on purpose, and one `page-not-drawn` (`/profile/:username/favorites`). With the Edit Article link taken out of a copy of the source, the tap from the author's article to the editor is reported as `tap-not-in-code`.
+
+Limits: patterns, not a parser, so a route table built at run time, or a target built in an unusual way, is missed. A link that shows in one state only cannot be told apart from one that always shows. Links in services and stores (signing out) are not asked of each page. The draft of Conduit has 19 items and 49 taps and crosses many lines: it is a list to start from, not a layout.
 
 ## 9. The first test set: Conduit
 
@@ -153,7 +163,7 @@ What a run is scored on:
 | --- | --- | --- |
 | 1 (built) | Plugin: `fidelity: "L4"` with `capture`; PNG embedding in HTML and draw.io; the checks in section 6; click to zoom in the HTML; an example built from synthetic captures (`examples/notes-built-screen-flow.spec.json`, screenshots of a small HTML page taken by `examples/captures/notes/capture.js`) | The tests pass with generated PNGs and an L4 example builds with no error |
 | 2 (built) | Skill: how to build and run the app, the Playwright capture template (`skills/screen-flow/capture.js`), the manifest, hotspots from selectors | A blind agent captures Conduit and draws `screen-L4-A-01`: done, `benchmarks/results/2026-10-28-screen-L4-A-01.md` |
-| 3 | Flow from code: routes and guards to a first spec; a check for drift between the diagram and the code | The drift check finds a transition removed from the code |
+| 3 (built) | Flow from code: `flow.py code`, `draft` and `drift` (section 8) | The drift check finds a transition removed from the code: done, the Edit Article link taken out of a copy of Conduit's source (section 8, and `tests/test_code_flow.py`) |
 
 ## 11. Open questions
 

@@ -116,6 +116,10 @@ class Code(StrEnum):
     CAPTURE_STALE = "capture-stale"
     CAPTURE_HEAVY = "capture-heavy"
     HOTSPOT_OUTSIDE = "hotspot-outside"
+    TAP_NOT_IN_CODE = "tap-not-in-code"
+    LINK_NOT_DRAWN = "link-not-drawn"
+    GUARD_NOT_DRAWN = "guard-not-drawn"
+    PAGE_NOT_DRAWN = "page-not-drawn"
 
 
 @dataclass(frozen=True)
