@@ -30,6 +30,8 @@ from .screen_items import assign_cells, build_nodes, densify
 from .screen_jumps import Jump, split_jumps
 from .screen_labels import Caption, assign_codes, caption_of, trigger_label
 from .screen_manifest import with_manifest
+from .screen_merge import merge_parallel
+from .screen_nudge import nudge_overlaps
 from .screen_plan import (
     ENTRY_STACK_GAP_PX,
     ENTRY_ZONE_ID,
@@ -73,6 +75,7 @@ from .screen_untangle import untangle
 
 ENTRY_ZONE_LABEL = "Entry points"
 BUS_CHIP_RISE_PX = 18
+SLOT = "slot"  # the key of a zig's channel among the choices the untangling may swap
 
 
 @dataclass(frozen=True)
@@ -117,6 +120,7 @@ def build_scene(spec: FlowSpec) -> Scene:
     Returns:
         The scene, with its canvas sized.
     """
+    spec = merge_parallel(spec)
     theme = load_theme()
     nodes = build_nodes(spec, theme)
     cells, rows, columns = densify(assign_cells(spec))
@@ -210,20 +214,35 @@ def _routes(
         for (node_id, _), group in uses.items()
         if len(group) > 1 and nodes[node_id].shape is not Shape.DECISION
     ]
-    offsets = untangle(
+    zigs: dict[int, list[tuple[int, str]]] = {}
+    for plan in build.plans:
+        if plan.route is RouteType.ZIG:
+            zigs.setdefault(plan.gap, []).append((plan.index, SLOT))
+            offsets[(plan.index, SLOT)] = plan.slot
+    groups.extend(group for group in zigs.values() if len(group) > 1)
+    choices = untangle(
         groups, offsets, lambda index, trial: _points(by_index[index], (nodes, trial), build)
     )
-    routes = [(plan, _points(plan, (nodes, offsets), build)) for plan in build.plans]
-    return part_tip_pairs(routes, nodes, build.theme.screen.port_clear), nodes
+    plans = [_with_slot(plan, choices) for plan in build.plans]
+    routes = [(plan, _points(plan, (nodes, choices), build)) for plan in plans]
+    clear = build.theme.screen.port_clear
+    return nudge_overlaps(part_tip_pairs(routes, nodes, clear), nodes, clear), nodes
+
+
+def _with_slot(plan: Plan, choices: dict[tuple[int, str], float]) -> Plan:
+    """Return a zig with the channel the untangling chose for it; any other arrow as it is."""
+    slot = choices.get((plan.index, SLOT))
+    return plan if slot is None else replace(plan, slot=int(slot))
 
 
 def _points(
     plan: Plan,
-    placed: tuple[dict[str, Node], dict[tuple[int, End], float]],
+    placed: tuple[dict[str, Node], dict[tuple[int, str], float]],
     build: Build,
 ) -> tuple[Point, ...]:
     """Route one transition between the sides of its two frames."""
     nodes, offsets = placed
+    plan = _with_slot(plan, offsets)
     transition = plan.transition
     cells = build.grid.cells
     sides = sides_of(plan, (cells[transition.source], cells[transition.target]))

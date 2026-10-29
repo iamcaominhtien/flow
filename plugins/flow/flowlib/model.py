@@ -10,6 +10,7 @@ from enum import StrEnum
 Point = tuple[float, float]
 
 DEFAULT_FONT_SIZE_PX = 12.0
+TRIGGER_JOIN = ", "  # between the triggers of one arrow that has several, as UML writes them
 REF_FRAGMENT = "ref"  # the label of a frame that points to another diagram, whose name it shows
 DEFAULT_THEME = "pastel"  # the look of every diagram that does not ask for another
 

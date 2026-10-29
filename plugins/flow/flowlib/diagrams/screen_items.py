@@ -15,7 +15,8 @@ from ..model import (
 )
 from ..reader import SpecError
 from ..screen_parts import screen_size
-from ..sizing import wrap_text
+from ..sizing import estimate_text_width, wrap_text
+from ..text_area import text_area_width
 from ..theme import Theme
 from .screen_arrange import arrange
 from .screen_spec import FlowSpec, Item, ItemKind
@@ -23,6 +24,7 @@ from .screen_spec import FlowSpec, Item, ItemKind
 ENTRY_COLUMN = -1  # entries sit in a column of their own, left of column 0
 DECISION_TEXT_FRACTION = 0.64  # of its width, the part of a diamond that can hold text
 DECISION_CHIP_RISE_PX = 14  # the system chip of a decision hangs this far above its top
+GROW_STEP_PX = 8  # an entry, flag or tab whose name is too long widens by this much at a time
 Cell = tuple[int, int]
 
 
@@ -50,21 +52,30 @@ def _node(item: Item, zone_tone: Tone | None, theme: Theme) -> Node:
         return _decision_node(item, zone_tone, theme)
     if item.kind in (ItemKind.START, ItemKind.END):
         return _mark_node(item, theme)
-    size = _size_of(item, theme)
     shape = {
         ItemKind.ENTRY: Shape.TERMINATOR,
         ItemKind.FLAG: Shape.FLAG,
         ItemKind.TAB: Shape.SCREEN,
     }[item.kind]
-    return _plain_node(item, shape, size)
+    return _plain_node(item, shape, _size_of(item, shape, theme))
 
 
-def _size_of(item: Item, theme: Theme) -> tuple[float, float]:
-    """Return the size of an entry, a flag or a tab."""
+def _size_of(item: Item, shape: Shape, theme: Theme) -> tuple[float, float]:
+    """Return the size of an entry, a flag or a tab: its design size, wider when its name is.
+
+    A top bar link of a web app (``New Article``) is longer than a phone's tab name, and the
+    name is drawn on one line.
+    """
     rules = theme.screen
-    return {ItemKind.ENTRY: rules.entry, ItemKind.FLAG: rules.flag, ItemKind.TAB: rules.tab}[
-        item.kind
-    ]
+    width, height = {
+        ItemKind.ENTRY: rules.entry,
+        ItemKind.FLAG: rules.flag,
+        ItemKind.TAB: rules.tab,
+    }[item.kind]
+    needed = estimate_text_width(item.name, theme.layout, DEFAULT_FONT_SIZE_PX)
+    while text_area_width(shape, width, item.icon is not None) < needed:
+        width += GROW_STEP_PX
+    return width, height
 
 
 def _plain_node(item: Item, shape: Shape, size: tuple[float, float]) -> Node:

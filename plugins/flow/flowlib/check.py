@@ -14,7 +14,18 @@ from .glyph_widths import FontWeight, inter_width
 from .html_board import board_text_room, is_board_node
 from .html_nodes import CAPTION_FONT_SIZE_PX, CAPTION_GAP_PX, CAPTION_WIDTH_PX
 from .html_plan import is_plan_node, plan_text_room
-from .model import Edge, EdgeLabel, Frame, LabelKind, Node, Point, Role, Scene, Shape
+from .model import (
+    TRIGGER_JOIN,
+    Edge,
+    EdgeLabel,
+    Frame,
+    LabelKind,
+    Node,
+    Point,
+    Role,
+    Scene,
+    Shape,
+)
 from .screen_part import Part, PartKind
 from .screen_parts import screen_parts
 from .sizing import LINE_HEIGHT_FACTOR, estimate_text_width
@@ -27,6 +38,7 @@ BORDER_TOLERANCE_PX = 1.0  # a part this close to a frame's border counts as ins
 NODE_CLEARANCE_PX = 4.0  # nodes closer than this count as touching
 LINE_CLEARANCE_PX = 2.0
 MIN_CROSSING_EDGES = 2
+CROSSES_MANY_LINES = 4  # a line that crosses this many others is hard to follow
 MIN_OVERLAP_PX = 32.0  # a shorter shared stretch is a junction at a node, not an overlap
 INLINE_LABEL_MAX_CHARS = 20  # design 02: longer words go in a table, under a code
 WORDS_KINDS = (
@@ -58,6 +70,7 @@ class Code(StrEnum):
     OUTSIDE_CANVAS = "outside-canvas"
     TEXT_MAY_NOT_FIT = "text-may-not-fit"
     LINES_CROSS = "lines-cross"
+    CROSSES_MANY = "crosses-many"
     LINES_OVERLAP = "lines-overlap"
     CAPTION_COVERED = "caption-covered"
     CROSSES_BORDER = "crosses-border"
@@ -558,7 +571,12 @@ def check_label_length(scene: Scene) -> list[Finding]:
 
 
 def _words_length(label: EdgeLabel) -> int:
-    """Return how many characters of a label are the author's words, without its brackets."""
+    """Return how many characters of a label are the author's words, without its brackets.
+
+    A chip that lists several triggers counts its longest one: each is read on its own.
+    """
+    if label.kind in (LabelKind.USER, LabelKind.SYSTEM):
+        return max(len(part) for part in label.text.split(TRIGGER_JOIN))
     is_wrapped = label.kind in (LabelKind.GUARD_OK, LabelKind.GUARD_FAIL, LabelKind.EFFECT)
     return len(label.text) - (WRAPPING_CHARS if is_wrapped else 0)
 
@@ -596,6 +614,47 @@ def check_crossings(scene: Scene) -> list[Finding]:
                 )
             )
     return findings
+
+
+def check_busy_lines(scene: Scene) -> list[Finding]:
+    """Report each line that crosses many others: the one to move, or to cut into a jump.
+
+    The pairwise ``lines-cross`` findings do not say which line causes them; a long return that
+    runs across a whole block of frames crosses most of them.
+    """
+    drawn = [edge for edge in scene.edges if _is_content(edge)]
+    segments = {edge.id: list(pairwise(edge.points)) for edge in drawn}
+    is_screen_flow = any(node.screen is not None for node in scene.nodes)
+    findings = []
+    for edge in drawn:
+        crossed = [
+            other.id
+            for other in drawn
+            if other.id != edge.id
+            and any(_crosses(a, b) for a in segments[edge.id] for b in segments[other.id])
+        ]
+        if len(crossed) < CROSSES_MANY_LINES:
+            continue
+        findings.append(
+            Finding(
+                Severity.WARNING,
+                Code.CROSSES_MANY,
+                f"line '{edge.id}' crosses {len(crossed)} other lines; "
+                + _busy_line_advice(is_screen_flow),
+                (edge.id,),
+            )
+        )
+    return findings
+
+
+def _busy_line_advice(is_screen_flow: bool) -> str:
+    """Say how to fix a line that crosses many: a jump in a screen flow, else a move."""
+    if is_screen_flow:
+        return (
+            'write "route": "jump" on its transition, which cuts it into two short arrows that '
+            "meet at a pair of lettered circles, or move one of its ends"
+        )
+    return "move one of its ends, or route it round the block it crosses"
 
 
 def _shared_length(first: tuple[Point, Point], second: tuple[Point, Point]) -> float:
@@ -762,6 +821,7 @@ def check_scene(scene: Scene) -> list[Finding]:
         *check_canvas(scene, rules),
         *check_text_fit(scene, rules),
         *check_crossings(scene),
+        *check_busy_lines(scene),
         *check_overlaps(scene),
         *check_borders(scene, rules),
         *check_label_length(scene),

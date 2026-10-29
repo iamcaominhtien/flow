@@ -10,7 +10,7 @@ share a line.
 
 import heapq
 from collections import defaultdict
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from enum import StrEnum
 
 Cell = tuple[int, int]
@@ -23,6 +23,7 @@ CROSS_COST = 1.0  # per line of another arrow that a move crosses
 STUB_COST = 0.6  # per empty column a stub runs through
 SIDE_COST = 0.6  # per arrow that already meets the side of the frame
 DECISION_SIDE_FACTOR = 2.0  # a decision has one tip per side, so it is charged more
+CLOSED_COST = 100.0  # a side another line needs: used only when no other way exists
 HALF = 0.5  # a lane is half a cell from the cells next to it
 OVERLAP_MARGIN = 0.25  # runs closer than this, in cells, need slots of their own
 
@@ -108,6 +109,7 @@ class Load:
     verticals: dict[tuple[int, int], int]  # (gap, column): lines that cross a gap in a column
     horizontals: dict[tuple[int, int], int]  # (row, column gap): lines that cross a row there
     runs_across: dict[tuple[bool, int, int], int]  # crossings that a route passes straight over
+    closed: set[tuple[str, PortSide]] = field(default_factory=set)  # sides kept for other lines
 
 
 @dataclass(frozen=True)
@@ -219,6 +221,8 @@ def _y_of(horizontal_gap: int) -> float:
 def _side_cost(load: Load, request: Request, which: int, side: PortSide) -> float:
     """Charge for meeting a side that other arrows meet."""
     end = request.ends[which]
+    if (end, side) in load.closed:
+        return CLOSED_COST
     factor = DECISION_SIDE_FACTOR if end in request.decisions else 1.0
     return SIDE_COST * factor * load.sides.get((end, side), 0)
 
