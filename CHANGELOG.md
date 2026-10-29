@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.17.0 (2026-10-29)
+
+Release of 0.11.3 to 0.16.1 to `main`, with no change of its own. In short, for the screen flow:
+
+- Checks: cut-off words in a screen measured with Inter's widths (0.11.4), chips on other lines (0.12.0), `crosses-many` (0.16.0), `description-too-long` (0.16.1).
+- L4, screens as built: screenshots in the frames (0.13.0), `capture.js` and the manifest (0.14.0), the flow read from the code with `flow.py code`, `draft` and `drift` (0.16.0). Plan: `docs/plugin/l4-as-built.md`.
+- Lines: ports and channels untangled, jumps, entry decisions kept apart, parallel triggers merged, top bars as buses (0.15.0, 0.16.0).
+- Author kit: coded conditions, a legend of the words on arrows (0.12.0).
+- Benchmarks: three more blind runs of `screen-C-01` and two of the new `screen-L4-A-01`, in `benchmarks/results/`.
+
 ## 0.16.1 (2026-10-29)
 
 From the second blind run of `screen-L4-A-01` on 0.16.0 (`benchmarks/results/2026-10-29-screen-L4-A-01.md`): 0 errors, 15 warnings (the first run had 30), 13 crossings (22), the top bars drawn as buses, two jumps, the drift check run with no `tap-not-in-code`.
