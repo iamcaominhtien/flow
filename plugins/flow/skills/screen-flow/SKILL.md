@@ -43,19 +43,20 @@ You write a short **spec**. A script places the screens in device frames, routes
 }
 ```
 
-Top level: `type` (`screen`), `title`, `desc`, `theme` (see the flowchart skill), `zones`, `screens`, `taps`, `buses`, `conditions` (`inline` default, or `coded`), `tab_count` (tabs in a tab bar, default 4).
+Top level: `type` (`screen`), `title`, `desc` (two lines under the title, about 250 characters; a longer one runs into the diagram and the check warns `description-too-long`), `theme` (see the flowchart skill), `zones`, `screens`, `taps`, `buses`, `conditions` (`inline` default, or `coded`), `tab_count` (tabs in a tab bar, default 4), `captures` (the manifest of L4 screenshots).
 
 ### Screens and ids
 
 - **Item**: `id` (any name you use in `taps`), `label` (the name), `kind`, `at: [row, column]`, `zone`, `tone`.
 - **Kinds**: `screen` (default), `decision` (a diamond, no id), `start`, `end`, `entry` (a green pill in the left column; `label` is its source: App icon, Push, Deep link; `detail` a second line; `at` is `[row]`), `flag` (an off-page mark with `label` and `detail`, such as "To Checkout flow" and "diagram 02"), `tab` (one tab of a bar, with an `icon`).
 - **Screen id chip**: `code` is the id written on the chip, `S` and two digits (group digit: 0 onboarding, 1 browse, 2 checkout, 3 account), `W` for web (W01). Default: the `id`. A state of one screen shares its id: `"code": "S31", "state": "loading"` is `S31 · loading`. An overlay drawn on the screen it covers: `"overlay": "modal"` (or `sheet`, `toast`) gives `S12 + modal`. Give an overlay its own code only if it has onward arrows of its own.
-- **Device**: `device` is `phone` (default), `tablet`, `desktop` (a browser bar) or `watch`; `orientation` is `portrait` or `landscape`; `"size": "mini"` draws a phone at 120 × 240 for diagrams with many screens. Sizes: phone 156 × 324, tablet 164 × 236, desktop 240 × 170, watch 80 × 96 (landscape swaps them). Use the frame that matches the platform; never a badge.
-- **Fidelity** `L0` to `L3`. Every level has the width of the device frame and the same centre line, so raising a screen never moves an arrow.
-  - `L0`: a rounded card with the id and the name.
+- **Device**: `device` is `phone` (default), `tablet`, `desktop` (a browser bar) or `watch`; `orientation` is `portrait` or `landscape`; `"size": "mini"` draws a phone at 120 × 240 for diagrams with many screens; `"size": "large"` draws any device at twice its size, so an L4 screenshot can be read on the page (the layout makes room). Sizes: phone 156 × 324, tablet 164 × 236, desktop 240 × 170, watch 80 × 96 (landscape swaps them). Use the frame that matches the platform; never a badge. A title is drawn on one line and cut off when too wide: about 17 characters fit a mini phone, 24 a phone; the check warns `text-may-not-fit` when one is cut.
+- **Fidelity** `L0` to `L4`. Every level has the width of the device frame and the same centre line, so raising a screen never moves an arrow.
+  - `L0`: a rounded card with the id and the name, 96 px high. The name is one line: about 19 characters fit a phone card, 13 a mini card and 29 a desktop card; the check warns when one is cut.
   - `L1`: a frame with the same generic skeleton and "content TBD".
   - `L2`: only the elements that cause a transition are drawn and named, the rest is hatched. `elements` is a list; each is a string (a primary button with a red dot where it was tapped) or an object `{"text", "style": "primary|secondary|outline|danger|field", "at": "top|bottom", "on": "overlay", "hotspot": false}`. `hatch` is the text of the hatched block (default "other content"). `content` replaces it with `splash`, `success`, `error`, `loading` or `empty`. `tab: 1` draws a tab bar with the second tab active.
   - `L3`: a full wireframe. Give the screen `blocks` (the same blocks as the wireframe skill: navbar, card, list item, form field, button, table and so on, placed by row, column and span; a block with `"tap": true` gets the red dot). They are drawn at 0.6 of a phone (0.5 tablet, 0.35 desktop), so small text is a structure, not a reading size. Blocks are read only at L3. An L3 screen with `elements` and no `blocks` is drawn as L2.
+  - `L4` (as built): a screenshot of the running app in the frame, under the screen's name. Take the screenshots with `capture.js` (see "Screens as built" below), then name the manifest once at the top of the spec, `"captures": "captures/manifest.json"`, and each L4 screen by its code, `"capture": "W02"`. A capture can also be written out: `"capture": {"image": "captures/S01.png", "source": "src/pages/Login.tsx", "hotspots": [{"text": "Sign in", "box": [24, 295, 342, 50]}]}`; paths are read from the spec's folder. The screenshot is fitted to the width of the body and cut at its bottom; each hotspot (left, top, width, height in the screenshot's pixels) gets the red dot. In the HTML a click on the screenshot opens it full size. The check reports a missing or broken file (error), a screenshot of the wrong width for its device, one older than its `source`, a hotspot outside it, and more than 8 MB of screenshots (warnings).
   - `"undecided": true`: a dashed card with a TBD tag; the arrows into it are dashed.
 - **Overlays**: `overlay`, `overlay_title` (the title of a modal or the text of a toast); elements with `"on": "overlay"` belong to the overlay (the buttons of a modal, the rows of a sheet).
 
@@ -67,8 +68,9 @@ An arrow is written `trigger [guard] / effect`.
 - `guard`: lower case, in brackets. Green on the success path, rose when `kind` is `failure`.
 - `effect`: grey, after a slash.
 - `kind`: `forward` (default), `main` (the happy path: blue, thick, animated; or `"main": true`; only one route per diagram), `failure` (rose), `back` (dashed slate, runs in a strip above the row), `retry` (dashed slate, returns to an earlier screen).
-- `route` (optional): `direct` keeps a back arrow straight between two frames, `elbow` leaves the top or bottom of the source and turns once into the side of the target.
-- `code`, `conditions: "coded"`: a label longer than about 20 characters, or shared by several arrows, becomes a code (C1, C2) on the arrow and a table below the diagram. The check warns about a long label.
+- `route` (optional): `direct` keeps a back arrow straight between two frames, `elbow` leaves the top or bottom of the source and turns once into the side of the target. `jump` cuts a long arrow in two: it leaves the source into a circle with a letter (A, B, ...), and a circle with the same letter beside the target leads into it (the off-page connector of the flowchart design, on one page). Use it for an arrow that would run across most of the page or cross many lines (a logout back to the home page, a start decision far from its screen); the words stay on the first part. The check names each line that crosses 4 or more others (`crosses-many`): those are the ones to jump.
+- Two taps between the same two items that differ only in their trigger (`click Sign up` and `click the heart`, both to Sign up) are drawn as one arrow with both triggers, `click Sign up, click the heart`, as UML writes a transition with several triggers. Each trigger is held to the 20-character limit on its own. Give one of them a `code` to keep them apart.
+- `code`: a label longer than about 20 characters, or shared by several arrows, becomes a code (C1, C2) on the arrow and a row in a table below the diagram: write `"code": "C1"` on that tap only. `"conditions": "coded"` at the top level codes **every** arrow that has words, which suits a diagram whose arrows are mostly long conditions, not a flow of short clicks. The check warns about a long label.
 - Old specs still work: a spec with only `label` and `style` (`tap`, `back`) is drawn as plain boxes as before.
 
 ### Layout
@@ -80,8 +82,47 @@ An arrow is written `trigger [guard] / effect`.
 - `zones`: `id`, `label`, `tone` (`blue`, `violet`, `amber`, `green`, `teal`, `gray`, `red`). Each is a dashed tinted frame with a pill; the id chip takes the zone colour. A zone is the box around its screens, so keep a zone's screens next to each other.
 - Rows of desktop screens are laid out in their own columns: the web flow goes in its own zone below the app flow.
 - **Tab bar**: one `tab` item per tab on one row, and `"buses": [{"trigger": "tap any tab", "to": ["tab1", "tab2"]}]`. The bar is drawn once as a bus. Then an arrow from each tab to the first screen of its stack. Screens that hide the bar go in their own zone.
+- **Top bar or side menu of a web app**: the same pattern. One `tab` item per link (`Home`, `New Article`, `Settings`), on one row inside the zone whose pages show the bar, `"buses": [{"trigger": "click a top bar link", "to": [...]}]`, and an arrow from each link to its page. A link's box widens to fit its name. Put each link above the column of its page, so its arrow stays short, and say in `desc` that every page of the zone has the bar. Do not draw the bar's links again from each page. A group of pages with another bar (signed out and signed in) gets its own row of links and its own bus. For example, in the zone `in`:
+
+  ```json
+  {"id": "t-home", "kind": "tab", "label": "Home", "zone": "in", "at": [4, 0]},
+  {"id": "t-new", "kind": "tab", "label": "New Article", "zone": "in", "at": [4, 1]}
+  ...
+  "buses": [{"trigger": "click a top bar link", "to": ["t-home", "t-new"]}],
+  "taps": [{"from": "t-home", "to": "home-in"}, {"from": "t-new", "to": "editor"}]
+  ```
+
+  The tap from a link has no trigger of its own: the bus carries it.
 - Examples: `examples/ride-screen-flow.spec.json` (52 screens, 6 zones, 77 arrows; take the `at` keys out and it still builds with no error), `examples/shop-screen-flow.spec.json` (the complete shop app at mixed fidelity), `shop-highlight-screen-flow`, `shop-fidelity-screen-flow`, `shop-entry-screen-flow`, `shop-tabs-screen-flow`, `shop-overlays-screen-flow`, `shop-states-screen-flow`, `shop-coded-screen-flow`, `shop-wireframe-screen-flow` (two screens at L3 with blocks).
 - Icons: `user phone cart card bell clock pin pot check box bike refund warn star doc store database server cloud lock key mail globe gear chat search file folder link shield truck home calendar bolt heart camera bug code wifi chart` and the others of the icon library. To draw a missing one, write `icons.local.json` next to the spec (see the flowchart skill).
+
+## Screens as built (L4)
+
+When the user wants the screens as the app shows them now, draw them at L4 from screenshots of the app, built and run from its own source. Plan: `docs/plugin/l4-as-built.md`.
+
+1. **Run the app** with the project's own commands (its README, `package.json` scripts), against seeded or demo data, never a real user's. If the app cannot run here, say so and draw L2 or L3 instead; do not invent screenshots.
+2. **Read the flow from the code**: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py code <app>/src -o code.json` lists every page of the router with the files that draw it and its guards (decisions such as "Signed in?"), every link and navigation call, and the files every page shows (the top bar). It reads Angular, Vue Router, React Router and plain links with patterns, not a parser: read the list it prints, check it against the code, and correct `code.json` where it is wrong. Each screen is a page in a state: signed in or out, empty, an error.
+3. **Write a plan** for `${CLAUDE_PLUGIN_ROOT}/skills/screen-flow/capture.js` (the steps it knows are at the top of the file):
+
+```json
+{"base_url": "http://127.0.0.1:4200", "viewport": [1280, 800],
+ "sessions": {"signed-in": {"steps": [
+   {"goto": "/register"}, {"fill": "input[name=\"username\"]", "value": "demo${run}"},
+   {"fill": "input[name=\"email\"]", "value": "demo${run}@example.com"},
+   {"fill": "input[name=\"password\"]", "value": "demo-${run}"},
+   {"click": "button[type=\"submit\"]"}, {"wait": "a[href=\"/settings\"]"}]}},
+ "screens": [
+   {"code": "W02", "goto": "/login", "wait": "form", "source": "../src/app/auth/auth.component.ts",
+    "hotspots": {"Sign in": "button[type=\"submit\"]"}},
+   {"code": "W12", "session": "signed-in", "goto": "/settings", "wait": "form",
+    "hotspots": {"Update Settings": "button:has-text(\"Update Settings\")"}}]}
+```
+
+   A session is made once and shared by the screens that name it; every screen is shot in a fresh browser. Steps reach a state (fill a form, click, wait); `remember` keeps a part of the address (a new article's slug) for later screens as `${name}`. A hotspot is the element a transition starts from, found by a stable selector (a test id, a form field's name, a button's text). `source` is the file that draws the screen, relative to the spec's folder; the check warns when it is newer than the screenshot. Viewports: desktop `[1280, 800]`, phone `[390, 844]`. `"full_page": true` on a screen takes the whole page; the frame still shows its top, the zoom shows all of it, and hotspots below the fold are kept. The script finds Playwright in the project, else in the machine's global `npm root`.
+4. **Run it**: `node ${CLAUDE_PLUGIN_ROOT}/skills/screen-flow/capture.js plan.json captures`. It needs Playwright and Chromium. It writes `captures/<code>.png` and `captures/manifest.json`; each entry lists the hotspots it found and the ones it did not (`missing`): fix a missing selector and run it again. Look at every screenshot before you draw: right page, right state, nothing still loading.
+5. **Draft the spec** (optional): `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py draft code.json --manifest captures/manifest.json -o draft.spec.json` writes a first spec from it: one screen per page (at L4 when the page was captured), one tap per link, the top bar as a bus, a decision per guard. The draft is a start: rename the screens, add the states the code has (signed in and out, an error), give the taps their words, and arrange the rows.
+6. **Write the spec** with `"captures"` and `"capture": "<code>"`, the transitions you read from the code, and build with `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build <spec> -o <folder>`. A screen that is not captured can carry `"path": "/settings"` instead, so the drift check knows its page. Screens that are not built yet can stay at L0 to L2 in the same diagram. Draw the links of a top bar that every page has once, as a bus into one `tab` item per link (see "Top bar or side menu of a web app"), and say so in `desc`. Use `"size": "large"` when the reader must read the screenshots on the page.
+7. **Check the drift**: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py drift <spec> code.json` compares the diagram with the code. `tap-not-in-code`: a tap whose source page has no link to its target (the code changed, or the tap is wrong). `link-not-drawn`: a link of a page with no tap (a link that shows in one state only, such as Edit for the author, is reported for every screen of the page: draw it, or say in `desc` why not). `guard-not-drawn`: a guarded page no decision leads to. `page-not-drawn`: pages with no screen. The last line says how many taps were checked: taps out of decisions, entries and screens with no page are not. Run it again when the code changes.
 
 ## Limits to tell the user
 
@@ -89,7 +130,7 @@ An arrow is written `trigger [guard] / effect`.
 - Elements are named, not laid out: the frame shows them in a fixed order (top ones, the hatched block, bottom ones, tab bar).
 - Routing follows the grid. Long returns and arrows between far zones cross other lines (the check warns `lines-cross`): that is geometry, not a bug. Put the screens a flow goes through next to each other, and a hub that many screens return to near them.
 - Text width is estimated, not measured. The draw.io file was checked in a viewer, not in the draw.io editor; the dark and slate chips are text with a background there, not pills.
-- The automatic arrangement orders by flow, not by how the diagram will look: it gives no errors on a large flow, but a hand-set `at` usually crosses fewer lines. The 52-screen benchmark gives about 30 `lines-cross` warnings with good `at` hints and more than 100 without.
+- The automatic arrangement orders by flow, not by how the diagram will look: it gives no errors on a large flow, but a hand-set `at` usually crosses far fewer lines.
 
 Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`, `red`. Any other value is refused by the build.
 

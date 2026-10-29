@@ -770,6 +770,7 @@ class ScreenRules:
     table_gap: float
     port_pitch: float
     port_clear: float
+    port_spread: float  # the pitch of the arrows that turn into a long edge, room allowing
     inner_pad: float
     title_size: float
     text_size: float

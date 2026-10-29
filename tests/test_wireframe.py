@@ -241,9 +241,10 @@ def test_palette_is_grey_with_blue_rose_green_and_amber_only() -> None:
     assert (colors.line, colors.fill, colors.text) == ("#CBD5E1", "#F1F5F9", "#334155")
 
 
-def test_scene_round_trip_keeps_blocks_and_badges() -> None:
-    """The scene file holds every block and badge; reading it back changes nothing."""
-    scene = diagrams.layout(spec_of("desktop"))
+@pytest.mark.parametrize("name", ["desktop", "mobile", "responsive", "states"])
+def test_scene_round_trip_keeps_blocks_and_badges(name: str) -> None:
+    """The scene file holds every block, badge and frame style; reading it back changes nothing."""
+    scene = diagrams.layout(spec_of(name))
     again = scene_io.parse(json.loads(scene_io.dumps(scene)))
     assert again == scene
 

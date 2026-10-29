@@ -10,7 +10,7 @@ are routed in free lanes, one slot each, and grows to fit them.
 
 from dataclasses import dataclass
 
-from ..model import Node
+from ..model import Node, Shape
 from ..theme import ScreenRules
 from .screen_labels import Caption, caption_width
 from .screen_plan import ENTRY_STACK_GAP_PX, Grid, Plan, RouteType, ZoneExtent
@@ -127,7 +127,8 @@ def compute_geometry(sizing: Sizing) -> Geometry:
 def _band_columns(sizing: Sizing, index: int) -> BandColumns:
     """Return the left edge and the width of each column of a band, and where its lanes are.
 
-    A column that holds nothing in the band takes no room and no gap.
+    A column that holds nothing in the band takes no room and no gap. A band with no entry
+    point still starts right of the entries' column, so that its zones cannot reach over them.
     """
     band, rules = sizing.bands[index], sizing.rules
     columns = sizing.grid.columns
@@ -138,6 +139,7 @@ def _band_columns(sizing: Sizing, index: int) -> BandColumns:
     present = [column for column in range(columns) if widths[column] > 0]
     outer = sizing.lane_slots.get((index, 0), 0)
     west_room = rules.lane_edge + outer * rules.lane_pitch if outer else 0.0
+    west_room = max(west_room, _entry_room(sizing, widths))
     has_zone_pad = any(extent.first_column == 0 for extent in sizing.zones.values())
     lane_first = [sizing.left - (rules.zone_pad_x if has_zone_pad else 0.0) + rules.lane_edge / 2]
     lefts = [sizing.left + west_room] * columns
@@ -154,6 +156,18 @@ def _band_columns(sizing: Sizing, index: int) -> BandColumns:
         lane_first.append(_first_lane_x(sizing, band, (column, following), (cursor, gap, slots)))
         cursor += gap
     return BandColumns(lefts, widths, lane_first)
+
+
+def _entry_room(sizing: Sizing, widths: list[float]) -> float:
+    """Return the room the entries' column takes in a band that has no entry, else 0."""
+    entries = [
+        (column, sizing.nodes[item_id].width)
+        for item_id, (_, column) in sizing.grid.cells.items()
+        if sizing.nodes[item_id].shape is Shape.TERMINATOR
+    ]
+    if not entries or any(widths[column] for column, _ in entries):
+        return 0.0
+    return max(width for _, width in entries) + sizing.rules.gap
 
 
 def _first_lane_x(

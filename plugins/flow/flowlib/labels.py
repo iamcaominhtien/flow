@@ -1,14 +1,15 @@
 """Move the label chips of a finished scene off boxes and captions, keeping them on their lines.
 
 A line may carry a main chip and extra chips (the guard and the effect of a screen flow arrow).
-They move together: the group keeps its shape and slides along the line.
+They move together: the group keeps its shape and slides along the line. A chip also keeps off
+the other lines when it can: on another line a reader cannot tell which line it names.
 """
 
 from collections.abc import Iterator
 from dataclasses import replace
 from itertools import pairwise
 
-from .check import Rect, caption_rect, chip_rect, frame_rect, node_rect
+from .check import Rect, caption_rect, chip_rect, frame_rect, line_rects, node_rect
 from .model import Edge, EdgeLabel, Frame, Node, Point, Scene
 from .screen_parts import chip_box, is_card
 from .theme import LayoutRules, load_theme
@@ -34,10 +35,14 @@ def place_labels(scene: Scene) -> Scene:
     """
     rules = load_theme().layout
     fixed = _fixed_rects(scene.nodes, rules) + _border_rects(scene.frames)
+    lines = {edge.id: line_rects(edge) for edge in scene.edges}
     taken: list[Rect] = []
     edges = []
     for edge in scene.edges:
-        placed = clear_edge(edge, fixed + taken, rules)
+        others = [rect for line_id, rects in lines.items() if line_id != edge.id for rect in rects]
+        placed = clear_edge(edge, fixed + taken + others, rules)
+        if not _is_clear(_group(placed), fixed + taken, rules):
+            placed = clear_edge(edge, fixed + taken, rules)
         taken.extend(_group_rects(placed, rules))
         edges.append(placed)
     return replace(scene, edges=tuple(edges))

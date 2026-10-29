@@ -36,10 +36,16 @@ class EdgeWords:
     guard: str | None = None  # written without the brackets
     effect: str | None = None  # written without the slash
     is_failure: bool = False  # the guard is rose, and the line is a "no" line unless a role is set
+    # A code such as ``C1``: the arrow shows only the code, and its words go in the conditions
+    # table (``Canvas.conditions``). Use it when the words are longer than about 20 characters.
+    code: str | None = None
     segment: int | None = None  # which stretch of the line carries the words; default the longest
     along: float = MIDDLE  # how far along that stretch, from 0 to 1
     shift: Point = (0.0, 0.0)  # a last nudge of the words, in pixels
-    is_left: bool = False  # on a vertical stretch, put the words on the left of the line
+    # On a vertical stretch, put the words left of the line (True) or right (False). None lets
+    # the canvas choose: the side away from the middle of the screen the line runs along, so the
+    # two lines of a back-and-forth pair carry their words outside the pair.
+    is_left: bool | None = None
 
 
 def build_words(
@@ -58,7 +64,7 @@ def build_words(
     caption = _caption(words)
     if not caption.has_text:
         return None, ()
-    start, end = _stretch(words, points)
+    start, end = stretch_of(words, points)
     x = start[0] + (end[0] - start[0]) * words.along + words.shift[0]
     y = start[1] + (end[1] - start[1]) * words.along + words.shift[1]
     if abs(start[1] - end[1]) < FLAT_TOLERANCE_PX:
@@ -73,13 +79,26 @@ def build_words(
 
 
 def _caption(words: EdgeWords) -> Caption:
-    """Build the caption the screen flow modules draw from the words of an arrow."""
+    """Build the caption the screen flow modules draw from the words of an arrow.
+
+    A coded arrow keeps only its code on the line; its words go in the conditions table.
+    """
     trigger = Trigger(words.trigger, words.system_icon) if words.trigger else None
+    if words.code:
+        return Caption(trigger, words.code, None, None, words.is_failure)
     return Caption(trigger, None, words.guard, words.effect, words.is_failure)
 
 
-def _stretch(words: EdgeWords, points: list[Point]) -> tuple[Point, Point]:
-    """Return the stretch of the line that carries the words: the chosen one, else the longest."""
+def stretch_of(words: EdgeWords, points: list[Point]) -> tuple[Point, Point]:
+    """Return the stretch of the line that carries the words: the chosen one, else the longest.
+
+    Args:
+        words: What the arrow says; its ``segment`` picks a stretch.
+        points: The corners of the line.
+
+    Returns:
+        The start and the end of the stretch.
+    """
     stretches = list(pairwise(points))
     if words.segment is not None:
         return stretches[words.segment]

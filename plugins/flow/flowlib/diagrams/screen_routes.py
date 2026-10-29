@@ -1,8 +1,9 @@
 """Place the ends of every arrow on the frames and draw its route (design 02, Layout).
 
 An arrow leaves the middle of the facing edge of a frame. When several arrows meet one edge they
-spread out: two arrows on a side edge take its upper and lower third; on a top or bottom edge they
-sit a fixed pitch apart, the one that goes straight in the middle. The order is chosen so that
+spread out: two arrows on a side edge take its upper and lower third; on a top or bottom edge the
+ones that go straight sit a fixed pitch apart in the middle, and the ones that turn in sit wider
+apart beside them, as far as the edge allows. The order is chosen so that
 arrows that share a side do not cross each other.
 """
 
@@ -89,8 +90,9 @@ def _across_offsets(uses: list[Use], width: float, rules: ScreenRules) -> dict[K
     for sign in (-1, 1):
         ordered = sorted(groups.get(sign, []), key=_outward_key)
         pitch = _fit_pitch(len(ordered), base, width, rules)
-        for rank, use in enumerate(ordered, start=1):
-            offsets[(use.index, use.end)] = sign * (base + rank * pitch)
+        first = min(rules.port_pitch, pitch)  # one arrow alone stays where it always was
+        for rank, use in enumerate(ordered):
+            offsets[(use.index, use.end)] = sign * (base + first + rank * pitch)
     return offsets
 
 
@@ -106,9 +108,13 @@ def _by_kind(uses: list[Use]) -> list[Use]:
 
 
 def _fit_pitch(count: int, base: float, width: float, rules: ScreenRules) -> float:
-    """Return the distance between ports, shrunk so that every port stays on the edge."""
+    """Return the distance between ports that turn in: wide apart when the edge has room.
+
+    Arrows that turn into an edge from one direction sit ``port_spread`` apart, so that their
+    heads can be told apart; on a short edge the pitch shrinks so every port stays on it.
+    """
     room = width / 2 - rules.port_clear - base
-    return min(rules.port_pitch, room / count) if count else rules.port_pitch
+    return min(rules.port_spread, room / count) if count else rules.port_pitch
 
 
 def _along_offsets(uses: list[Use], height: float) -> dict[Key, float]:

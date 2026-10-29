@@ -14,8 +14,9 @@ from itertools import pairwise
 from pathlib import Path
 
 from . import check, render_drawio, render_html, scene
-from .author_words import EdgeWords, build_words
+from .author_words import EdgeWords, build_words, stretch_of
 from .canvas import fit_canvas
+from .diagrams.screen_table import CodedArrow, condition_row, conditions_table
 from .labels import place_labels
 from .model import (
     DEFAULT_FONT_SIZE_PX,
@@ -54,6 +55,7 @@ LABEL_KIND_OF_ROLE = {Role.YES: LabelKind.YES, Role.NO: LabelKind.NO, Role.BACK:
 MIDDLE = 0.5
 LINE_ID = re.compile(r"e\d+")  # the ids the canvas gives to lines
 CONTENT_TOP_PX = 160  # the first y below the title and the description
+OFF_MIDDLE_PX = 1.0  # a line this close to the middle of a node runs down its middle
 GATEWAY_SIZE_PX = 56  # a BPMN gateway is a small diamond; its name goes under it
 GATEWAY_ICONS = {"x", "plus"}  # a diamond with one of these marks is a BPMN gateway
 TEXT_SLACK_PX = 48  # room added to the estimated width of free text, so it stays on one line
@@ -69,6 +71,26 @@ LEGEND_WORDS = {
     Role.BACK: "Retry or return",
     Role.NEXT: "Next step",
 }
+LEGEND_CHIPS = {
+    LabelKind.USER: (
+        EdgeLabel("tap", (0, 0), LabelKind.USER),
+        "What the person does: a tap, a click",
+    ),
+    LabelKind.SYSTEM: (
+        EdgeLabel("timer", (0, 0), LabelKind.SYSTEM, icon="clock"),
+        "What the system does: a timer, an answer, a push",
+    ),
+    LabelKind.GUARD_OK: (
+        EdgeLabel("[valid]", (0, 0), LabelKind.GUARD_OK),
+        "Condition to take the arrow",
+    ),
+    LabelKind.GUARD_FAIL: (
+        EdgeLabel("[declined]", (0, 0), LabelKind.GUARD_FAIL),
+        "Condition of a failure",
+    ),
+    LabelKind.EFFECT: (EdgeLabel("/ save", (0, 0), LabelKind.EFFECT), "What happens on the way"),
+    LabelKind.CODE: (EdgeLabel("C1", (0, 0), LabelKind.CODE), "A row of the conditions table"),
+}  # a sample chip and its words, for the legend of a screen flow
 
 
 class Side(StrEnum):
@@ -135,6 +157,7 @@ class Canvas:
     frames: list[Frame] = field(default_factory=list)
     edges: list[Edge] = field(default_factory=list)
     theme: str = DEFAULT_THEME  # ``pastel``, ``technical`` or ``midnight``
+    coded: list[CodedArrow] = field(default_factory=list)  # arrows written as a code, in order
 
     def lane(
         self, name: str, label: str, tone: Tone, bounds: tuple[float, float, float, float]
@@ -247,12 +270,20 @@ class Canvas:
             name, Shape.TEXT, words, NodeOptions(centre, width=width, height=TEXT_HEIGHT_PX)
         )
 
-    def legend(self, corner: Point, roles: tuple[Role, ...]) -> None:
-        """Add a "Reading the chart" legend: a heading, then a sample line and words per role.
+    def legend(
+        self, corner: Point, roles: tuple[Role, ...], chips: tuple[LabelKind, ...] = ()
+    ) -> None:
+        """Add a "Reading the chart" legend: a heading, then a sample and its words per row.
 
         Args:
             corner: The top-left corner of the legend.
             roles: The line roles the diagram uses, in the order to list them.
+            chips: The kinds of words on arrows to explain after the lines, for a screen flow:
+                ``LabelKind.USER`` (a dark chip), ``SYSTEM`` (a slate chip with an icon),
+                ``GUARD_OK``, ``GUARD_FAIL``, ``EFFECT`` and ``CODE``.
+
+        Raises:
+            KeyError: If a chip kind is not one of those.
         """
         left, top = corner
         self.text("legend-title", "Reading the chart", (left, top))
@@ -263,6 +294,12 @@ class Canvas:
             self.edges.append(_sample_edge(f"legend-line-{index}", sample, style))
             anchor = (left + LEGEND_TEXT_OFFSET_PX, row)
             self.text(f"legend-text-{index}", LEGEND_WORDS[role], anchor)
+        for index, kind in enumerate(chips, start=len(roles)):
+            row = top + LEGEND_ROW_PX * (index + 1)
+            chip, words = LEGEND_CHIPS[kind]
+            at = (left + LEGEND_SAMPLE_PX / 2, row)
+            self.edges.append(_sample_chip(f"legend-chip-{index}", replace(chip, at=at)))
+            self.text(f"legend-text-{index}", words, (left + LEGEND_TEXT_OFFSET_PX, row))
 
     def edge(
         self,
@@ -291,7 +328,12 @@ class Canvas:
             second.port(arrive, route.arrive_along),
         ]
         points = _right_angled(corners)
+        if route.words is not None and route.words.is_left is None:
+            side = _is_left_of_middle(stretch_of(route.words, points), (first, second))
+            route = replace(route, words=replace(route.words, is_left=side))
         label, extras = self._label_of(route, points)
+        if route.words is not None and route.words.code:
+            self.coded.append(_coded_arrow(route.words, (first, second)))
         role = route.role
         if route.words and route.words.is_failure and role is Role.NEXT:
             role = Role.NO
@@ -322,6 +364,23 @@ class Canvas:
             return None, ()
         kind = LABEL_KIND_OF_ROLE.get(route.role) or LabelKind.PLAIN
         return EdgeLabel(route.label, _middle(points), kind), ()
+
+    def conditions(self, corner: Point) -> Box:
+        """Add the conditions table: one row for each arrow written as a code, in order.
+
+        Args:
+            corner: The top-left corner of the table, usually under the diagram.
+
+        Returns:
+            The placed table.
+
+        Raises:
+            ValueError: If no arrow has a code.
+        """
+        if not self.coded:
+            raise ValueError("no arrow has a code; give EdgeWords(code='C1') to the long ones")
+        rows = tuple(condition_row(arrow) for arrow in self.coded)
+        return self._add(conditions_table(rows, corner, 0, load_theme().layout))
 
     def scene(self) -> Scene:
         """Return the finished scene: labels moved off boxes, canvas sized to hold everything.
@@ -484,6 +543,19 @@ def _sample_edge(name: str, points: list[Point], route: Route) -> Edge:
     )
 
 
+def _sample_chip(name: str, chip: EdgeLabel) -> Edge:
+    """Build a chip that stands alone, for the legend: a line of no length, so none is drawn."""
+    return Edge(
+        id=name,
+        role=Role.NEXT,
+        points=(chip.at, chip.at),
+        label=chip,
+        source=None,
+        target=None,
+        head=Head.NONE,
+    )
+
+
 def _facing_side(box: Box, other: Box) -> str:
     """Return the side of a box that looks towards another box."""
     delta_x = other.centre[0] - box.centre[0]
@@ -491,6 +563,32 @@ def _facing_side(box: Box, other: Box) -> str:
     if abs(delta_x) >= abs(delta_y):
         return Side.RIGHT if delta_x > 0 else Side.LEFT
     return Side.BOTTOM if delta_y > 0 else Side.TOP
+
+
+def _is_left_of_middle(stretch: tuple[Point, Point], ends: tuple[Box, Box]) -> bool:
+    """Tell whether a vertical stretch runs down the left half of the node it leaves or enters.
+
+    The words of such a line go on its left, outside a pair of lines that join the same two
+    nodes both ways. A line outside both nodes (in a channel) keeps its words on the right.
+    """
+    (start_x, _), (end_x, _) = stretch
+    if start_x != end_x:
+        return False
+    return any(box.node.x <= start_x < box.centre[0] - OFF_MIDDLE_PX for box in ends)
+
+
+def _coded_arrow(words: EdgeWords, ends: tuple[Box, Box]) -> CodedArrow:
+    """Describe an arrow written as a code, naming each screen by its id chip, else its name."""
+    source, target = (_table_name(box.node) for box in ends)
+    trigger = words.trigger or ""
+    return CodedArrow(words.code or "", source, target, trigger, words.guard, words.effect)
+
+
+def _table_name(node: Node) -> str:
+    """Return how a row of the conditions table names a node: its id code, else its words."""
+    if node.screen is not None:
+        return node.screen.code
+    return " ".join(node.text) or node.caption or node.id
 
 
 def _right_angled(corners: list[Point]) -> list[Point]:

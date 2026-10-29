@@ -7,6 +7,7 @@ boxes, as in earlier versions.
 """
 
 from dataclasses import dataclass, replace
+from pathlib import Path
 
 from ..canvas import fit_canvas
 from ..check import chip_rect
@@ -17,18 +18,20 @@ from ..model import (
     Node,
     Point,
     Role,
-    Row,
     Scene,
     Shape,
     Tone,
 )
-from ..sizing import estimate_text_width, key_room
-from ..theme import LayoutRules, Theme, load_theme
+from ..theme import Theme, load_theme
 from . import catalog, graph
 from .screen_chips import Crowd, blocks_of, choose_spot, lines_of
 from .screen_geometry import Geometry, Sizing, compute_geometry
 from .screen_items import assign_cells, build_nodes, densify
+from .screen_jumps import Jump, split_jumps
 from .screen_labels import Caption, assign_codes, caption_of, trigger_label
+from .screen_manifest import with_manifest
+from .screen_merge import merge_parallel
+from .screen_nudge import nudge_overlaps
 from .screen_plan import (
     ENTRY_STACK_GAP_PX,
     ENTRY_ZONE_ID,
@@ -64,16 +67,15 @@ from .screen_spec import (
     TransitionKind,
     parse_flow,
     uses_screen_features,
+    with_capture_paths,
 )
+from .screen_table import CodedArrow, condition_row, conditions_table
+from .screen_tips import part_tip_pairs
+from .screen_untangle import untangle
 
 ENTRY_ZONE_LABEL = "Entry points"
-CONDITIONS_TITLE = "Conditions"
-CONDITIONS_ID = "conditions"
-ARROW_JOIN = " → "
-TEXT_JOIN = " · "
 BUS_CHIP_RISE_PX = 18
-MONO_CHAR_EM = 0.62
-TABLE_TEXT_MARGIN = 1.12  # the width of a row is estimated, so it gets some room to spare
+SLOT = "slot"  # the key of a zig's channel among the choices the untangling may swap
 
 
 @dataclass(frozen=True)
@@ -88,11 +90,13 @@ class Build:
     geometry: Geometry
 
 
-def layout_raw(raw: object) -> Scene:
+def layout_raw(raw: object, source_dir: Path | None = None) -> Scene:
     """Lay out a screen flow from a parsed JSON spec.
 
     Args:
         raw: The result of ``json.loads`` on the spec.
+        source_dir: The folder of the spec file; the screenshots of L4 screens and their
+            manifest are found from it. The current folder when it is not given.
 
     Returns:
         The scene. A spec without the keys of design 02 is drawn as plain boxes.
@@ -100,9 +104,11 @@ def layout_raw(raw: object) -> Scene:
     Raises:
         SpecError: If the spec is not valid.
     """
+    folder = (source_dir or Path()).resolve()
+    raw = with_manifest(raw, folder)
     if not uses_screen_features(raw):
         return graph.layout_with(catalog.SCREEN)(raw)
-    return build_scene(parse_flow(raw))
+    return build_scene(with_capture_paths(parse_flow(raw), folder))
 
 
 def build_scene(spec: FlowSpec) -> Scene:
@@ -114,6 +120,7 @@ def build_scene(spec: FlowSpec) -> Scene:
     Returns:
         The scene, with its canvas sized.
     """
+    spec = merge_parallel(spec)
     theme = load_theme()
     nodes = build_nodes(spec, theme)
     cells, rows, columns = densify(assign_cells(spec))
@@ -126,7 +133,10 @@ def build_scene(spec: FlowSpec) -> Scene:
     placed = _place_nodes(nodes, build)
     frames = _zone_frames(placed, build)
     routes, placed = _routes(placed, build)
+    routes, jumps = split_jumps(routes, placed, (build.grid.cells, theme))
+    placed.update({mark.id: mark for jump in jumps for mark in jump.marks})
     edges = _labelled(routes, _bus_edges(placed, build), (placed, frames), build)
+    edges.extend(_jump_edge(jump, placed) for jump in jumps)
     table = _conditions_table(placed, frames, build, codes)
     scene = Scene(
         0, 0, spec.title, spec.description, tuple(frames), (*placed.values(), *table), tuple(edges)
@@ -198,16 +208,41 @@ def _routes(
     uses = collect_uses(build.plans, build.grid.cells)
     offsets = port_offsets(uses, nodes, build.theme)
     nodes, offsets = place_chips(nodes, uses, offsets, build.theme)
-    return [(plan, _points(plan, (nodes, offsets), build)) for plan in build.plans], nodes
+    by_index = {plan.index: plan for plan in build.plans}
+    groups = [
+        [(use.index, use.end) for use in group]
+        for (node_id, _), group in uses.items()
+        if len(group) > 1 and nodes[node_id].shape is not Shape.DECISION
+    ]
+    zigs: dict[int, list[tuple[int, str]]] = {}
+    for plan in build.plans:
+        if plan.route is RouteType.ZIG:
+            zigs.setdefault(plan.gap, []).append((plan.index, SLOT))
+            offsets[(plan.index, SLOT)] = plan.slot
+    groups.extend(group for group in zigs.values() if len(group) > 1)
+    choices = untangle(
+        groups, offsets, lambda index, trial: _points(by_index[index], (nodes, trial), build)
+    )
+    plans = [_with_slot(plan, choices) for plan in build.plans]
+    routes = [(plan, _points(plan, (nodes, choices), build)) for plan in plans]
+    clear = build.theme.screen.port_clear
+    return nudge_overlaps(part_tip_pairs(routes, nodes, clear), nodes, clear), nodes
+
+
+def _with_slot(plan: Plan, choices: dict[tuple[int, str], float]) -> Plan:
+    """Return a zig with the channel the untangling chose for it; any other arrow as it is."""
+    slot = choices.get((plan.index, SLOT))
+    return plan if slot is None else replace(plan, slot=int(slot))
 
 
 def _points(
     plan: Plan,
-    placed: tuple[dict[str, Node], dict[tuple[int, End], float]],
+    placed: tuple[dict[str, Node], dict[tuple[int, str], float]],
     build: Build,
 ) -> tuple[Point, ...]:
     """Route one transition between the sides of its two frames."""
     nodes, offsets = placed
+    plan = _with_slot(plan, offsets)
     transition = plan.transition
     cells = build.grid.cells
     sides = sides_of(plan, (cells[transition.source], cells[transition.target]))
@@ -255,6 +290,21 @@ def _labelled(
             )
         )
     return edges + buses
+
+
+def _jump_edge(jump: Jump, nodes: dict[str, Node]) -> Edge:
+    """Draw the second part of a jump: from the circle by the target into the target."""
+    transition = jump.plan.transition
+    return Edge(
+        id=f"{transition.source}>{transition.target}~{jump.marks[1].text[0]}",
+        role=_role_of(transition),
+        points=jump.points,
+        label=None,
+        source=jump.marks[1].id,
+        target=transition.target,
+        head=Head.FILLED,
+        dashed=_is_undecided(nodes[transition.target]),
+    )
 
 
 def _unique_id(wanted: str, seen: set[str]) -> str:
@@ -354,47 +404,22 @@ def _conditions_table(
     rules = build.theme.layout
     items = {item.id: item for item in build.spec.items}
     rows = tuple(
-        _table_row(build.spec.transitions[index], code, items) for index, code in codes.items()
+        condition_row(_coded_arrow(build.spec.transitions[index], code, items))
+        for index, code in codes.items()
     )
     bottoms = [n.y + n.height for n in nodes.values()] + [f.y + f.height for f in frames]
     rights = [n.x + n.width for n in nodes.values()] + [f.x + f.width for f in frames]
-    width = max(_table_width(rows, rules), max(rights) - rules.margin)
-    height = rules.table_header_height + len(rows) * rules.table_row_height + rules.table_bottom_pad
     top = max(bottoms) + build.theme.screen.table_gap
-    return [
-        Node(
-            id=CONDITIONS_ID,
-            shape=Shape.TABLE,
-            x=rules.margin,
-            y=top,
-            width=width,
-            height=height,
-            text=(CONDITIONS_TITLE,),
-            icon=None,
-            tone=Tone.GRAY,
-            number=None,
-            font_size=rules.table_name_font_size,
-            sections=(rows,),
-        )
-    ]
+    return [conditions_table(rows, (rules.margin, top), max(rights) - rules.margin, rules)]
 
 
-def _table_width(rows: tuple[Row, ...], rules: LayoutRules) -> float:
-    """Estimate the width the longest row of the conditions table needs."""
-    mono = MONO_CHAR_EM * rules.detail_font_size
-    widest = max(
-        estimate_text_width(row.left, rules, rules.table_name_font_size) + len(row.right) * mono
-        for row in rows
+def _coded_arrow(transition: Transition, code: str, items: dict[str, Item]) -> CodedArrow:
+    """Describe a coded transition for its row of the conditions table."""
+    return CodedArrow(
+        code=code,
+        source=_name_of(items[transition.source]),
+        target=_name_of(items[transition.target]),
+        trigger=transition.trigger.text if transition.trigger else "",
+        guard=transition.guard,
+        effect=transition.effect,
     )
-    room = 2 * rules.table_padding_x + key_room((rows,), rules) + rules.table_row_gap
-    return max(rules.table_min_width, widest * TABLE_TEXT_MARGIN + room)
-
-
-def _table_row(transition: Transition, code: str, items: dict[str, Item]) -> Row:
-    """Build a row of the conditions table: the code, the arrow, the guard and the effect."""
-    route = _name_of(items[transition.source]) + ARROW_JOIN + _name_of(items[transition.target])
-    trigger = transition.trigger.text if transition.trigger else ""
-    left = TEXT_JOIN.join(part for part in (route, trigger) if part)
-    guard = f"[{transition.guard}]" if transition.guard else ""
-    effect = f"/ {transition.effect}" if transition.effect else ""
-    return Row(left=left, right=" ".join(part for part in (guard, effect) if part), flags=(code,))

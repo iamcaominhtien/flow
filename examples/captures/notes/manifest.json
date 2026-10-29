@@ -1,0 +1,62 @@
+{
+  "sign-in": {
+    "image": "sign-in.png",
+    "hotspots": [
+      {
+        "text": "Sign in",
+        "box": [
+          24,
+          295,
+          342,
+          50
+        ]
+      }
+    ]
+  },
+  "notes": {
+    "image": "notes.png",
+    "hotspots": [
+      {
+        "text": "New note",
+        "box": [
+          339,
+          57,
+          27,
+          33
+        ]
+      },
+      {
+        "text": "Open a note",
+        "box": [
+          24,
+          114,
+          342,
+          77
+        ]
+      }
+    ]
+  },
+  "note": {
+    "image": "note.png",
+    "hotspots": [
+      {
+        "text": "Back",
+        "box": [
+          24,
+          57,
+          21,
+          33
+        ]
+      },
+      {
+        "text": "Done",
+        "box": [
+          331,
+          56,
+          35,
+          34
+        ]
+      }
+    ]
+  }
+}

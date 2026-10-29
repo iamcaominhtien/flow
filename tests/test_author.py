@@ -11,6 +11,7 @@ sys.path.insert(0, str(PLUGIN_DIR))
 import pytest  # noqa: E402
 from flowlib.author import Canvas, EdgeWords, NodeOptions, Route, Side, sentence_case  # noqa: E402
 from flowlib.check import Code, Severity, check_scene  # noqa: E402
+from flowlib.glyph_widths import FontWeight, inter_width  # noqa: E402
 from flowlib.labels import place_labels  # noqa: E402
 from flowlib.model import (  # noqa: E402
     Device,
@@ -246,6 +247,58 @@ def test_words_beside_a_vertical_line_sit_on_the_chosen_side() -> None:
     assert right.label.at[1] < right.extras[0].at[1]
 
 
+def test_a_back_and_forth_pair_carries_its_words_outside_the_pair() -> None:
+    """With no side given, each line of a vertical pair has its words on its outer side."""
+    canvas = Canvas()
+    view = ScreenView(code="S1", fidelity=Fidelity.L2)
+    canvas.node("top", Shape.SCREEN, "Top", NodeOptions((200, 300), screen=view))
+    canvas.node("low", Shape.SCREEN, "Low", NodeOptions((200, 800), screen=view))
+    down = canvas.edge(
+        "top", "low", Route(leave_along=0.3, arrive_along=0.3, words=EdgeWords("tap Next"))
+    )
+    up = canvas.edge(
+        "low", "top", Route(leave_along=0.7, arrive_along=0.7, words=EdgeWords("tap Back"))
+    )
+    assert down.label is not None and up.label is not None
+    assert down.label.at[0] < down.points[0][0] < up.points[0][0] < up.label.at[0]
+
+
+def test_a_title_too_long_for_a_mini_phone_is_reported() -> None:
+    """A mini phone cuts off a long title; the check says so, and a wider screen clears it."""
+    canvas = Canvas()
+    view = ScreenView(code="S1", fidelity=Fidelity.L1, is_mini=True)
+    canvas.node(
+        "cut", Shape.SCREEN, "Notification permission", NodeOptions((200, 300), screen=view)
+    )
+    canvas.node(
+        "wide",
+        Shape.SCREEN,
+        "Notification permission",
+        NodeOptions((500, 300), screen=view, width=160),
+    )
+    canvas.node("short", Shape.SCREEN, "Home map", NodeOptions((800, 300), screen=view))
+    cut = [
+        finding.items
+        for finding in check_scene(canvas.scene())
+        if finding.code is Code.TEXT_MAY_NOT_FIT
+    ]
+    assert cut == [("cut",)]
+
+
+def test_a_name_too_long_for_an_l0_card_is_reported() -> None:
+    """An L0 card draws its name in large bold type; a long one is cut and reported."""
+    canvas = Canvas()
+    card = ScreenView(code="S1")
+    canvas.node("cut", Shape.SCREEN, "DeleteAccountConfirm", NodeOptions((200, 300), screen=card))
+    canvas.node("fits", Shape.SCREEN, "Delete account", NodeOptions((500, 300), screen=card))
+    cut = [
+        finding.items
+        for finding in check_scene(canvas.scene())
+        if finding.code is Code.TEXT_MAY_NOT_FIT
+    ]
+    assert cut == [("cut",)]
+
+
 def _blocked_canvas() -> tuple[Canvas, Edge]:
     """Return a canvas whose arrow has its chip over a small box beside the line."""
     canvas = _screen_canvas()
@@ -288,3 +341,58 @@ def test_a_screen_flow_scene_is_written_and_has_no_error(tmp_path: Path) -> None
     findings = canvas.write(tmp_path, "screens")
     assert not [finding for finding in findings if finding.severity is Severity.ERROR]
     assert "S1" in (tmp_path / "screens.html").read_text(encoding="utf-8")
+
+
+def test_inter_widths_match_what_a_browser_draws() -> None:
+    """The measured widths give a bold name within 1% of Chromium (115 px at 13 px)."""
+    width = inter_width("Payment methods", 13, FontWeight.BOLD)
+    assert 114 <= width <= 116
+
+
+def test_a_coded_arrow_shows_its_code_and_fills_the_conditions_table() -> None:
+    """A code replaces the words on the arrow; the table holds them, naming screens by code."""
+    canvas = _screen_canvas()
+    line = canvas.edge(
+        "home", "web", Route(words=EdgeWords("click Request invoice", guard="paid", code="C1"))
+    )
+    assert line.label is not None
+    assert (line.label.text, line.label.kind, line.extras) == ("C1", LabelKind.CODE, ())
+    table = canvas.conditions((40, 600)).node
+    (row,) = table.sections[0]
+    assert row.flags == ("C1",)
+    assert "click Request invoice" in row.left
+    assert row.right == "[paid]"
+    long_words = [f for f in check_scene(canvas.scene()) if f.code is Code.LABEL_TOO_LONG]
+    assert not long_words
+
+
+def test_the_conditions_table_needs_a_coded_arrow() -> None:
+    """Asking for the table with no coded arrow is a mistake the canvas reports."""
+    with pytest.raises(ValueError, match="no arrow has a code"):
+        _screen_canvas().conditions((40, 600))
+
+
+def test_the_legend_explains_the_kinds_of_words(tmp_path: Path) -> None:
+    """Each chip kind gets a sample chip and a line of words; no line is drawn, draw.io too."""
+    canvas = Canvas()
+    canvas.legend((40, 200), (Role.MAIN,), (LabelKind.USER, LabelKind.SYSTEM))
+    chips = [edge for edge in canvas.edges if edge.id.startswith("legend-chip")]
+    assert [chip.label.kind for chip in chips if chip.label] == [LabelKind.USER, LabelKind.SYSTEM]
+    assert all(chip.points[0] == chip.points[-1] for chip in chips)
+    assert canvas.boxes["legend-text-2"].node.text
+    canvas.write(tmp_path, "legend")
+
+
+def test_a_chip_moves_off_another_line_when_it_can() -> None:
+    """A chip placed over a crossing line slides along its own line to a clear stretch."""
+    canvas = Canvas()
+    canvas.node("left", Shape.PROCESS, "Left", NodeOptions((200, 300)))
+    canvas.node("right", Shape.PROCESS, "Right", NodeOptions((800, 300)))
+    canvas.node("top", Shape.PROCESS, "Top", NodeOptions((500, 100)))
+    canvas.node("low", Shape.PROCESS, "Low", NodeOptions((500, 500)))
+    canvas.edge("left", "right", Route(label="across"))
+    canvas.edge("top", "low")
+    scene = canvas.scene()
+    assert not [f for f in check_scene(scene) if f.code is Code.LABEL_ON_LINE]
+    across = scene.edges[0].label
+    assert across is not None and abs(across.at[0] - 500) > 20

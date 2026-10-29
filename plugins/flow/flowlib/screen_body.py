@@ -6,6 +6,7 @@ drawn as L2.
 
 from dataclasses import dataclass
 
+from .glyph_widths import FontWeight, inter_width
 from .model import (
     Content,
     ElementStyle,
@@ -130,8 +131,12 @@ def _bold_text(frame: BodyFrame, bounds: Bounds, text: str, size: float) -> Part
     )
 
 
-def _title_parts(frame: BodyFrame, top: float) -> tuple[list[Part], float]:
+def title_parts(frame: BodyFrame, top: float) -> tuple[list[Part], float]:
     """Draw the name of the screen at the top left of its body.
+
+    Args:
+        frame: The screen being drawn.
+        top: The y of the top of the name.
 
     Returns:
         The part, and the y below it.
@@ -158,7 +163,7 @@ def _bar(frame: BodyFrame, bounds: Bounds, fill: str) -> Part:
 def _skeleton_parts(frame: BodyFrame) -> list[Part]:
     """Draw L1: the same generic content on every screen, and "content TBD"."""
     rules, theme = frame.rules, frame.theme
-    parts, top = _title_parts(frame, frame.origin[1])
+    parts, top = title_parts(frame, frame.origin[1])
     for fraction in SKELETON_BAR_WIDTHS:
         bounds = (frame.left, top, frame.span * fraction, rules.bar_height)
         parts.append(_bar(frame, bounds, theme.rule))
@@ -189,7 +194,7 @@ def _key_parts(frame: BodyFrame) -> list[Part]:
     parts: list[Part] = []
     top = frame.origin[1]
     if view.content not in (Content.SPLASH, Content.SUCCESS, Content.ERROR):
-        parts, top = _title_parts(frame, top)
+        parts, top = title_parts(frame, top)
     tops = [e for e in elements if e.placement is Placement.TOP]
     bottoms = [e for e in elements if e.placement is Placement.BOTTOM]
     for element in tops:
@@ -426,12 +431,20 @@ def _box_parts(frame: BodyFrame, box: Bounds, element: ScreenElement) -> list[Pa
         )
     )
     if has_dot:
-        parts.extend(_hotspot_parts(frame, box))
+        parts.extend(hotspot_parts(frame, box))
     return parts
 
 
-def _hotspot_parts(frame: BodyFrame, box: Bounds) -> list[Part]:
-    """Draw the red dot with a halo on the right end of the element that was tapped."""
+def hotspot_parts(frame: BodyFrame, box: Bounds) -> list[Part]:
+    """Draw the red dot with a halo on the right end of the element that was tapped.
+
+    Args:
+        frame: The screen being drawn.
+        box: The element, relative to the screen.
+
+    Returns:
+        The halo and the dot.
+    """
     rules = frame.rules
     centre_x = box[0] + box[2] - rules.halo_radius - 2
     centre_y = box[1] + box[3] / 2
@@ -486,15 +499,23 @@ def _scrim_part(frame: BodyFrame) -> Part:
 
 
 def _modal_parts(frame: BodyFrame, buttons: list[ScreenElement]) -> list[Part]:
-    """Draw a modal: a white card with a title, two grey lines and a row of buttons."""
+    """Draw a modal: a white card with a title, two grey lines and its buttons.
+
+    The buttons sit side by side when their names fit, else one under the other, so that a
+    modal on a mini phone does not cut its button names.
+    """
     rules, theme = frame.rules, frame.theme
     pad = rules.inner_pad
     width = frame.width * MODAL_WIDTH_FRACTION
+    inner = width - 2 * pad
+    is_row = _buttons_fit_in_a_row(frame, buttons, inner)
+    rows = 1 if is_row else max(len(buttons), 1)
     height = (
         2 * pad
         + MODAL_TITLE_HEIGHT_PX
         + 2 * (rules.bar_height + rules.bar_gap)
-        + rules.element_height
+        + rows * rules.element_height
+        + (rows - 1) * MODAL_BUTTON_GAP_PX
     )
     left, top = (frame.width - width) / 2, (frame.height - height) / 2
     parts = [
@@ -502,7 +523,7 @@ def _modal_parts(frame: BodyFrame, buttons: list[ScreenElement]) -> list[Part]:
             PartKind.RECT, (left, top, width, height), fill=theme.paper, radius=rules.element_radius
         )
     ]
-    title = (left + pad, top + pad, width - 2 * pad, MODAL_TITLE_HEIGHT_PX)
+    title = (left + pad, top + pad, inner, MODAL_TITLE_HEIGHT_PX)
     parts.append(
         Part(
             PartKind.TEXT,
@@ -516,18 +537,43 @@ def _modal_parts(frame: BodyFrame, buttons: list[ScreenElement]) -> list[Part]:
     )
     line_top = title[1] + MODAL_TITLE_HEIGHT_PX
     for _ in range(2):
-        parts.append(
-            _bar(frame, (left + pad, line_top, width - 2 * pad, rules.bar_height), theme.rule)
-        )
+        parts.append(_bar(frame, (left + pad, line_top, inner, rules.bar_height), theme.rule))
         line_top += rules.bar_height + rules.bar_gap
-    count = max(len(buttons), 1)
-    each = (width - 2 * pad - (count - 1) * MODAL_BUTTON_GAP_PX) / count
-    for index, element in enumerate(buttons):
-        x = left + pad + index * (each + MODAL_BUTTON_GAP_PX)
-        parts.extend(
-            _box_parts(frame, (x, line_top + rules.bar_gap, each, rules.element_height), element)
-        )
+    area = (left + pad, line_top + rules.bar_gap, inner, rules.element_height)
+    boxes = _row_boxes(area, len(buttons)) if is_row else _column_boxes(area, len(buttons))
+    for box, element in zip(boxes, buttons, strict=True):
+        parts.extend(_box_parts(frame, box, element))
     return parts
+
+
+def _buttons_fit_in_a_row(frame: BodyFrame, buttons: list[ScreenElement], width: float) -> bool:
+    """Tell whether every button name fits when the buttons share one row of a given width."""
+    if not buttons:
+        return True
+    each = (width - (len(buttons) - 1) * MODAL_BUTTON_GAP_PX) / len(buttons)
+    room = each - 2 * ELEMENT_TEXT_INSET_PX
+    return all(
+        inter_width(button.text, frame.rules.text_size, FontWeight.BOLD) <= room
+        for button in buttons
+    )
+
+
+def _row_boxes(area: Bounds, count: int) -> list[Bounds]:
+    """Split the first row of an area into ``count`` boxes side by side."""
+    left, top, width, height = area
+    each = (width - (count - 1) * MODAL_BUTTON_GAP_PX) / max(count, 1)
+    return [
+        (left + index * (each + MODAL_BUTTON_GAP_PX), top, each, height) for index in range(count)
+    ]
+
+
+def _column_boxes(area: Bounds, count: int) -> list[Bounds]:
+    """Stack ``count`` boxes as wide as the area, one under the other."""
+    left, top, width, height = area
+    return [
+        (left, top + index * (height + MODAL_BUTTON_GAP_PX), width, height)
+        for index in range(count)
+    ]
 
 
 def _sheet_parts(frame: BodyFrame, rows: list[ScreenElement]) -> list[Part]:

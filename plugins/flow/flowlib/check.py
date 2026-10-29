@@ -9,11 +9,26 @@ from dataclasses import dataclass, replace
 from enum import StrEnum
 from itertools import combinations, pairwise
 
-from .explain_parts import is_explain_node
+from .explain_parts import EXPLAINER, is_explain_node
+from .glyph_widths import FontWeight, inter_width
 from .html_board import board_text_room, is_board_node
 from .html_nodes import CAPTION_FONT_SIZE_PX, CAPTION_GAP_PX, CAPTION_WIDTH_PX
 from .html_plan import is_plan_node, plan_text_room
-from .model import Edge, EdgeLabel, Frame, LabelKind, Node, Point, Role, Scene, Shape
+from .model import (
+    TRIGGER_JOIN,
+    Edge,
+    EdgeLabel,
+    Frame,
+    LabelKind,
+    Node,
+    Point,
+    Role,
+    Scene,
+    Shape,
+)
+from .render_html import DESCRIPTION_FONT_SIZE_PX, DESCRIPTION_MAX_WIDTH_PX, TITLE_LEFT_PX
+from .screen_part import Part, PartKind
+from .screen_parts import screen_parts
 from .sizing import LINE_HEIGHT_FACTOR, estimate_text_width
 from .text_area import text_area_width
 from .theme import LayoutRules, Theme, load_theme
@@ -24,6 +39,7 @@ BORDER_TOLERANCE_PX = 1.0  # a part this close to a frame's border counts as ins
 NODE_CLEARANCE_PX = 4.0  # nodes closer than this count as touching
 LINE_CLEARANCE_PX = 2.0
 MIN_CROSSING_EDGES = 2
+CROSSES_MANY_LINES = 4  # a line that crosses this many others is hard to follow
 MIN_OVERLAP_PX = 32.0  # a shorter shared stretch is a junction at a node, not an overlap
 INLINE_LABEL_MAX_CHARS = 20  # design 02: longer words go in a table, under a code
 WORDS_KINDS = (
@@ -35,6 +51,9 @@ WORDS_KINDS = (
 )  # the kinds that carry the words of a screen flow transition
 WRAPPING_CHARS = 2  # the brackets of a guard, or the slash and space of an effect
 MIN_SHARED_BUS_PX = 240.0  # lines of one kind that leave one node may share a bus this long
+DESCRIPTION_LINES = 2  # the title block holds the title and two lines of the description
+DESCRIPTION_SCALE = 0.98  # the description is set at 400, about 2% narrower than the 500 widths
+CUT_TOLERANCE_PX = 2.0  # words this much wider than their box lose less than a letter's edge
 
 
 class Severity(StrEnum):
@@ -50,14 +69,17 @@ class Code(StrEnum):
     NODES_OVERLAP = "nodes-overlap"
     LINE_THROUGH_NODE = "line-through-node"
     LABEL_COVERS = "label-covers"
+    LABEL_ON_LINE = "label-on-line"
     OUTSIDE_CANVAS = "outside-canvas"
     TEXT_MAY_NOT_FIT = "text-may-not-fit"
     LINES_CROSS = "lines-cross"
+    CROSSES_MANY = "crosses-many"
     LINES_OVERLAP = "lines-overlap"
     CAPTION_COVERED = "caption-covered"
     CROSSES_BORDER = "crosses-border"
     ON_DIVIDER = "on-divider"
     LABEL_TOO_LONG = "label-too-long"
+    DESCRIPTION_TOO_LONG = "description-too-long"
     TEXT_TOO_LONG = "text-too-long"
     DECISION_NOT_QUESTION = "decision-not-question"
     DECISION_FEW_EXITS = "decision-few-exits"
@@ -92,6 +114,16 @@ class Code(StrEnum):
     WIREFRAME_TOO_TALL = "wireframe-too-tall"
     WIREFRAME_OVERLAP = "wireframe-blocks-overlap"
     WIREFRAME_NO_NOTES = "wireframe-no-notes"
+    CAPTURE_MISSING = "capture-missing"
+    CAPTURE_NOT_PNG = "capture-not-png"
+    CAPTURE_WIDTH = "capture-width"
+    CAPTURE_STALE = "capture-stale"
+    CAPTURE_HEAVY = "capture-heavy"
+    HOTSPOT_OUTSIDE = "hotspot-outside"
+    TAP_NOT_IN_CODE = "tap-not-in-code"
+    LINK_NOT_DRAWN = "link-not-drawn"
+    GUARD_NOT_DRAWN = "guard-not-drawn"
+    PAGE_NOT_DRAWN = "page-not-drawn"
 
 
 @dataclass(frozen=True)
@@ -121,6 +153,15 @@ class Rect:
             and self.top < other.bottom + margin
             and self.bottom > other.top - margin
         )
+
+
+@dataclass(frozen=True)
+class _BorderPart:
+    """Something a frame border must not cut: a node, or the chip of a line."""
+
+    id: str
+    name: str  # how a message names it: the quoted id, or "the chip of" a line
+    rect: Rect
 
 
 def node_rect(node: Node) -> Rect:
@@ -281,6 +322,61 @@ def check_labels(scene: Scene, rules: LayoutRules) -> list[Finding]:
     return findings
 
 
+def check_labels_on_lines(scene: Scene, rules: LayoutRules) -> list[Finding]:
+    """Report a chip that sits on another line, where a reader cannot tell which line it names.
+
+    Reference lines (lifelines, grid lines) are left out: words cross them by design.
+    """
+    drawn = [edge for edge in scene.edges if _is_content(edge)]
+    pairs: dict[tuple[str, str], None] = {}
+    for edge in drawn:
+        for label in _chips_of(edge):
+            rect = chip_rect(label, rules)
+            pairs.update(
+                ((edge.id, other.id), None)
+                for other in drawn
+                if other.id != edge.id and _covers_line(rect, other)
+            )
+    return [
+        Finding(
+            Severity.WARNING,
+            Code.LABEL_ON_LINE,
+            f"the chip of '{chip_id}' sits on the line '{line_id}'; move it along its line",
+            (chip_id, line_id),
+        )
+        for chip_id, line_id in pairs
+    ]
+
+
+def _covers_line(rect: Rect, edge: Edge) -> bool:
+    """Tell whether any segment of a line passes through a rectangle."""
+    return any(_segment_hits(start, end, rect) for start, end in pairwise(edge.points))
+
+
+def line_rects(edge: Edge) -> list[Rect]:
+    """Return the rectangles a chip must keep out of so as not to sit on a line.
+
+    Args:
+        edge: A line.
+
+    Returns:
+        One rectangle around each segment of a content line, as wide as the clearance the check
+        allows on each side; none for a reference line (a lifeline or a grid line), which words
+        may cross.
+    """
+    if not _is_content(edge):
+        return []
+    return [
+        Rect(
+            min(start[0], end[0]) - LINE_CLEARANCE_PX,
+            min(start[1], end[1]) - LINE_CLEARANCE_PX,
+            max(start[0], end[0]) + LINE_CLEARANCE_PX,
+            max(start[1], end[1]) + LINE_CLEARANCE_PX,
+        )
+        for start, end in pairwise(edge.points)
+    ]
+
+
 def _chips_of(edge: Edge) -> list[EdgeLabel]:
     """Return the main chip of a line and its extra chips."""
     return [edge.label, *edge.extras] if edge.label else []
@@ -301,7 +397,8 @@ def _chips_on_nodes(scene: Scene, rules: LayoutRules) -> list[Finding]:
                 Finding(
                     Severity.ERROR,
                     Code.LABEL_COVERS,
-                    f"the label of '{edge.id}' covers '{node.id}'",
+                    f"the label of '{edge.id}' covers '{node.id}' and has no clear place on "
+                    f"its line; leave a gap wider than the chip ({rect.right - rect.left:.0f} px)",
                     (edge.id, node.id),
                 )
                 for node in scene.nodes
@@ -386,16 +483,10 @@ def check_text_fit(scene: Scene, rules: LayoutRules) -> list[Finding]:
     findings = []
     theme = load_theme(scene.theme)
     for node in scene.nodes:
-        if not node.text or node.screen is not None:
+        if node.screen is not None:
+            findings.extend(_screen_text_findings(node, theme))
             continue
-        room = _text_room(node, rules, theme)
-        if room is None:
-            continue
-        widest = max(
-            (estimate_text_width(line, rules, node.font_size) for line in node.text), default=0
-        )
-        height = len(node.text) * node.font_size * LINE_HEIGHT_FACTOR
-        if widest > room or height > node.height:
+        if node.text and not _text_fits(node, rules, theme):
             findings.append(
                 Finding(
                     Severity.WARNING,
@@ -405,6 +496,48 @@ def check_text_fit(scene: Scene, rules: LayoutRules) -> list[Finding]:
                 )
             )
     return findings
+
+
+def _text_fits(node: Node, rules: LayoutRules, theme: Theme) -> bool:
+    """Tell whether the text of a node fits its box, or is not checked."""
+    room = _text_room(node, rules, theme)
+    if room is None:
+        return True
+    widest = max(
+        (estimate_text_width(line, rules, node.font_size) for line in node.text), default=0
+    )
+    height = len(node.text) * node.font_size * LINE_HEIGHT_FACTOR
+    return widest <= room and height <= node.height
+
+
+def _screen_text_findings(node: Node, theme: Theme) -> list[Finding]:
+    """Report the words in a device frame that its box cuts off: the title or an element name.
+
+    A device frame or an L0 card draws each text on one line and hides what does not fit, so a
+    long name on a mini phone or a card loses its end. Wireframe blocks are checked by the
+    wireframe rules instead. The id chip (mono type) is sized to its code and is left out.
+    """
+    view = node.screen
+    if view is None or view.blocks:
+        return []
+    cut = [part.text for part in screen_parts(node, theme) if _is_cut(part)]
+    return [
+        Finding(
+            Severity.WARNING,
+            Code.TEXT_MAY_NOT_FIT,
+            f"\"{text}\" may be cut off on the screen '{node.id}'; shorten it or widen the screen",
+            (node.id,),
+        )
+        for text in cut
+    ]
+
+
+def _is_cut(part: Part) -> bool:
+    """Tell whether a text part of a screen is wider than its box, measured in Inter."""
+    if part.kind is not PartKind.TEXT or not part.text or part.is_mono:
+        return False
+    weight = FontWeight.BOLD if part.is_bold else FontWeight.REGULAR
+    return inter_width(part.text, part.font_size, weight) > part.bounds[2] + CUT_TOLERANCE_PX
 
 
 def _text_room(node: Node, rules: LayoutRules, theme: Theme) -> float | None:
@@ -418,6 +551,44 @@ def _text_room(node: Node, rules: LayoutRules, theme: Theme) -> float | None:
     if node.card:
         return node.width - 2 * (rules.card_padding + rules.card_pill_padding)
     return text_area_width(node.shape, node.width, node.icon is not None)
+
+
+def check_description(scene: Scene) -> list[Finding]:
+    """Report a description longer than the title block holds: it runs into the diagram.
+
+    The block above a diagram has room for the title and two lines of the description; an
+    explainer sizes its own header and is left out.
+    """
+    if not scene.title or not scene.description or scene.diagram == EXPLAINER:
+        return []
+    width = min(scene.width - 2 * TITLE_LEFT_PX, DESCRIPTION_MAX_WIDTH_PX)
+    lines = _wrapped_lines(scene.description, width)
+    if lines <= DESCRIPTION_LINES:
+        return []
+    room = int(len(scene.description) * DESCRIPTION_LINES / lines)
+    return [
+        Finding(
+            Severity.WARNING,
+            Code.DESCRIPTION_TOO_LONG,
+            f"the description takes about {lines} lines and the title block holds "
+            f"{DESCRIPTION_LINES}, so it runs into the diagram; keep it under about {room} "
+            "characters, and put the rest in a note or the text around the diagram",
+            (),
+        )
+    ]
+
+
+def _wrapped_lines(text: str, width: float) -> int:
+    """Return how many lines a text takes in the description's type, wrapped at word breaks."""
+    space = inter_width(" ", DESCRIPTION_FONT_SIZE_PX, FontWeight.REGULAR) * DESCRIPTION_SCALE
+    lines, used = 1, 0.0
+    for word in text.split():
+        size = inter_width(word, DESCRIPTION_FONT_SIZE_PX, FontWeight.REGULAR) * DESCRIPTION_SCALE
+        if used and used + space + size > width:
+            lines, used = lines + 1, size
+            continue
+        used += (space if used else 0.0) + size
+    return lines
 
 
 def check_label_length(scene: Scene) -> list[Finding]:
@@ -436,7 +607,9 @@ def check_label_length(scene: Scene) -> list[Finding]:
                     Severity.WARNING,
                     Code.LABEL_TOO_LONG,
                     f"the words on '{edge.id}' are longer than {INLINE_LABEL_MAX_CHARS} "
-                    "characters; use conditions: coded",
+                    "characters; shorten them, or write a code on the arrow and the words in the "
+                    "conditions table (a spec: conditions: coded; the author kit: "
+                    "EdgeWords(code=...) and Canvas.conditions)",
                     (edge.id,),
                 )
             )
@@ -444,7 +617,12 @@ def check_label_length(scene: Scene) -> list[Finding]:
 
 
 def _words_length(label: EdgeLabel) -> int:
-    """Return how many characters of a label are the author's words, without its brackets."""
+    """Return how many characters of a label are the author's words, without its brackets.
+
+    A chip that lists several triggers counts its longest one: each is read on its own.
+    """
+    if label.kind in (LabelKind.USER, LabelKind.SYSTEM):
+        return max(len(part) for part in label.text.split(TRIGGER_JOIN))
     is_wrapped = label.kind in (LabelKind.GUARD_OK, LabelKind.GUARD_FAIL, LabelKind.EFFECT)
     return len(label.text) - (WRAPPING_CHARS if is_wrapped else 0)
 
@@ -482,6 +660,47 @@ def check_crossings(scene: Scene) -> list[Finding]:
                 )
             )
     return findings
+
+
+def check_busy_lines(scene: Scene) -> list[Finding]:
+    """Report each line that crosses many others: the one to move, or to cut into a jump.
+
+    The pairwise ``lines-cross`` findings do not say which line causes them; a long return that
+    runs across a whole block of frames crosses most of them.
+    """
+    drawn = [edge for edge in scene.edges if _is_content(edge)]
+    segments = {edge.id: list(pairwise(edge.points)) for edge in drawn}
+    is_screen_flow = any(node.screen is not None for node in scene.nodes)
+    findings = []
+    for edge in drawn:
+        crossed = [
+            other.id
+            for other in drawn
+            if other.id != edge.id
+            and any(_crosses(a, b) for a in segments[edge.id] for b in segments[other.id])
+        ]
+        if len(crossed) < CROSSES_MANY_LINES:
+            continue
+        findings.append(
+            Finding(
+                Severity.WARNING,
+                Code.CROSSES_MANY,
+                f"line '{edge.id}' crosses {len(crossed)} other lines; "
+                + _busy_line_advice(is_screen_flow),
+                (edge.id,),
+            )
+        )
+    return findings
+
+
+def _busy_line_advice(is_screen_flow: bool) -> str:
+    """Say how to fix a line that crosses many: a jump in a screen flow, else a move."""
+    if is_screen_flow:
+        return (
+            'write "route": "jump" on its transition, which cuts it into two short arrows that '
+            "meet at a pair of lettered circles, or move one of its ends"
+        )
+    return "move one of its ends, or route it round the block it crosses"
 
 
 def _shared_length(first: tuple[Point, Point], second: tuple[Point, Point]) -> float:
@@ -570,20 +789,21 @@ def _straddles(part: Rect, frame: Rect) -> bool:
     return not inside and not holds
 
 
-def _parts(scene: Scene, rules: LayoutRules) -> list[tuple[str, Rect]]:
+def _parts(scene: Scene, rules: LayoutRules) -> list[_BorderPart]:
     """Return what a frame border or a divider must not cut: nodes and the chips of lines.
 
-    An activation bar and the bar of a split are left out: they are long on purpose.
+    An activation bar and the bar of a split are left out: they are long on purpose. The line
+    itself may cross a border; only its words may not sit on one.
     """
     parts = [
-        (node.id, node_rect(node))
+        _BorderPart(node.id, f"'{node.id}'", node_rect(node))
         for node in scene.nodes
         if node.shape not in (Shape.BAR, Shape.FORK)
     ]
     for edge in scene.edges:
         rect = label_rect(edge, rules)
         if rect is not None:
-            parts.append((edge.id, rect))
+            parts.append(_BorderPart(edge.id, f"the chip of '{edge.id}'", rect))
     return parts
 
 
@@ -595,13 +815,13 @@ def check_borders(scene: Scene, rules: LayoutRules) -> list[Finding]:
     across a fragment. Both are warnings, since a long box may cross a frame on purpose.
     """
     findings = []
-    for part_id, rect in _parts(scene, rules):
+    for part in _parts(scene, rules):
         for frame in scene.frames:
             frame_box = frame_rect(frame)
-            if _straddles(rect, frame_box):
-                findings.append(_border_finding(part_id, frame, Code.CROSSES_BORDER))
-            if any(_on_divider(rect, frame_box, divider.y) for divider in frame.dividers):
-                findings.append(_border_finding(part_id, frame, Code.ON_DIVIDER))
+            if _straddles(part.rect, frame_box):
+                findings.append(_border_finding(part, frame, Code.CROSSES_BORDER))
+            if any(_on_divider(part.rect, frame_box, divider.y) for divider in frame.dividers):
+                findings.append(_border_finding(part, frame, Code.ON_DIVIDER))
     return findings
 
 
@@ -612,14 +832,14 @@ def _on_divider(part: Rect, frame: Rect, y: float) -> bool:
     return part.top + BORDER_TOLERANCE_PX < y < part.bottom - BORDER_TOLERANCE_PX
 
 
-def _border_finding(part_id: str, frame: Frame, code: Code) -> Finding:
+def _border_finding(part: _BorderPart, frame: Frame, code: Code) -> Finding:
     """Build the warning for a part that is cut by a frame border or a divider."""
     where = "straddles the border of" if code is Code.CROSSES_BORDER else "sits on a divider of"
     return Finding(
         Severity.WARNING,
         code,
-        f"'{part_id}' {where} the frame '{frame.id}'; move it inside or outside",
-        (part_id, frame.id),
+        f"{part.name} {where} the frame '{frame.id}'; move it inside or outside",
+        (part.id, frame.id),
     )
 
 
@@ -632,6 +852,7 @@ def check_scene(scene: Scene) -> list[Finding]:
     Returns:
         All findings, errors first.
     """
+    from .check_captures import check_captures
     from .check_notation import check_notation
     from .lint import lint_scene
 
@@ -641,14 +862,18 @@ def check_scene(scene: Scene) -> list[Finding]:
         *check_nodes_overlap(scene),
         *check_lines_through_nodes(scene),
         *check_labels(scene, rules),
+        *check_labels_on_lines(scene, rules),
         *check_captions(scene, rules),
         *check_canvas(scene, rules),
         *check_text_fit(scene, rules),
         *check_crossings(scene),
+        *check_busy_lines(scene),
         *check_overlaps(scene),
         *check_borders(scene, rules),
         *check_label_length(scene),
+        *check_description(scene),
         *check_notation(scene),
+        *check_captures(scene),
     ]
     named = [_with_names(finding, scene) for finding in findings]
     return sorted(named, key=lambda finding: finding.severity is not Severity.ERROR)
@@ -691,11 +916,15 @@ def format_report(findings: list[Finding]) -> str:
         findings: The result of ``check_scene``.
 
     Returns:
-        One line per finding, or a single line saying that nothing was found.
+        One line per finding and a last line with the number of errors and warnings, or a
+        single line saying that nothing was found.
     """
     if not findings:
         return "check: no problems found"
-    return "\n".join(
+    lines = [
         f"{finding.severity.value.upper()} {finding.code.value}: {finding.message}"
         for finding in findings
-    )
+    ]
+    errors = sum(1 for finding in findings if finding.severity is Severity.ERROR)
+    lines.append(f"check: {errors} errors, {len(findings) - errors} warnings")
+    return "\n".join(lines)

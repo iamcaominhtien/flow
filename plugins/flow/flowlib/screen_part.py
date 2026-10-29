@@ -1,4 +1,4 @@
-"""The parts a screen drawing is made of: rectangles, texts, circles, icons, hatches and arcs."""
+"""The parts a screen drawing is made of: rectangles, texts, circles, icons, arcs and images."""
 
 from dataclasses import dataclass
 from enum import StrEnum
@@ -14,6 +14,7 @@ class PartKind(StrEnum):
     HATCH = "hatch"
     ARC = "arc"
     PATH = "path"  # a stroked outline drawn from an SVG path: a chevron, a cross, a check
+    IMAGE = "image"  # a screenshot, fitted to the width of its box and cut at its bottom
 
 
 class Align(StrEnum):
@@ -47,3 +48,4 @@ class Part:
     align: Align = Align.CENTER
     icon: str = ""
     path: str = ""  # the ``d`` of an SVG path, in the units of the box of a PATH part
+    image: str = ""  # the base64 text of the PNG of an IMAGE part

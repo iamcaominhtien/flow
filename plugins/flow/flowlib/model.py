@@ -10,6 +10,7 @@ from enum import StrEnum
 Point = tuple[float, float]
 
 DEFAULT_FONT_SIZE_PX = 12.0
+TRIGGER_JOIN = ", "  # between the triggers of one arrow that has several, as UML writes them
 REF_FRAGMENT = "ref"  # the label of a frame that points to another diagram, whose name it shows
 DEFAULT_THEME = "pastel"  # the look of every diagram that does not ask for another
 
@@ -233,6 +234,7 @@ class Fidelity(StrEnum):
     L1 = "L1"
     L2 = "L2"
     L3 = "L3"
+    L4 = "L4"  # as built: a screenshot of the running app
 
 
 class Content(StrEnum):
@@ -529,6 +531,23 @@ class ScreenElement:
 
 
 @dataclass(frozen=True)
+class Hotspot:
+    """An element of a screenshot that a transition starts from, in the screenshot's pixels."""
+
+    text: str
+    box: tuple[float, float, float, float]  # left, top, width, height
+
+
+@dataclass(frozen=True)
+class Capture:
+    """The screenshot an L4 screen shows, and the source file that draws the screen."""
+
+    image: str  # the path of a PNG file
+    source: str = ""  # the path of the file that draws the screen, for the staleness check
+    hotspots: tuple[Hotspot, ...] = ()
+
+
+@dataclass(frozen=True)
 class ScreenView:
     """What a screen node shows: its device frame, its fidelity level and its named elements."""
 
@@ -537,6 +556,7 @@ class ScreenView:
     device: Device = Device.PHONE
     orientation: Orientation = Orientation.PORTRAIT
     is_mini: bool = False
+    is_large: bool = False  # twice the device size, for an L4 screenshot to be read
     fidelity: Fidelity = Fidelity.L0
     content: Content = Content.HATCH
     hatch_label: str = ""
@@ -556,6 +576,7 @@ class ScreenView:
     address: str = ""  # the address in the browser bar of a desktop wireframe
     is_bare: bool = False  # no device around the blocks: a note, which is a block on its own
     is_plain: bool = False  # a frame only: no status bar, home bar or browser bar
+    capture: Capture | None = None  # the screenshot of an L4 screen
 
 
 @dataclass(frozen=True)

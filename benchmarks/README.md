@@ -6,7 +6,8 @@ A set of 25 briefs for testing the Flow plugin on harder, realistic subjects tha
 - `briefs/index.md`: the list, with the element and connection counts (exact for level C, the research tool's claims for A and B).
 - `briefs/CHECKS.md`: what `check_briefs.py` measured, and what a person found when reading. **Read it before trusting the counts.**
 - `briefs/research-notes.md`: the research tool's own notes and its works-cited list. Not verified.
-- `briefs/screen.md`: one level C brief for the screen flow (52 items, 77 connections). Written here, not by the research tool, and **not read by `check_briefs.py`** (the checker expects levels A, B and C for every type). Results: `results/2026-10-27-screen-C-01.md` (automatic layout, 0.11.0) and `results/2026-10-27-screen-C-01-author.md` (author kit, 0.11.1).
+- `briefs/screen.md`: one level C brief for the screen flow (52 items, 77 connections). Written here, not by the research tool, and **not read by `check_briefs.py`** (the checker expects levels A, B and C for every type). Results: `results/2026-10-27-screen-C-01.md` (automatic layout, 0.11.0), `results/2026-10-27-screen-C-01-author.md` (author kit, 0.11.1) `results/2026-10-28-screen-C-01-author-sonnet.md` (author kit, 0.11.2, a Sonnet agent) `results/2026-10-28-screen-C-01-l0-sonnet.md` (the same at L0, 0.11.3) and `results/2026-10-28-screen-C-01-l0-sonnet-2.md` (L0 again, 0.12.0).
+- `briefs/screen-l4.md`: one level A brief for the screen flow at L4 (screens as built), on RealWorld Conduit (Angular), with the structure read from its code. `l4/conduit/plan.json` is the capture plan used to check that the app runs and the screens can be taken (a solution; do not show it to a blind agent). Not read by `check_briefs.py`. Results: `results/2026-10-28-screen-L4-A-01.md` (plugin 0.14.0), `results/2026-10-29-screen-L4-A-01.md` (0.16.0).
 - `check_briefs.py`: checks the format and compares the claims with the text. `python3 benchmarks/check_briefs.py`.
 
 ## Format of a brief
@@ -15,7 +16,7 @@ A heading `## <type>-<level>-<nn> — title`, a list of fields (`type`, `level`,
 
 ## How to run a brief
 
-1. Give a fresh agent **only the text under `Brief`**, and the plugin skill: `flow:author` for large or dense diagrams (level B and C), or the skill for the type (for example `flow:bpmn`) for the quick build path. Do not show `Must show`, `Traps` or `Structure`: the agent would fit its answer to them.
+1. Give a fresh agent **only the text under `Brief`**, and the plugin skill: `flow:author` for large or dense diagrams (level B and C), or the skill for the type (for example `flow:bpmn`) for the quick build path. Do not show `Must show`, `Traps` or `Structure`: the agent would fit its answer to them. Tell it not to open `benchmarks/`, `examples/`, `docs/`, `tests/`, the changelog or the git history: `examples/ride-screen-flow.spec.json` is a solution of `screen-C-01`, and the run records describe earlier answers.
 2. The agent writes the spec, builds, fixes errors by changing the spec (at most three rounds as the skill says), and looks at the HTML and draw.io pictures. Use an absolute path with `node /tmp/shot.js` and a viewport as wide as the diagram.
 3. Compare the picture with `Must show`, one point at a time, and count the elements and lines that are drawn against the `Structure` (level C) or the brief's text (levels A and B).
 4. Record the result in `benchmarks/results/<date>-<id>.md`: the spec, the build output, the number of rounds, what the check reported, what a person saw that the check did not, and the unclear parts of the skill.

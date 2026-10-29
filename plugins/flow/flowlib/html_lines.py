@@ -188,6 +188,7 @@ def lines_layer(edges: tuple[Edge, ...], theme: Theme, size: tuple[float, float]
     paths = "".join(edge_html(edge, theme) for edge in edges)
     return (
         f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
-        'style="position:absolute;left:0;top:0;overflow:visible" aria-hidden="true">'
+        'style="position:absolute;left:0;top:0;overflow:visible;pointer-events:none" '
+        'aria-hidden="true">'
         f"{arrowheads(theme)}{paths}</svg>"
     )

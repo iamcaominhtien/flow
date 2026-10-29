@@ -12,7 +12,7 @@ sys.path.insert(0, str(PLUGIN_DIR))
 import pytest  # noqa: E402
 from flowlib import build, import_drawio, render_drawio, render_html  # noqa: E402
 from flowlib import scene as scene_io  # noqa: E402
-from flowlib.check import Severity, check_scene  # noqa: E402
+from flowlib.check import Code, Severity, check_scene  # noqa: E402
 from flowlib.diagrams import layout, screenflow  # noqa: E402
 from flowlib.diagrams.screen_spec import uses_screen_features  # noqa: E402
 from flowlib.model import ChipPlace, LabelKind, Node, Role, Scene, Shape, Tone  # noqa: E402
@@ -428,3 +428,20 @@ def test_layout_raw_falls_back_to_the_plain_boxes() -> None:
         {"type": "screen", "screens": [{"id": "a", "label": "A"}], "taps": []}
     )
     assert scene.nodes[0].shape is Shape.PROCESS
+
+
+def test_modal_buttons_that_do_not_fit_side_by_side_are_stacked() -> None:
+    """On a mini phone two modal buttons go one under the other, so their names are not cut."""
+    elements = [{"text": "Cancel", "on": "overlay"}, {"text": "Delete", "on": "overlay"}]
+    keys = {"size": "mini", "fidelity": "L2", "overlay": "modal", "elements": elements}
+    scene = flow([screen("S1", [0, 0], **keys)], [])
+    node = node_of(scene, "S1")
+    theme = load_theme()
+    buttons = [
+        part
+        for part in screen_parts(node, theme)
+        if part.kind is PartKind.TEXT and part.text in ("Cancel", "Delete")
+    ]
+    assert buttons[0].bounds[0] == buttons[1].bounds[0]
+    assert buttons[0].bounds[1] < buttons[1].bounds[1]
+    assert not [f for f in check_scene(scene) if f.code is Code.TEXT_MAY_NOT_FIT]

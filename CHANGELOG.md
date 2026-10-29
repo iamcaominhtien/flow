@@ -1,5 +1,117 @@
 # Changelog
 
+## 0.17.0 (2026-10-29)
+
+Release of 0.11.3 to 0.16.1 to `main`, with no change of its own. In short, for the screen flow:
+
+- Checks: cut-off words in a screen measured with Inter's widths (0.11.4), chips on other lines (0.12.0), `crosses-many` (0.16.0), `description-too-long` (0.16.1).
+- L4, screens as built: screenshots in the frames (0.13.0), `capture.js` and the manifest (0.14.0), the flow read from the code with `flow.py code`, `draft` and `drift` (0.16.0). Plan: `docs/plugin/l4-as-built.md`.
+- Lines: ports and channels untangled, jumps, entry decisions kept apart, parallel triggers merged, top bars as buses (0.15.0, 0.16.0).
+- Author kit: coded conditions, a legend of the words on arrows (0.12.0).
+- Benchmarks: three more blind runs of `screen-C-01` and two of the new `screen-L4-A-01`, in `benchmarks/results/`.
+
+## 0.16.1 (2026-10-29)
+
+From the second blind run of `screen-L4-A-01` on 0.16.0 (`benchmarks/results/2026-10-29-screen-L4-A-01.md`): 0 errors, 15 warnings (the first run had 30), 13 crossings (22), the top bars drawn as buses, two jumps, the drift check run with no `tap-not-in-code`.
+
+- New check `description-too-long`: the title block holds the title and two lines of the description; a longer one runs into the diagram. Measured with Inter's widths, wrapped at word breaks. None of the examples has one.
+- A band of rows with no entry point starts right of the entries' column, so a zone in it (a top bar row) no longer reaches over the entries and hides their frame.
+- Entries, flags and tabs widen to fit their second line as well as their name.
+- Screen-flow skill: `"conditions": "coded"` codes every arrow with words, and a few long ones take `"code"`; an example of a top bar's links, bus and taps, and of two bars for two groups; the length of `desc`.
+
+## 0.16.0 (2026-10-29)
+
+Screen flow: the open items of 0.15.0, and L4 phase 3, the flow read from the code.
+
+Lines. On 80 random screen flows with one to three entry decisions in the entry column (a test written for this change, not in the repository): lines on top of each other 110 to 11, of which 9 are two arrows leaving one decision tip; check errors 3 to 0; crossings 861 to 812. On the screen flow examples and the Conduit spec of the first L4 run, crossings 30 to 31 and no other change in lines.
+
+- The untangling also swaps and moves the channels of the zigs in a gap between rows, and tries a move of one port or channel past several others as well as a swap of two.
+- A zig whose leg would run on the leg of another decision in the same column (the guards of two entry points) is routed in the free lanes, and the tip that faces the clash is closed to it.
+- A last pass moves a stretch of an arrow a few pixels sideways where it still runs on another arrow, with its port along the frame side (`diagrams/screen_nudge.py`).
+- Taps between the same two items that differ only in their trigger are drawn as one arrow with both triggers, `click Sign up, click the heart`, as UML writes a transition with several triggers (`diagrams/screen_merge.py`). `label-too-long` counts each trigger on its own.
+- New check `crosses-many` names a line that crosses 4 or more others; in a screen flow it suggests `"route": "jump"`.
+- Entry, flag and tab boxes widen to fit their names. The skill shows a web app's top bar as the tab bar pattern: one `tab` per link and a bus into them.
+
+Flow from the code (`docs/plugin/l4-as-built.md`, section 8):
+
+- `flow.py code <src> -o code.json` reads a web app's router (Angular, Vue Router, React Router), links and navigation calls, and imports, with regular expressions, into a code map.
+- `flow.py draft code.json [--manifest m]` writes a first spec: a screen per page, a tap per link, the top bar as a bus, a decision per guard.
+- `flow.py drift spec.json code.json` reports `tap-not-in-code`, `link-not-drawn`, `guard-not-drawn` and `page-not-drawn`. A screen is tied to its page by the new `"path"` key or by the address of its screenshot. On Conduit, a tap whose link was taken out of the source is reported.
+- Not done: no parser, so a route table built at run time is missed; a link that shows in one state only is reported for every screen of its page. Tried on Conduit's Angular source and on small test apps (Angular and React Router), not on a Vue app.
+
+## 0.15.0 (2026-10-29)
+
+Screen flow: tidier lines. Measured on the screen flow examples and the Conduit spec of `benchmarks/results/2026-10-28-screen-L4-A-01.md`: crossings 55 to 44 with no spec change, small jogs 5 to 1; the ride example goes from 33 to 14 crossings with three of its returns made jumps, and the Conduit spec from 22 to 9 with its logout made a jump.
+
+- Arrows that share a frame side swap ports when that removes crossings. The first order guessed from where each arrow heads; it did not know the channel each runs in, so two arrows turning into one side from different heights crossed just before the frame (`diagrams/screen_untangle.py`).
+- A frame and a decision right above or below it, joined both ways, no longer share the decision's tip and make a hook: the arrow back to the frame leaves a free side tip, and the one into the decision is straight (`diagrams/screen_tips.py`).
+- Arrows that turn into a long top or bottom edge sit up to 26 px apart (`port_spread` in the theme), so their heads can be told apart; a lone arrow stays where it was.
+- `"route": "jump"` cuts a long arrow into two short ones that meet at a pair of circles with one letter (the off-page connector of the flowchart design, on one page). Each circle sits by the side of its frame where it touches least (`diagrams/screen_jumps.py`). The ride example uses it for logout-like returns.
+- The words of an arrow are kept inside the page; a chip left of a line at the page's edge made the state example fail its check after the change above.
+- Not done: the lane router still lets a long line cross many others when no other lane exists; the skill says to use a jump there. Two entry decisions in one column, and two arrows between the same two screens, are as they were.
+
+## 0.14.0 (2026-10-28)
+
+Screen flow L4, phase 2: screenshots taken from the running app. Tried on RealWorld Conduit (Angular), built from its source here, and by a blind agent on the brief `screen-L4-A-01` (`benchmarks/results/2026-10-28-screen-L4-A-01.md`): 12 screenshots, 43 transitions read from the code, 0 errors.
+
+- `skills/screen-flow/capture.js` takes the screenshots from a plan: sessions made once (register, publish), steps (`goto`, `fill`, `click`, `press`, `wait`, `wait_url`, `remember`), hotspots by selector, masks, `full_page`. It writes `manifest.json` with the hotspots it did not find. It finds Playwright in the project or in the global `npm root`.
+- A spec names the manifest with `"captures"` and each L4 screen with `"capture": "<code>"`.
+- `"size": "large"` draws a screen at twice its device size, so a screenshot can be read on the page.
+- `capture-width` replaces `capture-aspect`: the width of a screenshot is checked against the device's viewport, so a whole-page capture passes.
+- Capture paths are made absolute, so a scene can be checked from any folder.
+- The check report ends with a line `check: N errors, M warnings`.
+- The screen-flow skill has a section "Screens as built (L4)"; the brief `screen-L4-A-01` and the capture plan used to check it are in `benchmarks/`.
+- Not done: phase 3 (the flow read from the code). The Conduit screenshots are not in the repository: they show the demo API's content.
+
+## 0.13.1 (2026-10-28)
+
+- Author skill: how `segment=` counts the stretches of a line with `via` points, how to nest two L-shaped lines between diagonal neighbours, and `Role.NO` in the legend example. Found by the fifth `screen-C-01` run (`benchmarks/results/2026-10-28-screen-C-01-l0-sonnet-2.md`): 0 errors, 9 warnings, all crossings.
+
+## 0.13.0 (2026-10-28)
+
+Screen flow L4, as built: phase 1 of `docs/plugin/l4-as-built.md`.
+
+- `"fidelity": "L4"` with `"capture": {"image", "source", "hotspots"}` draws a screenshot of the running app in the device frame, under the screen's name, fitted to the width of the body and cut at its bottom. Hotspot boxes, in the screenshot's pixels, get the red dot. Paths are read from the spec's folder; the author kit takes `ScreenView(capture=Capture(...))`.
+- The PNG is read with the standard library (its size from the header) and embedded as base64 in the HTML and the draw.io file. In the HTML a click on a screenshot opens it over the page with a stylesheet rule, no script. In draw.io a screenshot taller than the screen area is shrunk to fit, since draw.io cannot cut an image.
+- Checks: `capture-missing` and `capture-not-png` (errors; the screen is drawn as a hatch that says why), `capture-aspect`, `capture-stale` (the `source` file is newer than the screenshot), `hotspot-outside`, `capture-heavy` (over 8 MB of screenshots).
+- The line layer of the HTML no longer takes mouse clicks (`pointer-events: none`), so the screenshots under it can be clicked.
+- Example `notes-built-screen-flow`: three L4 screens beside an L2 and an L0 screen, with synthetic screenshots of a small HTML page taken by `examples/captures/notes/capture.js`.
+- Not done: phase 2 (the capture skill and the manifest read by the build) and phase 3 (the flow read from the code). RealWorld Conduit was not built here: installing its packages needs a permission the session did not have. The zoom was tried in Chromium only.
+
+## 0.12.0 (2026-10-28)
+
+The rest of the gaps from the fourth `screen-C-01` run (`benchmarks/results/2026-10-28-screen-C-01-l0-sonnet.md`), and what was left from 0.11.3.
+
+- Labels keep off other lines: `place_labels` slides a chip off any other content line when a clear place exists on its own line, and keeps the old place otherwise. New check `label-on-line` (warning) for a chip left on another line. Lifelines and grid lines are left out. ER diagrams place their labels again after moving lines to their rows. Over the 78 example specs, the new check found 17 chips on other lines in 9 examples before the change and none after; no other warning changed except in the two examples changed below.
+- Author kit, coded conditions: `EdgeWords(code="C1")` draws only the code on the arrow, and `Canvas.conditions(corner)` adds the Conditions table, the same table the automatic screen flow draws (now in `diagrams/screen_table.py`). The `label-too-long` message names both ways.
+- Author kit, legend: `Canvas.legend(corner, roles, chips)` adds samples of the words on arrows (person, system, guards, effect, code) with what each means. A chip in the legend stands alone; a line of no length is written to draw.io without an error.
+- Modal buttons that do not fit side by side are stacked, so a modal on a mini phone does not cut their names (the overlay example).
+- Ride example: screen names in sentence case and decisions as questions, so no name is cut and every diamond's text fits; the five arrows with words over 20 characters carry codes C1 to C5 and a Conditions table.
+- A scene with a plain-frame screen (`wireframe-responsive`) can be read back: the scene reader did not know the `plain` field.
+- Author skill: plan rows so each screen an entry opens is first in its row; codes and the Conditions table; chips on other lines; the legend of words.
+- Not done: zones that are not rectangles (the design draws zones as rectangles, and a new shape would need the renderers, draw.io and the border checks); a warning for very long lines (it would fire on six automatic-layout examples that cannot avoid it). The changes were not tried by a new blind run.
+
+## 0.11.4 (2026-10-28)
+
+Screen text check and L0 cards. Found by the fourth `screen-C-01` run, at L0 (`benchmarks/results/2026-10-28-screen-C-01-l0-sonnet.md`): 0 errors, 9 warnings.
+
+- The check of cut-off words in a screen now covers L0 cards too; 0.11.3 left them out, and two cut names went unreported.
+- Words in a screen are measured with the widths of Inter's characters (`glyph_widths.py`, `inter_widths.json`), measured in Chromium at weights 500 and 700. The character-count estimate was off by up to 10% either way for one bold line. Compared with Chromium on 51 L0 cards (17 names on a phone, a mini phone and a desktop), 28 frames (14 names on a phone and a mini phone) and the ten screen flow examples: every name cut by more than 2 px is reported; two cut by exactly 2 px are reported too.
+- Author skill: what an L0 card shows and its size, that every screen needs a `code` (S and W with two digits), and how many characters fit a phone, mini and desktop card. Screen flow skill: the card's size and name length.
+- Not done: the other gaps of the run (chips on other lines, the 20-character limit in the author kit, a legend sample for trigger chips, entry pills far from their screens).
+
+## 0.11.3 (2026-10-28)
+
+Author kit and check: fixes from the third `screen-C-01` run, a Sonnet agent with the author kit (`benchmarks/results/2026-10-28-screen-C-01-author-sonnet.md`): 0 errors, 7 warnings.
+
+- Words beside a vertical line choose their side when `is_left` is not given: left of a line that runs down the left half of the screen it leaves or enters, else right. A back-and-forth pair at `0.3` and `0.7` carries its words outside the pair without settings.
+- Check: a title or an element name that a device frame cuts off warns `text-may-not-fit`. The estimate was compared with the widths Chromium draws for 14 titles on a mini phone and a phone; it flags every one cut by 3 px or more, and one of the two cut by 1 px. The ride example (three mini phone titles) and the overlay example (two modal buttons on a mini phone) now warn; both were already cut and are not changed.
+- Check messages: `crosses-border` says "the chip of" a line when its chip is on the border, not the line; `label-covers` on a node says no clear place exists and gives the chip's width.
+- Author skill: how `via` corners turn, the side of the words, the length of a screen title, the entry pill's detail and its left column, one zone per group, how to assign screens to groups when a brief lists only connections, and the gap a chip needs between two zones.
+- Screen flow skill: the title length; the benchmark's numbers are taken out, since a blind run reads the skill. Benchmarks README: a blind agent is told not to open `examples/` (the ride example is a solution of `screen-C-01`).
+- The ruff hook only touches files of this repository and keeps the `docs/` exclude, so it no longer rewrites a scratch script in a temporary folder.
+- Not done: zones other than rectangles; a check for very long lines; a way to stack modal buttons that do not fit. The changes were not tried by a new blind run.
+
 ## 0.11.2 (2026-10-27)
 
 Author kit: screen flows by hand. Found by the second `screen-C-01` benchmark run (`benchmarks/results/2026-10-27-screen-C-01-author.md`).

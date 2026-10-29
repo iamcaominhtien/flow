@@ -7,10 +7,14 @@ flow.py check scene.json                   check a scene
 flow.py render scene.json [-o out.html]    draw a scene as HTML
 flow.py import file.drawio [-o dir]        read a draw.io file into a scene (HTML and draw.io)
 flow.py edit file.drawio ops.json [-o out]  change a draw.io file: move, rename, recolour, delete
+flow.py code src/ [-o code.json]           read a web app's routes, links and imports
+flow.py draft code.json [-o spec.json]     write a first screen flow spec from a code map
+flow.py drift spec.json code.json          say where a screen flow and the code differ
 """
 
 import argparse
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -20,6 +24,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from flowlib import (
     build,
     check,
+    code_draft,
+    code_drift,
+    code_map,
+    code_scan,
     edit_drawio,
     er_split,
     icon_check,
@@ -34,6 +42,9 @@ from flowlib import (
 EXIT_OK = 0
 EXIT_INVALID_INPUT = 1
 EXIT_ERRORS_FOUND = 2
+DEFAULT_CODE_MAP = "code.json"
+DEFAULT_DRAFT = "draft.spec.json"
+DEFAULT_DRAFT_TITLE = "Screens drafted from the code"
 
 
 def load_local_icons(directory: Path) -> int | None:
@@ -235,6 +246,82 @@ def run_check(arguments: argparse.Namespace) -> int:
     return EXIT_ERRORS_FOUND if has_errors else EXIT_OK
 
 
+def run_code(arguments: argparse.Namespace) -> int:
+    """Read the source folder of a web app into a code map.
+
+    Args:
+        arguments: The parsed command line; ``source`` is the folder and ``output`` the map's
+            path (default: ``code.json`` in the current folder).
+
+    Returns:
+        0 when the map was written, 1 when the folder does not exist.
+    """
+    source = Path(arguments.source)
+    if not source.is_dir():
+        print(f"{source} is not a folder", file=sys.stderr)
+        return EXIT_INVALID_INPUT
+    code = code_scan.scan(source)
+    output_path = Path(arguments.output or DEFAULT_CODE_MAP)
+    code_map.dump(code, output_path)
+    print(f"wrote {output_path}: {len(code.routes)} pages, {len(code.links)} links")
+    for route in code.routes:
+        guards = f"  guarded by {', '.join(route.guards)}" if route.guards else ""
+        print(f"  {route.path}  {', '.join(route.files)}{guards}")
+    return EXIT_OK
+
+
+def run_draft(arguments: argparse.Namespace) -> int:
+    """Write a first screen flow spec from a code map.
+
+    Args:
+        arguments: The parsed command line; ``code`` is the map, ``manifest`` an optional
+            capture manifest, ``title`` the diagram's title and ``output`` the spec's path
+            (default: ``draft.spec.json`` next to the map).
+
+    Returns:
+        0 when the spec was written, 1 when the map or the manifest cannot be read.
+    """
+    try:
+        code = code_map.load(Path(arguments.code))
+    except code_map.CodeMapError as error:
+        print(error, file=sys.stderr)
+        return EXIT_INVALID_INPUT
+    output_path = Path(arguments.output or Path(arguments.code).with_name(DEFAULT_DRAFT))
+    manifest = None
+    if arguments.manifest:
+        path = Path(arguments.manifest)
+        if not path.is_file():
+            print(f"{path} does not exist", file=sys.stderr)
+            return EXIT_INVALID_INPUT
+        reference = Path(os.path.relpath(path.resolve(), output_path.resolve().parent)).as_posix()
+        manifest = (reference, json.loads(path.read_text(encoding="utf-8")))
+    spec_raw = code_draft.draft_spec(code, manifest, arguments.title)
+    output_path.write_text(json.dumps(spec_raw, indent=build.JSON_INDENT) + "\n", encoding="utf-8")
+    print(f"wrote {output_path}: {len(spec_raw['screens'])} items, {len(spec_raw['taps'])} taps")
+    return EXIT_OK
+
+
+def run_drift(arguments: argparse.Namespace) -> int:
+    """Compare a screen flow spec with a code map and print where they differ.
+
+    Args:
+        arguments: The parsed command line; ``spec`` is the spec and ``code`` the map.
+
+    Returns:
+        0 when the comparison ran (differences are warnings), 1 when a file cannot be read.
+    """
+    spec_path = Path(arguments.spec)
+    try:
+        code = code_map.load(Path(arguments.code))
+        raw = json.loads(spec_path.read_text(encoding="utf-8"))
+    except (code_map.CodeMapError, OSError, json.JSONDecodeError) as error:
+        print(error, file=sys.stderr)
+        return EXIT_INVALID_INPUT
+    findings, summary = code_drift.find_drift(raw, spec_path.resolve().parent, code)
+    print(code_drift.format_drift(findings, summary))
+    return EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Return the command line parser, with one sub-command per action."""
     parser = argparse.ArgumentParser(prog="flow.py", description=__doc__.splitlines()[0])
@@ -270,7 +357,26 @@ def build_parser() -> argparse.ArgumentParser:
     edit_command.add_argument("-o", "--output")
     edit_command.add_argument("--in-place", action="store_true")
     edit_command.set_defaults(run=run_edit)
+    _add_code_commands(commands)
     return parser
+
+
+def _add_code_commands(commands: argparse._SubParsersAction) -> None:
+    """Add the sub-commands that read an app's code: code, draft and drift."""
+    code_command = commands.add_parser("code", help="read a web app's routes, links and imports")
+    code_command.add_argument("source")
+    code_command.add_argument("-o", "--output")
+    code_command.set_defaults(run=run_code)
+    draft_command = commands.add_parser("draft", help="write a first spec from a code map")
+    draft_command.add_argument("code")
+    draft_command.add_argument("--manifest")
+    draft_command.add_argument("--title", default=DEFAULT_DRAFT_TITLE)
+    draft_command.add_argument("-o", "--output")
+    draft_command.set_defaults(run=run_draft)
+    drift_command = commands.add_parser("drift", help="compare a screen flow with a code map")
+    drift_command.add_argument("spec")
+    drift_command.add_argument("code")
+    drift_command.set_defaults(run=run_drift)
 
 
 def main(argv: list[str] | None = None) -> int:

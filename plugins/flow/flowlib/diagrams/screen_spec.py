@@ -3,10 +3,12 @@
 The JSON format (design 02)::
 
     {"type": "screen", "title": "...", "desc": "...", "conditions": "inline|coded", "tab_count": 4,
+     "captures": "captures/manifest.json",
      "zones": [{"id", "label", "tone"}],
      "screens": [{"id", "label", "kind": "screen|decision|start|end|entry|flag|tab",
                   "code", "state", "overlay", "overlay_title", "device", "orientation", "size",
-                  "fidelity": "L0|L1|L2|L3", "content", "hatch", "elements", "blocks", "tab",
+                  "fidelity": "L0|L1|L2|L3|L4", "content", "hatch", "elements", "blocks", "tab",
+                  "capture": {"image", "source", "hotspots": [{"text", "box"}]} or "<code>",
                   "undecided",
                   "trigger", "system", "detail", "icon", "zone", "at": [row, column]}],
      "taps": [{"from", "to", "trigger", "system", "guard", "effect", "kind", "code", "route",
@@ -16,11 +18,13 @@ The JSON format (design 02)::
 A spec that uses none of the new keys is drawn as plain boxes by the older graph layout.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
+from pathlib import Path
 from typing import Any
 
 from ..model import (
+    Capture,
     Content,
     Device,
     ElementStyle,
@@ -35,6 +39,7 @@ from ..model import (
     WireBlock,
 )
 from ..reader import Reader, SpecError, suggestion
+from ..screen_scene import parse_capture
 from ..spec import SpecZone
 from ..theme import icon_names, load_theme
 from ..wire_scene import parse_blocks
@@ -46,6 +51,7 @@ DEFAULT_TAB_COUNT = 4
 DEFAULT_ZONE_TONE = Tone.GRAY
 DEFAULT_HATCH_LABEL = "other content"
 MINI_SIZE = "mini"
+LARGE_SIZE = "large"
 STATE_SEPARATOR = " · "
 OVERLAY_SEPARATOR = " + "
 TOP_KEYS = {"type", "title", "desc", "direction", "style", "screens", "taps", "zones", "buses"}
@@ -54,7 +60,7 @@ NEW_TOP_KEYS = {"zones", "buses", "conditions", "tab_count"}
 ITEM_KEYS = {"id", "label", "kind", "detail", "icon", "tone", "zone", "at"}
 NEW_ITEM_KEYS = {"code", "state", "overlay", "overlay_title", "device", "orientation", "size"}
 NEW_ITEM_KEYS |= {"fidelity", "content", "hatch", "elements", "tab", "undecided", "trigger"}
-NEW_ITEM_KEYS |= {"system", "blocks"}
+NEW_ITEM_KEYS |= {"system", "blocks", "capture", "path"}  # path: the address, for the drift check
 LINK_KEYS = {"from", "to", "label", "style", "main", "from_label", "to_label"}
 NEW_LINK_KEYS = {"trigger", "system", "guard", "effect", "kind", "code", "route"}
 ELEMENT_KEYS = {"text", "style", "at", "on", "hotspot"}
@@ -93,6 +99,7 @@ class Route(StrEnum):
     STRIP = "strip"
     DIRECT = "direct"
     ELBOW = "elbow"
+    JUMP = "jump"  # cut into two short arrows that meet at a pair of lettered circles
 
 
 class Conditions(StrEnum):
@@ -395,17 +402,21 @@ def _view(
         read.report(where, f"'tab' must be a whole number below tab_count ({tab_count})")
         tab = None
     size = raw.get("size")
-    if size is not None and size != MINI_SIZE:
-        read.report(where, f"unknown size '{size}'; use '{MINI_SIZE}' or leave it out")
+    if size is not None and size not in (MINI_SIZE, LARGE_SIZE):
+        read.report(
+            where, f"unknown size '{size}'; use '{MINI_SIZE}', '{LARGE_SIZE}' or leave it out"
+        )
     device = read.enum(Device, raw, "device", where) or Device.PHONE
     fidelity = _fidelity(raw, where, read)
     blocks = _blocks(raw, fidelity, where, read)
+    capture = _capture(raw, fidelity, where, read)
     return ScreenView(
         code=_chip_text(raw, identifier, where, read),
         title=name,
         device=device,
         orientation=read.enum(Orientation, raw, "orientation", where) or Orientation.PORTRAIT,
         is_mini=size == MINI_SIZE,
+        is_large=size == LARGE_SIZE,
         fidelity=fidelity,
         content=read.enum(Content, raw, "content", where) or Content.HATCH,
         hatch_label=read.text(raw, "hatch", where) or DEFAULT_HATCH_LABEL,
@@ -417,6 +428,7 @@ def _view(
         is_undecided=raw.get("undecided") is True,
         blocks=blocks,
         scale=_block_scale(blocks, device),
+        capture=capture,
     )
 
 
@@ -430,6 +442,44 @@ def _blocks(
         read.report(where, '\'blocks\' are drawn at fidelity L3; set "fidelity": "L3"')
         return ()
     return parse_blocks(raw["blocks"], f"{where}.blocks", read)
+
+
+def _capture(raw: dict[str, Any], fidelity: Fidelity, where: str, read: Reader) -> Capture | None:
+    """Read the screenshot of an L4 screen; an L4 screen needs one, and only L4 takes one."""
+    if fidelity is Fidelity.L4 and "capture" not in raw:
+        read.report(where, 'an L4 screen needs a "capture": {"image": "<a PNG screenshot>"}')
+        return None
+    if "capture" not in raw:
+        return None
+    if fidelity is not Fidelity.L4:
+        read.report(where, '\'capture\' is drawn at fidelity L4; set "fidelity": "L4"')
+        return None
+    return parse_capture(raw["capture"], f"{where}.capture", read)
+
+
+def with_capture_paths(spec: FlowSpec, folder: Path) -> FlowSpec:
+    """Read the paths of the screenshots and their source files from the spec's folder.
+
+    Args:
+        spec: A parsed screen flow.
+        folder: The folder of the spec file.
+
+    Returns:
+        The spec with every relative ``image`` and ``source`` path joined to the folder.
+    """
+    items = tuple(
+        replace(item, view=replace(item.view, capture=_rooted(item.view.capture, folder)))
+        if item.view is not None and item.view.capture is not None
+        else item
+        for item in spec.items
+    )
+    return replace(spec, items=items)
+
+
+def _rooted(capture: Capture, folder: Path) -> Capture:
+    """Join the relative paths of a capture to a folder."""
+    source = str(folder / capture.source) if capture.source else ""
+    return replace(capture, image=str(folder / capture.image), source=source)
 
 
 def _block_scale(blocks: tuple[WireBlock, ...], device: Device) -> float:

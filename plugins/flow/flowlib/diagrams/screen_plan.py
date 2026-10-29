@@ -43,6 +43,7 @@ class RouteType(StrEnum):
     ELBOW = "elbow"
     ROUTED = "routed"
     STRIP = "strip"
+    JUMP = "jump"  # two short arrows and a pair of lettered circles, for a very long return
 
 
 CHANNEL_ROUTES = (RouteType.ZIG, RouteType.STRIP)  # the shapes that run in a channel
@@ -101,8 +102,67 @@ def plan_routes(spec: FlowSpec, grid: Grid) -> list[Plan]:
         One plan per transition, in the order of the spec.
     """
     entries = frozenset(item.id for item in spec.items if item.kind is ItemKind.ENTRY)
+    decisions = frozenset(item.id for item in spec.items if item.kind is ItemKind.DECISION)
     plans = [_plan(index, t, grid, entries) for index, t in enumerate(spec.transitions)]
-    return _with_lanes(_with_slots(plans), spec, grid)
+    plans, closed = _part_decision_legs(plans, grid, decisions)
+    return _with_lanes(_with_slots(plans), spec, grid, closed)
+
+
+def _part_decision_legs(
+    plans: list[Plan], grid: Grid, decisions: frozenset[str]
+) -> tuple[list[Plan], set[tuple[str, PortSide]]]:
+    """Send to the free lanes a zig whose leg would run on the leg of another decision.
+
+    A decision has one point per tip, so its legs run down the middle of its column. Two
+    decisions in one column, such as the route guards of two entry points, then draw their legs
+    on one line when both reach into the gap between them. The later arrow is routed instead,
+    and the tip that faces the clash is closed to it.
+
+    Args:
+        plans: The plans, in the order of the spec.
+        grid: The cells of the items.
+        decisions: The ids of the decisions.
+
+    Returns:
+        The plans, with the clashing zigs routed, and the decision tips the lanes must not use.
+    """
+    taken: dict[tuple[int, int], str] = {}  # (column, gap) to the decision whose leg is there
+    closed: set[tuple[str, PortSide]] = set()
+    parted = []
+    for plan in plans:
+        legs = _decision_legs(plan, grid, decisions)
+        clashes = [leg for leg in legs if taken.get(leg.spot, leg.owner) != leg.owner]
+        if clashes:
+            parted.append(replace(plan, route=RouteType.ROUTED, gap=0))
+            closed.update((leg.owner, leg.side) for leg in clashes)
+            continue
+        taken.update((leg.spot, leg.owner) for leg in legs)
+        parted.append(plan)
+    return parted, closed
+
+
+@dataclass(frozen=True)
+class _DecisionLeg:
+    """A stretch of a zig at a decision's tip, where it crosses one gap between rows."""
+
+    owner: str  # the decision
+    side: PortSide  # the tip it leaves or enters by
+    spot: tuple[int, int]  # the column, and the gap between rows
+
+
+def _decision_legs(plan: Plan, grid: Grid, decisions: frozenset[str]) -> list[_DecisionLeg]:
+    """Return the gaps between rows that the legs of a zig at a decision run through."""
+    if plan.route is not RouteType.ZIG:
+        return []
+    ends = (plan.transition.source, plan.transition.target)
+    cells = (grid.cells[ends[0]], grid.cells[ends[1]])
+    legs = _vertical_legs(plan, (cells[0][0], cells[1][0]))
+    return [
+        _DecisionLeg(end, PortSide.SOUTH if gap > cell[0] else PortSide.NORTH, (cell[1], gap))
+        for end, cell, gaps in zip(ends, cells, legs, strict=True)
+        if end in decisions
+        for gap in gaps
+    ]
 
 
 def _is_clear_row(grid: Grid, row: int, columns: range) -> bool:
@@ -126,7 +186,9 @@ def _plan(index: int, transition: Transition, grid: Grid, entries: frozenset[str
     (row_a, column_a), (row_b, column_b) = source, target
     span = abs(column_b - column_a)
     is_down = row_b >= row_a
-    if transition.source in entries and not _is_clear_row(
+    if transition.route is Route.JUMP:
+        route, gap = RouteType.JUMP, 0
+    elif transition.source in entries and not _is_clear_row(
         grid, row_a, range(column_a + 1, column_b)
     ):
         route, gap = RouteType.ROUTED, 0
@@ -226,7 +288,8 @@ def sides_of(plan: Plan, cells: tuple[Cell, Cell]) -> tuple[PortSide, PortSide]:
     facing = PortSide.NORTH if goes_down else PortSide.SOUTH
     if plan.lanes is not None:
         return plan.lanes.start_side, plan.lanes.end_side
-    if plan.route is RouteType.HORIZONTAL:
+    is_jump_in_row = plan.route is RouteType.JUMP and row_a == row_b
+    if plan.route is RouteType.HORIZONTAL or is_jump_in_row:
         return sideways, opposite
     if plan.route is RouteType.STRIP:
         return PortSide.NORTH, PortSide.NORTH
@@ -246,13 +309,16 @@ def _lane_map(grid: Grid, bands: list[range]) -> LaneMap:
     return make_lane_map((grid.rows, grid.columns), bands, present, frozenset(grid.cells.values()))
 
 
-def _with_lanes(plans: list[Plan], spec: FlowSpec, grid: Grid) -> list[Plan]:
+def _with_lanes(
+    plans: list[Plan], spec: FlowSpec, grid: Grid, closed: set[tuple[str, PortSide]]
+) -> list[Plan]:
     """Route the arrows that need the free lanes and give each of their runs a slot."""
     routed = [plan for plan in plans if plan.route is RouteType.ROUTED]
     if not routed:
         return plans
     lane_map = _lane_map(grid, split_bands(spec, grid))
     load = new_load()
+    load.closed.update(closed)
     for plan in plans:
         if plan.route is not RouteType.ROUTED:
             _count_sides(load.sides, plan, grid)

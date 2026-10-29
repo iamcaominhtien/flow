@@ -11,11 +11,13 @@ import json
 from typing import Any
 
 from .model import (
+    Capture,
     ChipPlace,
     Content,
     Device,
     ElementStyle,
     Fidelity,
+    Hotspot,
     Layer,
     Orientation,
     Overlay,
@@ -38,7 +40,13 @@ SCREEN_KEYS |= {
     "captioned",
     "address",
     "bare",
+    "plain",
+    "capture",
+    "large",
 }
+CAPTURE_KEYS = {"image", "source", "hotspots"}
+HOTSPOT_KEYS = {"text", "box"}
+BOX_LENGTH = 4
 ELEMENT_KEYS = {"text", "style", "at", "on", "hotspot"}
 TAB_LENGTH = 2
 DEFAULT_VIEW = ScreenView(code="")
@@ -61,6 +69,7 @@ def dump_screen(view: ScreenView) -> dict[str, Any]:
         if view.orientation != DEFAULT_VIEW.orientation
         else None,
         "mini": view.is_mini,
+        "large": view.is_large,
         "content": view.content.value if view.content is not Content.HATCH else None,
         "hatch": view.hatch_label,
         "elements": [_dump_element(element) for element in view.elements],
@@ -78,6 +87,7 @@ def dump_screen(view: ScreenView) -> dict[str, Any]:
         "address": view.address,
         "bare": view.is_bare,
         "plain": view.is_plain,
+        "capture": dump_capture(view.capture) if view.capture else None,
     }
     written.update({key: value for key, value in optional.items() if value})
     return written
@@ -117,6 +127,7 @@ def parse_screen(raw: object, where: str, read: Reader) -> ScreenView | None:
         device=read.enum(Device, raw, "device", where) or Device.PHONE,
         orientation=read.enum(Orientation, raw, "orientation", where) or Orientation.PORTRAIT,
         is_mini=raw.get("mini") is True,
+        is_large=raw.get("large") is True,
         fidelity=read.enum(Fidelity, raw, "fidelity", where) or Fidelity.L0,
         content=read.enum(Content, raw, "content", where) or Content.HATCH,
         hatch_label=read.text(raw, "hatch", where) or "",
@@ -136,7 +147,81 @@ def parse_screen(raw: object, where: str, read: Reader) -> ScreenView | None:
         address=read.text(raw, "address", where) or "",
         is_bare=raw.get("bare") is True,
         is_plain=raw.get("plain") is True,
+        capture=parse_capture(raw["capture"], f"{where}.capture", read)
+        if "capture" in raw
+        else None,
     )
+
+
+def dump_capture(capture: Capture) -> dict[str, Any]:
+    """Write the screenshot of an L4 screen: its image, its source file and its hotspots.
+
+    Args:
+        capture: The capture.
+
+    Returns:
+        A JSON-style dict that ``parse_capture`` accepts.
+    """
+    written: dict[str, Any] = {"image": capture.image}
+    if capture.source:
+        written["source"] = capture.source
+    if capture.hotspots:
+        written["hotspots"] = [
+            {"text": hotspot.text, "box": list(hotspot.box)} for hotspot in capture.hotspots
+        ]
+    return written
+
+
+def parse_capture(raw: object, where: str, read: Reader) -> Capture | None:
+    """Read the screenshot of an L4 screen, from a spec or a scene.
+
+    Args:
+        raw: ``{"image": "a.png", "source": "src/a.ts", "hotspots": [{"text", "box"}]}``; the
+            box is left, top, width and height in the screenshot's pixels.
+        where: Where the object is, for messages.
+        read: The reader that collects problems.
+
+    Returns:
+        The capture, or None when it has no image.
+    """
+    if isinstance(raw, str):
+        read.report(
+            where, f'\'{raw}\' names a screen of a manifest; add "captures": "<manifest.json>"'
+        )
+        return None
+    if not isinstance(raw, dict):
+        read.report(where, "'capture' must be an object with an 'image'")
+        return None
+    read.check_keys(raw, CAPTURE_KEYS, where)
+    image = read.text(raw, "image", where)
+    if not image:
+        read.report(where, "'image' is required: the path of a PNG screenshot")
+        return None
+    hotspots = raw.get("hotspots", [])
+    if not isinstance(hotspots, list):
+        read.report(where, "'hotspots' must be a list")
+        hotspots = []
+    found = [_hotspot(item, f"{where}.hotspots[{i}]", read) for i, item in enumerate(hotspots)]
+    return Capture(
+        image=image,
+        source=read.text(raw, "source", where) or "",
+        hotspots=tuple(hotspot for hotspot in found if hotspot is not None),
+    )
+
+
+def _hotspot(raw: object, where: str, read: Reader) -> Hotspot | None:
+    """Read one hotspot: the text of the element and its box in the screenshot."""
+    if not isinstance(raw, dict):
+        read.report(where, "must be an object")
+        return None
+    read.check_keys(raw, HOTSPOT_KEYS, where)
+    box = raw.get("box")
+    is_box = isinstance(box, list) and len(box) == BOX_LENGTH and all(map(is_number, box))
+    if not is_box:
+        read.report(where, "'box' must be [left, top, width, height] in pixels")
+        return None
+    left, top, width, height = box
+    return Hotspot(read.text(raw, "text", where) or "", (left, top, width, height))
 
 
 def _parse_elements(raw: object, where: str, read: Reader) -> tuple[ScreenElement, ...]:
