@@ -2,7 +2,7 @@
 
 One hard brief for each of the 21 diagram types of the plugin. Written for this repository (not by the research tool) to stress each type's layout: many elements, hubs, loops, long names, and Vietnamese text in four of them. It is **not** read by `check_briefs.py`. The counts in `Must show` were written by hand with the brief and were not recounted by a script. No domain detail was checked against a source.
 
-First run: [`../results/2026-11-12-hard-set-sonnet.md`](../results/2026-11-12-hard-set-sonnet.md).
+First run: [`../results/2026-11-12-hard-set-sonnet.md`](../results/2026-11-12-hard-set-sonnet.md). Second run, not blind: [`../results/2026-11-12-hard-set-by-hand.md`](../results/2026-11-12-hard-set-by-hand.md).
 
 Faults in these briefs, found by the first run. The brief text is left as it was run; fix it before a second run.
 
