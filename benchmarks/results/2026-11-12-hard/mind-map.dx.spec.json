@@ -1,0 +1,338 @@
+{
+ "type": "mindmap",
+ "style": "illustrated",
+ "title": "Sơ đồ tư duy: chuyển đổi số doanh nghiệp vừa và nhỏ",
+ "desc": "Một ý trung tâm, bảy nhánh chính, các ý con và ba liên kết chéo.",
+ "root": {
+  "label": "Chuyển đổi số doanh nghiệp vừa và nhỏ",
+  "icon": "launch",
+  "children": [
+   {
+    "label": "Chiến lược",
+    "icon": "flag",
+    "side": "right",
+    "children": [
+     {
+      "label": "Tầm nhìn 3 năm"
+     },
+     {
+      "label": "Lộ trình theo quý"
+     },
+     {
+      "label": "Ngân sách",
+      "id": "ns",
+      "children": [
+       {
+        "label": "Vốn tự có"
+       },
+       {
+        "label": "Vay ưu đãi"
+       },
+       {
+        "label": "Hỗ trợ của nhà nước"
+       }
+      ]
+     },
+     {
+      "label": "Chỉ số đo lường",
+      "children": [
+       {
+        "label": "Doanh thu số"
+       },
+       {
+        "label": "Tỷ lệ khách quay lại"
+       },
+       {
+        "label": "Thời gian xử lý đơn"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "label": "Con người",
+    "icon": "team",
+    "side": "right",
+    "children": [
+     {
+      "label": "Lãnh đạo cam kết"
+     },
+     {
+      "label": "Đào tạo lại",
+      "children": [
+       {
+        "label": "Kỹ năng số cơ bản"
+       },
+       {
+        "label": "Phân tích dữ liệu"
+       },
+       {
+        "label": "An toàn thông tin",
+        "id": "attt"
+       }
+      ]
+     },
+     {
+      "label": "Tuyển dụng",
+      "children": [
+       {
+        "label": "Kỹ sư dữ liệu"
+       },
+       {
+        "label": "Quản lý sản phẩm"
+       }
+      ]
+     },
+     {
+      "label": "Văn hoá thử nghiệm"
+     },
+     {
+      "label": "Quản trị thay đổi",
+      "children": [
+       {
+        "label": "Truyền thông nội bộ"
+       },
+       {
+        "label": "Đại sứ thay đổi"
+       },
+       {
+        "label": "Khen thưởng"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "label": "Quy trình",
+    "icon": "gear",
+    "side": "right",
+    "children": [
+     {
+      "label": "Số hoá chứng từ"
+     },
+     {
+      "label": "Tự động hoá",
+      "children": [
+       {
+        "label": "Kế toán"
+       },
+       {
+        "label": "Kho vận",
+        "children": [
+         {
+          "label": "Quét mã vạch"
+         },
+         {
+          "label": "Kiểm kê tự động"
+         },
+         {
+          "label": "Dự báo tồn kho",
+          "id": "dbtk"
+         }
+        ]
+       },
+       {
+        "label": "Chăm sóc khách hàng"
+       }
+      ]
+     },
+     {
+      "label": "Chuẩn hoá dữ liệu"
+     },
+     {
+      "label": "Phê duyệt điện tử"
+     }
+    ]
+   },
+   {
+    "label": "Công nghệ",
+    "icon": "server",
+    "side": "right",
+    "children": [
+     {
+      "label": "Hạ tầng đám mây",
+      "children": [
+       {
+        "label": "Công cộng"
+       },
+       {
+        "label": "Riêng"
+       },
+       {
+        "label": "Lai"
+       }
+      ]
+     },
+     {
+      "label": "Phần mềm lõi",
+      "children": [
+       {
+        "label": "ERP"
+       },
+       {
+        "label": "CRM"
+       },
+       {
+        "label": "Quản lý kho"
+       },
+       {
+        "label": "Kế toán"
+       }
+      ]
+     },
+     {
+      "label": "Tích hợp",
+      "children": [
+       {
+        "label": "API"
+       },
+       {
+        "label": "Trao đổi dữ liệu điện tử"
+       }
+      ]
+     },
+     {
+      "label": "Trí tuệ nhân tạo",
+      "id": "ai",
+      "children": [
+       {
+        "label": "Trợ lý ảo"
+       },
+       {
+        "label": "Gợi ý sản phẩm"
+       },
+       {
+        "label": "Phát hiện gian lận"
+       }
+      ]
+     },
+     {
+      "label": "Thiết bị",
+      "children": [
+       {
+        "label": "Máy bán hàng"
+       },
+       {
+        "label": "Cảm biến kho"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "label": "Khách hàng",
+    "icon": "user",
+    "side": "left",
+    "children": [
+     {
+      "label": "Kênh bán",
+      "children": [
+       {
+        "label": "Cửa hàng"
+       },
+       {
+        "label": "Website"
+       },
+       {
+        "label": "Sàn thương mại điện tử"
+       },
+       {
+        "label": "Mạng xã hội"
+       }
+      ]
+     },
+     {
+      "label": "Trải nghiệm đa kênh"
+     },
+     {
+      "label": "Chương trình khách hàng thân thiết"
+     },
+     {
+      "label": "Thanh toán",
+      "children": [
+       {
+        "label": "Mã QR"
+       },
+       {
+        "label": "Ví điện tử"
+       },
+       {
+        "label": "Trả góp"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "label": "Dữ liệu",
+    "icon": "database",
+    "side": "left",
+    "children": [
+     {
+      "label": "Thu thập"
+     },
+     {
+      "label": "Kho dữ liệu"
+     },
+     {
+      "label": "Báo cáo quản trị"
+     },
+     {
+      "label": "Bảo vệ dữ liệu cá nhân",
+      "children": [
+       {
+        "label": "Nghị định 13/2023/NĐ-CP"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "label": "Rủi ro",
+    "icon": "warn",
+    "side": "right",
+    "children": [
+     {
+      "label": "An ninh mạng",
+      "id": "anm",
+      "children": [
+       {
+        "label": "Mã độc tống tiền"
+       },
+       {
+        "label": "Lừa đảo qua thư"
+       }
+      ]
+     },
+     {
+      "label": "Phụ thuộc nhà cung cấp"
+     },
+     {
+      "label": "Vượt ngân sách",
+      "id": "vns"
+     },
+     {
+      "label": "Nhân viên phản đối"
+     }
+    ]
+   }
+  ]
+ },
+ "links": [
+  {
+   "from": "attt",
+   "to": "anm",
+   "label": "liên quan"
+  },
+  {
+   "from": "dbtk",
+   "to": "ai",
+   "label": "dùng"
+  },
+  {
+   "from": "ns",
+   "to": "vns",
+   "label": "rủi ro"
+  }
+ ]
+}

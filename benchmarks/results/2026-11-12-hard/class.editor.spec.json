@@ -1,0 +1,730 @@
+{
+ "type": "class",
+ "title": "Class diagram: document editor",
+ "desc": "Nodes, commands, history, editor, plugins and renderers of a document editor.",
+ "classes": [
+  {
+   "id": "serializable",
+   "label": "Serializable",
+   "kind": "interface",
+   "operations": [
+    "+serialize(): bytes",
+    "+deserialize(data: bytes): void"
+   ],
+   "at": [
+    0,
+    0
+   ]
+  },
+  {
+   "id": "observable",
+   "label": "Observable<T>",
+   "kind": "interface",
+   "operations": [
+    "+subscribe(o: Observer<T>): Subscription",
+    "+notify(event: T): void"
+   ],
+   "at": [
+    0,
+    1
+   ]
+  },
+  {
+   "id": "observer",
+   "label": "Observer<T>",
+   "kind": "interface",
+   "operations": [
+    "+onEvent(event: T): void"
+   ],
+   "at": [
+    0,
+    4
+   ]
+  },
+  {
+   "id": "command",
+   "label": "Command",
+   "kind": "interface",
+   "operations": [
+    "+execute(): void",
+    "+undo(): void",
+    "+canMerge(other: Command): bool"
+   ],
+   "at": [
+    0,
+    3
+   ]
+  },
+  {
+   "id": "plugin",
+   "label": "Plugin",
+   "kind": "interface",
+   "attributes": [
+    "+id: string"
+   ],
+   "operations": [
+    "+activate(ctx: EditorContext): void",
+    "+deactivate(): void"
+   ],
+   "at": [
+    0,
+    5
+   ]
+  },
+  {
+   "id": "renderer",
+   "label": "Renderer",
+   "kind": "interface",
+   "operations": [
+    "+render(node: Node, surface: Surface): void"
+   ],
+   "at": [
+    0,
+    7
+   ]
+  },
+  {
+   "id": "nodevisitor",
+   "label": "NodeVisitor",
+   "kind": "interface",
+   "operations": [
+    "+visit(n: Node): void"
+   ],
+   "at": [
+    0,
+    8
+   ]
+  },
+  {
+   "id": "node",
+   "label": "Node",
+   "kind": "abstract",
+   "attributes": [
+    "#id: UUID",
+    "#parent: Node?",
+    "+children: List<Node>"
+   ],
+   "operations": [
+    "+accept(v: NodeVisitor): void {abstract}",
+    "+clone(): Node"
+   ],
+   "at": [
+    1,
+    0
+   ]
+  },
+  {
+   "id": "block",
+   "label": "BlockNode",
+   "kind": "abstract",
+   "at": [
+    2,
+    0
+   ]
+  },
+  {
+   "id": "inline",
+   "label": "InlineNode",
+   "kind": "abstract",
+   "at": [
+    2,
+    1
+   ]
+  },
+  {
+   "id": "basecmd",
+   "label": "BaseCommand",
+   "kind": "abstract",
+   "attributes": [
+    "#doc: Document",
+    "#timestamp: Instant"
+   ],
+   "at": [
+    1,
+    3
+   ]
+  },
+  {
+   "id": "paragraph",
+   "label": "Paragraph",
+   "at": [
+    3,
+    0
+   ]
+  },
+  {
+   "id": "heading",
+   "label": "Heading",
+   "attributes": [
+    "+level: int"
+   ],
+   "at": [
+    4,
+    0
+   ]
+  },
+  {
+   "id": "listblock",
+   "label": "ListBlock",
+   "attributes": [
+    "+ordered: bool"
+   ],
+   "at": [
+    5,
+    0
+   ]
+  },
+  {
+   "id": "table",
+   "label": "Table",
+   "attributes": [
+    "+rows: int",
+    "+cols: int"
+   ],
+   "at": [
+    6,
+    0
+   ]
+  },
+  {
+   "id": "codeblock",
+   "label": "CodeBlock",
+   "attributes": [
+    "+language: string"
+   ],
+   "at": [
+    7,
+    0
+   ]
+  },
+  {
+   "id": "tablecell",
+   "label": "TableCell",
+   "at": [
+    8,
+    0
+   ]
+  },
+  {
+   "id": "textrun",
+   "label": "TextRun",
+   "attributes": [
+    "+text: string",
+    "+marks: Set<Mark>"
+   ],
+   "at": [
+    3,
+    1
+   ]
+  },
+  {
+   "id": "link",
+   "label": "Link",
+   "attributes": [
+    "+href: URL"
+   ],
+   "at": [
+    4,
+    1
+   ]
+  },
+  {
+   "id": "imageinline",
+   "label": "ImageInline",
+   "attributes": [
+    "+src: URL",
+    "+alt: string"
+   ],
+   "at": [
+    5,
+    1
+   ]
+  },
+  {
+   "id": "mark",
+   "label": "Mark",
+   "stereotype": "«enumeration»",
+   "attributes": [
+    "BOLD",
+    "ITALIC",
+    "CODE",
+    "STRIKE"
+   ],
+   "at": [
+    6,
+    1
+   ]
+  },
+  {
+   "id": "document",
+   "label": "Document",
+   "attributes": [
+    "-root: BlockNode",
+    "-version: long"
+   ],
+   "operations": [
+    "+apply(c: Command): void",
+    "+snapshot(): Snapshot"
+   ],
+   "at": [
+    1,
+    1
+   ]
+  },
+  {
+   "id": "snapshot",
+   "label": "Snapshot",
+   "attributes": [
+    "+version: long",
+    "+data: bytes"
+   ],
+   "at": [
+    7,
+    1
+   ]
+  },
+  {
+   "id": "changeevent",
+   "label": "ChangeEvent",
+   "attributes": [
+    "+kind: ChangeKind",
+    "+path: List<int>"
+   ],
+   "at": [
+    7,
+    2
+   ]
+  },
+  {
+   "id": "changekind",
+   "label": "ChangeKind",
+   "stereotype": "«enumeration»",
+   "attributes": [
+    "INSERT",
+    "DELETE",
+    "UPDATE",
+    "MOVE"
+   ],
+   "at": [
+    8,
+    2
+   ]
+  },
+  {
+   "id": "history",
+   "label": "History",
+   "attributes": [
+    "-undoStack: Deque<Command>",
+    "-redoStack: Deque<Command>"
+   ],
+   "operations": [
+    "+push(c: Command): void",
+    "+undo(): void",
+    "+redo(): void"
+   ],
+   "at": [
+    2,
+    2
+   ]
+  },
+  {
+   "id": "inserttext",
+   "label": "InsertTextCommand",
+   "at": [
+    2,
+    3
+   ]
+  },
+  {
+   "id": "deleterange",
+   "label": "DeleteRangeCommand",
+   "at": [
+    3,
+    3
+   ]
+  },
+  {
+   "id": "format",
+   "label": "FormatCommand",
+   "at": [
+    4,
+    3
+   ]
+  },
+  {
+   "id": "movenode",
+   "label": "MoveNodeCommand",
+   "at": [
+    5,
+    3
+   ]
+  },
+  {
+   "id": "composite",
+   "label": "CompositeCommand",
+   "at": [
+    6,
+    3
+   ]
+  },
+  {
+   "id": "editor",
+   "label": "Editor",
+   "attributes": [
+    "-document: Document",
+    "-selection: Selection",
+    "-plugins: Map<string, Plugin>"
+   ],
+   "operations": [
+    "+static create(config: EditorConfig): Editor",
+    "+dispatch(c: Command): void"
+   ],
+   "at": [
+    1,
+    2
+   ]
+  },
+  {
+   "id": "selection",
+   "label": "Selection",
+   "attributes": [
+    "+anchor: Position",
+    "+focus: Position"
+   ],
+   "operations": [
+    "+isCollapsed(): bool"
+   ],
+   "at": [
+    3,
+    2
+   ]
+  },
+  {
+   "id": "position",
+   "label": "Position",
+   "attributes": [
+    "+path: List<int>",
+    "+offset: int"
+   ],
+   "at": [
+    4,
+    2
+   ]
+  },
+  {
+   "id": "editorctx",
+   "label": "EditorContext",
+   "attributes": [
+    "+editor: Editor"
+   ],
+   "operations": [
+    "+registerCommand(name: string, factory: CommandFactory): void"
+   ],
+   "at": [
+    5,
+    2
+   ]
+  },
+  {
+   "id": "editorcfg",
+   "label": "EditorConfig",
+   "attributes": [
+    "+readOnly: bool",
+    "+plugins: List<Plugin>"
+   ],
+   "at": [
+    6,
+    2
+   ]
+  },
+  {
+   "id": "spell",
+   "label": "SpellCheckPlugin",
+   "at": [
+    1,
+    5
+   ]
+  },
+  {
+   "id": "collab",
+   "label": "CollaborationPlugin",
+   "attributes": [
+    "-socket: WebSocket",
+    "-clock: VectorClock"
+   ],
+   "at": [
+    1,
+    4
+   ]
+  },
+  {
+   "id": "mdshort",
+   "label": "MarkdownShortcutsPlugin",
+   "at": [
+    1,
+    6
+   ]
+  },
+  {
+   "id": "vclock",
+   "label": "VectorClock",
+   "operations": [
+    "+tick(): void",
+    "+merge(o: VectorClock): void"
+   ],
+   "at": [
+    2,
+    4
+   ]
+  },
+  {
+   "id": "html",
+   "label": "HtmlRenderer",
+   "at": [
+    1,
+    7
+   ]
+  },
+  {
+   "id": "canvas",
+   "label": "CanvasRenderer",
+   "at": [
+    2,
+    7
+   ]
+  },
+  {
+   "id": "wordcount",
+   "label": "WordCountVisitor",
+   "at": [
+    1,
+    8
+   ]
+  }
+ ],
+ "relations": [
+  {
+   "from": "node",
+   "to": "serializable",
+   "style": "implements"
+  },
+  {
+   "from": "block",
+   "to": "node",
+   "style": "inheritance"
+  },
+  {
+   "from": "inline",
+   "to": "node",
+   "style": "inheritance"
+  },
+  {
+   "from": "basecmd",
+   "to": "command",
+   "style": "implements"
+  },
+  {
+   "from": "paragraph",
+   "to": "block",
+   "style": "inheritance"
+  },
+  {
+   "from": "heading",
+   "to": "block",
+   "style": "inheritance"
+  },
+  {
+   "from": "listblock",
+   "to": "block",
+   "style": "inheritance"
+  },
+  {
+   "from": "table",
+   "to": "block",
+   "style": "inheritance"
+  },
+  {
+   "from": "codeblock",
+   "to": "block",
+   "style": "inheritance"
+  },
+  {
+   "from": "tablecell",
+   "to": "block",
+   "style": "inheritance"
+  },
+  {
+   "from": "textrun",
+   "to": "inline",
+   "style": "inheritance"
+  },
+  {
+   "from": "link",
+   "to": "inline",
+   "style": "inheritance"
+  },
+  {
+   "from": "imageinline",
+   "to": "inline",
+   "style": "inheritance"
+  },
+  {
+   "from": "table",
+   "to": "tablecell",
+   "style": "composition",
+   "to_label": "1..*",
+   "from_label": "1"
+  },
+  {
+   "from": "document",
+   "to": "observable",
+   "style": "implements"
+  },
+  {
+   "from": "document",
+   "to": "serializable",
+   "style": "implements"
+  },
+  {
+   "from": "document",
+   "to": "node",
+   "style": "composition",
+   "label": "root",
+   "from_label": "1",
+   "to_label": "1"
+  },
+  {
+   "from": "history",
+   "to": "command",
+   "style": "aggregation",
+   "to_label": "0..*"
+  },
+  {
+   "from": "history",
+   "to": "document",
+   "label": "belongs to",
+   "from_label": "*",
+   "to_label": "1"
+  },
+  {
+   "from": "inserttext",
+   "to": "basecmd",
+   "style": "inheritance"
+  },
+  {
+   "from": "deleterange",
+   "to": "basecmd",
+   "style": "inheritance"
+  },
+  {
+   "from": "format",
+   "to": "basecmd",
+   "style": "inheritance"
+  },
+  {
+   "from": "movenode",
+   "to": "basecmd",
+   "style": "inheritance"
+  },
+  {
+   "from": "composite",
+   "to": "basecmd",
+   "style": "inheritance"
+  },
+  {
+   "from": "composite",
+   "to": "command",
+   "style": "aggregation",
+   "to_label": "1..*"
+  },
+  {
+   "from": "editor",
+   "to": "observer",
+   "style": "implements"
+  },
+  {
+   "from": "editor",
+   "to": "document",
+   "label": "has",
+   "from_label": "1",
+   "to_label": "1"
+  },
+  {
+   "from": "editor",
+   "to": "history",
+   "label": "has",
+   "from_label": "1",
+   "to_label": "1"
+  },
+  {
+   "from": "editor",
+   "to": "selection",
+   "label": "has",
+   "from_label": "1",
+   "to_label": "1"
+  },
+  {
+   "from": "editor",
+   "to": "plugin",
+   "label": "has",
+   "from_label": "1",
+   "to_label": "0..*"
+  },
+  {
+   "from": "editor",
+   "to": "renderer",
+   "label": "uses",
+   "style": "navigable"
+  },
+  {
+   "from": "spell",
+   "to": "plugin",
+   "style": "implements"
+  },
+  {
+   "from": "collab",
+   "to": "plugin",
+   "style": "implements"
+  },
+  {
+   "from": "mdshort",
+   "to": "plugin",
+   "style": "implements"
+  },
+  {
+   "from": "collab",
+   "to": "observer",
+   "style": "implements"
+  },
+  {
+   "from": "collab",
+   "to": "vclock",
+   "style": "dependency"
+  },
+  {
+   "from": "html",
+   "to": "renderer",
+   "style": "implements"
+  },
+  {
+   "from": "html",
+   "to": "nodevisitor",
+   "style": "implements"
+  },
+  {
+   "from": "canvas",
+   "to": "renderer",
+   "style": "implements"
+  },
+  {
+   "from": "canvas",
+   "to": "nodevisitor",
+   "style": "implements"
+  },
+  {
+   "from": "wordcount",
+   "to": "nodevisitor",
+   "style": "implements"
+  }
+ ]
+}

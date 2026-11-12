@@ -1,0 +1,14 @@
+# DFD blind test: hospital pharmacy, level 1
+
+1. Path: both. Quick: first build + 3 fix rounds (I added `at` positions). Builds: 16 errors/133 warnings; 15/98; 4/~94; final 4 errors/100 warnings, exit 2. Final errors: 3 line-through-node (Drug formulary to Order from wholesaler through Record administration, Bill and claim, Stock ledger), 1 outside-canvas (Report adverse events to Prescriber). Warnings: 76 lines-cross, 17 crosses-many, 1 lines-overlap, 1 dfd-process-count (12 processes), 5 dfd-store-one-way. (Exit codes of builds 2 and 3 were masked by my grep pipe, so not known.) Author: one pass, exit 0, 54 errors (39 line-through-node, 10 label-covers, 5 caption-covered), 131 warnings.
+2. Counts: brief 8 externals + 12 processes + 9 stores = 29 elements, 56 flows (52 listed + 4 audit-log writes; Wholesaler to Finance left out as told). Spec 29/56. Scene 29/56. Drawn in the quick HTML: all 29 boxes and 56 labelled lines exist; I did not trace each one, and several run through boxes.
+3. Problems, most serious first:
+ - Quick path (q_a.png, q_b.png, q_full.png in dfd/): 4 errors left; page 4848 x 2810 px. Without `at` the automatic layout was a 2-column zigzag about 5000 px tall.
+ - Long lines wrap round the page: rejection with reason, override reason, verification status run across the top over the subtitle (q_a.png); goods received note and recall notice run along the bottom (q_b.png). Hard to see which ends belong together.
+ - Many crossings and bundles (76), e.g. around Receive goods (q_b.png); the missed dose alert line passes the Drug formulary area and other labels (q_a.png).
+ - Main path (blue dashed, Prescriber to 1.0 to 2.0) is readable at the top; I did not view its later part.
+ - Author attempt (diagrams/author/out/pharmacy.html, a_full.png): worse. Lines run through boxes (labelled medication through D3 Drug formulary; four lines stacked on the Prescriber/1.0 row); the page is smaller (2659 x 1951). I used default routes without waypoints, so this is a weak attempt, not refined.
+4. Not expressible: nothing dropped. 12 processes is outside the skill's 4 to 7 (warning only). The audit log (D9) as a hub with 4 writers cannot be a wide bar in the quick path.
+5. Plugin bugs: none crashed. Warning text repeats the name: "store 'd1' (Prescriptions) (Prescriptions)" (rerun build on diagrams/pharmacy.spec.json).
+6. Skill text: no guidance on choosing `at` to remove line-through-node errors, and "3 rounds" was not enough to get to 0 errors. The 15-element hint sends to `author`, but the author skill has no DFD example and does not say which shapes mean external entity or store (I used ACTOR and STORE).
+Not verified: the quick .drawio parses as XML (481 elements) but was not rendered; the author .drawio was not parsed; only the top-left of the author picture was viewed.

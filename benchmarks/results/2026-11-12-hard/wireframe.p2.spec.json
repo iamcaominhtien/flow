@@ -1,0 +1,12 @@
+{"type":"wireframe","title":"Customer table: states","desc":"Desktop data table alone in four states","set":"states",
+"shared":[{"kind":"navbar","id":"sn","text":"Customers","logo":true,"avatar":true}],
+"screens":[
+{"id":"1","label":"Loading","device":"desktop","state":"loading","address":"app.example.com/customers","blocks":[{"kind":"loading","id":"l1","bars":8,"text":"Loading customers"}]},
+{"id":"2","label":"Empty","device":"desktop","state":"empty","address":"app.example.com/customers","blocks":[{"kind":"empty","id":"e1","text":"No customers match","detail":"Try removing a filter.","action":"Clear filters"}]},
+{"id":"3","label":"Error","device":"desktop","state":"error","address":"app.example.com/customers","blocks":[{"kind":"error","id":"x1","text":"Could not load customers","detail":"Check your connection.","action":"Retry","items":["Contact support"]}]},
+{"id":"4","label":"3 selected","device":"desktop","state":"normal","address":"app.example.com/customers","blocks":[
+{"kind":"panel","id":"bulk","text":"3 selected","children":[{"kind":"button","id":"b1","text":"Export","style":"secondary"},{"kind":"button","id":"b2","text":"Tag","style":"secondary"},{"kind":"button","id":"b3","text":"Delete","style":"danger"}]},
+{"kind":"table","id":"tb","rows":5,"columns":[{"label":"","weight":1,"kind":"text"},{"label":"Customer","weight":3,"kind":"bold"},{"label":"Plan","weight":2,"kind":"chip"},{"label":"MRR","weight":2,"kind":"text"},{"label":"Change","weight":2,"kind":"text"},{"label":"Last seen","weight":2,"kind":"text"}],
+"data":[["[x]","Northwind","Pro","$4,200","+5%","2 h ago"],["[x]","Globex","Team","$1,900","-2%","1 d ago"],["[x]","Initech","Pro","$3,100","+1%","3 h ago"],["[ ]","Umbrella","Ent","$12,000","+8%","5 min ago"],["[ ]","Hooli","Team","$2,400","0%","2 d ago"]]}],
+"annotations":[{"target":"bulk","corner":"tr","title":"Bulk action bar","text":"Appears once any row is selected.","number":10},{"target":"tb","corner":"tl","title":"Sticky header","text":"Header stays while rows scroll.","number":11}]}
+]}

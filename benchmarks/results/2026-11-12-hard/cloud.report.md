@@ -1,0 +1,12 @@
+# Cloud skill, hard brief (AWS two-region)
+
+1. Path: both. Quick: 3 builds. Round 1 exit 1 (KeyError 'tgw1'), round 2 exit 1 (KeyError 's3a'), round 3 exit 0: 0 errors, 121 warnings (lines-cross 87, crosses-many 22, lines-overlap 9, crosses-border 2, label-on-line 1). Author: one attempt, one fix; first run 6 errors (label-covers, 20 px gaps), final exit 0, 0 errors, 6 warnings (lines-cross 6).
+2. Counts. Brief: about 65 parts, about 35 connections. Quick spec: 65 parts, 51 links, 26 frames, all drawn. Author: 69 nodes, 28 lines. Author omits links EKS to MSK/OpenSearch/Secrets/KMS/CloudWatch/ECR/Cognito, API Gateway, SQS, and Org to Security account; Network and Production accounts are empty nodes.
+3. Problems, most serious first:
+- Quick path: page 18084 x 2121 px, unreadable. Region services sit in one row right of the VPC; many EKS links run the whole page width along the top and bottom and cross each other. Files: cloud/diagrams/full.png, crop0.png, crop2.png, crop5.png (crop1, 3, 4, 6 not opened).
+- Quick path: failover shows as a plain ink line (no dashed kind).
+- Author path (cloud/diagrams/author/full.png 3104 x 1978; opened crops c1.png, c2.png only): main path and failover lines run through the "Public/Private/Data subnet", AZ and region/VPC pills (my coordinates); the WAF-to-ALB and failover lines run 15 px apart and cross; "MSK, MirrorMaker 2" text wraps and is clipped; Route 53 detail wraps. Lower part (services rows, legend) not looked at.
+4. Not expressible: dashed alternative path in the quick path; AWS accounts as frames; ALB spanning three subnets (one part with a detail); Direct Connect 2 links in 2 locations (one part).
+5. Bug: cloud_grid.py assign_cells raises KeyError on rows[part.id] when a part in a VPC or region frame is linked only to parts with no row. Command: `python3 plugins/flow/scripts/flow.py build diagrams/aws.spec.json` on /tmp/.../hard/cloud/gen.py output before the extra links (tgw1 linked to tgw2, dx, vpn only). The skill says such parts are "not checked". I worked around it with extra links to EKS, which changed the diagram.
+6. Skill text: "more than about 16 parts: split" gives no way to split. No mention that region/VPC parts need a link to a subnet part. Failover is listed as not drawn although the brief needs it. Author skill does not say where zone pills sit, so lines through them are easy.
+Not verified: .drawio rendering (both files parse as XML; not rendered); HTML animation.

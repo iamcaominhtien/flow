@@ -1,0 +1,72 @@
+{
+ "type": "concept",
+ "style": "illustrated",
+ "title": "Concept: observability of a production system",
+ "desc": "Like a car dashboard, a black box recorder and a mechanic's manual together.",
+ "center": {
+  "label": "Observability of a production system",
+  "tone": "violet"
+ },
+ "items": [
+  {
+   "label": "Logs",
+   "icon": "file",
+   "detail": "Structured events with context. Event, field, level",
+   "tone": "blue"
+  },
+  {
+   "label": "Metrics",
+   "icon": "chart",
+   "detail": "Numbers over time, cheap to keep. Counter, gauge, histogram",
+   "tone": "blue"
+  },
+  {
+   "label": "Traces",
+   "icon": "search",
+   "detail": "One request across services. Span, context propagation, tail sampling",
+   "tone": "blue"
+  },
+  {
+   "label": "Profiles",
+   "icon": "gear",
+   "detail": "Where CPU and memory go. Flame graph, CPU, heap",
+   "tone": "blue"
+  },
+  {
+   "label": "Service level objectives",
+   "icon": "check",
+   "detail": "The promise, in numbers. Indicator, error budget, burn rate",
+   "tone": "amber"
+  },
+  {
+   "label": "Alerting on symptoms",
+   "icon": "bell",
+   "detail": "Page on what users feel. Symptom, threshold, routing",
+   "tone": "amber"
+  },
+  {
+   "label": "Incident response and runbooks",
+   "icon": "warn",
+   "detail": "Roles, timeline, review; what to do at 3 a.m. Commander, postmortem, steps",
+   "tone": "amber"
+  },
+  {
+   "label": "Instrumentation",
+   "icon": "code",
+   "detail": "OpenTelemetry SDKs and auto-instrumentation. SDK, auto-instrumentation, semantic conventions",
+   "tone": "green"
+  },
+  {
+   "label": "Pipeline and storage",
+   "icon": "database",
+   "detail": "Agents, sampling, routing; hot, warm, cold tiers. Agent, routing, retention",
+   "tone": "green"
+  },
+  {
+   "label": "Ownership",
+   "icon": "user",
+   "detail": "Every service has a team and a rota. Team, rota, escalation",
+   "tone": "teal"
+  }
+ ]
+}

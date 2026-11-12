@@ -1,0 +1,1068 @@
+{
+ "type": "screen",
+ "title": "Digital bank app: screen flow",
+ "desc": "Phones, with a tablet Teller group. Home, Cards, Pay, Savings and Profile tabs are on Home. Authenticate is one shared screen.",
+ "zones": [
+  {
+   "id": "ob",
+   "label": "Onboarding",
+   "tone": "blue"
+  },
+  {
+   "id": "hm",
+   "label": "Home",
+   "tone": "green"
+  },
+  {
+   "id": "xf",
+   "label": "Transfers",
+   "tone": "violet"
+  },
+  {
+   "id": "cd",
+   "label": "Cards",
+   "tone": "amber"
+  },
+  {
+   "id": "sp",
+   "label": "Savings and profile",
+   "tone": "teal"
+  },
+  {
+   "id": "tl",
+   "label": "Teller (tablet)",
+   "tone": "gray"
+  }
+ ],
+ "screens": [
+  {
+   "id": "e-app",
+   "kind": "entry",
+   "label": "App icon",
+   "detail": "opens Splash"
+  },
+  {
+   "id": "e-push",
+   "kind": "entry",
+   "label": "Push",
+   "detail": "Transfer received"
+  },
+  {
+   "id": "e-deep",
+   "kind": "entry",
+   "label": "Deep link",
+   "detail": "Activate card"
+  },
+  {
+   "id": "e-qr",
+   "kind": "entry",
+   "label": "QR scan",
+   "detail": "from the camera"
+  },
+  {
+   "id": "splash",
+   "label": "Splash",
+   "zone": "ob",
+   "code": "S001",
+   "fidelity": "L0"
+  },
+  {
+   "id": "welcome",
+   "label": "Welcome",
+   "zone": "ob",
+   "code": "S002",
+   "fidelity": "L0"
+  },
+  {
+   "id": "phone",
+   "label": "Phone number",
+   "zone": "ob",
+   "code": "S003",
+   "fidelity": "L0"
+  },
+  {
+   "id": "otp",
+   "label": "OTP",
+   "zone": "ob",
+   "code": "S004",
+   "fidelity": "L0"
+  },
+  {
+   "id": "idf",
+   "label": "ID capture front",
+   "zone": "ob",
+   "code": "S005",
+   "fidelity": "L0"
+  },
+  {
+   "id": "idb",
+   "label": "ID capture back",
+   "zone": "ob",
+   "code": "S006",
+   "fidelity": "L0"
+  },
+  {
+   "id": "selfie",
+   "label": "Selfie liveness",
+   "zone": "ob",
+   "code": "S007",
+   "fidelity": "L0"
+  },
+  {
+   "id": "vcall",
+   "label": "Video call booking",
+   "zone": "ob",
+   "code": "S008",
+   "fidelity": "L0"
+  },
+  {
+   "id": "pending",
+   "label": "Review pending",
+   "zone": "ob",
+   "code": "S009",
+   "fidelity": "L0"
+  },
+  {
+   "id": "reject",
+   "label": "Application rejected",
+   "zone": "ob",
+   "code": "S010",
+   "fidelity": "L0"
+  },
+  {
+   "id": "pin",
+   "label": "Create PIN",
+   "zone": "ob",
+   "code": "S011",
+   "fidelity": "L0"
+  },
+  {
+   "id": "bio",
+   "label": "Enable biometrics",
+   "zone": "ob",
+   "code": "S012",
+   "fidelity": "L0"
+  },
+  {
+   "id": "signin",
+   "label": "Sign in",
+   "zone": "ob",
+   "code": "S013",
+   "fidelity": "L0"
+  },
+  {
+   "id": "locked",
+   "label": "Account locked",
+   "zone": "ob",
+   "code": "S014",
+   "fidelity": "L0"
+  },
+  {
+   "id": "sess",
+   "kind": "decision",
+   "label": "Session valid?",
+   "zone": "ob"
+  },
+  {
+   "id": "kyc",
+   "kind": "decision",
+   "label": "KYC result?",
+   "zone": "ob"
+  },
+  {
+   "id": "home",
+   "label": "Home",
+   "zone": "hm",
+   "code": "S115",
+   "fidelity": "L0"
+  },
+  {
+   "id": "acct",
+   "label": "Account detail",
+   "zone": "hm",
+   "code": "S116",
+   "fidelity": "L0"
+  },
+  {
+   "id": "txn",
+   "label": "Transaction detail",
+   "zone": "hm",
+   "code": "S117",
+   "fidelity": "L0"
+  },
+  {
+   "id": "dispute",
+   "label": "Dispute form",
+   "zone": "hm",
+   "code": "S118",
+   "fidelity": "L0"
+  },
+  {
+   "id": "disputed",
+   "label": "Dispute submitted",
+   "zone": "hm",
+   "code": "S119",
+   "fidelity": "L2",
+   "overlay": "sheet",
+   "overlay_title": "Dispute submitted",
+   "elements": [
+    {
+     "text": "Close",
+     "on": "overlay"
+    }
+   ]
+  },
+  {
+   "id": "t-home",
+   "kind": "tab",
+   "label": "Home",
+   "zone": "hm"
+  },
+  {
+   "id": "t-cards",
+   "kind": "tab",
+   "label": "Cards",
+   "zone": "hm"
+  },
+  {
+   "id": "t-pay",
+   "kind": "tab",
+   "label": "Pay",
+   "zone": "hm"
+  },
+  {
+   "id": "t-sav",
+   "kind": "tab",
+   "label": "Savings",
+   "zone": "hm"
+  },
+  {
+   "id": "t-prof",
+   "kind": "tab",
+   "label": "Profile",
+   "zone": "hm"
+  },
+  {
+   "id": "payhub",
+   "label": "Pay hub",
+   "zone": "xf",
+   "code": "S220",
+   "fidelity": "L0"
+  },
+  {
+   "id": "recip",
+   "label": "Choose recipient",
+   "zone": "xf",
+   "code": "S221",
+   "fidelity": "L0"
+  },
+  {
+   "id": "addrec",
+   "label": "Add recipient",
+   "zone": "xf",
+   "code": "S222",
+   "fidelity": "L0"
+  },
+  {
+   "id": "amount",
+   "label": "Amount",
+   "zone": "xf",
+   "code": "S223",
+   "fidelity": "L0"
+  },
+  {
+   "id": "review",
+   "label": "Review transfer",
+   "zone": "xf",
+   "code": "S224",
+   "fidelity": "L0"
+  },
+  {
+   "id": "stepup",
+   "label": "Step-up OTP",
+   "zone": "xf",
+   "code": "S225",
+   "fidelity": "L0"
+  },
+  {
+   "id": "processing",
+   "label": "Processing",
+   "zone": "xf",
+   "code": "S226",
+   "fidelity": "L0"
+  },
+  {
+   "id": "success",
+   "label": "Transfer success",
+   "zone": "xf",
+   "code": "S227",
+   "fidelity": "L0"
+  },
+  {
+   "id": "failed",
+   "label": "Transfer failed",
+   "zone": "xf",
+   "code": "S228",
+   "fidelity": "L0"
+  },
+  {
+   "id": "qrpay",
+   "label": "Pay by QR",
+   "zone": "xf",
+   "code": "S229",
+   "fidelity": "L0"
+  },
+  {
+   "id": "mismatch",
+   "label": "Name mismatch warning",
+   "zone": "xf",
+   "code": "S230",
+   "fidelity": "L2",
+   "overlay": "modal",
+   "overlay_title": "Name mismatch",
+   "elements": [
+    {
+     "text": "Continue anyway",
+     "on": "overlay"
+    },
+    {
+     "text": "Edit",
+     "style": "secondary",
+     "on": "overlay"
+    }
+   ]
+  },
+  {
+   "id": "auth",
+   "label": "Authenticate",
+   "zone": "xf",
+   "code": "S231",
+   "fidelity": "L2",
+   "overlay": "sheet",
+   "overlay_title": "Enter PIN",
+   "elements": [
+    {
+     "text": "Confirm PIN",
+     "on": "overlay"
+    }
+   ]
+  },
+  {
+   "id": "share",
+   "label": "System share sheet",
+   "zone": "xf",
+   "code": "S232",
+   "fidelity": "L2",
+   "overlay": "sheet",
+   "overlay_title": "Share receipt",
+   "elements": [
+    {
+     "text": "Share",
+     "on": "overlay"
+    }
+   ]
+  },
+  {
+   "id": "name",
+   "kind": "decision",
+   "label": "Name matches?",
+   "zone": "xf"
+  },
+  {
+   "id": "over",
+   "kind": "decision",
+   "label": "Over limit?",
+   "zone": "xf"
+  },
+  {
+   "id": "cardlist",
+   "label": "Card list",
+   "zone": "cd",
+   "code": "S233",
+   "fidelity": "L0"
+  },
+  {
+   "id": "carddetail",
+   "label": "Card detail",
+   "zone": "cd",
+   "code": "S234",
+   "fidelity": "L0"
+  },
+  {
+   "id": "limits",
+   "label": "Card limits",
+   "zone": "cd",
+   "code": "S235",
+   "fidelity": "L0"
+  },
+  {
+   "id": "design",
+   "label": "Card design picker",
+   "zone": "cd",
+   "code": "S236",
+   "fidelity": "L0"
+  },
+  {
+   "id": "delivery",
+   "label": "Delivery address",
+   "zone": "cd",
+   "code": "S237",
+   "fidelity": "L0"
+  },
+  {
+   "id": "ordered",
+   "label": "Order confirmed",
+   "zone": "cd",
+   "code": "S238",
+   "fidelity": "L0"
+  },
+  {
+   "id": "cardact",
+   "label": "Card activation",
+   "zone": "cd",
+   "code": "S239",
+   "fidelity": "L0"
+  },
+  {
+   "id": "cardpin",
+   "label": "Create card PIN",
+   "zone": "cd",
+   "code": "S240",
+   "fidelity": "L0"
+  },
+  {
+   "id": "freeze",
+   "label": "Freeze confirm",
+   "zone": "cd",
+   "code": "S241",
+   "fidelity": "L2",
+   "overlay": "modal",
+   "overlay_title": "Freeze card?",
+   "elements": [
+    {
+     "text": "Confirm",
+     "on": "overlay"
+    }
+   ]
+  },
+  {
+   "id": "reveal",
+   "label": "Reveal PIN",
+   "zone": "cd",
+   "code": "S242",
+   "fidelity": "L0"
+  },
+  {
+   "id": "goals",
+   "label": "Savings goals",
+   "zone": "sp",
+   "code": "S343",
+   "fidelity": "L0"
+  },
+  {
+   "id": "goalsetup",
+   "label": "Goal setup",
+   "zone": "sp",
+   "code": "S344",
+   "fidelity": "L0"
+  },
+  {
+   "id": "autosave",
+   "label": "Auto-save rule",
+   "zone": "sp",
+   "code": "S345",
+   "fidelity": "L0"
+  },
+  {
+   "id": "profile",
+   "label": "Profile",
+   "zone": "sp",
+   "code": "S346",
+   "fidelity": "L0"
+  },
+  {
+   "id": "personal",
+   "label": "Personal details",
+   "zone": "sp",
+   "code": "S347",
+   "fidelity": "L0"
+  },
+  {
+   "id": "security",
+   "label": "Security settings",
+   "zone": "sp",
+   "code": "S348",
+   "fidelity": "L0"
+  },
+  {
+   "id": "statements",
+   "label": "Statements",
+   "zone": "sp",
+   "code": "S349",
+   "fidelity": "L0"
+  },
+  {
+   "id": "help",
+   "label": "Help centre",
+   "zone": "sp",
+   "code": "S350",
+   "fidelity": "L0"
+  },
+  {
+   "id": "changepin",
+   "label": "Change PIN",
+   "zone": "sp",
+   "code": "S351",
+   "fidelity": "L0"
+  },
+  {
+   "id": "trusted",
+   "label": "Trusted devices",
+   "zone": "sp",
+   "code": "S352",
+   "fidelity": "L0"
+  },
+  {
+   "id": "chat",
+   "label": "Chat with support",
+   "zone": "sp",
+   "code": "S353",
+   "fidelity": "L0"
+  },
+  {
+   "id": "signout",
+   "label": "Sign out confirm",
+   "zone": "sp",
+   "code": "S354",
+   "fidelity": "L2",
+   "overlay": "modal",
+   "overlay_title": "Sign out?",
+   "elements": [
+    {
+     "text": "Confirm",
+     "on": "overlay"
+    }
+   ]
+  },
+  {
+   "id": "tsignin",
+   "label": "Teller sign in",
+   "zone": "tl",
+   "code": "T55",
+   "fidelity": "L0",
+   "device": "tablet"
+  },
+  {
+   "id": "lookup",
+   "label": "Customer lookup",
+   "zone": "tl",
+   "code": "T56",
+   "fidelity": "L0",
+   "device": "tablet"
+  },
+  {
+   "id": "c360",
+   "label": "Customer 360",
+   "zone": "tl",
+   "code": "T57",
+   "fidelity": "L0",
+   "device": "tablet"
+  },
+  {
+   "id": "atransfer",
+   "label": "Assisted transfer",
+   "zone": "tl",
+   "code": "T58",
+   "fidelity": "L0",
+   "device": "tablet"
+  },
+  {
+   "id": "replace",
+   "label": "Card replacement",
+   "zone": "tl",
+   "code": "T59",
+   "fidelity": "L0",
+   "device": "tablet"
+  },
+  {
+   "id": "kycref",
+   "label": "KYC refresh",
+   "zone": "tl",
+   "code": "T60",
+   "fidelity": "L0",
+   "device": "tablet"
+  },
+  {
+   "id": "treceipt",
+   "label": "Teller receipt",
+   "zone": "tl",
+   "code": "T61",
+   "fidelity": "L0",
+   "device": "tablet"
+  },
+  {
+   "id": "authphone",
+   "label": "Authenticate (customer phone)",
+   "zone": "tl",
+   "code": "S299",
+   "fidelity": "L0"
+  }
+ ],
+ "taps": [
+  {
+   "from": "e-app",
+   "to": "splash"
+  },
+  {
+   "from": "e-push",
+   "to": "txn"
+  },
+  {
+   "from": "e-deep",
+   "to": "cardact"
+  },
+  {
+   "from": "e-qr",
+   "to": "qrpay"
+  },
+  {
+   "from": "splash",
+   "to": "sess",
+   "trigger": "after 1.5 s",
+   "system": "clock"
+  },
+  {
+   "from": "sess",
+   "to": "home",
+   "guard": "yes"
+  },
+  {
+   "from": "sess",
+   "to": "welcome",
+   "guard": "no"
+  },
+  {
+   "from": "welcome",
+   "to": "phone",
+   "trigger": "tap Open account"
+  },
+  {
+   "from": "welcome",
+   "to": "signin",
+   "trigger": "tap Sign in"
+  },
+  {
+   "from": "phone",
+   "to": "otp",
+   "trigger": "tap Continue"
+  },
+  {
+   "from": "otp",
+   "to": "phone",
+   "trigger": "tap Edit number",
+   "kind": "back"
+  },
+  {
+   "from": "otp",
+   "to": "idf",
+   "guard": "code correct"
+  },
+  {
+   "from": "idf",
+   "to": "idb",
+   "trigger": "take photo"
+  },
+  {
+   "from": "idb",
+   "to": "selfie",
+   "trigger": "take photo"
+  },
+  {
+   "from": "selfie",
+   "to": "kyc",
+   "guard": "check passes"
+  },
+  {
+   "from": "selfie",
+   "to": "vcall",
+   "guard": "fails 3 times",
+   "kind": "failure"
+  },
+  {
+   "from": "kyc",
+   "to": "pin",
+   "guard": "approved"
+  },
+  {
+   "from": "kyc",
+   "to": "pending",
+   "guard": "manual review"
+  },
+  {
+   "from": "kyc",
+   "to": "reject",
+   "guard": "rejected",
+   "kind": "failure"
+  },
+  {
+   "from": "pending",
+   "to": "pin",
+   "trigger": "push Approved",
+   "system": "bolt"
+  },
+  {
+   "from": "vcall",
+   "to": "pending",
+   "trigger": "tap Confirm"
+  },
+  {
+   "from": "pin",
+   "to": "bio",
+   "trigger": "PIN saved",
+   "system": "bolt"
+  },
+  {
+   "from": "bio",
+   "to": "home",
+   "trigger": "tap Enable or Skip"
+  },
+  {
+   "from": "signin",
+   "to": "home",
+   "trigger": "PIN or biometrics",
+   "guard": "accepted",
+   "system": "shield"
+  },
+  {
+   "from": "signin",
+   "to": "otp",
+   "trigger": "tap Forgot PIN"
+  },
+  {
+   "from": "signin",
+   "to": "locked",
+   "trigger": "enter PIN",
+   "guard": "5 wrong attempts",
+   "kind": "failure"
+  },
+  {
+   "from": "home",
+   "to": "acct",
+   "trigger": "tap an account"
+  },
+  {
+   "from": "acct",
+   "to": "txn",
+   "trigger": "tap a row"
+  },
+  {
+   "from": "txn",
+   "to": "dispute",
+   "trigger": "tap Dispute"
+  },
+  {
+   "from": "dispute",
+   "to": "disputed",
+   "trigger": "tap Submit"
+  },
+  {
+   "from": "t-home",
+   "to": "home"
+  },
+  {
+   "from": "t-cards",
+   "to": "cardlist"
+  },
+  {
+   "from": "t-pay",
+   "to": "payhub"
+  },
+  {
+   "from": "t-sav",
+   "to": "goals"
+  },
+  {
+   "from": "t-prof",
+   "to": "profile"
+  },
+  {
+   "from": "payhub",
+   "to": "recip",
+   "trigger": "tap Transfer",
+   "main": true
+  },
+  {
+   "from": "recip",
+   "to": "addrec",
+   "trigger": "tap New"
+  },
+  {
+   "from": "addrec",
+   "to": "name",
+   "trigger": "name check returns",
+   "system": "cloud"
+  },
+  {
+   "from": "name",
+   "to": "amount",
+   "guard": "match"
+  },
+  {
+   "from": "name",
+   "to": "mismatch",
+   "guard": "no match"
+  },
+  {
+   "from": "mismatch",
+   "to": "amount",
+   "trigger": "tap Continue anyway"
+  },
+  {
+   "from": "mismatch",
+   "to": "addrec",
+   "trigger": "tap Edit",
+   "kind": "back"
+  },
+  {
+   "from": "recip",
+   "to": "amount",
+   "trigger": "tap saved recipient",
+   "main": true
+  },
+  {
+   "from": "amount",
+   "to": "review",
+   "trigger": "tap Next",
+   "main": true
+  },
+  {
+   "from": "review",
+   "to": "over",
+   "trigger": "tap Confirm",
+   "main": true
+  },
+  {
+   "from": "over",
+   "to": "auth",
+   "guard": "under limit",
+   "main": true
+  },
+  {
+   "from": "over",
+   "to": "stepup",
+   "guard": "over limit"
+  },
+  {
+   "from": "stepup",
+   "to": "auth",
+   "guard": "code correct"
+  },
+  {
+   "from": "auth",
+   "to": "processing",
+   "guard": "accepted",
+   "main": true
+  },
+  {
+   "from": "processing",
+   "to": "success",
+   "trigger": "API answers",
+   "guard": "success",
+   "system": "cloud",
+   "main": true
+  },
+  {
+   "from": "processing",
+   "to": "failed",
+   "trigger": "API answers",
+   "guard": "failure",
+   "system": "cloud",
+   "kind": "failure"
+  },
+  {
+   "from": "failed",
+   "to": "review",
+   "trigger": "tap Try again",
+   "kind": "retry"
+  },
+  {
+   "from": "success",
+   "to": "share",
+   "trigger": "tap Share receipt"
+  },
+  {
+   "from": "success",
+   "to": "home",
+   "trigger": "tap Done",
+   "main": true
+  },
+  {
+   "from": "payhub",
+   "to": "qrpay",
+   "trigger": "tap Scan"
+  },
+  {
+   "from": "qrpay",
+   "to": "amount",
+   "trigger": "code read",
+   "system": "bolt"
+  },
+  {
+   "from": "cardlist",
+   "to": "carddetail",
+   "trigger": "tap a card"
+  },
+  {
+   "from": "carddetail",
+   "to": "freeze",
+   "trigger": "toggle Freeze"
+  },
+  {
+   "from": "freeze",
+   "to": "carddetail",
+   "trigger": "tap Confirm"
+  },
+  {
+   "from": "carddetail",
+   "to": "auth",
+   "trigger": "tap Show PIN"
+  },
+  {
+   "from": "auth",
+   "to": "reveal",
+   "guard": "accepted"
+  },
+  {
+   "from": "reveal",
+   "to": "carddetail",
+   "trigger": "after 10 s",
+   "system": "clock",
+   "kind": "back"
+  },
+  {
+   "from": "carddetail",
+   "to": "limits",
+   "trigger": "tap Limits"
+  },
+  {
+   "from": "cardlist",
+   "to": "design",
+   "trigger": "tap Order card"
+  },
+  {
+   "from": "design",
+   "to": "delivery"
+  },
+  {
+   "from": "delivery",
+   "to": "ordered"
+  },
+  {
+   "from": "cardact",
+   "to": "cardpin",
+   "trigger": "enter last 4 digits"
+  },
+  {
+   "from": "cardpin",
+   "to": "carddetail",
+   "trigger": "PIN saved",
+   "system": "bolt"
+  },
+  {
+   "from": "goals",
+   "to": "goalsetup",
+   "trigger": "tap New goal"
+  },
+  {
+   "from": "goalsetup",
+   "to": "autosave"
+  },
+  {
+   "from": "autosave",
+   "to": "goals",
+   "kind": "retry"
+  },
+  {
+   "from": "profile",
+   "to": "personal"
+  },
+  {
+   "from": "profile",
+   "to": "security"
+  },
+  {
+   "from": "profile",
+   "to": "statements"
+  },
+  {
+   "from": "profile",
+   "to": "help"
+  },
+  {
+   "from": "profile",
+   "to": "signout"
+  },
+  {
+   "from": "security",
+   "to": "changepin"
+  },
+  {
+   "from": "security",
+   "to": "trusted"
+  },
+  {
+   "from": "help",
+   "to": "chat"
+  },
+  {
+   "from": "signout",
+   "to": "welcome",
+   "trigger": "tap Confirm"
+  },
+  {
+   "from": "tsignin",
+   "to": "lookup"
+  },
+  {
+   "from": "lookup",
+   "to": "c360",
+   "guard": "customer found"
+  },
+  {
+   "from": "c360",
+   "to": "atransfer"
+  },
+  {
+   "from": "c360",
+   "to": "replace"
+  },
+  {
+   "from": "c360",
+   "to": "kycref"
+  },
+  {
+   "from": "atransfer",
+   "to": "authphone",
+   "trigger": "push to phone app",
+   "guard": "customer approves",
+   "system": "phone"
+  },
+  {
+   "from": "authphone",
+   "to": "treceipt",
+   "guard": "accepted"
+  }
+ ],
+ "buses": [
+  {
+   "trigger": "tap any tab",
+   "to": [
+    "t-home",
+    "t-cards",
+    "t-pay",
+    "t-sav",
+    "t-prof"
+   ]
+  }
+ ]
+}

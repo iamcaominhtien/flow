@@ -1,0 +1,329 @@
+{
+ "type": "explainer",
+ "shape": "sections",
+ "title": "What happens in the two seconds after you tap your card",
+ "desc": "Your tap travels down through four places and the answer comes back up; the money itself moves later. Read the numbered steps 1 to 14 in order.",
+ "sections": [
+  {
+   "shape": "layers",
+   "title": "The journey of one tap",
+   "column": "full",
+   "bands": [
+    {
+     "label": "You and the shop",
+     "tone": "blue",
+     "cards": [
+      {
+       "id": "s1",
+       "name": "You tap",
+       "text": "Your card meets the shop's card reader.",
+       "icon": "card",
+       "col": 0
+      },
+      {
+       "id": "s2",
+       "name": "The chip makes a one-time code",
+       "text": "A code that works only for this payment.",
+       "icon": "key",
+       "col": 1
+      },
+      {
+       "id": "s3",
+       "name": "The reader encrypts and sends",
+       "text": "It scrambles the details so no one can read them.",
+       "icon": "lock",
+       "col": 2
+      },
+      {
+       "id": "s13",
+       "name": "The reader beeps",
+       "text": "You see the result and walk away.",
+       "icon": "success",
+       "col": 3
+      }
+     ]
+    },
+    {
+     "label": "The shop's bank",
+     "tone": "teal",
+     "cards": [
+      {
+       "id": "s4",
+       "name": "The processor formats the request",
+       "text": "The payment processor turns it into a standard message.",
+       "icon": "gateway",
+       "col": 1
+      },
+      {
+       "id": "s5",
+       "name": "The acquirer forwards it",
+       "text": "The acquirer, the shop's bank, passes it to the card network.",
+       "icon": "server",
+       "col": 2
+      }
+     ]
+    },
+    {
+     "label": "The card network",
+     "tone": "violet",
+     "cards": [
+      {
+       "id": "s6",
+       "name": "The network swaps the token for the real card number",
+       "text": "A token is a stand-in number; the vault holds the real one.",
+       "icon": "id-card",
+       "col": 0
+      },
+      {
+       "id": "s7",
+       "name": "The network scores fraud risk",
+       "text": "A score says how unusual this payment is.",
+       "icon": "security",
+       "col": 1
+      },
+      {
+       "id": "s8",
+       "name": "The network routes to your bank",
+       "text": "The switch finds the right bank.",
+       "icon": "load-balancer",
+       "col": 2
+      }
+     ]
+    },
+    {
+     "label": "Your bank",
+     "tone": "amber",
+     "cards": [
+      {
+       "id": "s9",
+       "name": "Your bank checks the one-time code",
+       "text": "It confirms the code is genuine.",
+       "icon": "key",
+       "col": 0
+      },
+      {
+       "id": "s10",
+       "name": "Your bank checks balance and risk rules",
+       "text": "Is there enough money, and is it safe?",
+       "icon": "database",
+       "col": 1
+      },
+      {
+       "id": "s11",
+       "name": "Your bank answers approved or declined",
+       "text": "The issuer (the bank that gave you the card) decides.",
+       "icon": "success",
+       "col": 3
+      }
+     ]
+    },
+    {
+     "label": "Later that night",
+     "tone": "gray",
+     "cards": [
+      {
+       "id": "s14",
+       "name": "The money actually moves",
+       "text": "A clearing file and settlement between banks pay the shop the next day.",
+       "icon": "money",
+       "col": 3
+      }
+     ]
+    }
+   ],
+   "links": [
+    {
+     "from": "s1",
+     "to": "s2",
+     "kind": "path"
+    },
+    {
+     "from": "s2",
+     "to": "s3",
+     "kind": "path"
+    },
+    {
+     "from": "s3",
+     "to": "s4",
+     "kind": "path"
+    },
+    {
+     "from": "s4",
+     "to": "s5",
+     "kind": "path"
+    },
+    {
+     "from": "s5",
+     "to": "s6",
+     "kind": "path"
+    },
+    {
+     "from": "s6",
+     "to": "s7",
+     "kind": "path"
+    },
+    {
+     "from": "s7",
+     "to": "s8",
+     "kind": "path"
+    },
+    {
+     "from": "s8",
+     "to": "s9",
+     "kind": "path"
+    },
+    {
+     "from": "s9",
+     "to": "s10",
+     "kind": "path"
+    },
+    {
+     "from": "s10",
+     "to": "s11",
+     "kind": "path"
+    },
+    {
+     "from": "s11",
+     "to": "s13",
+     "kind": "return",
+     "label": "12 the answer travels back"
+    },
+    {
+     "from": "s11",
+     "to": "s14",
+     "kind": "step",
+     "label": "next day"
+    }
+   ],
+   "closing": "The answer takes about two seconds; the money follows a day later."
+  },
+  {
+   "shape": "analogy",
+   "column": "full",
+   "label": "It works like a restaurant order",
+   "tone": "amber",
+   "left": {
+    "name": "In a restaurant",
+    "text": "Guest orders; waiter carries it; kitchen pass; chef decides; suppliers paid weekly.",
+    "icon": "user"
+   },
+   "right": {
+    "name": "With your card",
+    "text": "You; the reader; the card network; your bank; settlement between banks.",
+    "icon": "card"
+   },
+   "link": "order goes in, answer comes out",
+   "closing": "Same flow, with a bank in place of a kitchen."
+  },
+  {
+   "shape": "comparison",
+   "title": "Three ways to pay",
+   "column": "left",
+   "left": {
+    "name": "Contactless card",
+    "text": "Tap the card.",
+    "icon": "card"
+   },
+   "right": {
+    "name": "Chip and PIN",
+    "text": "Insert and key in a PIN.",
+    "icon": "lock"
+   },
+   "rows": [
+    {
+     "label": "What proves it is you",
+     "left": "The card itself",
+     "right": "Your PIN"
+    },
+    {
+     "label": "What the shop sees",
+     "left": "Approved or declined",
+     "right": "Approved or declined"
+    },
+    {
+     "label": "Limit without a PIN",
+     "left": "A small fixed limit",
+     "right": "None; PIN each time"
+    },
+    {
+     "label": "Works offline?",
+     "left": "Rarely",
+     "right": "Sometimes"
+    },
+    {
+     "label": "Who pays if it is fraud",
+     "left": "Usually the bank",
+     "right": "Bank, unless PIN shared"
+    }
+   ],
+   "rule": {
+    "title": "Phone wallet",
+    "text": "Proof: face or fingerprint. Shop sees a token. Limit: none. Offline: rarely. Fraud: usually the bank."
+   }
+  },
+  {
+   "shape": "tree",
+   "title": "Why a payment gets declined",
+   "column": "right",
+   "names": "plain",
+   "root": {
+    "name": "Declined",
+    "text": "The bank or reader said no.",
+    "icon": "error"
+   },
+   "rows": [
+    {
+     "name": "Not enough money",
+     "text": "The balance is too low.",
+     "icon": "money",
+     "tone": "amber"
+    },
+    {
+     "name": "Looks like fraud",
+     "text": "Unusual place, unusual amount, too many taps.",
+     "icon": "warn",
+     "tone": "red"
+    },
+    {
+     "name": "Technical",
+     "text": "Reader offline, bank not answering, expired card.",
+     "icon": "server",
+     "tone": "gray"
+    },
+    {
+     "name": "Limits",
+     "text": "Daily limit, contactless limit reached.",
+     "icon": "lock",
+     "tone": "violet"
+    }
+   ]
+  },
+  {
+   "shape": "concept",
+   "title": "Numbers to remember",
+   "column": "full",
+   "hub": {
+    "name": "One tap",
+    "text": "Three numbers sum it up.",
+    "icon": "card"
+   },
+   "facts": [
+    {
+     "name": "About 2 seconds",
+     "text": "From tap to beep.",
+     "icon": "schedule"
+    },
+    {
+     "name": "4 parties",
+     "text": "Shop, shop's bank, network, your bank.",
+     "icon": "globe"
+    },
+    {
+     "name": "1 to 2 days",
+     "text": "Until the money moves.",
+     "icon": "money"
+    }
+   ]
+  }
+ ]
+}

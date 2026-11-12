@@ -1,0 +1,551 @@
+{
+ "type": "architecture",
+ "title": "Architecture: ride-hailing platform",
+ "desc": "Clients reach core services through the edge; trips are matched synchronously and announced through a Kafka backbone into data stores and notifications.",
+ "zones": [
+  {
+   "id": "clients",
+   "label": "Clients",
+   "tone": "blue"
+  },
+  {
+   "id": "edge",
+   "label": "Edge",
+   "tone": "violet"
+  },
+  {
+   "id": "core",
+   "label": "Core services",
+   "tone": "green"
+  },
+  {
+   "id": "async",
+   "label": "Async backbone",
+   "tone": "violet"
+  },
+  {
+   "id": "data",
+   "label": "Data",
+   "tone": "amber"
+  },
+  {
+   "id": "platform",
+   "label": "Platform",
+   "tone": "teal"
+  },
+  {
+   "id": "external",
+   "label": "External",
+   "tone": "gray",
+   "beside": "core"
+  }
+ ],
+ "components": [
+  {
+   "id": "rider",
+   "label": "Rider app",
+   "detail": "iOS/Android",
+   "icon": "phone",
+   "zone": "clients"
+  },
+  {
+   "id": "driver",
+   "label": "Driver app",
+   "detail": "mobile",
+   "icon": "phone",
+   "zone": "clients"
+  },
+  {
+   "id": "ops",
+   "label": "Ops web console",
+   "detail": "web",
+   "icon": "browser",
+   "zone": "clients"
+  },
+  {
+   "id": "partner",
+   "label": "Partner API clients",
+   "detail": "REST",
+   "icon": "code",
+   "zone": "clients"
+  },
+  {
+   "id": "cdn",
+   "label": "CDN",
+   "detail": "static, caching",
+   "icon": "cdn",
+   "zone": "edge"
+  },
+  {
+   "id": "waf",
+   "label": "WAF",
+   "detail": "filtering",
+   "icon": "firewall-waf",
+   "zone": "edge"
+  },
+  {
+   "id": "gw",
+   "label": "API Gateway",
+   "detail": "routing, limits",
+   "icon": "api-gateway",
+   "zone": "edge"
+  },
+  {
+   "id": "wsgw",
+   "label": "WebSocket Gateway",
+   "detail": "live connections",
+   "icon": "gateway",
+   "zone": "edge"
+  },
+  {
+   "id": "identity",
+   "label": "Identity",
+   "detail": "auth, sessions",
+   "icon": "identity-iam",
+   "zone": "core"
+  },
+  {
+   "id": "riderp",
+   "label": "Rider profile",
+   "detail": "accounts",
+   "icon": "user",
+   "zone": "core"
+  },
+  {
+   "id": "driverp",
+   "label": "Driver profile",
+   "detail": "accounts",
+   "icon": "id-card",
+   "zone": "core"
+  },
+  {
+   "id": "trip",
+   "label": "Trip",
+   "detail": "trip lifecycle",
+   "icon": "server",
+   "zone": "core"
+  },
+  {
+   "id": "matching",
+   "label": "Matching",
+   "detail": "driver to rider",
+   "icon": "target",
+   "zone": "core"
+  },
+  {
+   "id": "pricing",
+   "label": "Pricing",
+   "detail": "fares",
+   "icon": "money",
+   "zone": "core"
+  },
+  {
+   "id": "routing",
+   "label": "Routing/ETA",
+   "detail": "routes",
+   "icon": "pin",
+   "zone": "core"
+  },
+  {
+   "id": "payments",
+   "label": "Payments",
+   "detail": "charges",
+   "icon": "card",
+   "zone": "core"
+  },
+  {
+   "id": "promos",
+   "label": "Promotions",
+   "detail": "codes, offers",
+   "icon": "flag",
+   "zone": "core"
+  },
+  {
+   "id": "notif",
+   "label": "Notifications",
+   "detail": "push, SMS",
+   "icon": "bell",
+   "zone": "core"
+  },
+  {
+   "id": "support",
+   "label": "Support",
+   "detail": "tickets",
+   "icon": "chat",
+   "zone": "core"
+  },
+  {
+   "id": "registry",
+   "label": "Schema Registry",
+   "detail": "event schemas",
+   "icon": "json",
+   "zone": "async"
+  },
+  {
+   "id": "flink",
+   "label": "Stream processor",
+   "detail": "Flink",
+   "icon": "pipeline",
+   "zone": "async"
+  },
+  {
+   "id": "dlq",
+   "label": "Dead-letter queue",
+   "detail": "failed messages",
+   "icon": "queue",
+   "zone": "async"
+  },
+  {
+   "id": "kafka",
+   "label": "Kafka",
+   "detail": "trip-events, location-stream, payment-events",
+   "icon": "event-stream",
+   "zone": "async"
+  },
+  {
+   "id": "pg",
+   "label": "Postgres",
+   "detail": "trips, payments",
+   "icon": "sql-database",
+   "zone": "data"
+  },
+  {
+   "id": "redis",
+   "label": "Redis",
+   "detail": "geo index, sessions",
+   "icon": "in-memory-cache",
+   "zone": "data"
+  },
+  {
+   "id": "cass",
+   "label": "Cassandra",
+   "detail": "location history",
+   "icon": "nosql-database",
+   "zone": "data"
+  },
+  {
+   "id": "es",
+   "label": "Elasticsearch",
+   "detail": "support search",
+   "icon": "search",
+   "zone": "data"
+  },
+  {
+   "id": "lake",
+   "label": "S3 data lake",
+   "detail": "events archive",
+   "icon": "data-lake",
+   "zone": "data"
+  },
+  {
+   "id": "snow",
+   "label": "Snowflake",
+   "detail": "warehouse",
+   "icon": "data-warehouse",
+   "zone": "data"
+  },
+  {
+   "id": "k8s",
+   "label": "Kubernetes",
+   "detail": "orchestration",
+   "icon": "kubernetes",
+   "zone": "platform"
+  },
+  {
+   "id": "mesh",
+   "label": "Service mesh",
+   "detail": "mTLS, routing",
+   "icon": "private-network",
+   "zone": "platform"
+  },
+  {
+   "id": "vault",
+   "label": "Vault",
+   "detail": "secrets",
+   "icon": "secrets",
+   "zone": "platform"
+  },
+  {
+   "id": "obs",
+   "label": "Observability",
+   "detail": "Prometheus, Loki, Tempo",
+   "icon": "monitoring",
+   "zone": "platform"
+  },
+  {
+   "id": "flags",
+   "label": "Feature flags",
+   "detail": "rollouts",
+   "icon": "flag",
+   "zone": "platform"
+  },
+  {
+   "id": "card",
+   "label": "Card processor",
+   "detail": "card network",
+   "icon": "card",
+   "zone": "external"
+  },
+  {
+   "id": "maps",
+   "label": "Maps provider",
+   "detail": "maps, traffic",
+   "icon": "globe",
+   "zone": "external"
+  },
+  {
+   "id": "push",
+   "label": "SMS/Push provider",
+   "detail": "delivery",
+   "icon": "mail",
+   "zone": "external"
+  },
+  {
+   "id": "kyc",
+   "label": "Identity verification",
+   "detail": "KYC",
+   "icon": "approved-doc",
+   "zone": "external"
+  }
+ ],
+ "links": [
+  {
+   "from": "rider",
+   "to": "cdn",
+   "label": "HTTPS",
+   "main": true
+  },
+  {
+   "from": "driver",
+   "to": "cdn",
+   "label": "HTTPS"
+  },
+  {
+   "from": "ops",
+   "to": "cdn",
+   "label": "HTTPS"
+  },
+  {
+   "from": "partner",
+   "to": "cdn",
+   "label": "HTTPS"
+  },
+  {
+   "from": "cdn",
+   "to": "waf",
+   "label": "forward",
+   "main": true
+  },
+  {
+   "from": "waf",
+   "to": "gw",
+   "label": "filtered",
+   "main": true
+  },
+  {
+   "from": "rider",
+   "to": "wsgw",
+   "label": "WebSocket"
+  },
+  {
+   "from": "driver",
+   "to": "wsgw",
+   "label": "WebSocket"
+  },
+  {
+   "from": "gw",
+   "to": "identity",
+   "label": "auth every request"
+  },
+  {
+   "from": "gw",
+   "to": "riderp",
+   "label": "route"
+  },
+  {
+   "from": "gw",
+   "to": "driverp",
+   "label": "route"
+  },
+  {
+   "from": "gw",
+   "to": "trip",
+   "label": "route",
+   "main": true
+  },
+  {
+   "from": "gw",
+   "to": "payments",
+   "label": "route"
+  },
+  {
+   "from": "gw",
+   "to": "promos",
+   "label": "route"
+  },
+  {
+   "from": "gw",
+   "to": "support",
+   "label": "route"
+  },
+  {
+   "from": "trip",
+   "to": "matching",
+   "label": "match",
+   "main": true
+  },
+  {
+   "from": "trip",
+   "to": "pricing",
+   "label": "price"
+  },
+  {
+   "from": "trip",
+   "to": "routing",
+   "label": "route and ETA"
+  },
+  {
+   "from": "matching",
+   "to": "redis",
+   "label": "read geo index"
+  },
+  {
+   "from": "routing",
+   "to": "maps",
+   "label": "maps"
+  },
+  {
+   "from": "pricing",
+   "to": "promos",
+   "label": "discounts"
+  },
+  {
+   "from": "payments",
+   "to": "card",
+   "label": "charge"
+  },
+  {
+   "from": "driverp",
+   "to": "kyc",
+   "label": "verify"
+  },
+  {
+   "from": "notif",
+   "to": "push",
+   "label": "send",
+   "main": true
+  },
+  {
+   "from": "push",
+   "to": "driver",
+   "label": "push",
+   "main": true
+  },
+  {
+   "from": "wsgw",
+   "to": "kafka",
+   "label": "locations",
+   "kind": "event"
+  },
+  {
+   "from": "kafka",
+   "to": "flink",
+   "label": "location-stream",
+   "kind": "event"
+  },
+  {
+   "from": "flink",
+   "to": "redis",
+   "label": "geo index",
+   "kind": "event"
+  },
+  {
+   "from": "flink",
+   "to": "cass",
+   "label": "history",
+   "kind": "event"
+  },
+  {
+   "from": "trip",
+   "to": "kafka",
+   "label": "trip-events",
+   "kind": "event"
+  },
+  {
+   "from": "payments",
+   "to": "kafka",
+   "label": "payment-events",
+   "kind": "event"
+  },
+  {
+   "from": "matching",
+   "to": "kafka",
+   "label": "publish",
+   "kind": "event",
+   "main": true
+  },
+  {
+   "from": "kafka",
+   "to": "notif",
+   "label": "consume",
+   "kind": "event",
+   "main": true
+  },
+  {
+   "from": "kafka",
+   "to": "support",
+   "label": "consume",
+   "kind": "event"
+  },
+  {
+   "from": "kafka",
+   "to": "payments",
+   "label": "consume",
+   "kind": "event"
+  },
+  {
+   "from": "kafka",
+   "to": "dlq",
+   "label": "failed",
+   "kind": "event"
+  },
+  {
+   "from": "kafka",
+   "to": "registry",
+   "label": "schema check",
+   "kind": "copy"
+  },
+  {
+   "from": "kafka",
+   "to": "lake",
+   "label": "sink",
+   "kind": "copy"
+  },
+  {
+   "from": "lake",
+   "to": "snow",
+   "label": "nightly load",
+   "kind": "copy"
+  },
+  {
+   "from": "trip",
+   "to": "pg",
+   "label": "own"
+  },
+  {
+   "from": "payments",
+   "to": "pg",
+   "label": "own"
+  },
+  {
+   "from": "identity",
+   "to": "redis",
+   "label": "sessions"
+  },
+  {
+   "from": "support",
+   "to": "es",
+   "label": "index"
+  }
+ ]
+}

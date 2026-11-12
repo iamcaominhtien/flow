@@ -1,0 +1,21 @@
+{"type":"wireframe","title":"New chart flow: phone","desc":"Three phone screens","screens":[
+{"id":"1","label":"Choose metric","device":"phone","blocks":[
+{"kind":"navbar","id":"n1","text":"New chart","back":true},
+{"kind":"search_bar","id":"s1","text":"Search metrics"},
+{"kind":"list_item","id":"m1","text":"MRR","detail":"Monthly recurring revenue","trail":"link","tap":true},
+{"kind":"list_item","id":"m2","text":"Churn","detail":"Customers lost"},
+{"kind":"list_item","id":"m3","text":"ARPA","detail":"Revenue per account"},
+{"kind":"list_item","id":"m4","text":"New customers","detail":"Signups"}],
+"annotations":[{"target":"s1","corner":"tr","title":"Search metrics","text":"Filters the list as you type.","number":12}]},
+{"id":"2","label":"Choose chart type","device":"phone","blocks":[
+{"kind":"navbar","id":"n2","text":"Chart type","back":true},
+{"kind":"card","id":"c1","col":1,"span":6,"text":"Line","tap":true},{"kind":"card","id":"c2","col":7,"span":6,"text":"Bar"},
+{"kind":"card","id":"c3","col":1,"span":6,"text":"Area"},{"kind":"card","id":"c4","col":7,"span":6,"text":"Donut"},
+{"kind":"card","id":"c5","col":1,"span":6,"text":"Table"},{"kind":"card","id":"c6","col":7,"span":6,"text":"Number"}]},
+{"id":"3","label":"Preview and save","device":"phone","blocks":[
+{"kind":"navbar","id":"n3","text":"Preview","back":true},
+{"kind":"chart","id":"ch","values":[3,4,5,6,7,8],"height":140},
+{"kind":"form_field","id":"nm","text":"Chart name","value":"MRR by month"},
+{"kind":"button","id":"sv","text":"Save","style":"primary","anchor":"bottom"},
+{"kind":"button","id":"cn","text":"Cancel","style":"secondary"}]}
+]}

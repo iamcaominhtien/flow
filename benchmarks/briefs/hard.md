@@ -2,6 +2,19 @@
 
 One hard brief for each of the 21 diagram types of the plugin. Written for this repository (not by the research tool) to stress each type's layout: many elements, hubs, loops, long names, and Vietnamese text in four of them. It is **not** read by `check_briefs.py`. The counts in `Must show` were written by hand with the brief and were not recounted by a script. No domain detail was checked against a source.
 
+First run: [`../results/2026-11-12-hard-set-sonnet.md`](../results/2026-11-12-hard-set-sonnet.md).
+
+Faults in these briefs, found by the first run. The brief text is left as it was run; fix it before a second run.
+
+- **org-chart:** says 62 positions; the text lists 58 (3 + 7 + 22 + 19 + 7). `Must show` counts the store managers twice.
+- **architecture:** says 34 components; the lists add up to 38.
+- **er:** says 26 tables; the text lists 27.
+- **gantt:** four dependencies contradict the dates (the later task starts before the earlier one ends): Target architecture and Data model mapping after Current-state analysis, Security design after Target architecture, System integration test after Integration layer build. The build refuses them. There are 41 tasks and 6 milestones, 47 rows, not 46.
+- **roadmap:** 39 items (40 bars), not 40; 7 dependency sentences, 8 arrows.
+- **mind-map:** the agent counted 83 nodes; `Must show` says about 95. Not recounted.
+- **usecase:** the agent counted 31 use cases; `Must show` says 16 and 14. Says "three system actors" and lists four.
+- **dfd:** the agent counted 56 flows; `Must show` says 55. Not recounted.
+
 How to run: give a fresh agent only the text under `Brief` and the skill of the type, as in the [README](README.md). `Must show` is for the reviewer.
 
 ---

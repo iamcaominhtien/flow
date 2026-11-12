@@ -1,0 +1,546 @@
+{
+ "type": "dfd",
+ "level": 1,
+ "title": "Level 1: hospital pharmacy system",
+ "desc": "Prescriptions flow from the prescriber through checking, verification, dispensing and packing to the nurse, who records administration.",
+ "elements": [
+  {
+   "id": "presc",
+   "label": "Prescriber",
+   "kind": "external",
+   "at": [
+    1,
+    0
+   ]
+  },
+  {
+   "id": "nurse",
+   "label": "Nurse",
+   "kind": "external",
+   "at": [
+    2,
+    0
+   ]
+  },
+  {
+   "id": "patient",
+   "label": "Patient",
+   "kind": "external",
+   "at": [
+    3,
+    0
+   ]
+  },
+  {
+   "id": "whole",
+   "label": "Wholesaler",
+   "kind": "external",
+   "at": [
+    4,
+    6
+   ]
+  },
+  {
+   "id": "ins",
+   "label": "Health insurer",
+   "kind": "external",
+   "at": [
+    3,
+    6
+   ]
+  },
+  {
+   "id": "reg",
+   "label": "Drug regulator",
+   "kind": "external",
+   "at": [
+    6,
+    6
+   ]
+  },
+  {
+   "id": "fin",
+   "label": "Hospital finance system",
+   "kind": "external",
+   "at": [
+    4,
+    7
+   ]
+  },
+  {
+   "id": "cab",
+   "label": "Ward dispensing cabinet",
+   "kind": "external",
+   "at": [
+    4,
+    1
+   ]
+  },
+  {
+   "id": "p1",
+   "label": "Receive prescription",
+   "at": [
+    1,
+    2
+   ]
+  },
+  {
+   "id": "p2",
+   "label": "Check interactions and allergies",
+   "at": [
+    1,
+    3
+   ]
+  },
+  {
+   "id": "p3",
+   "label": "Verify by pharmacist",
+   "at": [
+    1,
+    4
+   ]
+  },
+  {
+   "id": "p4",
+   "label": "Dispense medication",
+   "at": [
+    2,
+    4
+   ]
+  },
+  {
+   "id": "p5",
+   "label": "Label and pack",
+   "at": [
+    2,
+    3
+   ]
+  },
+  {
+   "id": "p6",
+   "label": "Record administration",
+   "at": [
+    3,
+    2
+   ]
+  },
+  {
+   "id": "p7",
+   "label": "Manage stock",
+   "at": [
+    4,
+    3
+   ]
+  },
+  {
+   "id": "p8",
+   "label": "Order from wholesaler",
+   "at": [
+    4,
+    4
+   ]
+  },
+  {
+   "id": "p9",
+   "label": "Receive goods",
+   "at": [
+    5,
+    4
+   ]
+  },
+  {
+   "id": "p10",
+   "label": "Handle controlled drugs",
+   "at": [
+    2,
+    5
+   ]
+  },
+  {
+   "id": "p11",
+   "label": "Bill and claim",
+   "at": [
+    3,
+    4
+   ]
+  },
+  {
+   "id": "p12",
+   "label": "Report adverse events and recalls",
+   "at": [
+    5,
+    2
+   ]
+  },
+  {
+   "id": "d1",
+   "label": "Prescriptions",
+   "kind": "store",
+   "at": [
+    0,
+    2
+   ]
+  },
+  {
+   "id": "d2",
+   "label": "Patient medication record",
+   "kind": "store",
+   "at": [
+    4,
+    2
+   ]
+  },
+  {
+   "id": "d3",
+   "label": "Drug formulary",
+   "kind": "store",
+   "at": [
+    2,
+    2
+   ]
+  },
+  {
+   "id": "d4",
+   "label": "Interaction rules",
+   "kind": "store",
+   "at": [
+    0,
+    3
+   ]
+  },
+  {
+   "id": "d5",
+   "label": "Stock ledger",
+   "kind": "store",
+   "at": [
+    3,
+    3
+   ]
+  },
+  {
+   "id": "d6",
+   "label": "Purchase orders",
+   "kind": "store",
+   "at": [
+    4,
+    5
+   ]
+  },
+  {
+   "id": "d7",
+   "label": "Controlled drugs register",
+   "kind": "store",
+   "at": [
+    2,
+    6
+   ]
+  },
+  {
+   "id": "d8",
+   "label": "Claims",
+   "kind": "store",
+   "at": [
+    3,
+    5
+   ]
+  },
+  {
+   "id": "d9",
+   "label": "Audit log",
+   "kind": "store",
+   "at": [
+    1,
+    5
+   ]
+  }
+ ],
+ "flows": [
+  {
+   "from": "presc",
+   "to": "p1",
+   "label": "prescription",
+   "main": true
+  },
+  {
+   "from": "p1",
+   "to": "d1",
+   "label": "new prescription"
+  },
+  {
+   "from": "p1",
+   "to": "p2",
+   "label": "prescription to check",
+   "main": true
+  },
+  {
+   "from": "d2",
+   "to": "p2",
+   "label": "allergies and current drugs"
+  },
+  {
+   "from": "d3",
+   "to": "p2",
+   "label": "drug details"
+  },
+  {
+   "from": "d4",
+   "to": "p2",
+   "label": "interaction rules"
+  },
+  {
+   "from": "p2",
+   "to": "presc",
+   "label": "interaction alert"
+  },
+  {
+   "from": "p2",
+   "to": "p3",
+   "label": "checked prescription",
+   "main": true
+  },
+  {
+   "from": "presc",
+   "to": "p3",
+   "label": "override reason"
+  },
+  {
+   "from": "p3",
+   "to": "d1",
+   "label": "verification status"
+  },
+  {
+   "from": "p3",
+   "to": "p4",
+   "label": "approved order",
+   "main": true
+  },
+  {
+   "from": "p3",
+   "to": "presc",
+   "label": "rejection with reason"
+  },
+  {
+   "from": "d5",
+   "to": "p4",
+   "label": "stock availability"
+  },
+  {
+   "from": "p4",
+   "to": "d5",
+   "label": "stock decrement"
+  },
+  {
+   "from": "p4",
+   "to": "p5",
+   "label": "items to pack",
+   "main": true
+  },
+  {
+   "from": "p5",
+   "to": "nurse",
+   "label": "labelled medication",
+   "main": true
+  },
+  {
+   "from": "p5",
+   "to": "cab",
+   "label": "cabinet refill list"
+  },
+  {
+   "from": "cab",
+   "to": "p7",
+   "label": "cabinet stock levels"
+  },
+  {
+   "from": "p5",
+   "to": "patient",
+   "label": "discharge medication and leaflet"
+  },
+  {
+   "from": "nurse",
+   "to": "p6",
+   "label": "administration scan",
+   "main": true
+  },
+  {
+   "from": "p6",
+   "to": "d2",
+   "label": "administration record"
+  },
+  {
+   "from": "p6",
+   "to": "presc",
+   "label": "missed dose alert"
+  },
+  {
+   "from": "patient",
+   "to": "p6",
+   "label": "self-reported reaction"
+  },
+  {
+   "from": "p4",
+   "to": "p10",
+   "label": "controlled item request"
+  },
+  {
+   "from": "p10",
+   "to": "d7",
+   "label": "register entry"
+  },
+  {
+   "from": "nurse",
+   "to": "p10",
+   "label": "witness signature"
+  },
+  {
+   "from": "p10",
+   "to": "p4",
+   "label": "release authorisation"
+  },
+  {
+   "from": "p10",
+   "to": "reg",
+   "label": "controlled drugs return"
+  },
+  {
+   "from": "d5",
+   "to": "p7",
+   "label": "stock levels"
+  },
+  {
+   "from": "p7",
+   "to": "p8",
+   "label": "reorder request"
+  },
+  {
+   "from": "d3",
+   "to": "p8",
+   "label": "preferred supplier"
+  },
+  {
+   "from": "p8",
+   "to": "d6",
+   "label": "purchase order"
+  },
+  {
+   "from": "p8",
+   "to": "whole",
+   "label": "order"
+  },
+  {
+   "from": "whole",
+   "to": "p9",
+   "label": "delivery note and goods data"
+  },
+  {
+   "from": "d6",
+   "to": "p9",
+   "label": "expected order"
+  },
+  {
+   "from": "p9",
+   "to": "d5",
+   "label": "stock receipt"
+  },
+  {
+   "from": "p9",
+   "to": "p10",
+   "label": "controlled drugs received"
+  },
+  {
+   "from": "p9",
+   "to": "fin",
+   "label": "goods received note"
+  },
+  {
+   "from": "p4",
+   "to": "p11",
+   "label": "dispensed items"
+  },
+  {
+   "from": "d2",
+   "to": "p11",
+   "label": "patient cover details"
+  },
+  {
+   "from": "p11",
+   "to": "d8",
+   "label": "claim"
+  },
+  {
+   "from": "p11",
+   "to": "ins",
+   "label": "claim"
+  },
+  {
+   "from": "ins",
+   "to": "p11",
+   "label": "remittance or rejection"
+  },
+  {
+   "from": "p11",
+   "to": "fin",
+   "label": "charges"
+  },
+  {
+   "from": "p11",
+   "to": "patient",
+   "label": "co-payment invoice"
+  },
+  {
+   "from": "nurse",
+   "to": "p12",
+   "label": "adverse event report"
+  },
+  {
+   "from": "p6",
+   "to": "p12",
+   "label": "reaction record"
+  },
+  {
+   "from": "reg",
+   "to": "p12",
+   "label": "recall notice"
+  },
+  {
+   "from": "p12",
+   "to": "d3",
+   "label": "formulary update"
+  },
+  {
+   "from": "p12",
+   "to": "p7",
+   "label": "quarantine instruction"
+  },
+  {
+   "from": "p12",
+   "to": "reg",
+   "label": "adverse event submission"
+  },
+  {
+   "from": "p12",
+   "to": "presc",
+   "label": "recall alert"
+  },
+  {
+   "from": "p3",
+   "to": "d9",
+   "label": "audit entry"
+  },
+  {
+   "from": "p4",
+   "to": "d9",
+   "label": "audit entry"
+  },
+  {
+   "from": "p10",
+   "to": "d9",
+   "label": "audit entry"
+  },
+  {
+   "from": "p11",
+   "to": "d9",
+   "label": "audit entry"
+  }
+ ]
+}

@@ -1,0 +1,313 @@
+{
+ "type": "roadmap",
+ "title": "Roadmap 2027 Q1 to 2028 Q2",
+ "periods": [
+  {
+   "label": "27Q1"
+  },
+  {
+   "label": "27Q2"
+  },
+  {
+   "label": "27Q3"
+  },
+  {
+   "label": "27Q4"
+  },
+  {
+   "label": "28Q1"
+  },
+  {
+   "label": "28Q2"
+  }
+ ],
+ "lanes": [
+  {
+   "label": "Platform",
+   "tone": "blue",
+   "icon": "cloud",
+   "items": [
+    {
+     "label": "Kubernetes 1.34 upgrade",
+     "period": 0,
+     "length": 1,
+     "detail": "done"
+    },
+    {
+     "label": "Multi-region failover",
+     "period": 0,
+     "length": 3,
+     "detail": "in progress",
+     "id": "failover"
+    },
+    {
+     "label": "Cost dashboards",
+     "period": 1,
+     "length": 1,
+     "detail": "in progress"
+    },
+    {
+     "label": "Zero-trust network",
+     "period": 2,
+     "length": 3,
+     "detail": "planned",
+     "id": "zerotrust"
+    },
+    {
+     "label": "Developer portal v2",
+     "period": 3,
+     "length": 1,
+     "detail": "planned"
+    },
+    {
+     "label": "ARM migration",
+     "period": 4,
+     "length": 2,
+     "detail": "planned"
+    },
+    {
+     "label": "Chaos testing programme",
+     "period": 5,
+     "length": 1,
+     "detail": "planned"
+    }
+   ]
+  },
+  {
+   "label": "Payments",
+   "tone": "green",
+   "icon": "money",
+   "items": [
+    {
+     "label": "PSD3 readiness",
+     "period": 0,
+     "length": 2,
+     "detail": "in progress"
+    },
+    {
+     "label": "Instant payouts",
+     "period": 1,
+     "length": 2,
+     "detail": "at risk",
+     "depends_on": "ledger"
+    },
+    {
+     "label": "Multi-currency wallets",
+     "period": 2,
+     "length": 2,
+     "detail": "planned"
+    },
+    {
+     "label": "Dispute automation",
+     "period": 3,
+     "length": 1,
+     "detail": "planned"
+    },
+    {
+     "label": "Buy now, pay later pilot",
+     "period": 4,
+     "length": 1,
+     "detail": "planned"
+    },
+    {
+     "label": "Ledger v3",
+     "period": 0,
+     "length": 6,
+     "detail": "in progress",
+     "id": "ledger"
+    }
+   ]
+  },
+  {
+   "label": "Growth",
+   "tone": "amber",
+   "icon": "chart",
+   "items": [
+    {
+     "label": "Onboarding redesign",
+     "period": 0,
+     "length": 1,
+     "detail": "done"
+    },
+    {
+     "label": "Referral programme",
+     "period": 1,
+     "length": 1,
+     "detail": "in progress"
+    },
+    {
+     "label": "Pricing experiments",
+     "period": 1,
+     "length": 2,
+     "detail": "in progress"
+    },
+    {
+     "label": "Localisation: Vietnam, Thailand, Indonesia",
+     "period": 2,
+     "length": 3,
+     "detail": "planned"
+    },
+    {
+     "label": "Self-serve upgrade",
+     "period": 3,
+     "length": 1,
+     "detail": "planned"
+    },
+    {
+     "label": "Lifecycle messaging",
+     "period": 4,
+     "length": 2,
+     "detail": "planned"
+    }
+   ]
+  },
+  {
+   "label": "Mobile",
+   "tone": "violet",
+   "icon": "phone",
+   "items": [
+    {
+     "label": "Offline mode",
+     "period": 0,
+     "length": 2,
+     "detail": "at risk"
+    },
+    {
+     "label": "Design system 3.0",
+     "period": 0,
+     "length": 3,
+     "detail": "in progress"
+    },
+    {
+     "label": "Passkeys",
+     "period": 1,
+     "length": 1,
+     "detail": "planned"
+    },
+    {
+     "label": "Tablet layout",
+     "period": 2,
+     "length": 1,
+     "detail": "planned"
+    },
+    {
+     "label": "Widgets and live activities",
+     "period": 3,
+     "length": 1,
+     "detail": "planned"
+    },
+    {
+     "label": "React Native to native rewrite",
+     "period": 3,
+     "length": 3,
+     "detail": "planned"
+    },
+    {
+     "label": "Accessibility audit fixes",
+     "period": 4,
+     "length": 1,
+     "detail": "planned"
+    }
+   ]
+  },
+  {
+   "label": "Data and AI",
+   "tone": "teal",
+   "icon": "chart",
+   "items": [
+    {
+     "label": "Event schema registry",
+     "period": 0,
+     "length": 1,
+     "detail": "done"
+    },
+    {
+     "label": "Feature store",
+     "period": 0,
+     "length": 2,
+     "detail": "in progress"
+    },
+    {
+     "label": "Fraud model v2",
+     "period": 1,
+     "length": 2,
+     "detail": "in progress"
+    },
+    {
+     "label": "Assistant for support agents",
+     "period": 2,
+     "length": 2,
+     "detail": "planned"
+    },
+    {
+     "label": "Forecasting service",
+     "period": 3,
+     "length": 2,
+     "detail": "planned"
+    },
+    {
+     "label": "Customer-facing assistant",
+     "period": 4,
+     "length": 2,
+     "detail": "planned"
+    },
+    {
+     "label": "Model governance",
+     "period": 1,
+     "length": 5,
+     "detail": "in progress"
+    }
+   ]
+  },
+  {
+   "label": "Security and compliance",
+   "tone": "red",
+   "icon": "shield",
+   "items": [
+    {
+     "label": "SOC 2 Type II audit",
+     "period": 0,
+     "length": 2,
+     "detail": "in progress"
+    },
+    {
+     "label": "Secrets rotation",
+     "period": 0,
+     "length": 1,
+     "detail": "done"
+    },
+    {
+     "label": "ISO 27001 certification",
+     "period": 2,
+     "length": 2,
+     "detail": "planned"
+    },
+    {
+     "label": "Bug bounty launch",
+     "period": 2,
+     "length": 1,
+     "detail": "planned"
+    },
+    {
+     "label": "Data residency controls",
+     "period": 3,
+     "length": 2,
+     "detail": "planned"
+    },
+    {
+     "label": "Penetration test",
+     "period": 1,
+     "length": 1,
+     "detail": "planned"
+    },
+    {
+     "label": "Penetration test (repeat)",
+     "period": 5,
+     "length": 1,
+     "detail": "planned"
+    }
+   ]
+  }
+ ],
+ "note": "Only one dependency is drawn: Instant payouts needs Ledger v3. Not drawn: CONFLICT, Passkeys (27Q2) needs Zero-trust network (starts 27Q3), which points backwards in time; Multi-currency wallets needs Multi-region failover; Fraud model v2 needs Feature store; Customer-facing assistant needs Assistant for support agents and Model governance; Localisation needs Multi-currency wallets; Data residency controls needs Multi-region failover. Milestones: Series C close (end 27Q2), SOC 2 report issued (end 27Q2), Vietnam launch (end 27Q4), Annual conference (middle 28Q1). Today: middle of 27Q2."
+}

@@ -1,0 +1,518 @@
+{
+ "type": "c4",
+ "title": "Level 2, containers: Internet Banking System",
+ "desc": "What runs inside the Internet Banking System and what it talks to.",
+ "opens": {
+  "label": "Internet Banking System",
+  "tone": "violet"
+ },
+ "elements": [
+  {
+   "id": "retail",
+   "label": "Retail customer",
+   "kind": "person",
+   "description": "Banks online."
+  },
+  {
+   "id": "business",
+   "label": "Business customer",
+   "kind": "person",
+   "description": "Manages company accounts."
+  },
+  {
+   "id": "agent",
+   "label": "Customer support agent",
+   "kind": "person",
+   "description": "Helps customers."
+  },
+  {
+   "id": "fraud_an",
+   "label": "Fraud analyst",
+   "kind": "person",
+   "description": "Reviews fraud cases."
+  },
+  {
+   "id": "ops",
+   "label": "Bank operations engineer",
+   "kind": "person",
+   "description": "Runs batch jobs."
+  },
+  {
+   "id": "web",
+   "label": "Web application",
+   "kind": "container",
+   "technology": "React SPA",
+   "description": "Banking in the browser.",
+   "icon": "browser"
+  },
+  {
+   "id": "mobile",
+   "label": "Mobile app",
+   "kind": "container",
+   "technology": "Kotlin and Swift",
+   "description": "Banking on the phone.",
+   "icon": "phone"
+  },
+  {
+   "id": "backoffice",
+   "label": "Backoffice portal",
+   "kind": "container",
+   "technology": "Angular",
+   "description": "Support and fraud tooling.",
+   "icon": "admin"
+  },
+  {
+   "id": "gw",
+   "label": "API Gateway",
+   "kind": "container",
+   "technology": "Kong",
+   "description": "Authentication, rate limits, routing.",
+   "icon": "api-gateway"
+  },
+  {
+   "id": "bff",
+   "label": "Backend for frontend",
+   "kind": "container",
+   "technology": "Node.js GraphQL",
+   "description": "Shapes data for web and mobile."
+  },
+  {
+   "id": "accounts",
+   "label": "Accounts service",
+   "kind": "container",
+   "technology": "Java Spring Boot",
+   "description": "Balances and statements."
+  },
+  {
+   "id": "payments",
+   "label": "Payments service",
+   "kind": "container",
+   "technology": "Go",
+   "description": "Transfers, standing orders, SEPA and SWIFT files."
+  },
+  {
+   "id": "cards",
+   "label": "Cards service",
+   "kind": "container",
+   "technology": "Java",
+   "description": "Card controls, PIN change, tokenisation."
+  },
+  {
+   "id": "onboarding",
+   "label": "Onboarding service",
+   "kind": "container",
+   "technology": "Python FastAPI",
+   "description": "KYC and account opening."
+  },
+  {
+   "id": "fraudsvc",
+   "label": "Fraud detection service",
+   "kind": "container",
+   "technology": "Python",
+   "description": "Real-time scoring, case management."
+  },
+  {
+   "id": "notif",
+   "label": "Notification service",
+   "kind": "container",
+   "technology": "Node.js",
+   "description": "Email, SMS, push."
+  },
+  {
+   "id": "bus",
+   "label": "Event bus",
+   "kind": "container",
+   "technology": "Apache Kafka",
+   "description": "Domain events.",
+   "icon": "event-stream"
+  },
+  {
+   "id": "batch",
+   "label": "Batch scheduler",
+   "kind": "container",
+   "technology": "Airflow",
+   "description": "End-of-day jobs.",
+   "icon": "batch-scheduler"
+  },
+  {
+   "id": "opdb",
+   "label": "Operational database",
+   "kind": "database",
+   "technology": "PostgreSQL",
+   "description": "Accounts, payments, cards, one schema per service."
+  },
+  {
+   "id": "docs",
+   "label": "Document store",
+   "kind": "database",
+   "technology": "MongoDB",
+   "description": "KYC documents metadata."
+  },
+  {
+   "id": "cache",
+   "label": "Cache",
+   "kind": "database",
+   "technology": "Redis",
+   "description": "Sessions and rate limits."
+  },
+  {
+   "id": "objs",
+   "label": "Object storage",
+   "kind": "database",
+   "technology": "S3-compatible",
+   "description": "Statements as PDF, KYC scans."
+  },
+  {
+   "id": "dwh",
+   "label": "Analytics warehouse",
+   "kind": "database",
+   "technology": "Snowflake",
+   "description": "Reporting."
+  },
+  {
+   "id": "core",
+   "label": "Core Banking Mainframe",
+   "kind": "external",
+   "description": "IBM z/OS, the ledger of record."
+  },
+  {
+   "id": "cardproc",
+   "label": "Card processor",
+   "kind": "external",
+   "description": "Processes card transactions."
+  },
+  {
+   "id": "sepa",
+   "label": "SEPA clearing house",
+   "kind": "external",
+   "description": "Clears euro transfers."
+  },
+  {
+   "id": "swift",
+   "label": "SWIFT network",
+   "kind": "external",
+   "description": "International messages."
+  },
+  {
+   "id": "idv",
+   "label": "Identity verification provider",
+   "kind": "external",
+   "description": "Verifies identities."
+  },
+  {
+   "id": "bureau",
+   "label": "Credit bureau",
+   "kind": "external",
+   "description": "Provides credit data."
+  },
+  {
+   "id": "sms",
+   "label": "Email and SMS provider",
+   "kind": "external",
+   "description": "Sends email and SMS."
+  },
+  {
+   "id": "push",
+   "label": "Apple and Google push services",
+   "kind": "external",
+   "description": "Deliver push notifications."
+  },
+  {
+   "id": "reg",
+   "label": "Regulator reporting portal",
+   "kind": "external",
+   "description": "Receives regulatory reports."
+  }
+ ],
+ "relations": [
+  {
+   "from": "retail",
+   "to": "web",
+   "label": "Uses",
+   "protocol": "HTTPS",
+   "main": true
+  },
+  {
+   "from": "retail",
+   "to": "mobile",
+   "label": "Uses",
+   "protocol": "HTTPS"
+  },
+  {
+   "from": "business",
+   "to": "web",
+   "label": "Uses",
+   "protocol": "HTTPS"
+  },
+  {
+   "from": "business",
+   "to": "mobile",
+   "label": "Uses",
+   "protocol": "HTTPS"
+  },
+  {
+   "from": "agent",
+   "to": "backoffice",
+   "label": "Uses",
+   "protocol": "HTTPS"
+  },
+  {
+   "from": "fraud_an",
+   "to": "backoffice",
+   "label": "Uses",
+   "protocol": "HTTPS"
+  },
+  {
+   "from": "ops",
+   "to": "batch",
+   "label": "Uses Scheduler UI",
+   "protocol": "HTTPS"
+  },
+  {
+   "from": "web",
+   "to": "gw",
+   "label": "Calls",
+   "protocol": "HTTPS/JSON"
+  },
+  {
+   "from": "mobile",
+   "to": "gw",
+   "label": "Calls",
+   "protocol": "HTTPS/JSON"
+  },
+  {
+   "from": "backoffice",
+   "to": "gw",
+   "label": "Calls",
+   "protocol": "HTTPS/JSON"
+  },
+  {
+   "from": "gw",
+   "to": "cache",
+   "label": "Reads",
+   "protocol": "Redis protocol"
+  },
+  {
+   "from": "gw",
+   "to": "bff",
+   "label": "Routes web and mobile requests",
+   "protocol": "HTTPS/JSON"
+  },
+  {
+   "from": "bff",
+   "to": "accounts",
+   "label": "Calls",
+   "protocol": "gRPC"
+  },
+  {
+   "from": "accounts",
+   "to": "bus",
+   "label": "Publishes events",
+   "kind": "event"
+  },
+  {
+   "from": "bff",
+   "to": "payments",
+   "label": "Calls",
+   "protocol": "gRPC"
+  },
+  {
+   "from": "payments",
+   "to": "bus",
+   "label": "Publishes events",
+   "kind": "event"
+  },
+  {
+   "from": "bff",
+   "to": "cards",
+   "label": "Calls",
+   "protocol": "gRPC"
+  },
+  {
+   "from": "cards",
+   "to": "bus",
+   "label": "Publishes events",
+   "kind": "event"
+  },
+  {
+   "from": "bff",
+   "to": "onboarding",
+   "label": "Calls",
+   "protocol": "gRPC"
+  },
+  {
+   "from": "onboarding",
+   "to": "bus",
+   "label": "Publishes events",
+   "kind": "event"
+  },
+  {
+   "from": "gw",
+   "to": "accounts",
+   "label": "Routes backoffice requests",
+   "protocol": "gRPC"
+  },
+  {
+   "from": "gw",
+   "to": "fraudsvc",
+   "label": "Routes backoffice requests",
+   "protocol": "gRPC"
+  },
+  {
+   "from": "accounts",
+   "to": "opdb",
+   "label": "Reads and writes",
+   "protocol": "JDBC/SQL"
+  },
+  {
+   "from": "accounts",
+   "to": "core",
+   "label": "Calls",
+   "protocol": "IBM MQ"
+  },
+  {
+   "from": "payments",
+   "to": "opdb",
+   "label": "Reads and writes",
+   "protocol": "JDBC/SQL"
+  },
+  {
+   "from": "payments",
+   "to": "core",
+   "label": "Calls",
+   "protocol": "IBM MQ"
+  },
+  {
+   "from": "cards",
+   "to": "opdb",
+   "label": "Reads and writes",
+   "protocol": "JDBC/SQL"
+  },
+  {
+   "from": "cards",
+   "to": "core",
+   "label": "Calls",
+   "protocol": "IBM MQ"
+  },
+  {
+   "from": "payments",
+   "to": "sepa",
+   "label": "Sends files",
+   "protocol": "SFTP"
+  },
+  {
+   "from": "payments",
+   "to": "swift",
+   "label": "Sends messages",
+   "protocol": "ISO 20022 over MQ"
+  },
+  {
+   "from": "cards",
+   "to": "cardproc",
+   "label": "Calls",
+   "protocol": "ISO 8583"
+  },
+  {
+   "from": "onboarding",
+   "to": "idv",
+   "label": "Calls",
+   "protocol": "HTTPS"
+  },
+  {
+   "from": "onboarding",
+   "to": "bureau",
+   "label": "Calls",
+   "protocol": "HTTPS"
+  },
+  {
+   "from": "onboarding",
+   "to": "docs",
+   "label": "Writes",
+   "protocol": "MongoDB wire protocol"
+  },
+  {
+   "from": "onboarding",
+   "to": "objs",
+   "label": "Writes",
+   "protocol": "S3 API"
+  },
+  {
+   "from": "bus",
+   "to": "fraudsvc",
+   "label": "Consumed by",
+   "kind": "event"
+  },
+  {
+   "from": "bus",
+   "to": "notif",
+   "label": "Consumed by",
+   "kind": "event"
+  },
+  {
+   "from": "fraudsvc",
+   "to": "payments",
+   "label": "Blocks via",
+   "protocol": "gRPC"
+  },
+  {
+   "from": "fraudsvc",
+   "to": "cards",
+   "label": "Blocks via",
+   "protocol": "gRPC"
+  },
+  {
+   "from": "fraudsvc",
+   "to": "opdb",
+   "label": "Writes cases",
+   "protocol": "JDBC/SQL"
+  },
+  {
+   "from": "notif",
+   "to": "sms",
+   "label": "Calls",
+   "protocol": "HTTPS"
+  },
+  {
+   "from": "notif",
+   "to": "push",
+   "label": "Calls",
+   "protocol": "HTTPS"
+  },
+  {
+   "from": "batch",
+   "to": "accounts",
+   "label": "Triggers statements",
+   "protocol": "HTTPS"
+  },
+  {
+   "from": "accounts",
+   "to": "objs",
+   "label": "Writes statements",
+   "protocol": "S3 API"
+  },
+  {
+   "from": "opdb",
+   "to": "dwh",
+   "label": "Loaded into",
+   "protocol": "SQL"
+  },
+  {
+   "from": "bus",
+   "to": "dwh",
+   "label": "Loaded into",
+   "kind": "event"
+  },
+  {
+   "from": "batch",
+   "to": "dwh",
+   "label": "Loads",
+   "protocol": "SQL"
+  },
+  {
+   "from": "batch",
+   "to": "reg",
+   "label": "Sends reports",
+   "protocol": "HTTPS"
+  }
+ ]
+}

@@ -1,0 +1,397 @@
+{
+ "type": "kanban",
+ "title": "Kanban ngân hàng số · Tổng 48 thẻ · 61 điểm đang làm dở · Xanh dương: Tính năng, Đỏ: Lỗi, Vàng: Nợ kỹ thuật, Tím: Nghiên cứu",
+ "columns": [
+  {
+   "label": "Tồn đọng",
+   "tone": "gray",
+   "cards": [
+    {
+     "label": "NH-430 Mở tài khoản trực tuyến bằng định danh điện tử",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Trần Minh Đức",
+     "detail": "8 điểm"
+    },
+    {
+     "label": "NH-431 Tiết kiệm tự động theo mục tiêu",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "5 điểm"
+    },
+    {
+     "label": "NH-432 Nghiên cứu chuẩn ISO 20022",
+     "kind": "Nghiên cứu",
+     "tone": "violet",
+     "owner": "Trần Minh Đức",
+     "detail": "3 điểm"
+    },
+    {
+     "label": "NH-433 Tái cấu trúc mô-đun sổ cái",
+     "kind": "Nợ kỹ thuật",
+     "tone": "amber",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "8 điểm"
+    },
+    {
+     "label": "NH-434 Lỗi hiển thị số dư khi đổi ngôn ngữ sang tiếng Anh",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Trần Minh Đức",
+     "detail": "2 điểm · Hạn 20/11"
+    },
+    {
+     "label": "NH-435 Thông báo đẩy khi có biến động số dư",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "3 điểm"
+    },
+    {
+     "label": "NH-436 Nghiên cứu thanh toán bằng giọng nói",
+     "kind": "Nghiên cứu",
+     "tone": "violet",
+     "owner": "Trần Minh Đức",
+     "detail": "2 điểm"
+    },
+    {
+     "label": "NH-437 Nâng cấp thư viện mã hoá lên phiên bản mới",
+     "kind": "Nợ kỹ thuật",
+     "tone": "amber",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "5 điểm"
+    },
+    {
+     "label": "NH-438 Xuất sao kê giao dịch ra tệp PDF",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Trần Minh Đức",
+     "detail": "3 điểm"
+    },
+    {
+     "label": "NH-439 Lỗi trùng lặp thông báo OTP trên iOS 18",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "2 điểm"
+    },
+    {
+     "label": "NH-440 Nghiên cứu mô hình chấm điểm tín dụng bằng học máy cho khách hàng mới chưa có lịch sử vay vốn tại ngân hàng",
+     "kind": "Nghiên cứu",
+     "tone": "violet",
+     "owner": "Trần Minh Đức",
+     "detail": "5 điểm"
+    },
+    {
+     "label": "NH-441 Tách dịch vụ quản lý hạn mức giao dịch",
+     "kind": "Nợ kỹ thuật",
+     "tone": "amber",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "8 điểm"
+    }
+   ]
+  },
+  {
+   "label": "Sẵn sàng",
+   "tone": "teal",
+   "cards": [
+    {
+     "label": "NH-443 Đăng nhập bằng sinh trắc học",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Lê Thị Hồng Nhung",
+     "detail": "5 điểm · Hạn 22/11"
+    },
+    {
+     "label": "NH-444 Thanh toán hoá đơn điện nước định kỳ",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Võ Thanh Tùng",
+     "detail": "5 điểm"
+    },
+    {
+     "label": "NH-445 Lỗi sai tỷ giá hiển thị ở màn hình quy đổi",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Lê Thị Hồng Nhung",
+     "detail": "2 điểm"
+    },
+    {
+     "label": "NH-446 Xoá mã nguồn cũ của luồng đăng ký phiên bản 1",
+     "kind": "Nợ kỹ thuật",
+     "tone": "amber",
+     "owner": "Võ Thanh Tùng",
+     "detail": "3 điểm · Bị chặn: chờ phê duyệt của bộ phận pháp chế"
+    },
+    {
+     "label": "NH-447 Nghiên cứu quy định eKYC mới của Ngân hàng Nhà nước",
+     "kind": "Nghiên cứu",
+     "tone": "violet",
+     "owner": "Lê Thị Hồng Nhung",
+     "detail": "3 điểm"
+    },
+    {
+     "label": "NH-448 Tìm kiếm giao dịch theo ghi chú",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Võ Thanh Tùng",
+     "detail": "3 điểm"
+    },
+    {
+     "label": "NH-449 Lỗi không lưu được người thụ hưởng yêu thích khi chuyển tiền liên ngân hàng bằng số thẻ trên thiết bị Android cũ",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Lê Thị Hồng Nhung",
+     "detail": "2 điểm"
+    }
+   ],
+   "limit": 8
+  },
+  {
+   "label": "Đang phát triển",
+   "tone": "blue",
+   "cards": [
+    {
+     "label": "NH-412 Sửa lỗi chuyển khoản liên ngân hàng bị trừ tiền hai lần",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Trần Minh Đức",
+     "detail": "KHẨN CẤP · 5 điểm · Hạn 14/11"
+    },
+    {
+     "label": "NH-456 Chuyển tiền nhanh bằng mã QR",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Phạm Quốc Khánh",
+     "detail": "5 điểm"
+    },
+    {
+     "label": "NH-457 Lỗi màn hình trắng khi mở ứng dụng lần đầu",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Đặng Bảo Ngọc",
+     "detail": "3 điểm · Bị chặn: chờ dữ liệu từ đối tác thẻ"
+    },
+    {
+     "label": "NH-458 Tối ưu truy vấn lịch sử giao dịch",
+     "kind": "Nợ kỹ thuật",
+     "tone": "amber",
+     "owner": "Phạm Quốc Khánh",
+     "detail": "5 điểm"
+    },
+    {
+     "label": "NH-459 Quản lý thẻ ảo dùng một lần",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Đặng Bảo Ngọc",
+     "detail": "8 điểm · Hạn 18/11"
+    },
+    {
+     "label": "NH-460 Nghiên cứu tích hợp ví điện tử bên thứ ba",
+     "kind": "Nghiên cứu",
+     "tone": "violet",
+     "owner": "Phạm Quốc Khánh",
+     "detail": "3 điểm"
+    },
+    {
+     "label": "NH-461 Lỗi sai múi giờ trong lịch hẹn chuyển tiền",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Đặng Bảo Ngọc",
+     "detail": "2 điểm"
+    }
+   ],
+   "limit": 5
+  },
+  {
+   "label": "Chờ xem xét mã",
+   "tone": "violet",
+   "cards": [
+    {
+     "label": "NH-420 Ứng dụng treo khi quét mã QR trên Android 15",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "KHẨN CẤP · 3 điểm · Bị chặn: chờ thiết bị thử nghiệm"
+    },
+    {
+     "label": "NH-469 Nhắc nợ và chia hoá đơn giữa bạn bè",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "5 điểm"
+    },
+    {
+     "label": "NH-470 Lỗi nút xác nhận bị che trên màn hình nhỏ",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Trần Minh Đức",
+     "detail": "1 điểm"
+    },
+    {
+     "label": "NH-471 Chuẩn hoá cấu hình môi trường thử nghiệm",
+     "kind": "Nợ kỹ thuật",
+     "tone": "amber",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "3 điểm"
+    }
+   ],
+   "limit": 3
+  },
+  {
+   "label": "Đang kiểm thử",
+   "tone": "amber",
+   "cards": [
+    {
+     "label": "NH-415 Cập nhật chứng chỉ SSL sắp hết hạn",
+     "kind": "Nợ kỹ thuật",
+     "tone": "amber",
+     "owner": "Lê Thị Hồng Nhung",
+     "detail": "KHẨN CẤP · 2 điểm"
+    },
+    {
+     "label": "NH-482 Vay tiêu dùng nhanh trong năm phút",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Võ Thanh Tùng",
+     "detail": "8 điểm · Hạn 19/11"
+    },
+    {
+     "label": "NH-483 Lỗi không đăng xuất sau khi hết phiên",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Lê Thị Hồng Nhung",
+     "detail": "3 điểm · Bị chặn: chờ môi trường thử nghiệm"
+    },
+    {
+     "label": "NH-484 Tách cấu hình khỏi mã nguồn dịch vụ xác thực",
+     "kind": "Nợ kỹ thuật",
+     "tone": "amber",
+     "owner": "Võ Thanh Tùng",
+     "detail": "3 điểm"
+    },
+    {
+     "label": "NH-485 Nghiên cứu hành vi bỏ dở khi mở tài khoản",
+     "kind": "Nghiên cứu",
+     "tone": "violet",
+     "owner": "Lê Thị Hồng Nhung",
+     "detail": "2 điểm"
+    }
+   ],
+   "limit": 4
+  },
+  {
+   "label": "Chờ phát hành",
+   "tone": "teal",
+   "cards": [
+    {
+     "label": "NH-418 Khoá tính năng rút tiền không thẻ theo yêu cầu của Ngân hàng Nhà nước",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Phạm Quốc Khánh",
+     "detail": "KHẨN CẤP · 3 điểm · Hạn 15/11"
+    },
+    {
+     "label": "NH-495 Biểu đồ chi tiêu theo danh mục",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Đặng Bảo Ngọc",
+     "detail": "5 điểm"
+    },
+    {
+     "label": "NH-496 Lỗi làm tròn số tiền lãi tiết kiệm",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Phạm Quốc Khánh",
+     "detail": "2 điểm"
+    },
+    {
+     "label": "NH-497 Thay thế thư viện ghi nhật ký cũ",
+     "kind": "Nợ kỹ thuật",
+     "tone": "amber",
+     "owner": "Đặng Bảo Ngọc",
+     "detail": "3 điểm"
+    },
+    {
+     "label": "NH-498 Nghiên cứu mức độ hài lòng với giao diện tối",
+     "kind": "Nghiên cứu",
+     "tone": "violet",
+     "owner": "Phạm Quốc Khánh",
+     "detail": "2 điểm"
+    },
+    {
+     "label": "NH-499 Gói tiết kiệm có kỳ hạn linh hoạt",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Đặng Bảo Ngọc",
+     "detail": "5 điểm · Hạn 21/11"
+    }
+   ],
+   "limit": 6
+  },
+  {
+   "label": "Hoàn thành tuần này",
+   "tone": "green",
+   "cards": [
+    {
+     "label": "NH-508 Đổi mã PIN giao dịch",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Trần Minh Đức",
+     "detail": "3 điểm",
+     "done": true
+    },
+    {
+     "label": "NH-509 Lỗi sai định dạng ngày trong sao kê",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "1 điểm",
+     "done": true
+    },
+    {
+     "label": "NH-510 Dọn dẹp các nhánh mã nguồn không còn dùng",
+     "kind": "Nợ kỹ thuật",
+     "tone": "amber",
+     "owner": "Trần Minh Đức",
+     "detail": "1 điểm",
+     "done": true
+    },
+    {
+     "label": "NH-511 Nghiên cứu phương thức xác thực hai lớp",
+     "kind": "Nghiên cứu",
+     "tone": "violet",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "3 điểm",
+     "done": true
+    },
+    {
+     "label": "NH-512 Cài đặt hạn mức chuyển khoản hằng ngày",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Trần Minh Đức",
+     "detail": "3 điểm",
+     "done": true
+    },
+    {
+     "label": "NH-513 Lỗi trễ thông báo giao dịch thẻ",
+     "kind": "Lỗi",
+     "tone": "red",
+     "owner": "Nguyễn Hoàng Yến",
+     "detail": "2 điểm",
+     "done": true
+    },
+    {
+     "label": "NH-514 Cập nhật điều khoản sử dụng trong ứng dụng",
+     "kind": "Tính năng",
+     "tone": "blue",
+     "owner": "Trần Minh Đức",
+     "detail": "1 điểm",
+     "done": true
+    }
+   ],
+   "done": true
+  }
+ ]
+}

@@ -1,0 +1,407 @@
+{
+ "type": "usecase",
+ "title": "University learning platform",
+ "desc": "Learning Platform and Assessment Engine",
+ "system": "Learning Platform + Assessment Engine",
+ "actors": [
+  {
+   "id": "reg",
+   "label": "Registered user (abstract)"
+  },
+  {
+   "id": "student",
+   "label": "Student"
+  },
+  {
+   "id": "ta",
+   "label": "Teaching assistant"
+  },
+  {
+   "id": "lect",
+   "label": "Lecturer"
+  },
+  {
+   "id": "visitor",
+   "label": "Visitor"
+  },
+  {
+   "id": "admin",
+   "label": "Department administrator"
+  },
+  {
+   "id": "idp",
+   "label": "Identity Provider (SSO)",
+   "external": true
+  },
+  {
+   "id": "plag",
+   "label": "Plagiarism Checker",
+   "external": true
+  },
+  {
+   "id": "pay",
+   "label": "Payment Gateway",
+   "external": true
+  },
+  {
+   "id": "rec",
+   "label": "Student Records System",
+   "external": true
+  }
+ ],
+ "usecases": [
+  {
+   "id": "browse",
+   "label": "Browse course catalogue"
+  },
+  {
+   "id": "signin",
+   "label": "Sign in"
+  },
+  {
+   "id": "enrol",
+   "label": "Enrol in course"
+  },
+  {
+   "id": "fee",
+   "label": "Pay course fee"
+  },
+  {
+   "id": "wait",
+   "label": "Join waiting list"
+  },
+  {
+   "id": "watch",
+   "label": "Watch lecture"
+  },
+  {
+   "id": "dl",
+   "label": "Download materials"
+  },
+  {
+   "id": "forum",
+   "label": "Post in forum"
+  },
+  {
+   "id": "mod",
+   "label": "Moderate forum"
+  },
+  {
+   "id": "pub",
+   "label": "Publish course"
+  },
+  {
+   "id": "up",
+   "label": "Upload materials"
+  },
+  {
+   "id": "live",
+   "label": "Schedule live session"
+  },
+  {
+   "id": "manage",
+   "label": "Manage enrolments"
+  },
+  {
+   "id": "approve",
+   "label": "Approve course"
+  },
+  {
+   "id": "trans",
+   "label": "Generate transcript"
+  },
+  {
+   "id": "cal",
+   "label": "Configure term calendar"
+  },
+  {
+   "id": "cass",
+   "label": "Create assignment"
+  },
+  {
+   "id": "cquiz",
+   "label": "Create quiz"
+  },
+  {
+   "id": "sub",
+   "label": "Submit assignment"
+  },
+  {
+   "id": "take",
+   "label": "Take quiz"
+  },
+  {
+   "id": "orig",
+   "label": "Check originality"
+  },
+  {
+   "id": "grade",
+   "label": "Grade submission"
+  },
+  {
+   "id": "auto",
+   "label": "Auto-grade quiz"
+  },
+  {
+   "id": "regrade",
+   "label": "Request regrade"
+  },
+  {
+   "id": "aregrade",
+   "label": "Approve regrade"
+  },
+  {
+   "id": "pgrades",
+   "label": "Publish grades"
+  },
+  {
+   "id": "sync",
+   "label": "Sync grades to records"
+  },
+  {
+   "id": "ext",
+   "label": "Grant extension"
+  },
+  {
+   "id": "proctor",
+   "label": "Proctor exam"
+  },
+  {
+   "id": "mis",
+   "label": "Report misconduct"
+  },
+  {
+   "id": "anal",
+   "label": "Export analytics"
+  }
+ ],
+ "links": [
+  {
+   "from": "student",
+   "to": "reg",
+   "style": "generalizes"
+  },
+  {
+   "from": "ta",
+   "to": "reg",
+   "style": "generalizes"
+  },
+  {
+   "from": "lect",
+   "to": "ta",
+   "style": "generalizes"
+  },
+  {
+   "from": "visitor",
+   "to": "browse"
+  },
+  {
+   "from": "reg",
+   "to": "browse"
+  },
+  {
+   "from": "reg",
+   "to": "signin"
+  },
+  {
+   "from": "idp",
+   "to": "signin"
+  },
+  {
+   "from": "student",
+   "to": "enrol"
+  },
+  {
+   "from": "student",
+   "to": "fee"
+  },
+  {
+   "from": "pay",
+   "to": "fee"
+  },
+  {
+   "from": "student",
+   "to": "watch"
+  },
+  {
+   "from": "student",
+   "to": "dl"
+  },
+  {
+   "from": "reg",
+   "to": "forum"
+  },
+  {
+   "from": "ta",
+   "to": "mod"
+  },
+  {
+   "from": "lect",
+   "to": "pub"
+  },
+  {
+   "from": "lect",
+   "to": "up"
+  },
+  {
+   "from": "lect",
+   "to": "live"
+  },
+  {
+   "from": "admin",
+   "to": "manage"
+  },
+  {
+   "from": "admin",
+   "to": "approve"
+  },
+  {
+   "from": "student",
+   "to": "trans"
+  },
+  {
+   "from": "rec",
+   "to": "trans"
+  },
+  {
+   "from": "admin",
+   "to": "cal"
+  },
+  {
+   "from": "lect",
+   "to": "cass"
+  },
+  {
+   "from": "lect",
+   "to": "cquiz"
+  },
+  {
+   "from": "student",
+   "to": "sub"
+  },
+  {
+   "from": "student",
+   "to": "take"
+  },
+  {
+   "from": "plag",
+   "to": "orig"
+  },
+  {
+   "from": "ta",
+   "to": "grade"
+  },
+  {
+   "from": "student",
+   "to": "regrade"
+  },
+  {
+   "from": "lect",
+   "to": "aregrade"
+  },
+  {
+   "from": "lect",
+   "to": "pgrades"
+  },
+  {
+   "from": "rec",
+   "to": "sync"
+  },
+  {
+   "from": "lect",
+   "to": "ext"
+  },
+  {
+   "from": "ta",
+   "to": "proctor"
+  },
+  {
+   "from": "ta",
+   "to": "mis"
+  },
+  {
+   "from": "admin",
+   "to": "mis"
+  },
+  {
+   "from": "lect",
+   "to": "anal"
+  },
+  {
+   "from": "admin",
+   "to": "anal"
+  },
+  {
+   "from": "enrol",
+   "to": "signin",
+   "style": "include"
+  },
+  {
+   "from": "forum",
+   "to": "signin",
+   "style": "include"
+  },
+  {
+   "from": "watch",
+   "to": "signin",
+   "style": "include"
+  },
+  {
+   "from": "pub",
+   "to": "signin",
+   "style": "include"
+  },
+  {
+   "from": "pub",
+   "to": "approve",
+   "style": "include"
+  },
+  {
+   "from": "sub",
+   "to": "orig",
+   "style": "include"
+  },
+  {
+   "from": "take",
+   "to": "auto",
+   "style": "include"
+  },
+  {
+   "from": "pgrades",
+   "to": "sync",
+   "style": "include"
+  },
+  {
+   "from": "fee",
+   "to": "enrol",
+   "style": "extend",
+   "label": "«extend» [course is paid]"
+  },
+  {
+   "from": "wait",
+   "to": "enrol",
+   "style": "extend",
+   "label": "«extend» [course is full]"
+  },
+  {
+   "from": "regrade",
+   "to": "grade",
+   "style": "extend"
+  },
+  {
+   "from": "ext",
+   "to": "sub",
+   "style": "extend"
+  },
+  {
+   "from": "mis",
+   "to": "orig",
+   "style": "extend"
+  },
+  {
+   "from": "mis",
+   "to": "proctor",
+   "style": "extend"
+  }
+ ]
+}

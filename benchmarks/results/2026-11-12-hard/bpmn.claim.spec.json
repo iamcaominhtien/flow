@@ -1,0 +1,704 @@
+{
+ "type": "bpmn",
+ "title": "BPMN: motor insurance claim",
+ "desc": "A policyholder claims for accident damage; the insurer checks the policy, fraud and damage, then pays a total-loss settlement or has the garage repair the car.",
+ "zones": [
+  {
+   "id": "ph",
+   "label": "Policyholder",
+   "tone": "blue"
+  },
+  {
+   "id": "ins",
+   "label": "Insurer",
+   "tone": "green"
+  },
+  {
+   "id": "intake",
+   "label": "Claims intake",
+   "tone": "green",
+   "parent": "ins"
+  },
+  {
+   "id": "adj",
+   "label": "Claims adjuster",
+   "tone": "teal",
+   "parent": "ins"
+  },
+  {
+   "id": "fraud",
+   "label": "Fraud unit",
+   "tone": "amber",
+   "parent": "ins"
+  },
+  {
+   "id": "fin",
+   "label": "Finance",
+   "tone": "violet",
+   "parent": "ins"
+  },
+  {
+   "id": "gar",
+   "label": "Repair garage",
+   "tone": "gray"
+  }
+ ],
+ "elements": [
+  {
+   "id": "ph_s",
+   "kind": "start",
+   "label": "Accident happens",
+   "zone": "ph"
+  },
+  {
+   "id": "ph_submit",
+   "kind": "send",
+   "label": "Submit claim form with photos",
+   "zone": "ph"
+  },
+  {
+   "id": "ph_wait",
+   "kind": "receive",
+   "label": "Wait for decision",
+   "zone": "ph"
+  },
+  {
+   "id": "ph_dec",
+   "kind": "exclusive",
+   "label": "Rejected?",
+   "zone": "ph"
+  },
+  {
+   "id": "ph_rejend",
+   "kind": "end",
+   "trigger": "message",
+   "label": "Rejection letter received",
+   "zone": "ph",
+   "column": 7
+  },
+  {
+   "id": "ph_offer",
+   "kind": "receive",
+   "label": "Receive offer",
+   "zone": "ph",
+   "column": 14
+  },
+  {
+   "id": "ph_accept",
+   "kind": "send",
+   "label": "Accept offer",
+   "zone": "ph",
+   "column": 16
+  },
+  {
+   "id": "ph_bring",
+   "label": "Bring car to garage",
+   "zone": "ph"
+  },
+  {
+   "id": "ph_excess",
+   "kind": "send",
+   "label": "Pay excess to garage",
+   "zone": "ph"
+  },
+  {
+   "id": "ph_collect",
+   "label": "Collect repaired car",
+   "zone": "ph"
+  },
+  {
+   "id": "ph_confirm",
+   "label": "Confirm satisfaction",
+   "zone": "ph"
+  },
+  {
+   "id": "ph_e",
+   "kind": "end",
+   "label": "Car returned",
+   "zone": "ph"
+  },
+  {
+   "id": "i_s",
+   "kind": "start",
+   "trigger": "message",
+   "label": "Claim received",
+   "zone": "intake"
+  },
+  {
+   "id": "i_reg",
+   "label": "Register claim",
+   "zone": "intake"
+  },
+  {
+   "id": "i_pol",
+   "kind": "exclusive",
+   "label": "Policy active?",
+   "zone": "intake"
+  },
+  {
+   "id": "i_rej",
+   "kind": "send",
+   "label": "Send rejection letter",
+   "zone": "intake",
+   "column": 6
+  },
+  {
+   "id": "i_rejend",
+   "kind": "end",
+   "label": "Claim rejected",
+   "zone": "intake",
+   "column": 7
+  },
+  {
+   "id": "i_par",
+   "kind": "parallel",
+   "zone": "intake"
+  },
+  {
+   "id": "i_police",
+   "kind": "send",
+   "label": "Request police report",
+   "zone": "intake"
+  },
+  {
+   "id": "i_timer",
+   "kind": "timer",
+   "label": "10 days",
+   "attached_to": "i_police",
+   "interrupting": false,
+   "zone": "intake"
+  },
+  {
+   "id": "i_remind",
+   "kind": "send",
+   "label": "Send reminder",
+   "zone": "intake"
+  },
+  {
+   "id": "i_join",
+   "kind": "parallel",
+   "zone": "intake"
+  },
+  {
+   "id": "a_assess",
+   "label": "Assess damage",
+   "zone": "adj"
+  },
+  {
+   "id": "f_score",
+   "kind": "service",
+   "label": "Run automated fraud score",
+   "zone": "fraud"
+  },
+  {
+   "id": "f_gw",
+   "kind": "exclusive",
+   "label": "Fraud score?",
+   "zone": "fraud"
+  },
+  {
+   "id": "f_inv",
+   "kind": "subprocess",
+   "label": "Manual investigation",
+   "zone": "fraud"
+  },
+  {
+   "id": "f_err",
+   "kind": "error",
+   "label": "Fraud confirmed",
+   "attached_to": "f_inv",
+   "zone": "fraud"
+  },
+  {
+   "id": "a_fraudrej",
+   "kind": "send",
+   "label": "Reject claim and report fraud",
+   "zone": "adj",
+   "column": 6
+  },
+  {
+   "id": "a_fraudend",
+   "kind": "end",
+   "label": "Claim rejected (fraud)",
+   "zone": "adj",
+   "column": 7
+  },
+  {
+   "id": "a_dec",
+   "kind": "exclusive",
+   "label": "Outcome?",
+   "zone": "adj"
+  },
+  {
+   "id": "a_exrej",
+   "kind": "send",
+   "label": "Send rejection letter",
+   "zone": "adj",
+   "column": 6
+  },
+  {
+   "id": "a_exend",
+   "kind": "end",
+   "label": "Rejected: below excess",
+   "zone": "adj",
+   "column": 7
+  },
+  {
+   "id": "fin_val",
+   "label": "Calculate market value",
+   "zone": "fin"
+  },
+  {
+   "id": "fin_offer",
+   "kind": "send",
+   "label": "Send offer",
+   "zone": "fin",
+   "column": 14
+  },
+  {
+   "id": "fin_eb",
+   "kind": "event_based",
+   "zone": "fin"
+  },
+  {
+   "id": "fin_acc",
+   "kind": "message",
+   "label": "Acceptance received",
+   "zone": "fin",
+   "column": 16
+  },
+  {
+   "id": "fin_t14",
+   "kind": "timer",
+   "label": "14 days",
+   "zone": "fin"
+  },
+  {
+   "id": "fin_call",
+   "label": "Escalate to a call",
+   "zone": "fin"
+  },
+  {
+   "id": "fin_settle",
+   "label": "Pay settlement",
+   "zone": "fin"
+  },
+  {
+   "id": "fin_end1",
+   "kind": "end",
+   "label": "Claim closed",
+   "zone": "fin"
+  },
+  {
+   "id": "a_auth",
+   "kind": "send",
+   "label": "Send repair authorisation",
+   "zone": "adj"
+  },
+  {
+   "id": "a_quote",
+   "kind": "receive",
+   "label": "Receive quote",
+   "zone": "adj"
+  },
+  {
+   "id": "a_appr",
+   "kind": "exclusive",
+   "label": "Quote approved?",
+   "zone": "adj"
+  },
+  {
+   "id": "a_revise",
+   "kind": "send",
+   "label": "Ask for revised quote (max 2)",
+   "zone": "adj"
+  },
+  {
+   "id": "fin_invrcv",
+   "kind": "receive",
+   "label": "Receive invoice",
+   "zone": "fin"
+  },
+  {
+   "id": "fin_gpay",
+   "label": "Pay garage minus excess",
+   "zone": "fin"
+  },
+  {
+   "id": "fin_end2",
+   "kind": "end",
+   "label": "Claim closed",
+   "zone": "fin"
+  },
+  {
+   "id": "g_rec",
+   "kind": "receive",
+   "label": "Receive authorisation",
+   "zone": "gar"
+  },
+  {
+   "id": "g_insp",
+   "label": "Inspect car",
+   "zone": "gar"
+  },
+  {
+   "id": "g_quote",
+   "kind": "send",
+   "label": "Send quote",
+   "zone": "gar"
+  },
+  {
+   "id": "g_repair",
+   "label": "Repair car",
+   "repeat": "loop",
+   "zone": "gar"
+  },
+  {
+   "id": "g_inv",
+   "kind": "send",
+   "label": "Send invoice",
+   "zone": "gar"
+  },
+  {
+   "id": "g_hand",
+   "label": "Hand over car",
+   "zone": "gar"
+  },
+  {
+   "id": "g_exrcv",
+   "kind": "receive",
+   "label": "Receive excess",
+   "zone": "gar",
+   "column": 12
+  },
+  {
+   "id": "a_notify",
+   "kind": "send",
+   "label": "Notify approval",
+   "zone": "adj"
+  },
+  {
+   "id": "g_appr",
+   "kind": "receive",
+   "label": "Receive approval",
+   "zone": "gar"
+  }
+ ],
+ "flows": [
+  {
+   "from": "ph_s",
+   "to": "ph_submit"
+  },
+  {
+   "from": "ph_submit",
+   "to": "ph_wait"
+  },
+  {
+   "from": "ph_wait",
+   "to": "ph_dec"
+  },
+  {
+   "from": "ph_dec",
+   "to": "ph_rejend",
+   "label": "Yes"
+  },
+  {
+   "from": "ph_dec",
+   "to": "ph_bring",
+   "label": "No"
+  },
+  {
+   "from": "ph_bring",
+   "to": "ph_excess"
+  },
+  {
+   "from": "ph_excess",
+   "to": "ph_collect"
+  },
+  {
+   "from": "ph_collect",
+   "to": "ph_confirm"
+  },
+  {
+   "from": "ph_confirm",
+   "to": "ph_e"
+  },
+  {
+   "from": "ph_offer",
+   "to": "ph_accept"
+  },
+  {
+   "from": "i_s",
+   "to": "i_reg",
+   "main": true
+  },
+  {
+   "from": "i_reg",
+   "to": "i_pol",
+   "main": true
+  },
+  {
+   "from": "i_pol",
+   "to": "i_rej",
+   "label": "Not active"
+  },
+  {
+   "from": "i_rej",
+   "to": "i_rejend"
+  },
+  {
+   "from": "i_pol",
+   "to": "i_par",
+   "label": "Active",
+   "main": true
+  },
+  {
+   "from": "i_par",
+   "to": "a_assess",
+   "main": true
+  },
+  {
+   "from": "i_par",
+   "to": "f_score"
+  },
+  {
+   "from": "i_par",
+   "to": "i_police"
+  },
+  {
+   "from": "i_timer",
+   "to": "i_remind"
+  },
+  {
+   "from": "i_remind",
+   "to": "i_police",
+   "style": "return",
+   "label": "wait again"
+  },
+  {
+   "from": "a_assess",
+   "to": "i_join",
+   "main": true
+  },
+  {
+   "from": "f_score",
+   "to": "i_join"
+  },
+  {
+   "from": "i_police",
+   "to": "i_join"
+  },
+  {
+   "from": "i_join",
+   "to": "f_gw",
+   "main": true
+  },
+  {
+   "from": "f_gw",
+   "to": "a_dec",
+   "label": "Low",
+   "main": true
+  },
+  {
+   "from": "f_gw",
+   "to": "f_inv",
+   "label": "High"
+  },
+  {
+   "from": "f_inv",
+   "to": "a_dec",
+   "label": "No fraud"
+  },
+  {
+   "from": "f_err",
+   "to": "a_fraudrej",
+   "failure": true
+  },
+  {
+   "from": "a_fraudrej",
+   "to": "a_fraudend"
+  },
+  {
+   "from": "a_dec",
+   "to": "fin_val",
+   "label": "Total loss"
+  },
+  {
+   "from": "a_dec",
+   "to": "a_auth",
+   "label": "Repairable",
+   "main": true
+  },
+  {
+   "from": "a_dec",
+   "to": "a_exrej",
+   "label": "Below excess"
+  },
+  {
+   "from": "a_exrej",
+   "to": "a_exend"
+  },
+  {
+   "from": "fin_val",
+   "to": "fin_offer"
+  },
+  {
+   "from": "fin_offer",
+   "to": "fin_eb"
+  },
+  {
+   "from": "fin_eb",
+   "to": "fin_acc"
+  },
+  {
+   "from": "fin_eb",
+   "to": "fin_t14"
+  },
+  {
+   "from": "fin_t14",
+   "to": "fin_call"
+  },
+  {
+   "from": "fin_call",
+   "to": "fin_eb",
+   "style": "return",
+   "label": "wait again"
+  },
+  {
+   "from": "fin_acc",
+   "to": "fin_settle"
+  },
+  {
+   "from": "fin_settle",
+   "to": "fin_end1"
+  },
+  {
+   "from": "a_auth",
+   "to": "a_quote",
+   "main": true
+  },
+  {
+   "from": "a_quote",
+   "to": "a_appr",
+   "main": true
+  },
+  {
+   "from": "a_appr",
+   "to": "a_revise",
+   "label": "No"
+  },
+  {
+   "from": "fin_invrcv",
+   "to": "fin_gpay",
+   "main": true
+  },
+  {
+   "from": "fin_gpay",
+   "to": "fin_end2",
+   "main": true
+  },
+  {
+   "from": "g_rec",
+   "to": "g_insp"
+  },
+  {
+   "from": "g_insp",
+   "to": "g_quote"
+  },
+  {
+   "from": "g_repair",
+   "to": "g_inv"
+  },
+  {
+   "from": "g_inv",
+   "to": "g_hand"
+  },
+  {
+   "from": "ph_submit",
+   "to": "i_s",
+   "style": "message",
+   "label": "claim"
+  },
+  {
+   "from": "i_rej",
+   "to": "ph_rejend",
+   "style": "message",
+   "label": "rejection"
+  },
+  {
+   "from": "fin_offer",
+   "to": "ph_offer",
+   "style": "message",
+   "label": "offer"
+  },
+  {
+   "from": "ph_accept",
+   "to": "fin_acc",
+   "style": "message",
+   "label": "acceptance"
+  },
+  {
+   "from": "a_auth",
+   "to": "g_rec",
+   "style": "message",
+   "label": "authorisation"
+  },
+  {
+   "from": "g_quote",
+   "to": "a_quote",
+   "style": "message",
+   "label": "quote"
+  },
+  {
+   "from": "a_revise",
+   "to": "g_insp",
+   "style": "message",
+   "label": "revise"
+  },
+  {
+   "from": "g_inv",
+   "to": "fin_invrcv",
+   "style": "message",
+   "label": "invoice"
+  },
+  {
+   "from": "ph_excess",
+   "to": "g_exrcv",
+   "style": "message",
+   "label": "excess"
+  },
+  {
+   "from": "a_appr",
+   "to": "a_notify",
+   "label": "Yes",
+   "main": true
+  },
+  {
+   "from": "a_notify",
+   "to": "fin_invrcv",
+   "main": true
+  },
+  {
+   "from": "a_notify",
+   "to": "g_appr",
+   "style": "message",
+   "label": "approval"
+  },
+  {
+   "from": "g_appr",
+   "to": "g_repair"
+  },
+  {
+   "from": "a_exrej",
+   "to": "ph_rejend",
+   "style": "message",
+   "label": "rejection"
+  },
+  {
+   "from": "a_fraudrej",
+   "to": "ph_rejend",
+   "style": "message",
+   "label": "rejection"
+  }
+ ]
+}

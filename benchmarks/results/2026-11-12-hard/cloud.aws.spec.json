@@ -1,0 +1,865 @@
+{
+ "type": "cloud",
+ "title": "AWS regulated web application: eu-west-1 active, eu-central-1 standby",
+ "frames": [
+  {
+   "id": "edge",
+   "kind": "edge",
+   "label": "Global (outside regions)"
+  },
+  {
+   "id": "r1",
+   "kind": "region",
+   "label": "eu-west-1 Ireland (active)"
+  },
+  {
+   "id": "v1",
+   "kind": "vpc",
+   "range": "10.0.0.0/16",
+   "parent": "r1"
+  },
+  {
+   "id": "r2",
+   "kind": "region",
+   "label": "eu-central-1 Frankfurt (standby)"
+  },
+  {
+   "id": "v2",
+   "kind": "vpc",
+   "range": "10.1.0.0/16",
+   "parent": "r2"
+  },
+  {
+   "id": "dc",
+   "kind": "onprem",
+   "label": "On-premises data centre"
+  },
+  {
+   "id": "z1a",
+   "kind": "zone",
+   "label": "AZ a",
+   "parent": "v1"
+  },
+  {
+   "id": "pub1a",
+   "kind": "public",
+   "parent": "z1a"
+  },
+  {
+   "id": "prv1a",
+   "kind": "private",
+   "parent": "z1a"
+  },
+  {
+   "id": "dat1a",
+   "kind": "data",
+   "parent": "z1a"
+  },
+  {
+   "id": "z1b",
+   "kind": "zone",
+   "label": "AZ b",
+   "parent": "v1"
+  },
+  {
+   "id": "pub1b",
+   "kind": "public",
+   "parent": "z1b"
+  },
+  {
+   "id": "prv1b",
+   "kind": "private",
+   "parent": "z1b"
+  },
+  {
+   "id": "dat1b",
+   "kind": "data",
+   "parent": "z1b"
+  },
+  {
+   "id": "z1c",
+   "kind": "zone",
+   "label": "AZ c",
+   "parent": "v1"
+  },
+  {
+   "id": "pub1c",
+   "kind": "public",
+   "parent": "z1c"
+  },
+  {
+   "id": "prv1c",
+   "kind": "private",
+   "parent": "z1c"
+  },
+  {
+   "id": "dat1c",
+   "kind": "data",
+   "parent": "z1c"
+  },
+  {
+   "id": "z2a",
+   "kind": "zone",
+   "label": "AZ a",
+   "parent": "v2"
+  },
+  {
+   "id": "pub2a",
+   "kind": "public",
+   "parent": "z2a"
+  },
+  {
+   "id": "prv2a",
+   "kind": "private",
+   "parent": "z2a"
+  },
+  {
+   "id": "dat2a",
+   "kind": "data",
+   "parent": "z2a"
+  },
+  {
+   "id": "z2b",
+   "kind": "zone",
+   "label": "AZ b",
+   "parent": "v2"
+  },
+  {
+   "id": "pub2b",
+   "kind": "public",
+   "parent": "z2b"
+  },
+  {
+   "id": "prv2b",
+   "kind": "private",
+   "parent": "z2b"
+  },
+  {
+   "id": "dat2b",
+   "kind": "data",
+   "parent": "z2b"
+  }
+ ],
+ "parts": [
+  {
+   "id": "users",
+   "label": "Users",
+   "detail": "browsers, apps",
+   "icon": "user"
+  },
+  {
+   "id": "r53",
+   "label": "Route 53",
+   "detail": "failover, health checks",
+   "icon": "dns",
+   "frame": "edge"
+  },
+  {
+   "id": "cf",
+   "label": "CloudFront",
+   "detail": "CDN",
+   "icon": "cdn",
+   "frame": "edge"
+  },
+  {
+   "id": "waf",
+   "label": "AWS WAF",
+   "detail": "web rules",
+   "icon": "firewall-waf",
+   "frame": "edge"
+  },
+  {
+   "id": "shield",
+   "label": "Shield Advanced",
+   "detail": "DDoS protection",
+   "icon": "shield",
+   "frame": "edge"
+  },
+  {
+   "id": "acm",
+   "label": "ACM",
+   "detail": "certificates",
+   "icon": "key",
+   "frame": "edge"
+  },
+  {
+   "id": "idc",
+   "label": "IAM Identity Center",
+   "detail": "workforce sign-in",
+   "icon": "identity-iam",
+   "frame": "edge"
+  },
+  {
+   "id": "org",
+   "label": "AWS Organizations",
+   "detail": "3 accounts",
+   "icon": "cloud"
+  },
+  {
+   "id": "acctnet",
+   "label": "Network account",
+   "detail": "Transit, endpoints",
+   "icon": "virtual-network"
+  },
+  {
+   "id": "acctprod",
+   "label": "Production account",
+   "detail": "the workload",
+   "icon": "cloud"
+  },
+  {
+   "id": "acctsec",
+   "label": "Security / Log archive",
+   "detail": "account",
+   "icon": "lock"
+  },
+  {
+   "id": "gd",
+   "label": "GuardDuty",
+   "detail": "threat detection",
+   "icon": "bug"
+  },
+  {
+   "id": "sh",
+   "label": "Security Hub",
+   "detail": "findings",
+   "icon": "shield"
+  },
+  {
+   "id": "ct",
+   "label": "CloudTrail",
+   "detail": "organisation trail",
+   "icon": "logging"
+  },
+  {
+   "id": "cfg",
+   "label": "AWS Config",
+   "detail": "configuration history",
+   "icon": "check"
+  },
+  {
+   "id": "nata",
+   "label": "NAT gateway",
+   "detail": "zone a",
+   "icon": "virtual-network",
+   "frame": "pub1a"
+  },
+  {
+   "id": "eksa",
+   "label": "EKS workers",
+   "detail": "zone a, ASG 2-6",
+   "icon": "kubernetes",
+   "frame": "prv1a"
+  },
+  {
+   "id": "natb",
+   "label": "NAT gateway",
+   "detail": "zone b",
+   "icon": "virtual-network",
+   "frame": "pub1b"
+  },
+  {
+   "id": "eksb",
+   "label": "EKS workers",
+   "detail": "zone b, ASG 2-6",
+   "icon": "kubernetes",
+   "frame": "prv1b"
+  },
+  {
+   "id": "natc",
+   "label": "NAT gateway",
+   "detail": "zone c",
+   "icon": "virtual-network",
+   "frame": "pub1c"
+  },
+  {
+   "id": "eksc",
+   "label": "EKS workers",
+   "detail": "zone c, ASG 2-6",
+   "icon": "kubernetes",
+   "frame": "prv1c"
+  },
+  {
+   "id": "alb",
+   "label": "Application LB",
+   "detail": "spans zones a, b, c",
+   "icon": "load-balancer",
+   "frame": "pub1a"
+  },
+  {
+   "id": "aw",
+   "label": "Aurora writer",
+   "detail": "PostgreSQL, zone a",
+   "icon": "sql-database",
+   "frame": "dat1a"
+  },
+  {
+   "id": "ar1",
+   "label": "Aurora reader",
+   "detail": "zone b",
+   "icon": "sql-database",
+   "frame": "dat1b"
+  },
+  {
+   "id": "ar2",
+   "label": "Aurora reader",
+   "detail": "zone c",
+   "icon": "sql-database",
+   "frame": "dat1c"
+  },
+  {
+   "id": "rp",
+   "label": "Redis primary",
+   "detail": "ElastiCache, zone a",
+   "icon": "in-memory-cache",
+   "frame": "dat1a"
+  },
+  {
+   "id": "rr1",
+   "label": "Redis replica",
+   "detail": "zone b",
+   "icon": "in-memory-cache",
+   "frame": "dat1b"
+  },
+  {
+   "id": "rr2",
+   "label": "Redis replica",
+   "detail": "zone c",
+   "icon": "in-memory-cache",
+   "frame": "dat1c"
+  },
+  {
+   "id": "mska",
+   "label": "MSK broker",
+   "detail": "zone a",
+   "icon": "message-queue",
+   "frame": "dat1a"
+  },
+  {
+   "id": "mskb",
+   "label": "MSK broker",
+   "detail": "zone b",
+   "icon": "message-queue",
+   "frame": "dat1b"
+  },
+  {
+   "id": "mskc",
+   "label": "MSK broker",
+   "detail": "zone c",
+   "icon": "message-queue",
+   "frame": "dat1c"
+  },
+  {
+   "id": "osa",
+   "label": "OpenSearch",
+   "detail": "zone a",
+   "icon": "search",
+   "frame": "dat1a"
+  },
+  {
+   "id": "osb",
+   "label": "OpenSearch",
+   "detail": "zone b",
+   "icon": "search",
+   "frame": "dat1b"
+  },
+  {
+   "id": "igw",
+   "label": "Internet gateway",
+   "detail": "",
+   "icon": "globe",
+   "frame": "v1"
+  },
+  {
+   "id": "tgw1",
+   "label": "Transit Gateway",
+   "detail": "eu-west-1",
+   "icon": "private-network",
+   "frame": "v1"
+  },
+  {
+   "id": "vpceg",
+   "label": "VPC endpoint",
+   "detail": "gateway: S3",
+   "icon": "private-network",
+   "frame": "v1"
+  },
+  {
+   "id": "vpcei",
+   "label": "VPC endpoints",
+   "detail": "interface: ECR, Secrets, CloudWatch",
+   "icon": "private-network",
+   "frame": "v1"
+  },
+  {
+   "id": "ssm",
+   "label": "Systems Manager",
+   "detail": "Session Manager, no bastion",
+   "icon": "gear",
+   "frame": "v1"
+  },
+  {
+   "id": "s3a",
+   "label": "S3 assets",
+   "detail": "application, versioning",
+   "icon": "object-storage",
+   "frame": "r1"
+  },
+  {
+   "id": "s3l",
+   "label": "S3 audit logs",
+   "detail": "object lock",
+   "icon": "object-storage",
+   "frame": "r1"
+  },
+  {
+   "id": "ecr",
+   "label": "ECR",
+   "detail": "container images",
+   "icon": "container",
+   "frame": "r1"
+  },
+  {
+   "id": "sec",
+   "label": "Secrets Manager",
+   "detail": "",
+   "icon": "secrets",
+   "frame": "r1"
+  },
+  {
+   "id": "kms",
+   "label": "KMS",
+   "detail": "keys",
+   "icon": "key",
+   "frame": "r1"
+  },
+  {
+   "id": "cw",
+   "label": "CloudWatch",
+   "detail": "metrics, logs",
+   "icon": "monitoring",
+   "frame": "r1"
+  },
+  {
+   "id": "sqs",
+   "label": "SQS",
+   "detail": "queue + dead-letter queue",
+   "icon": "message-queue",
+   "frame": "r1"
+  },
+  {
+   "id": "lam",
+   "label": "Lambda",
+   "detail": "image processing",
+   "icon": "serverless-function",
+   "frame": "r1"
+  },
+  {
+   "id": "cog",
+   "label": "Cognito",
+   "detail": "user pools",
+   "icon": "identity-iam",
+   "frame": "r1"
+  },
+  {
+   "id": "apigw",
+   "label": "API Gateway",
+   "detail": "private, for partners",
+   "icon": "api-gateway",
+   "frame": "r1"
+  },
+  {
+   "id": "evb",
+   "label": "EventBridge",
+   "detail": "event bus",
+   "icon": "bolt",
+   "frame": "r1"
+  },
+  {
+   "id": "nat2a",
+   "label": "NAT gateway",
+   "detail": "zone a",
+   "icon": "virtual-network",
+   "frame": "pub2a"
+  },
+  {
+   "id": "eks2a",
+   "label": "EKS pilot light",
+   "detail": "zone a, minimum size",
+   "icon": "kubernetes",
+   "frame": "prv2a"
+  },
+  {
+   "id": "nat2b",
+   "label": "NAT gateway",
+   "detail": "zone b",
+   "icon": "virtual-network",
+   "frame": "pub2b"
+  },
+  {
+   "id": "eks2b",
+   "label": "EKS pilot light",
+   "detail": "zone b, minimum size",
+   "icon": "kubernetes",
+   "frame": "prv2b"
+  },
+  {
+   "id": "alb2",
+   "label": "Application LB",
+   "detail": "standby",
+   "icon": "load-balancer",
+   "frame": "pub2a"
+  },
+  {
+   "id": "asec",
+   "label": "Aurora secondary",
+   "detail": "global database",
+   "icon": "sql-database",
+   "frame": "dat2a"
+  },
+  {
+   "id": "mm2",
+   "label": "MSK (MirrorMaker 2)",
+   "detail": "replicated brokers",
+   "icon": "message-queue",
+   "frame": "dat2a"
+  },
+  {
+   "id": "mm2b",
+   "label": "MSK (MirrorMaker 2)",
+   "detail": "replicated brokers",
+   "icon": "message-queue",
+   "frame": "dat2b"
+  },
+  {
+   "id": "tgw2",
+   "label": "Transit Gateway",
+   "detail": "eu-central-1",
+   "icon": "private-network",
+   "frame": "v2"
+  },
+  {
+   "id": "s3r",
+   "label": "S3 replica",
+   "detail": "bucket",
+   "icon": "object-storage",
+   "frame": "r2"
+  },
+  {
+   "id": "ecr2",
+   "label": "ECR replica",
+   "detail": "images",
+   "icon": "container",
+   "frame": "r2"
+  },
+  {
+   "id": "bank",
+   "label": "Core banking",
+   "detail": "",
+   "icon": "server",
+   "frame": "dc"
+  },
+  {
+   "id": "hsm",
+   "label": "HSM",
+   "detail": "",
+   "icon": "lock",
+   "frame": "dc"
+  },
+  {
+   "id": "ad",
+   "label": "Active Directory",
+   "detail": "",
+   "icon": "identity-iam",
+   "frame": "dc"
+  },
+  {
+   "id": "dx",
+   "label": "Direct Connect",
+   "detail": "2 links, 2 locations",
+   "icon": "private-network",
+   "frame": "dc"
+  },
+  {
+   "id": "vpn",
+   "label": "Site-to-site VPN",
+   "detail": "backup",
+   "icon": "private-network",
+   "frame": "dc"
+  }
+ ],
+ "links": [
+  {
+   "from": "users",
+   "to": "r53",
+   "label": "DNS lookup",
+   "main": true
+  },
+  {
+   "from": "r53",
+   "to": "cf",
+   "label": "HTTPS",
+   "main": true
+  },
+  {
+   "from": "cf",
+   "to": "waf",
+   "label": "inspect",
+   "main": true
+  },
+  {
+   "from": "waf",
+   "to": "alb",
+   "label": "HTTPS",
+   "main": true
+  },
+  {
+   "from": "alb",
+   "to": "eksa",
+   "label": "HTTP",
+   "main": true
+  },
+  {
+   "from": "eksa",
+   "to": "aw",
+   "label": "SQL",
+   "main": true
+  },
+  {
+   "from": "r53",
+   "to": "alb2",
+   "label": "failover (dashed alternative)",
+   "kind": "call"
+  },
+  {
+   "from": "alb2",
+   "to": "eks2a",
+   "label": "HTTP, on failover",
+   "kind": "call"
+  },
+  {
+   "from": "eks2a",
+   "to": "asec",
+   "label": "SQL, on failover",
+   "kind": "call"
+  },
+  {
+   "from": "eksa",
+   "to": "rp",
+   "label": "Redis"
+  },
+  {
+   "from": "eksa",
+   "to": "mskb",
+   "label": "events"
+  },
+  {
+   "from": "eksa",
+   "to": "osa",
+   "label": "search"
+  },
+  {
+   "from": "eksb",
+   "to": "ar1",
+   "label": "SQL reads"
+  },
+  {
+   "from": "s3a",
+   "to": "lam",
+   "label": "S3 event",
+   "kind": "event"
+  },
+  {
+   "from": "lam",
+   "to": "sqs",
+   "label": "failures",
+   "kind": "event"
+  },
+  {
+   "from": "shield",
+   "to": "cf",
+   "label": "protects"
+  },
+  {
+   "from": "acm",
+   "to": "cf",
+   "label": "certificate"
+  },
+  {
+   "from": "idc",
+   "to": "org",
+   "label": "sign-in"
+  },
+  {
+   "from": "org",
+   "to": "acctnet",
+   "label": "manages"
+  },
+  {
+   "from": "org",
+   "to": "acctprod",
+   "label": "manages"
+  },
+  {
+   "from": "org",
+   "to": "acctsec",
+   "label": "manages"
+  },
+  {
+   "from": "ct",
+   "to": "s3l",
+   "label": "trail writes"
+  },
+  {
+   "from": "acctsec",
+   "to": "gd",
+   "label": "hosts"
+  },
+  {
+   "from": "acctsec",
+   "to": "sh",
+   "label": "hosts"
+  },
+  {
+   "from": "acctsec",
+   "to": "ct",
+   "label": "hosts"
+  },
+  {
+   "from": "acctsec",
+   "to": "cfg",
+   "label": "hosts"
+  },
+  {
+   "from": "aw",
+   "to": "asec",
+   "label": "Aurora global replication",
+   "kind": "copy"
+  },
+  {
+   "from": "s3a",
+   "to": "s3r",
+   "label": "cross-region replication",
+   "kind": "copy"
+  },
+  {
+   "from": "ecr",
+   "to": "ecr2",
+   "label": "ECR replication",
+   "kind": "copy"
+  },
+  {
+   "from": "mska",
+   "to": "mm2",
+   "label": "MirrorMaker 2 mirroring",
+   "kind": "copy"
+  },
+  {
+   "from": "tgw1",
+   "to": "tgw2",
+   "label": "TGW peering"
+  },
+  {
+   "from": "dx",
+   "to": "tgw1",
+   "label": "Direct Connect"
+  },
+  {
+   "from": "vpn",
+   "to": "tgw1",
+   "label": "IPsec VPN backup",
+   "kind": "event"
+  },
+  {
+   "from": "bank",
+   "to": "dx",
+   "label": "private link"
+  },
+  {
+   "from": "hsm",
+   "to": "dx",
+   "label": "private link"
+  },
+  {
+   "from": "ad",
+   "to": "dx",
+   "label": "private link"
+  },
+  {
+   "from": "eksa",
+   "to": "vpceg",
+   "label": "S3 via gateway endpoint"
+  },
+  {
+   "from": "eksa",
+   "to": "vpcei",
+   "label": "ECR, Secrets, CloudWatch"
+  },
+  {
+   "from": "eksa",
+   "to": "cog",
+   "label": "auth"
+  },
+  {
+   "from": "apigw",
+   "to": "eksb",
+   "label": "partner API"
+  },
+  {
+   "from": "evb",
+   "to": "sqs",
+   "label": "events",
+   "kind": "event"
+  },
+  {
+   "from": "ssm",
+   "to": "eksc",
+   "label": "Session Manager"
+  },
+  {
+   "from": "nata",
+   "to": "igw",
+   "label": "outbound"
+  },
+  {
+   "from": "eksa",
+   "to": "s3a",
+   "label": "assets, HTTPS"
+  },
+  {
+   "from": "eksa",
+   "to": "ecr",
+   "label": "pull images"
+  },
+  {
+   "from": "eksa",
+   "to": "sec",
+   "label": "secrets"
+  },
+  {
+   "from": "eksa",
+   "to": "kms",
+   "label": "encrypt"
+  },
+  {
+   "from": "eksa",
+   "to": "cw",
+   "label": "logs, metrics"
+  },
+  {
+   "from": "eksa",
+   "to": "s3l",
+   "label": "audit logs"
+  },
+  {
+   "from": "eksb",
+   "to": "tgw1",
+   "label": "private routes"
+  },
+  {
+   "from": "eks2a",
+   "to": "tgw2",
+   "label": "private routes"
+  }
+ ]
+}

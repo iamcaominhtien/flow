@@ -1,0 +1,16 @@
+# org-chart blind test (Vietnamese retail group, 5 levels)
+
+1. Path: quick only; 2 builds. Round 1: exit 1, spec invalid: 42x "needs a 'name' (or 'open': true with a 'role')" (nameless positions), 5x "joins two people on different levels" (dotted functional lines). Round 2 (title put in `name`; functional reporting written into the role text; links removed): exit 0, 0 errors, 50 warnings: text-may-not-fit 42, org-role-sentence 7, org-too-many-levels 1. Author skill not tried: no errors, and the text was readable at 1:1 (though the page is huge).
+2. Counts. The brief says 62 positions but its text lists 58 (3+7+22+19+7); I drew 58. Spec: 58 people, 0 links (brief asks for 5 dotted lines). Scene: 61 nodes, 58 edges (the 3 extra nodes not checked). Drawn: 58 cards (I opened crops of about half of them), 0 dotted lines.
+3. Problems, most serious first:
+ - The 5 dotted functional-reporting lines are not drawn. Only a text line "Báo cáo chức năng: GĐ ..." sits inside 5 cards (diagrams/c2.png, c3.png, c4.png). The subtitle I wrote mentions dashed lines, but none exist.
+ - The two staff positions sit on the same bus as the 7 directors, at the far left, in gray (c1.png). Not "off to the side, outside the line"; they read as direct reports.
+ - Page is 11548 x 1390 px (about 8 screens wide); the CEO is at x=8006 and the staff at x=64 (full.png). No overview is possible.
+ - Block colours are inconsistent: Vận hành head and Chuỗi cung ứng green, but the three regional directors and all their area managers are amber (c2.png). A `team` value on a child overrode the head's explicit tone. The Legal head is gray, the same as staff.
+ - Initials are meaningless: every "Trưởng phòng" shows "TP", regional directors "GĐ", the CEO "NT" (c1.png, c3.png, c4.png).
+ - Legend is English ("Reports to", "Open role"; the open card also says "Open role") in a Vietnamese chart (c1.png, c4.png).
+ - Long titles wrap to 2-3 lines; no clipping seen in the crops I opened. I did not confirm the 42 text-may-not-fit warnings one by one.
+4. Not expressible: dotted lines between different levels; staff outside the line of management; a person with a title only (name is required, so the title went in the name field and the role stayed empty); a legend or labels in Vietnamese.
+5. Plugin bugs: no crash. Command: `python3 plugins/flow/scripts/flow.py build diagrams/org.spec.json`. Questionable: `team` tint overriding a head's tone; English legend.
+6. Skill text: "Limits" says working links join people on the same level, but functional reporting, the usual dotted line, is across levels; no workaround is given. Nothing on a person without a name. No staff or assistant role. The tint rule (tone, team, name, head) is hard to predict. For 5 levels the skill only says "one chart per department", which this brief rules out; the author-skill pointer says "more than about 15 elements", which applies here, but I did not follow it.
+Not verified: the .drawio file was written and parses as XML (239 mxCell elements); I could not render it. The HTML animation was not checked. Crops for the Hà Nội stores, mobile engineers and Miền Bắc were not opened. Files are in the folder diagrams/ (org.spec.json, org.html, org.drawio, full.png, c1-c4.png).

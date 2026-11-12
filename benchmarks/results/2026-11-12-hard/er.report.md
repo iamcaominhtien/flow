@@ -1,0 +1,16 @@
+# ER blind test report (hard brief, 27 tables)
+
+1. Path: quick only; 1 build round (1st attempt exit 1 from my own spec error: a type string parsed as a flag; fixed, not counted as a check round). Final exit code 0. Check: 0 errors, 77 warnings: lines-cross 55 (inferred: listed pairs), crosses-many 15, lines-overlap 3, crosses-border 2 (chips of sellers-warehouses and product_variants-order_items). Author skill not tried (step 3 only applies when errors or unreadable; the picture is hard to read, so it arguably applied, but I stopped as the quick path had 0 errors; flagging this as a judgement call).
+2. Counts: brief says "26 tables" but lists 27 (6+9+8+4). I drew 27. Relations: brief lists about 44 FK links (incl. two orders-addresses links, self link categories.parent_id); spec 44; scene 44 edges; all appear drawn. audit_log (entity_type, entity_id) polymorphic pointer: not expressible, no line; noted in desc only. Domain frames: 4 drawn. Optional links: 4 marked with zero_one at the parent (customers.user_id, categories.parent_id, refunds.order_item_id; reviews.order_item_id unique as zero_one at child end). Nullable columns show "?".
+3. Problems (full.png = whole page 3283x1676; crop1.png = top-left):
+ - Tangle of long lines: tenants to 7 children (owns) runs as thick horizontal bundles across the whole page; at users/customers the lines merge into one heavy black bar and are impossible to trace (crop1.png, around y=540). full.png.
+ - Lines run through other domains' frames and tables' edges: e.g. users-to-customers and tenants-to-customers cross the whole Catalogue frame; sellers-to-payouts, products-to-reviews, order_items-to-refunds run vertically across Orders/Catalogue.
+ - Many "owns" labels sit far from their line end, so which line is which is unclear. Several chips straddle borders (warned).
+ - Lines meet tables at the top/bottom edge, not at the FK row (from_column/to_column are accepted but, per skill, not drawn). Skill text elsewhere promises level entry.
+ - Money frame sits alone below with a big gap; tenant-level page is 3283 px wide, text small at fit-to-screen.
+ - The "main" blue animated line (customers to orders) is visible but runs through the middle of the bundle.
+ - Two orders-addresses links (ships to, bills to) are visible and separately labelled: fine.
+4. Not expressible: polymorphic pointer (entity_type + entity_id to any table); a "26 vs 27" mismatch cannot be flagged in the diagram; optional-ness of FKs only through the end mark, no per-column note.
+5. Plugin bugs: none seen (no traceback). Minor: error for a wrong flag names the index path only (tables[5].columns[4]), no table name.
+6. Unclear skill text: from_column/to_column "not drawn yet" (Spec section) vs. "so the line leaves level with those rows" (Layout); relation default direction (one at from) is clear but optional-parent encoding via from_end is not described. "Split" exists but the brief wants one diagram; the skill does not say to use author for 27 tables until the last line. Domain bands arrangement guidance is thin for 4 domains.
+Not verified: .drawio renders (parses as XML, 698 elements, ok; cannot render here); HTML animation; hover behaviour; the author path.

@@ -1,0 +1,411 @@
+{
+ "type": "gantt",
+ "title": "Gantt: core banking migration",
+ "desc": "52 weeks from Monday 4 January 2027, six phases.",
+ "today": 10,
+ "tasks": [
+  {
+   "id": "bc",
+   "label": "Business case",
+   "owner": "PMO",
+   "group": "Mobilise",
+   "start": 1,
+   "end": 3,
+   "status": "done"
+  },
+  {
+   "id": "vs",
+   "label": "Vendor selection",
+   "owner": "Procurement",
+   "group": "Mobilise",
+   "start": 2,
+   "end": 7,
+   "status": "done"
+  },
+  {
+   "id": "onb",
+   "label": "Team onboarding",
+   "owner": "HR",
+   "group": "Mobilise",
+   "start": 8,
+   "end": 10,
+   "progress": 0.8
+  },
+  {
+   "id": "gov",
+   "label": "Programme governance",
+   "owner": "PMO",
+   "group": "Mobilise",
+   "start": 1,
+   "end": 52,
+   "progress": 0.25
+  },
+  {
+   "id": "csa",
+   "label": "Current-state analysis",
+   "owner": "Architecture",
+   "group": "Design",
+   "start": 6,
+   "end": 12,
+   "progress": 0.6
+  },
+  {
+   "id": "ta",
+   "label": "Target architecture",
+   "owner": "Architecture",
+   "group": "Design",
+   "start": 10,
+   "end": 17
+  },
+  {
+   "id": "dmm",
+   "label": "Data model mapping",
+   "owner": "Data",
+   "group": "Design",
+   "start": 12,
+   "end": 20
+  },
+  {
+   "id": "ii",
+   "label": "Integration inventory",
+   "owner": "Integration",
+   "group": "Design",
+   "start": 10,
+   "end": 14
+  },
+  {
+   "id": "sd",
+   "label": "Security design",
+   "owner": "Security",
+   "group": "Design",
+   "start": 14,
+   "end": 19
+  },
+  {
+   "id": "env",
+   "label": "Environment setup",
+   "owner": "Platform",
+   "group": "Build",
+   "start": 15,
+   "end": 18
+  },
+  {
+   "id": "cc",
+   "label": "Core configuration",
+   "owner": "Vendor",
+   "group": "Build",
+   "start": 21,
+   "end": 32,
+   "after": "dso"
+  },
+  {
+   "id": "pc",
+   "label": "Product catalogue setup",
+   "owner": "Product",
+   "group": "Build",
+   "start": 23,
+   "end": 30
+  },
+  {
+   "id": "ilb",
+   "label": "Integration layer build",
+   "owner": "Integration",
+   "group": "Build",
+   "start": 21,
+   "end": 34,
+   "after": [
+    "dso"
+   ]
+  },
+  {
+   "id": "pay",
+   "label": "Payments adapters",
+   "owner": "Payments",
+   "group": "Build",
+   "start": 24,
+   "end": 33
+  },
+  {
+   "id": "card",
+   "label": "Card system adapter",
+   "owner": "Cards",
+   "group": "Build",
+   "start": 26,
+   "end": 33
+  },
+  {
+   "id": "rep",
+   "label": "Reporting rebuild",
+   "owner": "Data",
+   "group": "Build",
+   "start": 27,
+   "end": 36
+  },
+  {
+   "id": "am",
+   "label": "Access management",
+   "owner": "Security",
+   "group": "Build",
+   "start": 22,
+   "end": 27
+  },
+  {
+   "id": "bs",
+   "label": "Batch scheduler",
+   "owner": "Platform",
+   "group": "Build",
+   "start": 28,
+   "end": 32
+  },
+  {
+   "id": "cl",
+   "label": "Cleansing rules",
+   "owner": "Data",
+   "group": "Data migration",
+   "start": 22,
+   "end": 28
+  },
+  {
+   "id": "ext",
+   "label": "Extract scripts",
+   "owner": "Data",
+   "group": "Data migration",
+   "start": 21,
+   "end": 26,
+   "after": "dmm"
+  },
+  {
+   "id": "m1",
+   "label": "Mock migration 1",
+   "owner": "Data",
+   "group": "Data migration",
+   "start": 29,
+   "end": 30,
+   "after": [
+    "ext",
+    "cl"
+   ]
+  },
+  {
+   "id": "r1",
+   "label": "Reconciliation 1",
+   "owner": "Data",
+   "group": "Data migration",
+   "start": 31,
+   "end": 31
+  },
+  {
+   "id": "m2",
+   "label": "Mock migration 2",
+   "owner": "Data",
+   "group": "Data migration",
+   "start": 34,
+   "end": 35,
+   "after": "r1"
+  },
+  {
+   "id": "r2",
+   "label": "Reconciliation 2",
+   "owner": "Data",
+   "group": "Data migration",
+   "start": 36,
+   "end": 36
+  },
+  {
+   "id": "dr",
+   "label": "Dress rehearsal",
+   "owner": "Data",
+   "group": "Data migration",
+   "start": 44,
+   "end": 45,
+   "after": [
+    "r2",
+    "uat2"
+   ]
+  },
+  {
+   "id": "fm",
+   "label": "Final migration",
+   "owner": "Data",
+   "group": "Data migration",
+   "start": 49,
+   "end": 49,
+   "after": "gng"
+  },
+  {
+   "id": "ts",
+   "label": "Test strategy",
+   "owner": "QA",
+   "group": "Test",
+   "start": 18,
+   "end": 20
+  },
+  {
+   "id": "sit",
+   "label": "System integration test",
+   "owner": "QA",
+   "group": "Test",
+   "start": 33,
+   "end": 38,
+   "after": [
+    "cc"
+   ]
+  },
+  {
+   "id": "uat1",
+   "label": "UAT cycle 1",
+   "owner": "Business",
+   "group": "Test",
+   "start": 39,
+   "end": 41,
+   "after": "sit"
+  },
+  {
+   "id": "uat2",
+   "label": "UAT cycle 2",
+   "owner": "Business",
+   "group": "Test",
+   "start": 42,
+   "end": 43,
+   "after": "uat1"
+  },
+  {
+   "id": "perf",
+   "label": "Performance test",
+   "owner": "Platform",
+   "group": "Test",
+   "start": 37,
+   "end": 40
+  },
+  {
+   "id": "pen",
+   "label": "Security penetration test",
+   "owner": "Security",
+   "group": "Test",
+   "start": 38,
+   "end": 40
+  },
+  {
+   "id": "fix",
+   "label": "Defect fixing",
+   "owner": "Vendor",
+   "group": "Test",
+   "start": 39,
+   "end": 44
+  },
+  {
+   "id": "par",
+   "label": "Regulatory parallel run",
+   "owner": "Finance",
+   "group": "Test",
+   "start": 40,
+   "end": 47
+  },
+  {
+   "id": "tm",
+   "label": "Training material",
+   "owner": "Change",
+   "group": "Cutover and hypercare",
+   "start": 30,
+   "end": 36
+  },
+  {
+   "id": "bst",
+   "label": "Branch staff training",
+   "owner": "Change",
+   "group": "Cutover and hypercare",
+   "start": 37,
+   "end": 46,
+   "after": "tm"
+  },
+  {
+   "id": "cu",
+   "label": "Customer communications",
+   "owner": "Marketing",
+   "group": "Cutover and hypercare",
+   "start": 40,
+   "end": 48
+  },
+  {
+   "id": "rb",
+   "label": "Cutover runbook",
+   "owner": "PMO",
+   "group": "Cutover and hypercare",
+   "start": 38,
+   "end": 44
+  },
+  {
+   "id": "hc",
+   "label": "Hypercare",
+   "owner": "Vendor",
+   "group": "Cutover and hypercare",
+   "start": 50,
+   "end": 52
+  },
+  {
+   "id": "ldp",
+   "label": "Legacy decommission planning",
+   "owner": "Architecture",
+   "group": "Cutover and hypercare",
+   "start": 46,
+   "end": 52
+  },
+  {
+   "id": "ll",
+   "label": "Lessons learned",
+   "owner": "PMO",
+   "group": "Cutover and hypercare",
+   "start": 52,
+   "end": 52
+  }
+ ],
+ "milestones": [
+  {
+   "id": "con",
+   "label": "Contract signature",
+   "at": 8,
+   "group": "Mobilise",
+   "after": "vs"
+  },
+  {
+   "id": "dso",
+   "label": "Design sign-off",
+   "at": 20,
+   "group": "Design",
+   "after": [
+    "ta",
+    "dmm",
+    "sd"
+   ]
+  },
+  {
+   "id": "bld",
+   "label": "Build complete",
+   "at": 36,
+   "group": "Build"
+  },
+  {
+   "id": "tex",
+   "label": "Test exit",
+   "at": 47,
+   "group": "Test"
+  },
+  {
+   "id": "gng",
+   "label": "Go/No-go",
+   "at": 48,
+   "group": "Cutover and hypercare",
+   "after": [
+    "tex",
+    "dr"
+   ]
+  },
+  {
+   "id": "gl",
+   "label": "Go-live",
+   "at": 49,
+   "group": "Cutover and hypercare",
+   "after": "fm"
+  }
+ ]
+}

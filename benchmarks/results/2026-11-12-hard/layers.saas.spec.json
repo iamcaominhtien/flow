@@ -1,0 +1,173 @@
+{
+ "type": "layers",
+ "flow": true,
+ "title": "SaaS platform layers",
+ "desc": "Seven layers. Cross-cutting bands: Security and compliance (SSO, secrets, SOC 2 controls) on the left; Observability (logs, metrics, traces, on-call) on the right.",
+ "layers": [
+  {
+   "label": "Experience",
+   "tone": "blue",
+   "items": [
+    {
+     "label": "Web app (React)"
+    },
+    {
+     "label": "iOS app"
+    },
+    {
+     "label": "Android app"
+    },
+    {
+     "label": "Public API docs"
+    },
+    {
+     "label": "Admin console"
+    },
+    {
+     "label": "Embeddable widget"
+    }
+   ]
+  },
+  {
+   "label": "Edge and delivery",
+   "tone": "violet",
+   "items": [
+    {
+     "label": "CDN"
+    },
+    {
+     "label": "WAF"
+    },
+    {
+     "label": "Rate limiter"
+    },
+    {
+     "label": "API Gateway"
+    },
+    {
+     "label": "GraphQL federation router"
+    },
+    {
+     "label": "WebSocket hub"
+    }
+   ]
+  },
+  {
+   "label": "Application services",
+   "tone": "green",
+   "items": [
+    {
+     "label": "Accounts"
+    },
+    {
+     "label": "Billing"
+    },
+    {
+     "label": "Workspaces"
+    },
+    {
+     "label": "Documents"
+    },
+    {
+     "label": "Search"
+    },
+    {
+     "label": "Notifications"
+    },
+    {
+     "label": "Automation rules"
+    },
+    {
+     "label": "Reporting"
+    }
+   ]
+  },
+  {
+   "label": "Domain and shared libraries",
+   "tone": "teal",
+   "items": [
+    {
+     "label": "Auth SDK"
+    },
+    {
+     "label": "Permissions engine"
+    },
+    {
+     "label": "Feature flags"
+    },
+    {
+     "label": "Audit trail"
+    },
+    {
+     "label": "Pricing rules"
+    }
+   ]
+  },
+  {
+   "label": "Integration and messaging",
+   "tone": "amber",
+   "items": [
+    {
+     "label": "Event bus"
+    },
+    {
+     "label": "Job queue"
+    },
+    {
+     "label": "Webhook dispatcher"
+    },
+    {
+     "label": "Email/SMS adapters"
+    },
+    {
+     "label": "Third-party connectors"
+    }
+   ]
+  },
+  {
+   "label": "Data",
+   "tone": "gray",
+   "items": [
+    {
+     "label": "PostgreSQL (primary + 2 replicas)"
+    },
+    {
+     "label": "Redis"
+    },
+    {
+     "label": "OpenSearch"
+    },
+    {
+     "label": "Object storage"
+    },
+    {
+     "label": "ClickHouse"
+    },
+    {
+     "label": "Backup vault"
+    }
+   ]
+  },
+  {
+   "label": "Infrastructure",
+   "tone": "blue",
+   "items": [
+    {
+     "label": "Kubernetes"
+    },
+    {
+     "label": "Service mesh"
+    },
+    {
+     "label": "Terraform state"
+    },
+    {
+     "label": "Multi-region network"
+    },
+    {
+     "label": "Hardware security module"
+    }
+   ]
+  }
+ ]
+}

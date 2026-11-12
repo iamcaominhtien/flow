@@ -1,0 +1,306 @@
+{
+ "type": "org",
+ "title": "Sơ đồ tổ chức tập đoàn bán lẻ",
+ "desc": "Đường liền: báo cáo trực tiếp. Đường nét đứt: báo cáo chức năng. Thẻ nét đứt: vị trí đang tuyển.",
+ "root": {
+  "id": "ceo",
+  "name": "Nguyễn Thị Minh Khuê",
+  "role": "Tổng Giám đốc",
+  "tone": "violet",
+  "children": [
+   {
+    "id": "ta",
+    "name": "Phạm Quỳnh Anh",
+    "role": "Trợ lý Tổng Giám đốc",
+    "tone": "gray"
+   },
+   {
+    "id": "vp",
+    "name": "Đỗ Hữu Nghĩa",
+    "role": "Chánh Văn phòng Hội đồng quản trị",
+    "tone": "gray"
+   },
+   {
+    "id": "fin",
+    "name": "Trần Quốc Bảo",
+    "role": "Giám đốc Tài chính",
+    "team": "Tài chính",
+    "tone": "blue",
+    "children": [
+     {
+      "id": "f1",
+      "name": "Kế toán trưởng"
+     },
+     {
+      "id": "f2",
+      "name": "Trưởng phòng Ngân quỹ"
+     },
+     {
+      "id": "f3",
+      "name": "Trưởng phòng Kế hoạch tài chính"
+     },
+     {
+      "id": "f4",
+      "name": "Trưởng phòng Thuế"
+     }
+    ]
+   },
+   {
+    "id": "ops",
+    "name": "Lê Hoàng Phúc",
+    "role": "Giám đốc Vận hành",
+    "team": "Vận hành",
+    "tone": "green",
+    "children": [
+     {
+      "id": "sc",
+      "name": "Giám đốc Chuỗi cung ứng",
+      "children": [
+       {
+        "id": "w1",
+        "name": "Trưởng kho Hà Nội"
+       },
+       {
+        "id": "w2",
+        "name": "Trưởng kho Đà Nẵng"
+       },
+       {
+        "id": "w3",
+        "name": "Trưởng kho TP. Hồ Chí Minh"
+       },
+       {
+        "id": "w4",
+        "name": "Trưởng bộ phận Vận tải"
+       },
+       {
+        "id": "w5",
+        "name": "Trưởng bộ phận Mua hàng"
+       }
+      ]
+     },
+     {
+      "id": "vn",
+      "name": "Giám đốc Vùng Miền Bắc",
+      "role": "Báo cáo chức năng: GĐ Kinh doanh",
+      "team": "Vận hành",
+      "children": [
+       {
+        "id": "vn0",
+        "name": "Quản lý khu vực Hà Nội",
+        "children": [
+         {
+          "id": "st0",
+          "name": "Cửa hàng trưởng Cầu Giấy"
+         },
+         {
+          "id": "st1",
+          "name": "Cửa hàng trưởng Hoàn Kiếm"
+         },
+         {
+          "id": "st2",
+          "name": "Cửa hàng trưởng Long Biên"
+         },
+         {
+          "id": "st3",
+          "name": "Cửa hàng trưởng Hà Đông"
+         }
+        ]
+       },
+       {
+        "id": "vn1",
+        "name": "Quản lý khu vực Hải Phòng"
+       },
+       {
+        "id": "vn2",
+        "name": "Quản lý khu vực Quảng Ninh"
+       }
+      ]
+     },
+     {
+      "id": "vt",
+      "name": "Giám đốc Vùng Miền Trung",
+      "role": "Báo cáo chức năng: GĐ Kinh doanh",
+      "team": "Vận hành",
+      "children": [
+       {
+        "id": "vt0",
+        "name": "Quản lý khu vực Đà Nẵng"
+       },
+       {
+        "id": "vt1",
+        "name": "Quản lý khu vực Huế"
+       },
+       {
+        "id": "vt2",
+        "name": "Quản lý khu vực Nha Trang"
+       }
+      ]
+     },
+     {
+      "id": "vs",
+      "name": "Giám đốc Vùng Miền Nam",
+      "role": "Báo cáo chức năng: GĐ Kinh doanh",
+      "team": "Vận hành",
+      "children": [
+       {
+        "id": "vs0",
+        "name": "Quản lý khu vực TP. Hồ Chí Minh"
+       },
+       {
+        "id": "vs1",
+        "name": "Quản lý khu vực Cần Thơ"
+       },
+       {
+        "id": "vs2",
+        "name": "Quản lý khu vực Bình Dương"
+       }
+      ]
+     },
+     {
+      "id": "q",
+      "name": "Trưởng phòng Chất lượng"
+     }
+    ]
+   },
+   {
+    "id": "cto",
+    "name": "Vũ Thanh Tùng",
+    "role": "Giám đốc Công nghệ",
+    "team": "Công nghệ",
+    "tone": "violet",
+    "children": [
+     {
+      "id": "t1",
+      "name": "Trưởng phòng Hạ tầng"
+     },
+     {
+      "id": "t2",
+      "name": "Trưởng phòng Phát triển sản phẩm số",
+      "children": [
+       {
+        "id": "m",
+        "name": "Trưởng nhóm Ứng dụng di động",
+        "children": [
+         {
+          "id": "e0",
+          "name": "Kỹ sư"
+         },
+         {
+          "id": "e1",
+          "name": "Kỹ sư"
+         },
+         {
+          "id": "e2",
+          "name": "Kỹ sư"
+         }
+        ]
+       },
+       {
+        "id": "web",
+        "name": "Trưởng nhóm Web"
+       },
+       {
+        "id": "ux",
+        "name": "Trưởng nhóm Thiết kế trải nghiệm"
+       }
+      ]
+     },
+     {
+      "id": "t3",
+      "name": "Trưởng phòng Dữ liệu và Trí tuệ nhân tạo",
+      "children": [
+       {
+        "id": "de",
+        "name": "Trưởng nhóm Kỹ thuật dữ liệu"
+       },
+       {
+        "id": "da",
+        "name": "Trưởng nhóm Phân tích"
+       }
+      ]
+     },
+     {
+      "id": "t4",
+      "name": "Trưởng phòng An toàn thông tin",
+      "role": "Báo cáo chức năng: GĐ Pháp chế"
+     }
+    ]
+   },
+   {
+    "id": "hr",
+    "name": "Đặng Ngọc Ánh",
+    "role": "Giám đốc Nhân sự",
+    "team": "Nhân sự",
+    "tone": "amber",
+    "children": [
+     {
+      "id": "h1",
+      "name": "Trưởng phòng Tuyển dụng"
+     },
+     {
+      "id": "h2",
+      "name": "Trưởng phòng Đào tạo"
+     },
+     {
+      "id": "h3",
+      "name": "Trưởng phòng Lương thưởng và Phúc lợi"
+     }
+    ]
+   },
+   {
+    "id": "sal",
+    "name": "Bùi Gia Huy",
+    "role": "Giám đốc Kinh doanh",
+    "team": "Kinh doanh",
+    "tone": "red",
+    "children": [
+     {
+      "id": "s1",
+      "name": "Trưởng phòng Bán lẻ"
+     },
+     {
+      "id": "s2",
+      "name": "Trưởng phòng Thương mại điện tử",
+      "role": "Báo cáo chức năng: GĐ Công nghệ"
+     },
+     {
+      "id": "s3",
+      "name": "Trưởng phòng Khách hàng doanh nghiệp"
+     }
+    ]
+   },
+   {
+    "id": "mk",
+    "name": "Hoàng Thị Thu Hằng",
+    "role": "Giám đốc Marketing",
+    "team": "Marketing",
+    "tone": "teal",
+    "children": [
+     {
+      "id": "k1",
+      "name": "Trưởng phòng Thương hiệu"
+     },
+     {
+      "id": "k2",
+      "name": "Trưởng phòng Truyền thông số"
+     }
+    ]
+   },
+   {
+    "id": "leg",
+    "name": "Phan Đình Trọng Nghĩa",
+    "role": "Giám đốc Pháp chế và Tuân thủ",
+    "team": "Pháp chế",
+    "tone": "gray",
+    "children": [
+     {
+      "id": "l1",
+      "role": "Trưởng phòng Hợp đồng",
+      "open": true
+     }
+    ]
+   }
+  ]
+ },
+ "links": []
+}

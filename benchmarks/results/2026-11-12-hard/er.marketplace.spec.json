@@ -1,0 +1,1355 @@
+{
+ "type": "er",
+ "title": "ER: multi-tenant marketplace",
+ "desc": "27 tables in four domains (Tenancy, Catalogue, Orders, Money); audit_log.entity_type + entity_id is a polymorphic pointer and has no drawn line.",
+ "domain_frames": true,
+ "tables": [
+  {
+   "id": "tenants",
+   "name": "tenants",
+   "domain": "Tenancy",
+   "tone": "blue",
+   "at": [
+    0,
+    0
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "slug",
+     "type": "text",
+     "flags": [
+      "uq"
+     ]
+    },
+    {
+     "name": "plan",
+     "type": "text"
+    },
+    {
+     "name": "created_at",
+     "type": "timestamp"
+    }
+   ],
+   "icon": "home"
+  },
+  {
+   "id": "roles",
+   "name": "roles",
+   "domain": "Tenancy",
+   "tone": "blue",
+   "at": [
+    0,
+    1
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "tenant_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "name",
+     "type": "text"
+    }
+   ],
+   "icon": "key"
+  },
+  {
+   "id": "users",
+   "name": "users",
+   "domain": "Tenancy",
+   "tone": "blue",
+   "at": [
+    1,
+    0
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "tenant_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "email",
+     "type": "text",
+     "flags": [
+      "uq"
+     ]
+    },
+    {
+     "name": "password_hash",
+     "type": "text"
+    },
+    {
+     "name": "status",
+     "type": "text"
+    }
+   ],
+   "icon": "user"
+  },
+  {
+   "id": "user_roles",
+   "name": "user_roles",
+   "domain": "Tenancy",
+   "tone": "gray",
+   "at": [
+    1,
+    1
+   ],
+   "columns": [
+    {
+     "name": "user_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    },
+    {
+     "name": "role_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "api_keys",
+   "name": "api_keys",
+   "domain": "Tenancy",
+   "tone": "blue",
+   "at": [
+    2,
+    0
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "user_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "hash",
+     "type": "text"
+    },
+    {
+     "name": "last_used_at",
+     "type": "timestamp"
+    }
+   ],
+   "icon": "lock"
+  },
+  {
+   "id": "audit_log",
+   "name": "audit_log",
+   "domain": "Tenancy",
+   "tone": "blue",
+   "at": [
+    2,
+    1
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "tenant_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "actor_user_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "entity_type",
+     "type": "text"
+    },
+    {
+     "name": "entity_id",
+     "type": "uuid"
+    },
+    {
+     "name": "action",
+     "type": "text"
+    },
+    {
+     "name": "at",
+     "type": "timestamp"
+    }
+   ],
+   "icon": "doc"
+  },
+  {
+   "id": "sellers",
+   "name": "sellers",
+   "domain": "Catalogue",
+   "tone": "green",
+   "at": [
+    0,
+    2
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "tenant_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "owner_user_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "legal_name",
+     "type": "text"
+    }
+   ],
+   "icon": "store"
+  },
+  {
+   "id": "categories",
+   "name": "categories",
+   "domain": "Catalogue",
+   "tone": "green",
+   "at": [
+    0,
+    3
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "tenant_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "parent_id",
+     "type": "uuid",
+     "flags": [
+      "fk",
+      "null"
+     ]
+    },
+    {
+     "name": "name",
+     "type": "text"
+    }
+   ],
+   "icon": "folder"
+  },
+  {
+   "id": "tags",
+   "name": "tags",
+   "domain": "Catalogue",
+   "tone": "green",
+   "at": [
+    0,
+    4
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "tenant_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "label",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "id": "product_images",
+   "name": "product_images",
+   "domain": "Catalogue",
+   "tone": "green",
+   "at": [
+    1,
+    2
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "product_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "url",
+     "type": "text"
+    },
+    {
+     "name": "position",
+     "type": "int"
+    }
+   ],
+   "icon": "camera"
+  },
+  {
+   "id": "products",
+   "name": "products",
+   "domain": "Catalogue",
+   "tone": "green",
+   "at": [
+    1,
+    3
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "seller_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "category_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "title",
+     "type": "text"
+    },
+    {
+     "name": "status",
+     "type": "text"
+    }
+   ],
+   "icon": "box"
+  },
+  {
+   "id": "product_tags",
+   "name": "product_tags",
+   "domain": "Catalogue",
+   "tone": "gray",
+   "at": [
+    1,
+    4
+   ],
+   "columns": [
+    {
+     "name": "product_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    },
+    {
+     "name": "tag_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "warehouses",
+   "name": "warehouses",
+   "domain": "Catalogue",
+   "tone": "green",
+   "at": [
+    2,
+    2
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "seller_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "country",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "id": "stock_levels",
+   "name": "stock_levels",
+   "domain": "Catalogue",
+   "tone": "green",
+   "at": [
+    2,
+    3
+   ],
+   "columns": [
+    {
+     "name": "variant_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    },
+    {
+     "name": "warehouse_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    },
+    {
+     "name": "on_hand",
+     "type": "int"
+    },
+    {
+     "name": "reserved",
+     "type": "int"
+    }
+   ]
+  },
+  {
+   "id": "product_variants",
+   "name": "product_variants",
+   "domain": "Catalogue",
+   "tone": "green",
+   "at": [
+    2,
+    4
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "product_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "sku",
+     "type": "text",
+     "flags": [
+      "uq"
+     ]
+    },
+    {
+     "name": "price_cents",
+     "type": "int"
+    },
+    {
+     "name": "currency",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "id": "customers",
+   "name": "customers",
+   "domain": "Orders",
+   "tone": "violet",
+   "at": [
+    0,
+    5
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "tenant_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "user_id",
+     "type": "uuid",
+     "flags": [
+      "fk",
+      "null"
+     ]
+    },
+    {
+     "name": "email",
+     "type": "text"
+    }
+   ],
+   "icon": "user"
+  },
+  {
+   "id": "addresses",
+   "name": "addresses",
+   "domain": "Orders",
+   "tone": "violet",
+   "at": [
+    0,
+    6
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "customer_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "kind",
+     "type": "text"
+    },
+    {
+     "name": "line1",
+     "type": "text"
+    },
+    {
+     "name": "city",
+     "type": "text"
+    },
+    {
+     "name": "country",
+     "type": "text"
+    }
+   ],
+   "icon": "pin"
+  },
+  {
+   "id": "carts",
+   "name": "carts",
+   "domain": "Orders",
+   "tone": "violet",
+   "at": [
+    0,
+    7
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "customer_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "updated_at",
+     "type": "timestamp"
+    }
+   ],
+   "icon": "cart"
+  },
+  {
+   "id": "order_items",
+   "name": "order_items",
+   "domain": "Orders",
+   "tone": "violet",
+   "at": [
+    1,
+    5
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "order_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "variant_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "seller_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "qty",
+     "type": "int"
+    },
+    {
+     "name": "unit_price_cents",
+     "type": "int"
+    }
+   ]
+  },
+  {
+   "id": "orders",
+   "name": "orders",
+   "domain": "Orders",
+   "tone": "violet",
+   "at": [
+    1,
+    6
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "customer_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "shipping_address_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "billing_address_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "status",
+     "type": "text"
+    },
+    {
+     "name": "total_cents",
+     "type": "int"
+    },
+    {
+     "name": "placed_at",
+     "type": "timestamp"
+    }
+   ],
+   "icon": "doc"
+  },
+  {
+   "id": "cart_items",
+   "name": "cart_items",
+   "domain": "Orders",
+   "tone": "gray",
+   "at": [
+    1,
+    7
+   ],
+   "columns": [
+    {
+     "name": "cart_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    },
+    {
+     "name": "variant_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    },
+    {
+     "name": "qty",
+     "type": "int"
+    }
+   ]
+  },
+  {
+   "id": "shipments",
+   "name": "shipments",
+   "domain": "Orders",
+   "tone": "teal",
+   "at": [
+    2,
+    5
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "order_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "warehouse_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "carrier",
+     "type": "text"
+    },
+    {
+     "name": "tracking_no",
+     "type": "text"
+    }
+   ],
+   "icon": "truck"
+  },
+  {
+   "id": "shipment_items",
+   "name": "shipment_items",
+   "domain": "Orders",
+   "tone": "gray",
+   "at": [
+    2,
+    6
+   ],
+   "columns": [
+    {
+     "name": "shipment_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    },
+    {
+     "name": "order_item_id",
+     "type": "uuid",
+     "flags": [
+      "pk",
+      "fk"
+     ]
+    },
+    {
+     "name": "qty",
+     "type": "int"
+    }
+   ]
+  },
+  {
+   "id": "payouts",
+   "name": "payouts",
+   "domain": "Money",
+   "tone": "amber",
+   "at": [
+    3,
+    4
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "seller_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "period_start",
+     "type": "date"
+    },
+    {
+     "name": "period_end",
+     "type": "date"
+    },
+    {
+     "name": "amount_cents",
+     "type": "int"
+    }
+   ],
+   "icon": "card"
+  },
+  {
+   "id": "payments",
+   "name": "payments",
+   "domain": "Money",
+   "tone": "amber",
+   "at": [
+    3,
+    5
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "order_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "provider",
+     "type": "text"
+    },
+    {
+     "name": "amount_cents",
+     "type": "int"
+    },
+    {
+     "name": "status",
+     "type": "text"
+    }
+   ],
+   "icon": "card"
+  },
+  {
+   "id": "refunds",
+   "name": "refunds",
+   "domain": "Money",
+   "tone": "amber",
+   "at": [
+    3,
+    6
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "payment_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "order_item_id",
+     "type": "uuid",
+     "flags": [
+      "fk",
+      "null"
+     ]
+    },
+    {
+     "name": "amount_cents",
+     "type": "int"
+    },
+    {
+     "name": "reason",
+     "type": "text"
+    }
+   ],
+   "icon": "refund"
+  },
+  {
+   "id": "reviews",
+   "name": "reviews",
+   "domain": "Money",
+   "tone": "amber",
+   "at": [
+    3,
+    7
+   ],
+   "columns": [
+    {
+     "name": "id",
+     "type": "uuid",
+     "flags": [
+      "pk"
+     ]
+    },
+    {
+     "name": "product_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "customer_id",
+     "type": "uuid",
+     "flags": [
+      "fk"
+     ]
+    },
+    {
+     "name": "order_item_id",
+     "type": "uuid",
+     "flags": [
+      "fk",
+      "uq"
+     ]
+    },
+    {
+     "name": "rating",
+     "type": "int"
+    },
+    {
+     "name": "body",
+     "type": "text"
+    }
+   ],
+   "icon": "star"
+  }
+ ],
+ "relations": [
+  {
+   "from": "tenants",
+   "to": "users",
+   "label": "owns",
+   "from_column": "id",
+   "to_column": "tenant_id"
+  },
+  {
+   "from": "tenants",
+   "to": "roles",
+   "label": "owns",
+   "from_column": "id",
+   "to_column": "tenant_id"
+  },
+  {
+   "from": "tenants",
+   "to": "sellers",
+   "label": "owns",
+   "from_column": "id",
+   "to_column": "tenant_id"
+  },
+  {
+   "from": "tenants",
+   "to": "categories",
+   "label": "owns",
+   "from_column": "id",
+   "to_column": "tenant_id"
+  },
+  {
+   "from": "tenants",
+   "to": "tags",
+   "label": "owns",
+   "from_column": "id",
+   "to_column": "tenant_id"
+  },
+  {
+   "from": "tenants",
+   "to": "customers",
+   "label": "owns",
+   "from_column": "id",
+   "to_column": "tenant_id"
+  },
+  {
+   "from": "tenants",
+   "to": "audit_log",
+   "label": "owns",
+   "from_column": "id",
+   "to_column": "tenant_id"
+  },
+  {
+   "from": "users",
+   "to": "user_roles",
+   "label": "holds",
+   "from_column": "id",
+   "to_column": "user_id"
+  },
+  {
+   "from": "roles",
+   "to": "user_roles",
+   "label": "grants",
+   "from_column": "id",
+   "to_column": "role_id"
+  },
+  {
+   "from": "users",
+   "to": "api_keys",
+   "label": "issues",
+   "from_column": "id",
+   "to_column": "user_id"
+  },
+  {
+   "from": "users",
+   "to": "audit_log",
+   "label": "acts in",
+   "from_column": "id",
+   "to_column": "actor_user_id"
+  },
+  {
+   "from": "users",
+   "to": "sellers",
+   "label": "owns",
+   "from_column": "id",
+   "to_column": "owner_user_id"
+  },
+  {
+   "from": "users",
+   "to": "customers",
+   "label": "signs in as",
+   "from_column": "id",
+   "to_column": "user_id",
+   "from_end": "zero_one"
+  },
+  {
+   "from": "categories",
+   "to": "categories",
+   "label": "contains",
+   "from_column": "id",
+   "to_column": "parent_id",
+   "from_end": "zero_one"
+  },
+  {
+   "from": "sellers",
+   "to": "products",
+   "label": "lists",
+   "from_column": "id",
+   "to_column": "seller_id"
+  },
+  {
+   "from": "categories",
+   "to": "products",
+   "label": "groups",
+   "from_column": "id",
+   "to_column": "category_id"
+  },
+  {
+   "from": "products",
+   "to": "product_variants",
+   "label": "has",
+   "from_column": "id",
+   "to_column": "product_id"
+  },
+  {
+   "from": "products",
+   "to": "product_images",
+   "label": "shows",
+   "from_column": "id",
+   "to_column": "product_id"
+  },
+  {
+   "from": "products",
+   "to": "product_tags",
+   "label": "carries",
+   "from_column": "id",
+   "to_column": "product_id"
+  },
+  {
+   "from": "tags",
+   "to": "product_tags",
+   "label": "labels",
+   "from_column": "id",
+   "to_column": "tag_id"
+  },
+  {
+   "from": "sellers",
+   "to": "warehouses",
+   "label": "runs",
+   "from_column": "id",
+   "to_column": "seller_id"
+  },
+  {
+   "from": "product_variants",
+   "to": "stock_levels",
+   "label": "is stocked in",
+   "from_column": "id",
+   "to_column": "variant_id"
+  },
+  {
+   "from": "warehouses",
+   "to": "stock_levels",
+   "label": "holds",
+   "from_column": "id",
+   "to_column": "warehouse_id"
+  },
+  {
+   "from": "customers",
+   "to": "addresses",
+   "label": "saves",
+   "from_column": "id",
+   "to_column": "customer_id"
+  },
+  {
+   "from": "customers",
+   "to": "carts",
+   "label": "fills",
+   "from_column": "id",
+   "to_column": "customer_id"
+  },
+  {
+   "from": "carts",
+   "to": "cart_items",
+   "label": "contains",
+   "from_column": "id",
+   "to_column": "cart_id"
+  },
+  {
+   "from": "product_variants",
+   "to": "cart_items",
+   "label": "is in",
+   "from_column": "id",
+   "to_column": "variant_id"
+  },
+  {
+   "from": "customers",
+   "to": "orders",
+   "label": "places",
+   "from_column": "id",
+   "to_column": "customer_id",
+   "main": true
+  },
+  {
+   "from": "addresses",
+   "to": "orders",
+   "label": "ships to",
+   "from_column": "id",
+   "to_column": "shipping_address_id"
+  },
+  {
+   "from": "addresses",
+   "to": "orders",
+   "label": "bills to",
+   "from_column": "id",
+   "to_column": "billing_address_id"
+  },
+  {
+   "from": "orders",
+   "to": "order_items",
+   "label": "contains",
+   "from_column": "id",
+   "to_column": "order_id"
+  },
+  {
+   "from": "product_variants",
+   "to": "order_items",
+   "label": "is sold as",
+   "from_column": "id",
+   "to_column": "variant_id"
+  },
+  {
+   "from": "sellers",
+   "to": "order_items",
+   "label": "sells",
+   "from_column": "id",
+   "to_column": "seller_id"
+  },
+  {
+   "from": "orders",
+   "to": "shipments",
+   "label": "ships as",
+   "from_column": "id",
+   "to_column": "order_id"
+  },
+  {
+   "from": "warehouses",
+   "to": "shipments",
+   "label": "sends",
+   "from_column": "id",
+   "to_column": "warehouse_id"
+  },
+  {
+   "from": "shipments",
+   "to": "shipment_items",
+   "label": "packs",
+   "from_column": "id",
+   "to_column": "shipment_id"
+  },
+  {
+   "from": "order_items",
+   "to": "shipment_items",
+   "label": "is shipped in",
+   "from_column": "id",
+   "to_column": "order_item_id"
+  },
+  {
+   "from": "orders",
+   "to": "payments",
+   "label": "is paid by",
+   "from_column": "id",
+   "to_column": "order_id"
+  },
+  {
+   "from": "payments",
+   "to": "refunds",
+   "label": "gets",
+   "from_column": "id",
+   "to_column": "payment_id"
+  },
+  {
+   "from": "order_items",
+   "to": "refunds",
+   "label": "is refunded by",
+   "from_column": "id",
+   "to_column": "order_item_id",
+   "from_end": "zero_one"
+  },
+  {
+   "from": "sellers",
+   "to": "payouts",
+   "label": "receives",
+   "from_column": "id",
+   "to_column": "seller_id"
+  },
+  {
+   "from": "products",
+   "to": "reviews",
+   "label": "gets",
+   "from_column": "id",
+   "to_column": "product_id"
+  },
+  {
+   "from": "customers",
+   "to": "reviews",
+   "label": "writes",
+   "from_column": "id",
+   "to_column": "customer_id"
+  },
+  {
+   "from": "order_items",
+   "to": "reviews",
+   "label": "is reviewed in",
+   "from_column": "id",
+   "to_column": "order_item_id",
+   "from_end": "one",
+   "to_end": "zero_one"
+  }
+ ]
+}

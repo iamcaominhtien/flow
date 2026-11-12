@@ -1,0 +1,415 @@
+{
+ "type": "sequence",
+ "title": "Web checkout",
+ "desc": "A card checkout across ten participants: token check, order, stock reservation, payment with optional 3-D Secure, capture retries, and the paid or cancelled outcome.",
+ "participants": [
+  {
+   "id": "shopper",
+   "label": "Shopper",
+   "icon": "user",
+   "tone": "gray"
+  },
+  {
+   "id": "spa",
+   "label": "Browser SPA",
+   "icon": "globe",
+   "tone": "blue"
+  },
+  {
+   "id": "gw",
+   "label": "API Gateway",
+   "icon": "shield",
+   "tone": "violet"
+  },
+  {
+   "id": "auth",
+   "label": "Auth Service",
+   "icon": "key",
+   "tone": "amber"
+  },
+  {
+   "id": "order",
+   "label": "Order Service",
+   "icon": "box",
+   "tone": "green"
+  },
+  {
+   "id": "inv",
+   "label": "Inventory Service",
+   "icon": "database",
+   "tone": "teal"
+  },
+  {
+   "id": "pay",
+   "label": "Payment Service",
+   "icon": "card",
+   "tone": "blue"
+  },
+  {
+   "id": "card",
+   "label": "Card Network / Issuer ACS",
+   "icon": "bolt",
+   "tone": "gray"
+  },
+  {
+   "id": "broker",
+   "label": "Message Broker",
+   "icon": "mail",
+   "tone": "violet"
+  },
+  {
+   "id": "notif",
+   "label": "Notification Service",
+   "icon": "bell",
+   "tone": "amber"
+  }
+ ],
+ "items": [
+  {
+   "kind": "async",
+   "from": "shopper",
+   "to": "spa",
+   "label": "Click Pay",
+   "role": "main"
+  },
+  {
+   "kind": "sync",
+   "from": "spa",
+   "to": "gw",
+   "label": "POST /checkout + token",
+   "role": "main"
+  },
+  {
+   "kind": "sync",
+   "from": "gw",
+   "to": "auth",
+   "label": "Validate token"
+  },
+  {
+   "kind": "self",
+   "from": "auth",
+   "to": "auth",
+   "label": "Check cache"
+  },
+  {
+   "kind": "return",
+   "from": "auth",
+   "to": "gw",
+   "label": "200 + claims"
+  },
+  {
+   "fragment": "opt",
+   "sections": [
+    {
+     "guard": "token expired",
+     "items": [
+      {
+       "kind": "return",
+       "from": "gw",
+       "to": "spa",
+       "label": "401",
+       "role": "fail"
+      },
+      {
+       "kind": "sync",
+       "from": "spa",
+       "to": "auth",
+       "label": "POST /refresh"
+      },
+      {
+       "kind": "return",
+       "from": "auth",
+       "to": "spa",
+       "label": "New token"
+      },
+      {
+       "kind": "sync",
+       "from": "spa",
+       "to": "gw",
+       "label": "POST /checkout again"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "sync",
+   "from": "gw",
+   "to": "order",
+   "label": "Forward checkout"
+  },
+  {
+   "kind": "self",
+   "from": "order",
+   "to": "order",
+   "label": "Create order PENDING"
+  },
+  {
+   "fragment": "par",
+   "sections": [
+    {
+     "items": [
+      {
+       "kind": "sync",
+       "from": "order",
+       "to": "inv",
+       "label": "Reserve 3 lines"
+      },
+      {
+       "kind": "return",
+       "from": "inv",
+       "to": "order",
+       "label": "Reserved"
+      }
+     ]
+    },
+    {
+     "items": [
+      {
+       "kind": "sync",
+       "from": "order",
+       "to": "pay",
+       "label": "Create payment intent"
+      },
+      {
+       "kind": "return",
+       "from": "pay",
+       "to": "order",
+       "label": "Intent created"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "fragment": "alt",
+   "sections": [
+    {
+     "guard": "frictionless",
+     "items": [
+      {
+       "kind": "sync",
+       "from": "pay",
+       "to": "card",
+       "label": "Authorise"
+      },
+      {
+       "kind": "return",
+       "from": "card",
+       "to": "pay",
+       "label": "Approval"
+      }
+     ]
+    },
+    {
+     "guard": "challenge required",
+     "items": [
+      {
+       "kind": "return",
+       "from": "pay",
+       "to": "order",
+       "label": "3-D Secure redirect"
+      },
+      {
+       "kind": "return",
+       "from": "order",
+       "to": "gw",
+       "label": "3-D Secure redirect"
+      },
+      {
+       "kind": "return",
+       "from": "gw",
+       "to": "spa",
+       "label": "3-D Secure redirect"
+      },
+      {
+       "kind": "sync",
+       "from": "spa",
+       "to": "shopper",
+       "label": "Show issuer page"
+      },
+      {
+       "kind": "sync",
+       "from": "shopper",
+       "to": "spa",
+       "label": "Type one-time code"
+      },
+      {
+       "kind": "sync",
+       "from": "spa",
+       "to": "card",
+       "label": "POST result to ACS"
+      },
+      {
+       "kind": "async",
+       "from": "card",
+       "to": "pay",
+       "label": "Webhook: result"
+      },
+      {
+       "kind": "sync",
+       "from": "pay",
+       "to": "card",
+       "label": "Authorise"
+      },
+      {
+       "kind": "return",
+       "from": "card",
+       "to": "pay",
+       "label": "Approval"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "fragment": "loop",
+   "sections": [
+    {
+     "guard": "max 3 tries, back-off",
+     "items": [
+      {
+       "kind": "sync",
+       "from": "pay",
+       "to": "card",
+       "label": "Capture"
+      },
+      {
+       "kind": "return",
+       "from": "card",
+       "to": "pay",
+       "label": "Captured / timeout"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "fragment": "alt",
+   "sections": [
+    {
+     "guard": "captured",
+     "items": [
+      {
+       "kind": "async",
+       "from": "pay",
+       "to": "order",
+       "label": "Captured"
+      },
+      {
+       "kind": "self",
+       "from": "order",
+       "to": "order",
+       "label": "Mark order PAID"
+      },
+      {
+       "kind": "async",
+       "from": "order",
+       "to": "broker",
+       "label": "Publish OrderPaid"
+      },
+      {
+       "kind": "async",
+       "from": "broker",
+       "to": "notif",
+       "label": "OrderPaid"
+      },
+      {
+       "kind": "async",
+       "from": "broker",
+       "to": "inv",
+       "label": "Commit reservation"
+      },
+      {
+       "kind": "async",
+       "from": "notif",
+       "to": "shopper",
+       "label": "Send email"
+      }
+     ]
+    },
+    {
+     "guard": "capture failed after 3 tries",
+     "items": [
+      {
+       "kind": "async",
+       "from": "pay",
+       "to": "order",
+       "label": "Capture failed",
+       "role": "fail"
+      },
+      {
+       "kind": "sync",
+       "from": "order",
+       "to": "inv",
+       "label": "Release reservation"
+      },
+      {
+       "kind": "return",
+       "from": "inv",
+       "to": "order",
+       "label": "Released"
+      },
+      {
+       "kind": "sync",
+       "from": "order",
+       "to": "pay",
+       "label": "Void authorisation"
+      },
+      {
+       "kind": "return",
+       "from": "pay",
+       "to": "order",
+       "label": "Voided"
+      },
+      {
+       "kind": "self",
+       "from": "order",
+       "to": "order",
+       "label": "Mark order CANCELLED"
+      },
+      {
+       "kind": "async",
+       "from": "order",
+       "to": "broker",
+       "label": "Publish OrderCancelled"
+      },
+      {
+       "kind": "async",
+       "from": "broker",
+       "to": "notif",
+       "label": "OrderCancelled"
+      },
+      {
+       "kind": "async",
+       "from": "notif",
+       "to": "shopper",
+       "label": "Tell shopper: failed"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "return",
+   "from": "order",
+   "to": "gw",
+   "label": "201 or 402",
+   "role": "main"
+  },
+  {
+   "kind": "return",
+   "from": "gw",
+   "to": "spa",
+   "label": "201 or 402",
+   "role": "main"
+  },
+  {
+   "kind": "return",
+   "from": "spa",
+   "to": "shopper",
+   "label": "Show result",
+   "role": "main"
+  }
+ ]
+}
