@@ -2,7 +2,7 @@
 
 ## 0.20.0 (2026-11-27)
 
-A shared working method for every input and every type, in place of the one-case patches of 0.19.0. Design and review: `docs/plugin/working-method.md`. Not yet measured: the held-out briefs in `benchmarks/heldout/` and the decision rule there were committed before this change and are the test.
+A shared working method for every input and every type, in place of the one-case patches of 0.19.0. Design and review: `docs/plugin/working-method.md`. **Measured and not shown better**: on the held-out briefs, by the rule fixed in advance, it is not better than 0.17.0, but Flow ran in only 7 of 28 runs, so the test hardly touched the change (`benchmarks/results/2026-11-27-heldout-0.20.0.md`). Kept as unmeasured. Where it was loaded, the brief and `view.js` were used every time.
 
 - `skills/WORKING.md`: what to do before and after drawing (purpose, medium, understanding the source, type, scope; verify, deliver), each with when it is done. Every drawing skill (22) opens its steps with the same block that points to it; a test keeps the copies identical.
 - The brief: `<name>.brief.md` beside the spec, or in the output folder on the author path, with Question, Reader, Medium, Sources read, Left out and Unknowns. `flow.py build`, `flow.py split` and `Canvas.write` print all six lines with the check report, and warn `no-brief` when the file or a line is missing. Nothing in it is judged.

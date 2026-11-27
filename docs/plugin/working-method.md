@@ -1,6 +1,6 @@
 # Working method: from any input to a diagram
 
-Status: version 2 of the design, after one review (an independent agent, 2026-11-27). Built in 0.20.0 and fixed after a second review of the code; not yet measured. The held-out briefs that will measure it, and the rule that decides, are in `benchmarks/heldout/` and were committed before the build.
+Status: version 2 of the design, after one review (an independent agent, 2026-11-27). Built in 0.20.0 and fixed after a second review of the code. Evaluated on the held-out briefs: not better by the rule, but the plugin was bypassed in 21 of 28 runs, so the change is still unmeasured (`benchmarks/results/2026-11-27-heldout-0.20.0.md`). The held-out briefs that will measure it, and the rule that decides, are in `benchmarks/heldout/` and were committed before the build.
 
 ## The gap
 
