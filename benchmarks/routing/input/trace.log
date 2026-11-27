@@ -1,0 +1,14 @@
+2026-11-20T10:00:00.000Z gateway   req=7f3a POST /checkout recv
+2026-11-20T10:00:00.004Z gateway   req=7f3a -> auth.verify
+2026-11-20T10:00:00.019Z auth      req=7f3a token ok user=4411
+2026-11-20T10:00:00.021Z gateway   req=7f3a -> api.checkout
+2026-11-20T10:00:00.030Z api       req=7f3a load order 9120 (db 6ms)
+2026-11-20T10:00:00.041Z api       req=7f3a -> pricing.total
+2026-11-20T10:00:00.055Z pricing   req=7f3a coupon SUMMER applied, vip
+2026-11-20T10:00:00.057Z api       req=7f3a -> payments.charge amount=8412
+2026-11-20T10:00:02.061Z payments  req=7f3a provider timeout after 2000ms
+2026-11-20T10:00:02.062Z api       req=7f3a charge retryable -> queue retry_charge delay=60s
+2026-11-20T10:00:02.065Z gateway   req=7f3a 202 Accepted (2065ms)
+2026-11-20T10:01:02.100Z worker    req=7f3a job retry_charge order=9120 attempt=1
+2026-11-20T10:01:02.900Z payments  req=7f3a charge ok id=ch_88
+2026-11-20T10:01:02.910Z worker    req=7f3a -> email.send receipt

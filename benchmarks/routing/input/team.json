@@ -1,0 +1,15 @@
+[
+ {"name": "Mai", "title": "CTO", "manager": null},
+ {"name": "Quang", "title": "Head of Platform", "manager": "Mai"},
+ {"name": "Vy", "title": "Head of Product Eng", "manager": "Mai"},
+ {"name": "Son", "title": "SRE", "manager": "Quang"},
+ {"name": "Linh", "title": "SRE", "manager": "Quang"},
+ {"name": "Duc", "title": "Data Engineer", "manager": "Quang"},
+ {"name": "Thao", "title": "Engineering Manager, Checkout", "manager": "Vy"},
+ {"name": "Khoa", "title": "Engineering Manager, Mobile", "manager": "Vy"},
+ {"name": "Nam", "title": "Backend Engineer", "manager": "Thao"},
+ {"name": "Yen", "title": "Frontend Engineer", "manager": "Thao"},
+ {"name": "Phuc", "title": "iOS Engineer", "manager": "Khoa"},
+ {"name": "Ha", "title": "Android Engineer", "manager": "Khoa"},
+ {"name": "Bao", "title": "Designer", "manager": "Vy"}
+]

@@ -1,0 +1,11 @@
+<mxfile><diagram name="Page-1"><mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/>
+<mxCell id="a" value="Browser" style="rounded=0;" vertex="1" parent="1"><mxGeometry x="20" y="40" width="90" height="40" as="geometry"/></mxCell>
+<mxCell id="b" value="nginx" vertex="1" parent="1"><mxGeometry x="300" y="10" width="70" height="30" as="geometry"/></mxCell>
+<mxCell id="c" value="api" vertex="1" parent="1"><mxGeometry x="160" y="200" width="80" height="40" as="geometry"/></mxCell>
+<mxCell id="d" value="postgres" vertex="1" parent="1"><mxGeometry x="420" y="230" width="90" height="40" as="geometry"/></mxCell>
+<mxCell id="e" value="redis" vertex="1" parent="1"><mxGeometry x="10" y="300" width="60" height="40" as="geometry"/></mxCell>
+<mxCell id="e1" edge="1" parent="1" source="a" target="b"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e2" edge="1" parent="1" source="b" target="c"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e3" edge="1" parent="1" source="c" target="d"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e4" edge="1" parent="1" source="c" target="e"><mxGeometry relative="1" as="geometry"/></mxCell>
+</root></mxGraphModel></diagram></mxfile>
