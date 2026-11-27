@@ -1,0 +1,14 @@
+[
+{"id": "f01", "expect": "flow", "split": "fresh", "asks": "generic", "input": "file", "text": "I just joined and shop/refunds.py is a maze. Can you show me what happens from the moment a refund is requested until the money goes back?"},
+{"id": "f02", "expect": "flow", "split": "fresh", "asks": "generic", "input": "file", "text": "Help me see how the services in docker-compose.yml talk to each other."},
+{"id": "f03", "expect": "flow", "split": "fresh", "asks": "type", "input": "file", "text": "Draw an ER diagram of the tables in schema.sql. I want to paste it into our onboarding doc."},
+{"id": "f04", "expect": "flow", "split": "fresh", "asks": "generic", "input": "file", "text": "Cho mình xem luồng xử lý của một request đi qua trace.log, từ lúc vào đến lúc lỗi xảy ra."},
+{"id": "f05", "expect": "flow", "split": "fresh", "asks": "generic", "input": "file", "text": "plan.csv has the launch tasks and who owns them. I need something visual for the steering meeting tomorrow that shows what depends on what and roughly when."},
+{"id": "f06", "expect": "flow", "split": "fresh", "asks": "generic", "input": "none", "text": "How does OAuth login actually work when a user clicks 'Sign in with Google'? I keep mixing up who talks to whom."},
+{"id": "f07", "expect": "flow", "split": "fresh", "asks": "generic", "input": "file", "text": "Our order goes through a bunch of statuses in shop/models.py and I can never remember which ones can follow which. Can you lay it out?"},
+{"id": "f08", "expect": "flow", "split": "fresh", "asks": "type", "input": "none", "text": "Make me an org chart for a 30-person startup: CEO, a CTO with two eng teams, a head of sales, and an ops lead."},
+{"id": "f09", "expect": "other", "split": "fresh", "asks": "negative", "input": "file", "text": "Plot monthly revenue from sales.csv as a bar chart, one bar per month, and highlight the best one."},
+{"id": "f10", "expect": "other", "split": "fresh", "asks": "negative", "input": "none", "text": "Can you draw me a cute logo of a fox holding a coffee cup? Something I can use as an avatar."},
+{"id": "f11", "expect": "other", "split": "fresh", "asks": "negative", "input": "file", "text": "Viết giúp mình một mermaid flowchart dạng text cho deploy.sh để dán vào README, không cần file hình."},
+{"id": "f12", "expect": "other", "split": "fresh", "asks": "negative", "input": "none", "text": "Build me a small React dashboard page with a sidebar, a search box and a table of users. Make it look clean."}
+]

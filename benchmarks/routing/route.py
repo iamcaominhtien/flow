@@ -53,6 +53,7 @@ ALLOWED: list[str] = [
 ]  # fmt: skip
 NO_SYNC: dict[str, str] = {"CLAUDE_CODE_SYNC_PLUGINS": "0", "CLAUDE_CODE_SYNC_SKILLS": "0"}
 FLOW_SKILL: str = "flow:"
+REQUEST_FILES: tuple[str, ...] = ("requests.json", "fresh.json")  # fresh: split "fresh"
 ENTRY_SKILL: str = "flow:draw"  # routes on to a type skill; loading it alone decides nothing
 ROUTING_FILES: tuple[str, ...] = ("skills/draw/", "skills/WORKING.md")  # read before routing
 WRITES_OUTPUT: re.Pattern[str] = re.compile(
@@ -312,7 +313,12 @@ def main(argv: list[str]) -> None:
         argv: LABEL PLUGIN_DIR ENV RUNS, then request ids or split names (all when none).
     """
     label, plugin, env_kind, runs, *ids = argv
-    entries = json.loads((HERE / "requests.json").read_text(encoding="utf-8"))
+    entries = [
+        entry
+        for name in REQUEST_FILES
+        if (HERE / name).is_file()
+        for entry in json.loads((HERE / name).read_text(encoding="utf-8"))
+    ]
     chosen = [entry for entry in entries if not ids or entry["id"] in ids or entry["split"] in ids]
     (OUT / label).mkdir(parents=True, exist_ok=True)
     (OUT / "clean-config").mkdir(parents=True, exist_ok=True)
