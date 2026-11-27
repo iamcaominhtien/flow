@@ -6,7 +6,8 @@ ENV is ``owner`` (the container's own settings and synced plugins) or ``clean`` 
 folder, sync off: Flow and the built-in skills only). Each run gets a fresh copy of ``input/`` plus
 four standard-library modules, and is stopped at its first decisive event:
 
-- a ``flow:`` skill, or a tool call that names a file of the plugin folder: ``flow``;
+- a ``flow:`` skill other than the entry skill ``flow:draw`` (which only routes), or a tool call
+  that names a file of the plugin folder other than that skill's and ``WORKING.md``: ``flow``;
 - a file with an output suffix written, or newly present in the work folder: ``own:<suffix>``;
 - a final answer before either: ``text`` (with the answer kept, to tell a question from a reply).
 
@@ -18,6 +19,7 @@ agent and which model served it.
 import json
 import os
 import queue
+import re
 import shutil
 import subprocess
 import sys
@@ -51,6 +53,11 @@ ALLOWED: list[str] = [
 ]  # fmt: skip
 NO_SYNC: dict[str, str] = {"CLAUDE_CODE_SYNC_PLUGINS": "0", "CLAUDE_CODE_SYNC_SKILLS": "0"}
 FLOW_SKILL: str = "flow:"
+ENTRY_SKILL: str = "flow:draw"  # routes on to a type skill; loading it alone decides nothing
+ROUTING_FILES: tuple[str, ...] = ("skills/draw/", "skills/WORKING.md")  # read before routing
+WRITES_OUTPUT: re.Pattern[str] = re.compile(
+    r"(>|\btee\s+)\s*['\"]?[\w./-]+\.(png|svg|html?|drawio|pdf|pptx|jpe?g|webp)\b"
+)  # a shell redirect or tee into an output file
 LOCK: threading.Lock = threading.Lock()
 # Each worker reuses one work folder path, so the agent's system prompt (which names its folder)
 # is the same from run to run and its prompt cache is read instead of written again.
@@ -93,12 +100,16 @@ def decide(setup: Setup, tool: str, args: dict[str, object]) -> str | None:
         ``flow``, ``own:<suffix>`` or None.
     """
     if tool == "Skill":
-        return "flow" if str(args.get("skill", "")).startswith(FLOW_SKILL) else None
-    if str(setup.plugin) in json.dumps(args):
+        name = str(args.get("skill", ""))
+        return "flow" if name.startswith(FLOW_SKILL) and name != ENTRY_SKILL else None
+    text = json.dumps(args)
+    if str(setup.plugin) in text and not any(name in text for name in ROUTING_FILES):
         return "flow"
     suffix = Path(str(args.get("file_path", ""))).suffix.lower()
     if tool in ("Write", "Edit") and suffix in OUTPUT_SUFFIXES:
         return "own:" + suffix.lstrip(".")
+    if tool == "Bash" and WRITES_OUTPUT.search(str(args.get("command", ""))):
+        return "own:bash"
     return None
 
 

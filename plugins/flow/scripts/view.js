@@ -17,8 +17,6 @@ const path = require('path');
 const { execSync } = require('child_process');
 const { pathToFileURL } = require('url');
 
-const { chromium } = loadPlaywright();
-
 const MEDIA = {
   phone: { width: 390, scale: 3 },
   screen: { width: 1440, scale: 1 },
@@ -28,6 +26,9 @@ const MEDIA = {
 };
 const WHOLE_SCALE = 2; // the delivered picture is sharp when zoomed in
 const MEASURE_WIDTH = 320; // css px; narrower than any diagram
+const NO_BROWSER = 3; // exit code: Playwright or its Chromium is missing
+const INSTALL_HINT =
+  'view.js needs Node, Playwright and Chromium: npm install -g playwright && npx playwright install chromium';
 
 async function main() {
   const [page, mediumName = 'screen'] = process.argv.slice(2);
@@ -38,7 +39,7 @@ async function main() {
   }
   const source = path.resolve(page);
   const base = source.replace(/\.html$/, '');
-  const browser = await chromium.launch();
+  const browser = await launchBrowser();
   const whole = `${base}.png`;
   const size = await shootWhole(browser, source, whole);
   const seen = `${base}.${mediumName}.png`;
@@ -89,12 +90,28 @@ function dataUrl(picture) {
   return `data:image/png;base64,${fs.readFileSync(picture).toString('base64')}`;
 }
 
+async function launchBrowser() {
+  let playwright;
+  try {
+    playwright = loadPlaywright();
+  } catch (error) {
+    console.error(`Playwright is not installed. ${INSTALL_HINT}`);
+    process.exit(NO_BROWSER);
+  }
+  try {
+    return await playwright.chromium.launch();
+  } catch (error) {
+    console.error(`Chromium could not start (${error.message.split('\n')[0]}). ${INSTALL_HINT}`);
+    process.exit(NO_BROWSER);
+  }
+}
+
 function loadPlaywright() {
   // The project's own Playwright first, then the one installed for the whole machine.
   try {
     return require('playwright');
   } catch (error) {
-    const root = execSync('npm root -g', { encoding: 'utf8' }).trim();
+    const root = execSync('npm root -g', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
     return require(path.join(root, 'playwright'));
   }
 }
