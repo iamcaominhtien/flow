@@ -150,15 +150,31 @@ def read_event(setup: Setup, run: Run, message: dict[str, object]) -> str | None
     if kind != "assistant":
         return None
     for part in message["message"]["content"]:
-        if part.get("type") != "tool_use":
-            continue
-        run.calls.append(part["name"])
-        if part["name"] == "Skill":
-            run.skills.append(str(part["input"].get("skill", "")))
-        made = decide(setup, part["name"], part["input"])
+        made = _read_tool_call(setup, run, part) if part.get("type") == "tool_use" else None
         if made:
             return made
     return new_output(run)
+
+
+def _read_tool_call(setup: Setup, run: Run, part: dict[str, object]) -> str | None:
+    """Record one tool call and return its decision, naming the Flow skill when one decides.
+
+    Args:
+        setup: The result set.
+        run: The run so far.
+        part: A ``tool_use`` part of an assistant message.
+
+    Returns:
+        ``flow:<skill>``, ``flow``, ``own:<suffix>`` or None.
+    """
+    name, args = str(part["name"]), part["input"]
+    run.calls.append(name)
+    if name == "Skill":
+        run.skills.append(str(args.get("skill", "")))
+    made = decide(setup, name, args)
+    if made == "flow" and name == "Skill":
+        return "flow:" + str(args.get("skill", "")).removeprefix(FLOW_SKILL)
+    return made
 
 
 def watch(setup: Setup, run: Run, process: subprocess.Popen[str], log: Path) -> None:

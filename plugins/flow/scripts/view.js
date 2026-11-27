@@ -1,6 +1,7 @@
 // Render a Flow page to PNG, whole and as it will be seen on its medium.
 //
 //   node view.js page.html [medium]
+//   node view.js --check            exit 0 when a browser starts here, 3 when not (for doctor)
 //
 // medium: phone, screen (the default), slide, editor or print. It writes, next to the page:
 //   <name>.png           the whole diagram at twice its size, to deliver or to inspect
@@ -10,7 +11,8 @@
 // Open the second file and read it at that size: if a label cannot be read there, the reader
 // cannot read it either. Animations are stilled (reduced motion), so the picture is final.
 //
-// It needs Playwright and Chromium (the project's own, or `require('playwright')` in the session).
+// It needs Playwright and Chromium: a Playwright Node can find from this file, or the one installed
+// with `npm install -g`.
 
 const fs = require('fs');
 const path = require('path');
@@ -32,6 +34,11 @@ const INSTALL_HINT =
 
 async function main() {
   const [page, mediumName = 'screen'] = process.argv.slice(2);
+  if (page === '--check') {
+    await (await launchBrowser()).close();
+    console.log('a headless browser starts');
+    return;
+  }
   const medium = MEDIA[mediumName];
   if (!page || !medium) {
     console.error(`usage: node view.js page.html [${Object.keys(MEDIA).join('|')}]`);
@@ -107,7 +114,7 @@ async function launchBrowser() {
 }
 
 function loadPlaywright() {
-  // The project's own Playwright first, then the one installed for the whole machine.
+  // A Playwright found from this file's folder first, then the one installed for the whole machine.
   try {
     return require('playwright');
   } catch (error) {

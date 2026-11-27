@@ -18,7 +18,7 @@ Written on 2026-11-27, before any change to the plugin's routing.
 
 `route.py LABEL PLUGIN_DIR ENV RUNS [ID | SPLIT ...]` runs each request with `claude -p` (model from `ROUTING_MODEL`, default Sonnet; the resolved id is recorded), and stops it at the first decisive event:
 
-- `flow`: a `flow:` skill, or any tool call naming a file of the plugin folder;
+- `flow:<skill>`: a `flow:` type skill (loading the entry skill `flow:draw`, or reading it or `WORKING.md`, decides nothing: the run goes on to the type skill), or `flow` for any other tool call naming a file of the plugin folder; every decision starting with `flow` counts as a hit;
 - `own:<suffix>`: the agent writes a file with an output suffix (html, svg, png, drawio, pdf, pptx, jpg, webp), or such a file appears in the work folder;
 - `text`: a final answer before either (the answer is kept, so a clarifying question, which nobody can answer in `-p` mode, can be told from a reply).
 

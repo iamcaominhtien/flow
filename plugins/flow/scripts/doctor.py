@@ -12,13 +12,8 @@ DRAWIO_HINT = (
     "INFO exporting .drawio files to PNG, SVG or PDF needs the optional `drawio@drawio` plugin;\n"
     "     check with `claude plugin list`"
 )
-BROWSER_PROBE = (
-    "let p; try { p = require('playwright') } catch (e) {"
-    " p = require(require('path').join(require('child_process')"
-    ".execSync('npm root -g', {encoding: 'utf8'}).trim(), 'playwright')) }"
-    " process.stdout.write(p.chromium.executablePath())"
-)  # the lookup view.js makes, without starting a browser
-PROBE_TIMEOUT_S = 30
+PROBE_TIMEOUT_S = 60  # starting Chromium once can take a while
+NO_BROWSER = 3  # view.js's exit code when Playwright or Chromium is missing
 PNG_MISSING = (
     "INFO PNG pictures (scripts/view.js) are not available: {reason};\n"
     "     install with `npm install -g playwright && npx playwright install chromium`"
@@ -41,26 +36,30 @@ def installed_skills(plugin_root: Path) -> list[str]:
 def png_status() -> str:
     """Return one line on whether ``view.js`` can write PNG pictures here.
 
+    It runs ``view.js --check``, which loads Playwright and starts Chromium the way a real
+    render does, so the check and the use cannot disagree.
+
     Returns:
-        An ``OK`` line with the browser's path, or an ``INFO`` line with what is missing.
+        An ``OK`` line, or an ``INFO`` line with what is missing.
     """
     if shutil.which("node") is None:
         return PNG_MISSING.format(reason="Node is not installed")
+    view = PLUGIN_ROOT / "scripts" / "view.js"
     try:
         probe = subprocess.run(
-            ["node", "-e", BROWSER_PROBE],
+            ["node", str(view), "--check"],
             capture_output=True,
             text=True,
             timeout=PROBE_TIMEOUT_S,
             check=False,
         )
     except subprocess.TimeoutExpired:
-        return PNG_MISSING.format(reason="Node did not answer")
+        return PNG_MISSING.format(reason="the browser did not start in time")
+    if probe.returncode == NO_BROWSER:
+        return PNG_MISSING.format(reason=probe.stderr.strip().split(". ")[0])
     if probe.returncode != 0:
-        return PNG_MISSING.format(reason="Playwright is not installed")
-    if not Path(probe.stdout.strip()).is_file():
-        return PNG_MISSING.format(reason="Playwright's Chromium is not downloaded")
-    return f"OK   PNG pictures: Chromium at {probe.stdout.strip()}"
+        return PNG_MISSING.format(reason=f"view.js failed: {probe.stderr.strip()[:200]}")
+    return "OK   PNG pictures: a headless browser starts (scripts/view.js)"
 
 
 def main() -> None:

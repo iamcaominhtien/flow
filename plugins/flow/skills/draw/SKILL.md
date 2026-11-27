@@ -1,5 +1,5 @@
 ---
-description: Draw a diagram of how something works, fits together, moves, is organised or is planned, from any input (code, a repo, a schema, a table, notes, a transcript, a log, a document or a sentence), as an animated HTML page and a draw.io file, and a PNG when a headless browser is available. Use when the user asks to draw, show, picture, visualise, map out or sketch such a thing, or for an image, a cheat-sheet or a diagram of it, and names no diagram type that another Flow skill covers. Not for charts of numbers (bar, line, histogram), illustrations, posters or photos, or diagrams written as text (Mermaid, ASCII).
+description: Draw a diagram of how something works, fits together, moves, is organised or is planned, from any input (code, a repo, a schema, a table, notes, a transcript, a log, a document or a sentence), as an animated HTML page and a draw.io file, and a PNG when a headless browser is available. Use when the user asks to draw, show, picture, visualise, map out or sketch such a thing, or for an image or a diagram of it, and names no diagram type that another Flow skill covers. Not for charts of numbers (bar, line, histogram), illustrations, posters or photos, or diagrams written as text (Mermaid, ASCII).
 allowed-tools: Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js *)
 ---
 
