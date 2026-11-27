@@ -123,16 +123,40 @@ Set `canvas.theme = "neutral"`, `"technical"` or `"midnight"` (default `"pastel"
 **Layout**: the happy path stays on one straight line; exceptions branch to the side or down. Steps in a row share a centre line. Gaps: 56 px or more between rows, 70 px or more between columns, more where a line carries a label. Return lines run *outside* the flow, never through a step. Snap positions to a 10 px grid. In a swimlane chart a step sits in exactly one lane, the actor who starts is in the top lane, a line that changes lane runs straight across.
 
 **Arranging** (your judgement, but think about these):
-- Size the page for the medium in the brief. On a screen, keep it readable at normal zoom: aim for no more than about 3000 px wide and 2500 px tall. On a phone, prefer a narrow, tall arrangement, or an overview and one diagram per part. A long chain of steps should be folded into a column or into rows, not left as one very long row.
+- Size the page for the medium in the brief. On a screen, keep it readable at normal zoom: aim for no more than about 3000 px wide and 2500 px tall. On a phone, prefer a narrow, tall arrangement, or an overview and one diagram per part. A long chain of steps should be folded into rows that read left to right (`chain`), not left as one very long row.
 - A node that many lines meet (a hub) can be a tall bar or a wide band so the lines arrive in parallel and apart, instead of bunching into one point.
 - Put what belongs together close and group it in a lane or a zone; put the main path where the eye starts (top left) and let it run to the end.
 - Use the space. If a large part of the page is empty (a corner, half of a zone), move things so the diagram is compact: put the legend under or beside the diagram where it does not leave a hole, shrink zones to their contents, and bring far-apart groups closer. An empty zone corner is a sign the arrangement can be tighter.
 - Give a hub or a big shared node a `tone` (`NodeOptions(tone=Tone.AMBER)`) so it stands out from its neighbours; any shape takes a tone, which tints its fill.
 - Avoid several near-parallel lines closer than about 12 px, and lines that cross a whole page. Move a node, change the side a line uses, or give a line a waypoint.
-- A long chain of steps inside one lane (more than about eight) is folded: continue it on a second row inside the same lane (make the lane taller) or let the chain turn back under itself, rather than running one row across a very wide page.
+- A long chain of steps is folded with `chain` (below), which wraps it like text; never let a row run right to left.
 - Many return lines into one node: send them along a channel inside the top (or bottom) edge of the lane, one line per row of the channel about 12 px apart, and give each its own arrival point along the node's top edge. Order them so that the line coming from farthest away has the highest row and arrives leftmost, and none of them cross. If a return line would be longer than about half the page, put a connector (`Shape.CONNECTOR`, one letter) at each end instead.
 - `detail` also works on plain nodes (a second, smaller line under the name).
 - Use one icon style per diagram. In the illustrated style the work steps are cards; in the plain style none are.
+
+## Large diagrams: say what the content is, let the kit place it
+
+In a large diagram most of the work is the same three things again and again, and placing each one by hand is where layouts go wrong (rows that run backwards, a box per name, zones with holes). `flowlib.arrange` places them by one rule each; use it for every part it fits, and place by hand only what is left (decisions and their branches, the joins between parts).
+
+```python
+from flowlib.arrange import ChainSpace, Listing, Step, chain, cover, fit_zone, listing
+
+steps = [Step("load", "Load order"), Step("price", "Price cart"), Step("pay", "Charge card")]
+area = chain(canvas, steps, ChainSpace(left=80, top=220, width=1200, role=Role.MAIN))
+names = ("Load user", "Load follows", "Load mutes")  # a set: they run at once
+tables = listing(canvas, Listing("hyd", "Query loaders, 3 at once", names), (80, area.bottom + 90))
+zone = fit_zone(canvas, "hydrate", ("Hydrate", Tone.TEAL), [box.node.id for box in tables])
+```
+
+Decide what each part of the content is before you place anything:
+
+- **A set** (members that run at once, or are listed rather than ordered: loaders, sources, side effects, the terms of a sum, flags): `listing`. One titled table, a row per member (a `(name, note)` pair adds a short note), split into columns of equal height when it is long. Never one box per member.
+- **A sequence with no branch** longer than about six steps (21 filters applied one after another): `listing` with `is_ordered=True`, numbered rows. A reader follows the numbers; arrows between 21 boxes add nothing.
+- **A sequence with branches**, or a short one: `chain` for the straight runs (rows left to right; a full row continues at the left of the next row, as text does), then decisions and their exits by hand with `canvas.node` and `canvas.edge`. Pass `role=Role.MAIN` for the main path.
+- **A group**: `fit_zone` around its members after they are placed, so it is no bigger than what it holds. Number a stage in its zone name (`3 · Filter`) instead of repeating it in a separate column.
+- `cover(canvas, ids)` gives the rectangle of placed nodes, to put the next part below or beside it.
+
+**Levels.** Choose one level of detail per diagram. When the whole would pass about 80 nodes, or the medium is a phone or a slide, draw an overview (one node per stage, with the count of what each holds) and one diagram per stage, each written with its own name, and say in the overview which file holds each stage. On a screen or in an editor a single large diagram is fine if every part uses the patterns above.
 
 ## Looking
 
