@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.19.0 (2026-11-27)
+
+From a blind run: a fresh session with the plugin loaded, given only "draw a flowchart of X's open-sourced algorithm", chose the flowchart skill before opening the source, read only the README, drew 16 of 23 steps as process boxes, sent a failed end on into the flow, and left half the page empty beside a shifted main column. The check reported only long names and one crossing.
+
+- New error `end-has-exit`: a `fail` step, or a `terminator` that a line reaches, has a line out. None of the examples has one.
+- New warnings `few-shapes` (eight or more steps, more than 60% one kind or two kinds or fewer) and `long-column` (more than four times longer than wide). Both point to subprocess steps, lanes or `/flow:author`. None of the examples gets one.
+- Layout: a split bar fans its branches out on both sides, as a decision with three or more exits does, so the flow after the join comes back to the column it left. Swimlane charts are unchanged.
+- Flowchart skill: the description says when to use the author skill (the flow of a whole system or codebase, many stages, the best result); a step 0 chooses the path, asks to read the source itself and not only a README, and to use the kinds of step for what they are. The author skill's description names whole systems and codebases.
+- Not checked: whether a blind run now picks the author skill; that is the next run.
+
 ## 0.18.0 (2026-11-27)
 
 - Flowchart: no step limit. A long flowchart keeps one column (one row going right) instead of being folded into bands side by side; the warning `chart-too-big` (more than 15 steps) and the theme value `fold_extent_lanes` are gone. Other types that share the layout (tables, screens) still fold past `fold_extent`.

@@ -1,5 +1,5 @@
 ---
-description: Lay out a diagram by hand, in a script of your own, when the automatic layout of the other Flow skills is not good enough (long or dense flows, many groups, a hub with many lines). You choose every position and route, in the Flow design, and write HTML and draw.io files. Use for large or complex diagrams, or when the user wants the best result rather than the quickest.
+description: Lay out a diagram by hand, in a script of your own, when the automatic layout of the other Flow skills is not good enough (long or dense flows, many groups, a hub with many lines). You choose every position and route, in the Flow design, and write HTML and draw.io files. Use for large or complex diagrams, for the flow of a whole system or codebase, or when the user wants the best result rather than the quickest.
 allowed-tools: Bash(python3 *)
 ---
 

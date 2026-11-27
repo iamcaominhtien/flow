@@ -15,7 +15,7 @@ BAR_THICKNESS_PX = 8
 sys.path.insert(0, str(PLUGIN_DIR))
 
 from flowlib import diagrams, render_drawio, render_html, scene as scene_io  # noqa: E402,I001
-from flowlib.check import Code, check_scene  # noqa: E402
+from flowlib.check import Code, Severity, check_scene  # noqa: E402
 from flowlib.import_drawio import convert  # noqa: E402
 from flowlib.model import FrameVariant, LabelKind, Role, Scene, Shape  # noqa: E402
 
@@ -164,12 +164,70 @@ def test_lint_flags_text_and_decisions() -> None:
 
 
 def test_a_long_chart_keeps_one_column() -> None:
-    """A flowchart has no step limit: forty steps stay in one column, with nothing reported."""
+    """A flowchart has no step limit: forty steps stay in one column and only get hints."""
     many = [{"id": f"n{i}", "kind": "process", "text": "Step"} for i in range(40)]
     links = [{"from": f"n{i}", "to": f"n{i + 1}"} for i in range(39)]
     laid = chart(many, links)
     assert len({node.x for node in laid.nodes}) == 1
-    assert not codes(laid)
+    assert codes(laid) == {Code.FEW_SHAPES.value, Code.LONG_COLUMN.value}
+    hints = [f for f in check_scene(laid) if f.code in (Code.FEW_SHAPES, Code.LONG_COLUMN)]
+    assert all(f.severity is Severity.WARNING and "/flow:author" in f.message for f in hints)
+
+
+def test_the_flow_after_a_wide_split_comes_back_to_its_column() -> None:
+    """Four parallel branches fan out on both sides, so the step after the join stays in line."""
+    branches = [f"b{index}" for index in range(4)]
+    nodes = [
+        {"id": "a", "kind": "process", "text": "Load user"},
+        {"id": "split", "kind": "fork"},
+        *[{"id": name, "kind": "process", "text": f"Source {name}"} for name in branches],
+        {"id": "merge", "kind": "join"},
+        {"id": "z", "kind": "process", "text": "Rank posts"},
+    ]
+    edges = [
+        {"from": "a", "to": "split"},
+        *[{"from": "split", "to": name} for name in branches],
+        *[{"from": name, "to": "merge"} for name in branches],
+        {"from": "merge", "to": "z"},
+    ]
+    centre = {node.id: node.x + node.width / 2 for node in chart(nodes, edges).nodes}
+    assert centre["a"] == centre["z"]
+
+
+def test_a_line_out_of_a_failed_end_is_an_error() -> None:
+    """A fail node that the flow goes on from is reported as an error."""
+    nodes = [
+        {"id": "check", "kind": "decision", "text": "Allowed?"},
+        {"id": "drop", "kind": "fail", "text": "Dropped"},
+        {"id": "keep", "kind": "process", "text": "Keep post"},
+        {"id": "merge", "kind": "process", "text": "Merge threads"},
+    ]
+    edges = [
+        {"from": "check", "to": "keep", "label": "Yes", "role": "yes"},
+        {"from": "check", "to": "drop", "label": "No"},
+        {"from": "drop", "to": "merge"},
+        {"from": "keep", "to": "merge"},
+    ]
+    found = [f for f in check_scene(chart(nodes, edges)) if f.code is Code.END_HAS_EXIT]
+    assert [f.items for f in found] == [("drop",)]
+    assert found[0].severity is Severity.ERROR
+
+
+def test_an_end_terminator_with_a_line_out_is_an_error_and_a_start_is_not() -> None:
+    """A terminator reached by a line and left by one is an error; the start is fine."""
+    nodes = [
+        {"id": "start", "kind": "terminator", "text": "Order placed"},
+        {"id": "pay", "kind": "process", "text": "Pay"},
+        {"id": "done", "kind": "terminator", "text": "Order paid"},
+        {"id": "ship", "kind": "process", "text": "Ship"},
+    ]
+    edges = [
+        {"from": "start", "to": "pay"},
+        {"from": "pay", "to": "done"},
+        {"from": "done", "to": "ship"},
+    ]
+    found = [f.items for f in check_scene(chart(nodes, edges)) if f.code is Code.END_HAS_EXIT]
+    assert found == [("done",)]
 
 
 def test_lint_asks_for_else_last() -> None:

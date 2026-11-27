@@ -2,8 +2,12 @@
 
 These are rules about the words and the shape of a chart, not about its geometry: the checks in
 ``check`` look at the pictures, these at the content. Each finding is a warning, because an
-author may break a rule on purpose. Which rules apply depends on ``Scene.diagram``.
+author may break a rule on purpose. The exception is a flowchart that goes on past an end: it says
+the opposite of what the chart means, so it is an error. Which rules apply depends on
+``Scene.diagram``.
 """
+
+from collections import Counter
 
 from .check import Code, Finding, Severity
 from .lint_board import lint_kanban, lint_roadmap
@@ -29,6 +33,11 @@ TEXT_SHAPES = (
     Shape.PREPARATION,
 )  # outlines whose text the word limit applies to
 NOT_DRAWN_AS_NODES = (Shape.FORK, Shape.CONNECTOR)  # marks that do not count as steps
+MIN_STEPS_FOR_MIX = 8  # a shorter chart may well use one kind of step
+MAIN_KIND_SHARE = 0.6  # past this share of one kind, a chart reads as a list drawn in boxes
+FEW_KINDS = 2  # a chart this long with this many kinds of step or fewer reads the same way
+LONG_RATIO = 4.0  # a chart this many times longer than it is wide is scrolled, not seen
+AUTHOR_HINT = "or lay the chart out by hand with /flow:author"
 NOTE_ROLES = (Role.LIFELINE,)
 MAX_ROLE_WORDS = 6  # a role longer than this is a sentence, not a noun phrase
 LEGEND_PREFIXES = ("legend", "key")  # the ids of the samples and the words of a legend
@@ -55,6 +64,8 @@ def lint_flowchart(scene: Scene) -> list[Finding]:
     steps = [node for node in scene.nodes if node.shape not in NOT_DRAWN_AS_NODES]
     findings = [_too_long(node) for node in steps if _has_too_many_words(node)]
     findings += _decision_findings(scene)
+    findings += [_end_has_exit(scene, node) for node in steps if _goes_on_past_end(scene, node)]
+    findings += _few_shapes(steps) + _long_column(scene)
     return findings + _placement_findings(scene)
 
 
@@ -94,6 +105,97 @@ def _too_long(node: Node) -> Finding:
         f"'{node.id}' has {len(_words(node))} words; four or fewer read at a glance",
         (node.id,),
     )
+
+
+def _few_shapes(steps: list[Node]) -> list[Finding]:
+    """Suggest more kinds of step when a chart is mostly one kind, so it reads as a list.
+
+    Args:
+        steps: The nodes of the flowchart drawn as steps.
+
+    Returns:
+        One ``few-shapes`` warning, or nothing.
+    """
+    middle = [node for node in steps if node.shape is not Shape.TERMINATOR]
+    kinds = Counter(node.shape for node in middle)
+    if len(middle) < MIN_STEPS_FOR_MIX or not _is_mainly_one_kind(kinds, len(middle)):
+        return []
+    shape, count = kinds.most_common(1)[0]
+    message = (
+        f"{count} of {len(middle)} steps are {shape.value} and only {len(kinds)} kinds are used; "
+        f"group steps into subprocess steps or lanes, show data with io or document, {AUTHOR_HINT}"
+    )
+    return [_warn(Code.FEW_SHAPES, message, ())]
+
+
+def _long_column(scene: Scene) -> list[Finding]:
+    """Suggest another arrangement when a chart is one long column or row, scrolled, not seen.
+
+    Args:
+        scene: The laid out flowchart.
+
+    Returns:
+        One ``long-column`` warning, or nothing.
+    """
+    long_side, short_side = sorted((scene.width, scene.height), reverse=True)
+    if not short_side or long_side / short_side <= LONG_RATIO:
+        return []
+    message = (
+        f"the chart is {long_side:.0f} px long and {short_side:.0f} px across; group steps into "
+        f"subprocess steps or lanes, {AUTHOR_HINT}"
+    )
+    return [_warn(Code.LONG_COLUMN, message, ())]
+
+
+def _is_mainly_one_kind(kinds: Counter[Shape], step_count: int) -> bool:
+    """Tell whether one kind of step dominates, or too few kinds are used.
+
+    Args:
+        kinds: How many steps there are of each shape.
+        step_count: The number of steps counted.
+
+    Returns:
+        True when the chart uses few kinds, or one kind takes more than its share.
+    """
+    return len(kinds) <= FEW_KINDS or max(kinds.values()) / step_count > MAIN_KIND_SHARE
+
+
+def _goes_on_past_end(scene: Scene, node: Node) -> bool:
+    """Tell whether a line leaves a failed end, or an end that a line reaches.
+
+    A terminator with lines out and none in is the start; one with both is an end the flow
+    walks through, so what follows it reads as happening after the flow has stopped.
+
+    Args:
+        scene: The laid out flowchart.
+        node: The step to look at.
+
+    Returns:
+        True when the flow goes on from an end.
+    """
+    if not _exits(scene, node):
+        return False
+    if node.shape is Shape.FAIL:
+        return True
+    return node.shape is Shape.TERMINATOR and any(edge.target == node.id for edge in scene.edges)
+
+
+def _end_has_exit(scene: Scene, node: Node) -> Finding:
+    """Build the error for an end that the flow goes on from.
+
+    Args:
+        scene: The laid out flowchart.
+        node: The end that a line leaves.
+
+    Returns:
+        An ``end-has-exit`` error that names the end and where its lines go.
+    """
+    targets = ", ".join(f"'{edge.target}'" for edge in _exits(scene, node))
+    message = (
+        f"'{node.id}' is an end but a line leaves it to {targets}; "
+        "end the path there, or make the step a process"
+    )
+    return Finding(Severity.ERROR, Code.END_HAS_EXIT, message, (node.id,))
 
 
 def _exits(scene: Scene, node: Node) -> list[Edge]:

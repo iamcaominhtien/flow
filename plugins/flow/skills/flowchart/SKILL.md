@@ -1,5 +1,5 @@
 ---
-description: Draw a flowchart (steps, decisions, loops, optional swimlanes, top-to-bottom or left-to-right) as an animated HTML page and a draw.io file from a short description. Use when the user asks for a flowchart, a process flow, or the steps and decisions of a procedure.
+description: Draw a flowchart (steps, decisions, loops, optional swimlanes, top-to-bottom or left-to-right) as an animated HTML page and a draw.io file from a short description, with one automatic layout. Use when the user asks for a flowchart, a process flow, or the steps and decisions of a procedure, and the process is small enough to describe in a few lines. For the flow of a whole system or codebase (many stages, many components, a source to read first), or when the user wants the best result, use the author skill instead.
 allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py *)
 ---
 
@@ -11,7 +11,8 @@ Scope: flowcharts in the plain or the illustrated style, top to bottom or left t
 
 ## Steps
 
-1. Work out the steps, the decisions and the places where the flow loops back. Ask only if the process is unclear.
+0. Choose the path first. This skill is the quick one: one automatic layout, no control over the arrangement. If the flow is that of a whole system or codebase, has several stages each with many steps, or the user wants the best picture rather than the quickest, use `/flow:author` instead and stop here. If the flow comes from code or documents, read the source itself (not only its README) before you draw, and draw what it does, with real names.
+1. Work out the steps, the decisions and the places where the flow loops back. Ask only if the process is unclear. Use the kinds of step for what they are (`io` for data in or out, `document`, `subprocess` for a stage with its own chart, `preparation`, lanes for who does what); a chart that is a column of one kind reads as a list.
 2. Write `<name>.spec.json` in a `diagrams/` folder of the current project (create it if needed).
 3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` (view and share) and `<name>.drawio` (open and edit in draw.io) next to the spec, and prints a check report.
 4. Read the report. Exit code 0 means no error; 2 means errors were found (the files are still written); 1 means the spec is invalid and the message lists every problem.
@@ -56,7 +57,7 @@ Scope: flowcharts in the plain or the illustrated style, top to bottom or left t
 
 ## Reading the report
 
-`line-through-node`, `nodes-overlap`, `label-covers` and `outside-canvas` are errors. `text-may-not-fit` and `lines-cross` are warnings, and so are the writing rules: `text-too-long` (more than four words), `decision-not-question`, `decision-few-exits`, `decision-no-else` (three or more exits and the last is not `else`), `start-placement` and `end-placement`. Fix an error by:
+`line-through-node`, `nodes-overlap`, `label-covers` and `outside-canvas` are errors. `text-may-not-fit` and `lines-cross` are warnings, and so are the writing rules: `text-too-long` (more than four words), `decision-not-question`, `decision-few-exits`, `decision-no-else` (three or more exits and the last is not `else`), `start-placement` and `end-placement`. `end-has-exit` is an error: a `fail` step, or a `terminator` that a line reaches, has a line out, so the flow goes on after it has ended; end the path there, or make the step a process. Two warnings are hints about the whole chart: `few-shapes` (eight or more steps, mostly one kind, or two kinds or fewer) and `long-column` (the chart is more than four times longer than it is wide). Act on them by grouping steps into `subprocess` steps or lanes, or by moving to `/flow:author`. Fix an error by:
 
 1. Shortening the text of the nodes involved.
 2. Moving a branch with `side`, or changing which exit has the role `yes`.

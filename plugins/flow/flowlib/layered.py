@@ -143,7 +143,9 @@ def assign_columns(
         Node id to column; columns may be negative when a branch asks for the left side.
     """
     sides = {node.id: node.side for node in spec.nodes}
-    fans = {node.id for node in spec.nodes if node.kind is Shape.DECISION}
+    # A split bar fans its branches out on both sides, as a decision does, so that the flow
+    # after the join comes back to the column it left from.
+    fans = {node.id for node in spec.nodes if node.kind in (Shape.DECISION, Shape.FORK)}
     has_parent = {edge.target for edge in forward}
     column: dict[str, int] = {}
     taken: set[tuple[int, int]] = set()
