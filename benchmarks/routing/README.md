@@ -33,7 +33,9 @@ Two environments:
 
 ## The rule, fixed before the baseline
 
-Primary: the `held` split, Opus, `owner` environment, two runs per request.
+Every run uses Sonnet: the plugin has to work for a model that is not the strongest, and that is where its gaps show. (The first version of this rule, `c90ee95`, made Opus primary; it was changed before any baseline run finished, on the owner's instruction.)
+
+Primary: the `held` split, Sonnet, `owner` environment, two runs per request.
 
 - **Misses**: runs of `expect: flow` requests whose decision is not `flow`, out of 30.
 - **False positives**: runs of `expect: other` requests whose decision is `flow`, out of 16.
@@ -42,7 +44,6 @@ A change to routing is kept when all of these hold:
 
 1. Misses fall by at least half and by at least 4 runs.
 2. False positives are at most the baseline's plus 2.
-3. With Sonnet (`held`, `owner`, two runs), hits are not fewer than the baseline's.
-4. In `clean` (Sonnet, `held`, one run), hits are not fewer than the baseline's.
+3. In `clean` (`held`, one run), hits are not fewer than the baseline's.
 
 Anything less is reported as not shown. Reported beside it and deciding nothing: hits split by `type` and `generic`, a per-request sign test, the `dev` split, and how often Flow was not listed at all.
