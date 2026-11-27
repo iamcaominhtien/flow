@@ -28,3 +28,8 @@ Unlike `briefs/`, these do not list what to draw. The agent has to work out the 
 ## Decision rule (fixed before any run)
 
 Two runs per brief and plugin version, Sonnet, the old version being 0.17.0 (`main`, aeef609). The new version is better if, over the two runs, its mean gain over the control is higher on at least 5 of the 7 briefs, and its count of wrong or invented elements (of the five checked per run) is no higher in total. Otherwise it is not better, whatever else it does. The size of the smallest text is recorded but does not decide: no diagram in `examples/` is readable on a phone at fit-to-width (smallest text 1.3 to 6.6 px at 390 px), so it would only measure a format the plugin does not have yet.
+
+### Amendment (2026-11-27, after the controls and before any run was graded)
+
+The no-picture control scored 5/5 on h1-rebase, 5/5 on h2-redirect and 4/5 on h7-httpstates (the model already knows git and CPython), 0/5 on the other four. On those three the gain over the control cannot show a difference, so the gain criterion uses only the briefs where the control scored 3 or less (h3, h4, h5, h6): the new version must have the higher mean gain on at least 3 of these 4. The fidelity criterion (wrong or invented elements no higher in total) still covers all seven. h7's request is also no longer fully blind: the working method written after it names a docstring diagram as a summary to check against the source; that example was removed again before any run of the new version.
+
