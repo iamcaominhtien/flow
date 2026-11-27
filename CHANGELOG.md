@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.20.0 (2026-11-27)
+
+A shared working method for every input and every type, in place of the one-case patches of 0.19.0. Design and review: `docs/plugin/working-method.md`. Not yet measured: the held-out briefs in `benchmarks/heldout/` and the decision rule there were committed before this change and are the test.
+
+- `skills/WORKING.md`: what to do before and after drawing (purpose, medium, understanding the source, type, scope; verify, deliver), each with when it is done. Every drawing skill (22) opens its steps with the same block that points to it; a test keeps the copies identical.
+- The brief: `<name>.brief.md` beside the spec, or in the output folder on the author path, with Question, Reader, Medium, Sources read, Left out and Unknowns. `flow.py build`, `flow.py split` and `Canvas.write` print its main lines with the check report, or warn `no-brief`. Nothing in it is judged.
+- Removed from 0.19.0: the warnings `few-shapes` and `long-column`, the flowchart skill's step 0, and the routing by input kind ("a whole system or codebase") in the flowchart and author descriptions. Kept: `end-has-exit` and the balanced fan-out of a split bar.
+- Author skill: the page size follows the medium; "do not drop a step" applies when the input lists its steps, and for raw input what is left out goes in the brief.
+- Found and not changed: Flow has no format for a phone (at 390 px the smallest text of every example is 1.3 to 6.6 px), and `text-too-long` counts words by spaces, which misjudges Vietnamese and ignores Chinese and Japanese.
+
 ## 0.19.0 (2026-11-27)
 
 From a blind run: a fresh session with the plugin loaded, given only "draw a flowchart of X's open-sourced algorithm", chose the flowchart skill before opening the source, read only the README, drew 16 of 23 steps as process boxes, sent a failed end on into the flow, and left half the page empty beside a shifted main column. The check reported only long names and one crossing.

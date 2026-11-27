@@ -9,6 +9,8 @@ You write a short **spec**: the periods and the lanes (rows) with their items. A
 
 ## Steps
 
+Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write `<name>.brief.md` beside the spec (on the author path, in the output folder) with the lines `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`. The build prints it back. When you deliver, tell the user the sources you read and what you left out.
+
 1. Choose the periods (quarters, months) and the lanes (teams or themes), then list each lane's items with the period they start in, whether they are committed, and who owns them. Dates do not belong here: use a Gantt chart.
 2. Write `diagrams/<name>.spec.json` in the current project.
 3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` and `<name>.drawio` next to the spec and prints a check report. Exit code 0: no error; 2: errors found (files still written); 1: the spec is invalid and the message lists every problem.

@@ -1,5 +1,5 @@
 ---
-description: Lay out a diagram by hand, in a script of your own, when the automatic layout of the other Flow skills is not good enough (long or dense flows, many groups, a hub with many lines). You choose every position and route, in the Flow design, and write HTML and draw.io files. Use for large or complex diagrams, for the flow of a whole system or codebase, or when the user wants the best result rather than the quickest.
+description: Lay out a diagram by hand, in a script of your own, when the automatic layout of the other Flow skills is not good enough (long or dense flows, many groups, a hub with many lines). You choose every position and route, in the Flow design, and write HTML and draw.io files. Use for large or complex diagrams, or when the user wants the best result rather than the quickest.
 allowed-tools: Bash(python3 *)
 ---
 
@@ -8,6 +8,8 @@ allowed-tools: Bash(python3 *)
 The other Flow skills turn a short spec into a diagram with one fixed automatic layout. That is quick and fine for small diagrams. For a big or dense one it gives long pages, bundles of lines and wasted space. Here you do the layout yourself: you decide the arrangement, write a small Python script that places everything, build it, **look at the picture**, and change the script until it is good. The kit keeps the design (sizes, colours, line roles, files); the arrangement is yours.
 
 ## Steps
+
+Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write `<name>.brief.md` beside the spec (on the author path, in the output folder) with the lines `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`. The build prints it back. When you deliver, tell the user the sources you read and what you left out.
 
 1. Read the brief. List every step and every connection, and keep the list: every one must appear.
 2. Decide the arrangement before you write code. See "Arranging" below. Sketch the rows and columns in a comment.
@@ -121,7 +123,7 @@ Set `canvas.theme = "technical"` or `"midnight"` (default `"pastel"`) before `ca
 **Layout**: the happy path stays on one straight line; exceptions branch to the side or down. Steps in a row share a centre line. Gaps: 56 px or more between rows, 70 px or more between columns, more where a line carries a label. Return lines run *outside* the flow, never through a step. Snap positions to a 10 px grid. In a swimlane chart a step sits in exactly one lane, the actor who starts is in the top lane, a line that changes lane runs straight across.
 
 **Arranging** (your judgement, but think about these):
-- Keep the page readable at normal zoom: aim for no more than about 3000 px wide and 2500 px tall. A long chain of steps should be folded into a column or into rows, not left as one very long row.
+- Size the page for the medium in the brief. On a screen, keep it readable at normal zoom: aim for no more than about 3000 px wide and 2500 px tall. On a phone, prefer a narrow, tall arrangement, or an overview and one diagram per part. A long chain of steps should be folded into a column or into rows, not left as one very long row.
 - A node that many lines meet (a hub) can be a tall bar or a wide band so the lines arrive in parallel and apart, instead of bunching into one point.
 - Put what belongs together close and group it in a lane or a zone; put the main path where the eye starts (top left) and let it run to the end.
 - Use the space. If a large part of the page is empty (a corner, half of a zone), move things so the diagram is compact: put the legend under or beside the diagram where it does not leave a hole, shrink zones to their contents, and bring far-apart groups closer. An empty zone corner is a sign the arrangement can be tighter.
@@ -140,6 +142,5 @@ You cannot judge a layout from numbers. Render the HTML to an image and open it:
 
 - Do not use `flow.py build` for the diagram you are authoring by hand; it applies the automatic layout and ignores your positions.
 - Do not edit the plugin's code. If the kit lacks something you need, write it in your own script and say so in your report.
-- Keep the brief's step names recognisable. The design wants a decision to be a question and a process to start with a verb, so reword where needed, but a reader should be able to match every step to the brief; keep a list of the mapping in your script.
-- A step that the brief puts in a group belongs in that group's area. If the layout needs it elsewhere, say so in your report.
-- Do not drop a step or a connection to make the layout easier. If the brief cannot be expressed, say what and why.
+- When the input lists its steps (a brief written as a list of elements), keep their names recognisable. The design wants a decision to be a question and a process to start with a verb, so reword where needed, but a reader should be able to match every step to the input; keep a list of the mapping in your script. A step that the input puts in a group belongs in that group's area; if the layout needs it elsewhere, say so in your report. Do not drop a step or a connection to make the layout easier; if the input cannot be expressed, say what and why.
+- When you worked from raw input (code, a document, a transcript, data), choosing what to leave out is part of the work: keep what the question needs, and write the rest under `Left out:` in the brief file.

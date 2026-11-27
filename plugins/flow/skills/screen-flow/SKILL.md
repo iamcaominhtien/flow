@@ -9,6 +9,8 @@ You write a short **spec**. A script places the screens in device frames, routes
 
 ## Steps
 
+Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write `<name>.brief.md` beside the spec (on the author path, in the output folder) with the lines `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`. The build prints it back. When you deliver, tell the user the sources you read and what you left out.
+
 1. Ask, or pick from the stage of the design, the **fidelity** of each screen: L0 names only, L1 skeleton, L2 key elements (see below). There is no default level in the design; a screen with no `fidelity` is drawn as L0.
 2. List the screens (device, id, name), the decisions, the entry points and the arrows: what the person does, which condition decides the path, what happens on the way.
 3. Put the screens in zones. For up to about 12 screens give each an `at: [row, column]` (flow runs left to right in a row; a branch goes to the next row). With more, leave `at` out and let the script arrange the zones (see Layout). Draw a web flow as its own zone below the phone flow.

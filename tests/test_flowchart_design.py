@@ -164,14 +164,12 @@ def test_lint_flags_text_and_decisions() -> None:
 
 
 def test_a_long_chart_keeps_one_column() -> None:
-    """A flowchart has no step limit: forty steps stay in one column and only get hints."""
+    """A flowchart has no step limit: forty steps stay in one column, with nothing reported."""
     many = [{"id": f"n{i}", "kind": "process", "text": "Step"} for i in range(40)]
     links = [{"from": f"n{i}", "to": f"n{i + 1}"} for i in range(39)]
     laid = chart(many, links)
     assert len({node.x for node in laid.nodes}) == 1
-    assert codes(laid) == {Code.FEW_SHAPES.value, Code.LONG_COLUMN.value}
-    hints = [f for f in check_scene(laid) if f.code in (Code.FEW_SHAPES, Code.LONG_COLUMN)]
-    assert all(f.severity is Severity.WARNING and "/flow:author" in f.message for f in hints)
+    assert not codes(laid)
 
 
 def test_the_flow_after_a_wide_split_comes_back_to_its_column() -> None:

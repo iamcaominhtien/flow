@@ -9,6 +9,8 @@ You write a short **spec**. A script places the boxes on a grid, routes the line
 
 ## Steps
 
+Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write `<name>.brief.md` beside the spec (on the author path, in the output folder) with the lines `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`. The build prints it back. When you deliver, tell the user the sources you read and what you left out.
+
 1. Pick one level and answer one question: **1 context** (who uses the system, what does it depend on), **2 containers** (what runs inside it), **3 components** (how one container is built). Level 4 is a UML class diagram: not drawn here.
 2. Write `diagrams/<name>.spec.json` in the current project. Write level 1 first; a lower level names the box it opens.
 3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` and `<name>.drawio` next to the spec and prints a check report. Exit code 0: no error; 2: errors found (files still written); 1: the spec is invalid and the message lists every problem.

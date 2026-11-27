@@ -1,52 +1,37 @@
-# Working method: from any input to a diagram (draft for review)
+# Working method: from any input to a diagram
 
-Status: draft, not built. Written after two blind runs on the x-algorithm repo (2026-11-27) and a review of the plugin against the question "what does a person do to draw a diagram from any input". This page says what to change, why, and how to test that it generalises.
+Status: version 2 of the design, after one review (an independent agent, 2026-11-27). Being built; not yet measured. The held-out briefs that will measure it, and the rule that decides, are in `benchmarks/heldout/` and were committed before the build.
 
 ## The gap
 
-Every skill starts from a brief that already lists what to draw: the design's pipeline is "brief (words) → spec" (`design.md`), the author skill's first step is "Read the brief. List every step", and every benchmark brief enumerates its elements. So the plugin teaches and measures transcription plus layout. It does not teach, and nothing measures, the work before that: deciding what the diagram is for, understanding the source, choosing what to leave out, and checking the picture against the source. On raw input (a codebase, a document, a transcript) an agent does what the skills ask: it finds something that looks like a brief (a README's own box diagram), transcribes it and stops when the check report is clean. That is a gap in the method, not in one skill, so it is fixed in one shared place.
+Every skill starts from a brief that already lists what to draw: the pipeline is "brief (words) → spec" (`design.md`), the author skill's first step is "Read the brief. List every step", and every benchmark brief enumerates its elements. So the plugin teaches and measures transcription plus layout. It does not teach, and nothing measures, the work before that: what the diagram is for, understanding the source, choosing what to leave out, and checking the picture against the source. On raw input an agent does what the skills ask: it finds something that looks like a brief (in two blind runs on the x-algorithm repo, the README's own box diagram), transcribes it, and stops when the check report is clean.
 
 ## What a person does
 
-1. **Purpose.** Who reads it and which question it answers. Done: one sentence.
-2. **Medium.** Where it is read: phone (portrait, about 390 px wide), screen, slide, print, an editor. Done: a target width and orientation.
-3. **Understand the source.** Read the primary source as deep as the question needs, no deeper. Done: you can walk one concrete case through it, and you can say where each fact comes from. Unknowns are listed.
-4. **Type.** Choose it from the structure of what is to be shown (control flow, messages over time, structure, data, states, time) and the question. The user's word is a strong hint, not a rule; if it does not fit, say so and offer the type that does.
-5. **Scope and level.** Start and end, what is in and what is out, one level of detail per diagram; an overview plus linked detail diagrams when one is not enough. Done: what was left out is written down.
-6. **Model.** The elements and links, each traced to a place in the source or marked as an assumption. For a flowchart the decisions, loops and failure paths are the content.
-7. **Lay out and draw.** The type's skill: the build path or the author path.
-8. **Verify.** Against the source: walk two or three cases on the picture. Against the reader: look at the picture at the target size.
-9. **Deliver.** The picture, the sources, what was left out, what is uncertain, and the next level of zoom on offer.
+1. **Purpose.** Who reads it, which question it answers. Done: one sentence.
+2. **Medium.** Where it is read: phone, screen, slide, print, an editor.
+3. **Understand the source.** As deep as the question needs. Done: you can walk one concrete case through it and say where each fact came from; unknowns are listed.
+4. **Type.** From the structure of what is shown and the question; the user's word is a strong hint, not a rule.
+5. **Scope and level.** Start, end, in, out; one level of detail per diagram, with an overview and linked details when one is not enough. Done: what was left out is written down.
+6. **Model**, 7. **Lay out and draw:** the type's skill (build path or author path).
+8. **Verify.** Walk two or three cases on the picture against the source; look at the picture at the size it will be read.
+9. **Deliver.** The picture, the sources, what was left out, what is uncertain, the next level of zoom on offer.
 
-## Change 1: one shared step, written down beside the diagram
+## What the review changed, and why
 
-- A new reference page, `plugins/flow/skills/WORKING.md` (one file, not a skill, so it is never skipped by routing), holds steps 1-5, 8 and 9 above, each with its "done". Every SKILL.md's first step becomes: "Follow the working method in WORKING.md, then come back here for steps 6 and 7". The steps of the types stay as they are.
-- The agent writes the result as `<name>.brief.md` beside the spec (or beside `make.py` on the author path), with fixed headings: Question, Reader, Medium, Sources read, Scope, Left out, Unknowns, Trace (element → source). A Markdown file, not a spec field, so no spec reader of the twenty types changes and a person can read it.
-- The build (`build.py`) and the author kit (`Canvas.write`) look for that file. Missing: a warning `no-brief`. Present: they read the Medium line (`phone`, `screen`, `slide`, `print`, or a width in px) and run Change 2. Trace lines are counted against the drawn elements and reported as "n of m elements traced"; this is a report line, not a warning, because some elements (a start, a legend) need no source.
+- Prose alone did not change behaviour: run 2 had "read the source itself (not only its README)" inline in the flowchart skill and still drew from the README. So the method is not only text to read: it produces a file the tools read back and print, and the last step makes the agent tell the user its sources and omissions. That makes a shallow reading visible to the person, which is the only general check of step 3 there is; nothing in the tool judges understanding, and the held-out briefs measure it.
+- No trace table (element → source): self-reported, and "every element → README.md" would pass it.
+- No size check from the medium. Measured on all 80 examples: at a phone's 390 px the smallest text is 1.3 to 6.6 px; even the narrowest one-column flowchart (704 px) gives 6.6 px. The build path has no narrow format, so a warning would fire on every phone diagram and tell the agent nothing it can act on. **Open issue: Flow has no phone format.** That is a gap in the design system (node widths, margins, text sizes), to be designed on its own.
+- The text-too-long rule counts words separated by spaces; it fires on short Vietnamese phrases (one word per syllable) and never on Chinese or Japanese. A language proxy; recorded here, not changed now.
 
-## Change 2: one size check from the medium, instead of shape quotas and fixed ratios
+## The change
 
-- `text-too-small` (warning): with the scene scaled to the medium's width (phone 390 px, screen 1440, slide 1280, print as given), the smallest text of a node or label is below 11 px. This replaces `long-column` (a fixed 4:1 ratio) and is the same rule for every type. A tall phone chart passes; a wide landscape chart on a phone fails, which is what run 2 showed and could not report.
-- No size limit is set by the plugin. A size budget is the agent's own choice in the brief (Scope), from the question and the medium.
+1. **`plugins/flow/skills/WORKING.md`**: steps 1-5, 8 and 9 with their "done". Not a skill, so routing cannot skip it.
+2. **The same short block at the start of every SKILL.md** (a test keeps the copies identical): before the spec or the script, follow WORKING.md and write `<name>.brief.md` beside the spec (on the author path, in the output folder, as `<folder>/<name>.brief.md`), with the lines `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`. And at the end: tell the user the sources read and what was left out.
+3. **The build and the author kit read the brief back.** `flow.py build` and `Canvas.write` look for it; if present they print its `Question`, `Medium`, `Sources read` and `Left out` lines with the report, and if missing they print a warning `no-brief`. Nothing else is parsed.
+4. **Undo the patches of 0.18.0 and 0.19.0:** remove `few-shapes` and `long-column`; remove the routing by input kind from the flowchart and author descriptions; remove the flowchart skill's step 0 (now WORKING.md). Keep `end-has-exit` and the balanced fan-out of a split bar.
+5. **Author skill:** "do not drop a step" and "keep the brief's names" apply to an enumerated brief; for raw input, keep what the question needs and list what was left out. The fixed page size gives way to the medium.
 
-## Change 3: undo the parts of 0.18.0 and 0.19.0 that were patches
+## How it is measured
 
-- Remove `few-shapes` (a proxy; a correct pipeline can be all process boxes).
-- Remove the routing by input kind ("for the flow of a whole system or codebase, use the author skill") from the flowchart and author descriptions; the path is chosen after scoping, by how large and dense the scoped diagram is.
-- Remove the flowchart skill's step 0; its content moves into WORKING.md, for every type.
-- Author skill: "Do not drop a step" and "keep the brief's names" apply when the input is an enumerated brief; for raw input, keep what the question needs and list what was left out in the brief file. The fixed page size (3000 x 2500) gives way to the medium.
-- Keep `end-has-exit` and the balanced fan-out of a split bar (general rules of meaning and layout).
-
-## How to test that it generalises
-
-- A held-out set, `benchmarks/heldout/`, written before any of this is built and never used to tune: raw inputs of different kinds, each with a one-line request as a user would write it and a medium. Inputs available offline in this container: a sentence only; Python standard library source (a retry or redirect path); a man page or long docstring; a meeting transcript written for the set; a CSV of tickets; an ambiguous request.
-- Each has, hidden from the agent: five questions a reader should be able to answer from the picture, with answers from the source.
-- Grading, outside the plugin's own check: a separate model answers the five questions from the PNG alone; five drawn elements are checked against the source; the smallest text at the medium's width is measured.
-- Runs: the plugin before (0.17.0, main) and after, the same model (Sonnet), one run per brief and version at first; more runs where the two differ. The existing enumerated briefs stay as a regression set.
-
-## Open questions for the reviewer
-
-1. Is a Markdown brief file beside the spec the right carrier, or should it be in the spec after all?
-2. Should `no-brief` be a warning or an error, given a one-line request should stay quick?
-3. Is one size check from the medium enough to replace length and shape rules, or does something else need a general rule?
-4. Is the held-out set wide enough, and is one run per brief enough to decide?
+`benchmarks/heldout/`: seven raw inputs of different kinds, two runs per brief and version, graded by a separate model that answers five questions per brief from the PNG at the medium's size, against a control with no picture. The decision rule is in that README and was fixed before the runs.

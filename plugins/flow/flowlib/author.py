@@ -13,7 +13,7 @@ from enum import StrEnum
 from itertools import pairwise
 from pathlib import Path
 
-from . import check, render_drawio, render_html, scene
+from . import brief, check, render_drawio, render_html, scene
 from .author_words import EdgeWords, build_words, stretch_of
 from .canvas import fit_canvas
 from .diagrams.screen_table import CodedArrow, condition_row, conditions_table
@@ -407,6 +407,9 @@ class Canvas:
     def write(self, folder: str | Path, name: str) -> list[check.Finding]:
         """Write ``<name>.scene.json``, ``.html`` and ``.drawio`` and check the scene.
 
+        The brief ``<folder>/<name>.brief.md`` is read back: its main lines are printed, or a
+        ``no-brief`` warning is added when it is missing.
+
         Args:
             folder: Where to write; it is created when missing.
             name: The file name without a suffix.
@@ -420,7 +423,7 @@ class Canvas:
         (target / f"{name}.scene.json").write_text(scene.dumps(final, indent=2), encoding="utf-8")
         (target / f"{name}.html").write_text(render_html.render(final), encoding="utf-8")
         (target / f"{name}.drawio").write_text(render_drawio.render(final), encoding="utf-8")
-        return check.check_scene(final)
+        return check.check_scene(final) + brief.report_brief(brief.brief_path(target, name))
 
 
 @dataclass(frozen=True)

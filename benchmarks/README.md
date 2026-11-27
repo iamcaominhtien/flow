@@ -10,6 +10,8 @@ A set of 25 briefs for testing the Flow plugin on harder, realistic subjects tha
 - `briefs/screen-l4.md`: one level A brief for the screen flow at L4 (screens as built), on RealWorld Conduit (Angular), with the structure read from its code. `l4/conduit/plan.json` is the capture plan used to check that the app runs and the screens can be taken (a solution; do not show it to a blind agent). Not read by `check_briefs.py`. Results: `results/2026-10-28-screen-L4-A-01.md` (plugin 0.14.0), `results/2026-10-29-screen-L4-A-01.md` (0.16.0).
 - `check_briefs.py`: checks the format and compares the claims with the text. `python3 benchmarks/check_briefs.py`.
 
+- `heldout/`: seven requests on raw input (code, a transcript, a CSV, a small repo, a sentence) that do not list what to draw, with hidden questions and a decision rule fixed before the change they test. See its README.
+
 ## Format of a brief
 
 A heading `## <type>-<level>-<nn> — title`, a list of fields (`type`, `level`, `elements`, `connections`, `groups`) and the sections `Brief`, `Must show`, `Traps`, `Sources`, `Uncertain`. Level C briefs also have `Structure`: the elements by group (a Gantt task is written `Name@start+length`, in weeks from 0) and the connections as `A -> B (label)`. For a sequence brief, elements are the participants and connections are the messages, named in the label.

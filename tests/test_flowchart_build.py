@@ -201,7 +201,28 @@ def test_build_command_writes_the_files(tmp_path: Path) -> None:
     assert (tmp_path / "login-flow.scene.json").is_file()
     assert (tmp_path / "login-flow.html").is_file()
     assert (tmp_path / "login-flow.drawio").is_file()
-    assert "no problems found" in run.stdout
+    assert "WARNING no-brief" in run.stdout
+
+
+def test_build_command_prints_the_brief_beside_the_spec(tmp_path: Path) -> None:
+    """A brief next to the spec is read back: its main lines are printed, with no warning."""
+    spec_path = tmp_path / "login-flow.spec.json"
+    spec_path.write_text(LOGIN_SPEC.read_text())
+    (tmp_path / "login-flow.brief.md").write_text(
+        "- **Question:** how does a user sign in?\n"
+        "Reader: new developers\nMedium: screen\n"
+        "Sources read: auth/login.py, auth/session.py\nLeft out: password reset\n"
+    )
+    run = subprocess.run(
+        [sys.executable, str(FLOW_CLI), "build", str(spec_path)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert run.returncode == EXIT_OK, run.stderr
+    assert "brief Question: how does a user sign in?" in run.stdout
+    assert "brief Sources read: auth/login.py, auth/session.py" in run.stdout
+    assert "no-brief" not in run.stdout
 
 
 def test_build_command_rejects_a_bad_spec(tmp_path: Path) -> None:

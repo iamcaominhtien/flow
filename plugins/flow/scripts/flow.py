@@ -22,6 +22,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from flowlib import (
+    brief,
     build,
     check,
     code_draft,
@@ -115,8 +116,10 @@ def run_build(arguments: argparse.Namespace) -> int:
         print(f"the overrides next to {spec_path} are not valid:\n{error}", file=sys.stderr)
         return EXIT_INVALID_INPUT
     print(f"wrote {result.scene_path}\nwrote {result.html_path}\nwrote {result.drawio_path}")
-    print(check.format_report(result.findings))
-    has_errors = any(finding.severity is check.Severity.ERROR for finding in result.findings)
+    stem = build.output_stem(spec_path)
+    findings = brief.report_brief(brief.brief_path(spec_path.parent, stem)) + result.findings
+    print(check.format_report(findings))
+    has_errors = any(finding.severity is check.Severity.ERROR for finding in findings)
     return EXIT_ERRORS_FOUND if has_errors else EXIT_OK
 
 
@@ -139,6 +142,8 @@ def run_split(arguments: argparse.Namespace) -> int:
         print(f"{spec_path} cannot be split: {error}", file=sys.stderr)
         return EXIT_INVALID_INPUT
     out_dir.mkdir(parents=True, exist_ok=True)
+    stem = build.output_stem(spec_path)
+    print(check.format_report(brief.report_brief(brief.brief_path(spec_path.parent, stem))))
     exit_code = EXIT_OK
     for name, page in pages.items():
         path = out_dir / f"{build.output_stem(spec_path)}-{name}{build.SPEC_SUFFIX}"
