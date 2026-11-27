@@ -49,3 +49,11 @@ Five questions per brief, with answers from the source. A grader answers them fr
 3. When does staging deploy? On every push to `main`, after the image job, followed by the smoke test.
 4. What happens when the production smoke test fails? A rollback to the last good tag of production (`.last_good_production`). In staging a failed smoke test only fails the job.
 5. What happens when the Kubernetes rollout does not finish within 300 s? `kubectl rollout undo`, the step fails, and the last good tag is not updated.
+
+## h7-httpstates (source: `input/client.py`, `HTTPConnection`; its docstring holds its own ASCII state diagram)
+
+1. What happens when `putrequest()` is called while the connection is not Idle? `CannotSendRequest` is raised.
+2. Can `getresponse()` be called while an earlier response has not been read to the end? No: `ResponseNotReady` is raised until that response is closed. It is also raised before a request has been sent.
+3. What happens when the response says the server will close the connection? The connection closes itself and hands the socket to the response; it is Idle again.
+4. What happens when reading the response's status line fails with a `ConnectionError`? The connection is closed (Idle) and the error is raised again.
+5. When is the socket opened? On the first send, when `auto_open` is set (the default), by `connect()`; otherwise `NotConnected` is raised.
