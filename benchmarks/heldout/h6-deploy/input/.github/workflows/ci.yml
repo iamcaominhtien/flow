@@ -1,0 +1,37 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v*"]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make lint test
+  image:
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make image push TAG=${{ github.sha }}
+  staging:
+    needs: image
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - run: make deploy ENV=staging TAG=${{ github.sha }}
+      - run: make smoke ENV=staging
+  production:
+    needs: image
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: production   # requires a reviewer's approval in GitHub
+    steps:
+      - uses: actions/checkout@v4
+      - run: make deploy ENV=production TAG=${{ github.sha }}
+      - run: make smoke ENV=production || make rollback ENV=production
