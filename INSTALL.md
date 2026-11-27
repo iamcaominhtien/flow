@@ -1,6 +1,6 @@
 # Install Flow
 
-Flow is a plugin for Claude Code. It needs Python 3.11 or newer and nothing else (standard library only).
+Flow is a plugin for Claude Code. It needs Python 3.11 or newer and nothing else (standard library only). PNG pictures, and Claude looking at its own picture, also need Node with Playwright and Chromium (`npm install -g playwright && npx playwright install chromium`); `/flow:doctor` says whether they work.
 
 ## Claude Code
 
@@ -13,6 +13,7 @@ Then run `/flow:doctor`. It checks that Python is found and that the scripts run
 
 Use it:
 
+- `/flow:draw how a refund moves through shop/refunds.py` when you do not want to pick a type: Claude reads the input, picks one and hands over to that skill.
 - `/flow:flowchart how a customer pays and gets an order delivered` (or `/flow:bpmn`, `/flow:sequence`, `/flow:er`, and the other type skills) for a small diagram. Claude writes a short spec, a script lays it out and writes `<name>.html` (animated) and `<name>.drawio` next to the spec.
 - `/flow:author` for a large or dense diagram. Claude writes a layout script of its own, builds, looks at the picture and improves it. For it to look, a headless browser has to be available (Chromium with Playwright, for example). Without one, Claude has only the check report and should say so.
 - Open the `.html` in any browser. Open the `.drawio` in draw.io (diagrams.net) to keep editing. To export PNG, SVG or PDF, also install the draw.io plugin: `/plugin marketplace add jgraph/drawio-mcp` then `/plugin install drawio@drawio`.

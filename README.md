@@ -8,7 +8,7 @@
 Describe a diagram in plain language. Get a web page you can view and share, and a <code>.drawio</code> file you can keep editing.</p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.20.0-1D4ED8?style=flat-square">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.21.0-1D4ED8?style=flat-square">
   <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude_Code-plugin-D97757?style=flat-square">
   <img alt="Python" src="https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white">
   <img alt="Standard library only" src="https://img.shields.io/badge/dependencies-none-15803D?style=flat-square">
@@ -24,7 +24,7 @@ Describe a diagram in plain language. Get a web page you can view and share, and
 
 - **Text to diagram.** Say what you want ("how a customer pays and gets an order delivered") and Claude draws it.
 - **Two outputs.** An HTML page with animated lines (the main path moves, data streams move slowly) and a native `.drawio` file, both from the same positions so they do not drift apart.
-- **24 skills for 20+ diagram types.** Flowchart, sequence, ER, architecture, C4, cloud, state, BPMN, use case, class, DFD, screen flow, org chart, mind map, Gantt, roadmap, Kanban, layers, wireframe, concept, and editing of existing `.drawio` files.
+- **25 skills for 20+ diagram types.** A way in for any request to draw (`/flow:draw`), and Flowchart, sequence, ER, architecture, C4, cloud, state, BPMN, use case, class, DFD, screen flow, org chart, mind map, Gantt, roadmap, Kanban, layers, wireframe, concept, and editing of existing `.drawio` files.
 - **Two ways to lay a diagram out.** Small diagrams: a short spec and an automatic layout, in seconds. Large or dense diagrams: `/flow:author`, where Claude lays the diagram out itself, looks at its own picture and improves it.
 - **One design.** A shared palette, type, icons (40 flat, 97 detailed) and line roles for every type, in a plain and an illustrated style (cards with a name pill and a large icon).
 - **Checks.** Overlaps, lines through boxes, covered labels and captions, lines on top of each other, crossings, text that does not fit.
@@ -33,7 +33,7 @@ Describe a diagram in plain language. Get a web page you can view and share, and
 
 ## What is inside
 
-- **`plugins/flow/`**: the plugin. `skills/` (the 24 skills), `scripts/` (`flow.py`, `doctor.py`), `flowlib/` (layout, routing, renderers, checks, the author kit).
+- **`plugins/flow/`**: the plugin. `skills/` (the 25 skills), `scripts/` (`flow.py`, `doctor.py`), `flowlib/` (layout, routing, renderers, checks, the author kit).
 - **`docs/design/`**: the design of every diagram type, with 100+ pictures. **`docs/plugin/design.md`**: how the plugin is built and the decisions taken.
 - **`examples/`**: a spec for every type. **`benchmarks/`**: 25 hard test briefs, a checker, and the first agent runs.
 
@@ -79,6 +79,7 @@ Claude writes the files next to your spec: `<name>.html` (open it in any browser
 
 | Skill | Draws |
 | --- | --- |
+| `/flow:draw` | Any diagram from any input when you do not name a type: Claude picks the type and hands over to its skill |
 | `/flow:flowchart` | Flowcharts, top to bottom or left to right, with swimlanes and an overrides file for fixes |
 | `/flow:author` | Large or dense diagrams of any type: Claude lays the diagram out by hand in a script of its own, using a small kit that keeps the design, and looks at the result and improves it |
 | `/flow:sequence` | Sequence diagrams: activation bars, fragments, notes, create and destroy |

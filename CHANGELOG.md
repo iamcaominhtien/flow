@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.21.0 (2026-11-27)
+
+A way in for requests that say what to show but not which diagram, and an honest PNG. **Measured** (`benchmarks/results/2026-11-27-routing-0.21.0.md`): on the held routing set, Sonnet missed Flow in 3 of 30 runs instead of 10, with no false positives; the entry skill itself was loaded in only 2 of those runs, and on twelve fresh requests there was no gain.
+
+- `skills/draw/`: draw a diagram of how something works, fits together, moves, is organised or is planned, from any input. It checks that Flow is the tool (not a chart of numbers, an illustration or a text diagram), follows `WORKING.md`, picks the type skill from the structure shown, and delivers a PNG through `view.js` when a headless browser is available. A test keeps its table in step with the skills.
+- `doctor` says whether PNG pictures work here, by running `view.js --check`, which starts the browser the way a render does.
+- `view.js` exits 3 with an install line when Playwright or Chromium is missing, instead of a stack trace.
+- `benchmarks/routing/`: 44 requests (and 12 fresh ones), a harness that stops each run at its first decisive event, and the rule.
+
 ## 0.20.0 (2026-11-27)
 
 A shared working method for every input and every type, in place of the one-case patches of 0.19.0. Design and review: `docs/plugin/working-method.md`. **Measured and not shown better**: on the held-out briefs, by the rule fixed in advance, it is not better than 0.17.0, but Flow ran in only 7 of 28 runs, so the test hardly touched the change (`benchmarks/results/2026-11-27-heldout-0.20.0.md`). Kept as unmeasured. Where it was loaded, the brief and `view.js` were used every time.
