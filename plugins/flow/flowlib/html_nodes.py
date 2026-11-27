@@ -17,7 +17,14 @@ from .model import KEY_FLAG_TONES, Node, Row, Shape, Tone
 from .shapes import outline_svg, table_radius
 from .sizing import key_room, table_header_height
 from .text_area import text_area_width
-from .theme import ShapeColors, Theme, detailed_icon_svg, has_detailed_icon, icon_svg
+from .theme import (
+    ShapeColors,
+    Theme,
+    detailed_icon_svg,
+    has_detailed_icon,
+    icon_svg,
+    node_colors,
+)
 
 # Text inside a node
 LINE_HEIGHT_FACTOR = 1.25
@@ -521,8 +528,8 @@ def node_html(node: Node, theme: Theme) -> str:
         return explain_node_html(node, theme)
     colors = theme.shapes[node.shape]
     if node.tone is not None and node.shape is not Shape.TABLE:
-        tone = theme.tones[node.tone]
-        colors = replace(colors, fill=tone.box, stroke=tone.outline)
+        fill, stroke = node_colors(theme, node.shape, node.tone)
+        colors = replace(colors, fill=fill, stroke=stroke)
     if node.dashed:
         colors = replace(colors, dash=DASH_PATTERN)
     inside = outline_svg(node.shape, node.width, node.height, colors)

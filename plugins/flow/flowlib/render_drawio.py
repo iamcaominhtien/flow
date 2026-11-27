@@ -59,7 +59,14 @@ from .model import (
 from .shapes import SUBPROCESS_BAR_INSET_PX
 from .sizing import estimate_text_width, key_room, table_header_height
 from .text_area import ICON_TEXT_RESERVE_PX
-from .theme import Theme, detailed_icon_svg, has_detailed_icon, icon_svg, load_theme
+from .theme import (
+    Theme,
+    detailed_icon_svg,
+    has_detailed_icon,
+    icon_svg,
+    load_theme,
+    node_colors,
+)
 
 ICON_SIZE_PX = 18
 CONNECTOR_NOTE_GAP_PX = 10  # the note beside an off-page connector, as in the HTML page
@@ -350,12 +357,10 @@ def _theme_pairs(node: Node, theme: Theme) -> dict[str, object]:
 def _base_pairs(node: Node, theme: Theme) -> dict[str, object]:
     """Return the style pairs every node has: its colours, its outline and its text."""
     colors = theme.shapes[node.shape]
-    fill = theme.tones[node.tone].box if node.tone else colors.fill
-    stroke = (
-        theme.tones[node.tone].outline
-        if node.tone and node.shape is not Shape.TABLE
-        else colors.stroke
-    )
+    tone = node.tone if node.shape is not Shape.TABLE else None
+    fill, stroke = node_colors(theme, node.shape, tone)
+    if node.shape is Shape.TABLE and node.tone:
+        fill = theme.tones[node.tone].box
     if node.shape is Shape.TABLE and node.card:
         fill = theme.tones[node.tone or Tone.GRAY].pill
     return {

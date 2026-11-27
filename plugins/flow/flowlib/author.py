@@ -43,6 +43,7 @@ from .sizing import (
     estimate_text_width,
     fit_card,
     fit_node,
+    fit_node_to_width,
     fit_table,
     fit_table_card,
     wrap_text,
@@ -220,13 +221,15 @@ class Canvas:
             fitted = replace(
                 fitted, width=rules.min_sizes[shape][0], height=rules.min_sizes[shape][1]
             )
-        width = options.width or fitted.width
-        height = options.height or fitted.height
-        if options.width:
-            area = text_area_width(shape, width, options.icon is not None)
+        if options.width and not captioned and not options.card and shape is not Shape.TABLE:
+            fitted = fit_node_to_width(shape, content, rules, options.width)
+        elif options.width:
+            area = text_area_width(shape, options.width, options.icon is not None)
             fitted = replace(
                 fitted, lines=tuple(wrap_text(text, rules, area, DEFAULT_FONT_SIZE_PX))
             )
+        width = options.width or fitted.width
+        height = options.height or fitted.height
         placed = Node(
             id=name,
             shape=shape,

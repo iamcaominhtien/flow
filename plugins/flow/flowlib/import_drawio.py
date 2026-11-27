@@ -188,11 +188,11 @@ def _shape_of(style: dict[str, str], width: float, height: float) -> Shape:
 
 
 def _tone_of(fill: str | None) -> Tone | None:
-    """Return the tone whose box colour is ``fill``, or None."""
+    """Return the tone whose box or zone colour is ``fill``, or None."""
     if fill is None:
         return None
     for tone, colors in load_theme().tones.items():
-        if colors.box.lower() == fill.lower():
+        if fill.lower() in (colors.box.lower(), colors.lane.lower()):
             return tone
     return None
 

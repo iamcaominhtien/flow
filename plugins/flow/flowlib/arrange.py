@@ -18,6 +18,8 @@ from itertools import pairwise
 
 from .author import Box, Canvas, NodeOptions, Route, Side
 from .model import Role, Row, Shape, Tone
+from .sizing import estimate_text_width
+from .theme import load_theme
 
 CHAIN_GAP_PX = 70  # between two steps of a row, room for an arrowhead and a short label
 ROW_GAP_PX = 70  # between two rows of a chain, room for the line that wraps
@@ -27,6 +29,7 @@ ZONE_HEADER_PX = 40  # above the content of a zone, for its name pill
 LIST_GAP_PX = 24  # between two columns of a list
 MIN_ROWS_PER_COLUMN = 4  # a list shorter than this stays in one column
 GRID_PX = 10  # positions snap to this grid
+PILL_ROOM_PX = 60  # beside the name pill of a zone: its own padding and the zone's inset
 
 
 @dataclass(frozen=True)
@@ -174,11 +177,11 @@ def fit_zone(canvas: Canvas, name: str, label: tuple[str, Tone], members: list[s
         The rectangle of the zone, to place the next thing below or beside it.
     """
     inner = cover(canvas, members)
+    theme = load_theme()
+    pill = estimate_text_width(label[0], theme.layout, theme.type_scale.pill.size) + PILL_ROOM_PX
+    right = max(inner.right + ZONE_PAD_PX, inner.left - ZONE_PAD_PX + pill)
     bounds = Bounds(
-        inner.left - ZONE_PAD_PX,
-        inner.top - ZONE_HEADER_PX,
-        inner.right + ZONE_PAD_PX,
-        inner.bottom + ZONE_PAD_PX,
+        inner.left - ZONE_PAD_PX, inner.top - ZONE_HEADER_PX, right, inner.bottom + ZONE_PAD_PX
     )
     canvas.zone(name, label[0], label[1], (bounds.left, bounds.top, bounds.width, bounds.height))
     return bounds
@@ -218,6 +221,8 @@ def _place_step(canvas: Canvas, step: Step, width: float) -> Box:
 
 def _move(canvas: Canvas, name: str, centre: tuple[float, float]) -> Box:
     """Move a placed node so its middle is at a grid point; no line may attach to it yet."""
+    if any(name in (edge.source, edge.target) for edge in canvas.edges):
+        raise ValueError(f"'{name}' already has a line; place parts before joining them")
     node = canvas.boxes[name].node
     x = _snap(centre[0] - node.width / 2)
     y = _snap(centre[1] - node.height / 2)

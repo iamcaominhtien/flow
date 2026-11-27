@@ -84,3 +84,23 @@ def test_a_fitted_zone_holds_its_members_with_room_for_its_name() -> None:
     assert zone.left < inner.left and zone.top < inner.top
     assert zone.right > inner.right and zone.bottom > inner.bottom
     assert zone.width - inner.width < 100
+
+
+def test_a_long_step_in_a_chain_is_tall_enough_for_its_wrapped_text() -> None:
+    """Forcing the chain's width wraps the words; the box grows to hold every line."""
+    canvas = Canvas("Chain", None)
+    words = "Check that the order total still matches the cart"
+    steps = [Step("a", "Pay"), Step("b", words, detail="against the latest prices and coupons")]
+    chain(canvas, steps, ChainSpace(100, 200, ROW_WIDTH_PX))
+    short, long = canvas.boxes["a"].node, canvas.boxes["b"].node
+    assert long.height > short.height
+    assert len(long.text) >= 2
+
+
+def test_a_zone_is_wide_enough_for_its_name() -> None:
+    """A long name widens the zone around a narrow member."""
+    canvas = Canvas("Zone", None)
+    chain(canvas, [Step("a", "Pay")], ChainSpace(100, 200, ROW_WIDTH_PX))
+    name = "A rather long name for a group that holds a single small step"
+    zone = fit_zone(canvas, "z", (name, Tone.TEAL), ["a"])
+    assert zone.width > cover(canvas, ["a"]).width + 200

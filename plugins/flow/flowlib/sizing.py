@@ -106,6 +106,32 @@ def fit_node(shape: Shape, content: NodeContent, rules: LayoutRules) -> FittedNo
     return FittedNode(width, max(min_height, needed), tuple(lines), tuple(detail_lines))
 
 
+def fit_node_to_width(
+    shape: Shape, content: NodeContent, rules: LayoutRules, width: float
+) -> FittedNode:
+    """Wrap a node's text at a given width and return the height that holds it.
+
+    Args:
+        shape: The node shape.
+        content: The title, an optional detail text and whether there is an icon.
+        rules: The layout rules.
+        width: The width the node must have.
+
+    Returns:
+        That width, the height the wrapped lines need (at least the shape's minimum), and the
+        lines.
+    """
+    room = text_area_width(shape, width, content.has_icon)
+    lines = wrap_text(content.title, rules, room, DEFAULT_FONT_SIZE_PX)
+    detail = content.detail
+    detail_lines = wrap_text(detail, rules, room, rules.detail_font_size) if detail else []
+    needed = math.ceil(len(lines) * DEFAULT_FONT_SIZE_PX * LINE_HEIGHT_FACTOR)
+    needed += len(detail_lines) * rules.detail_line_height + 2 * rules.line_padding
+    return FittedNode(
+        width, max(rules.min_sizes[shape][1], needed), tuple(lines), tuple(detail_lines)
+    )
+
+
 def fit_card(content: NodeContent, rules: LayoutRules) -> FittedNode:
     """Size an illustrated card: an icon disc on top, a name pill under it, then a detail text.
 

@@ -151,7 +151,7 @@ zone = fit_zone(canvas, "hydrate", ("Hydrate", Tone.TEAL), [box.node.id for box 
 Decide what each part of the content is before you place anything:
 
 - **A set** (members that run at once, or are listed rather than ordered: loaders, sources, side effects, the terms of a sum, flags): `listing`. One titled table, a row per member (a `(name, note)` pair adds a short note), split into columns of equal height when it is long. Never one box per member.
-- **A sequence with no branch** longer than about six steps (21 filters applied one after another): `listing` with `is_ordered=True`, numbered rows. A reader follows the numbers; arrows between 21 boxes add nothing.
+- **A long sequence with no branch and no line in or out of its middle** (the checks a payment passes in turn): consider `listing` with `is_ordered=True`, numbered rows, which a reader follows by the numbers in far less room. Keep boxes (`chain`) when the steps are the subject of the diagram, or when other parts join a step in the middle.
 - **A sequence with branches**, or a short one: `chain` for the straight runs (rows left to right; a full row continues at the left of the next row, as text does), then decisions and their exits by hand with `canvas.node` and `canvas.edge`. Pass `role=Role.MAIN` for the main path.
 - **A group**: `fit_zone` around its members after they are placed, so it is no bigger than what it holds. Number a stage in its zone name (`3 · Filter`) instead of repeating it in a separate column.
 - `cover(canvas, ids)` gives the rectangle of placed nodes, to put the next part below or beside it.

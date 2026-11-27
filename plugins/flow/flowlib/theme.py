@@ -10,6 +10,9 @@ from .model import DEFAULT_THEME, Animation, LabelKind, Role, Shape, Status, Ton
 
 DATA_DIR = Path(__file__).parent
 WIRE_PAIR_KEYS = ("device", "responsive")  # the wireframe sizes written as [width, height]
+KEEPS_OWN_OUTLINE: frozenset[Shape] = frozenset(
+    {Shape.TERMINATOR, Shape.FAIL, Shape.DECISION, Shape.CONNECTOR}
+)  # shapes whose outline colour carries their meaning (an end, a failure), whatever the tone
 THEMES_KEY = "themes"  # in ``theme.json``: the overrides of each theme other than the default
 SHAPE_PAINT_KEY = "shape_paint"  # an override that paints every shape the same way
 ICON_STROKE_WIDTH = 2  # line weight of a flat icon, in its 24 px grid
@@ -117,6 +120,7 @@ class StyleRules:
     frame_radius: float
     stroke_width: float
     shadow: bool
+    tint_nodes: bool = True  # a node's tone tints its fill; a neutral theme keeps nodes white
 
 
 @dataclass(frozen=True)
@@ -1332,6 +1336,29 @@ def _paint_every_shape(raw: dict[str, Any], paint: dict[str, Any]) -> dict[str, 
     kept = set(paint.get("except", ()))
     shapes = {name: (old if name in kept else colors) for name, old in raw["shapes"].items()}
     return {**raw, "shapes": shapes}
+
+
+def node_colors(theme: "Theme", shape: Shape, tone: Tone | None) -> tuple[str, str]:
+    """Return the fill and outline of a node of a shape and an optional tone.
+
+    A tone tints the fill (unless the theme keeps nodes white) and darkens the outline to match,
+    except on the shapes whose outline means something by itself.
+
+    Args:
+        theme: The design tokens.
+        shape: The node's shape.
+        tone: The node's tone, or None.
+
+    Returns:
+        The fill and the outline colour.
+    """
+    colors = theme.shapes[shape]
+    if tone is None:
+        return colors.fill, colors.stroke
+    tint = theme.tones[tone]
+    fill = tint.box if theme.style.tint_nodes else colors.fill
+    keeps = shape in KEEPS_OWN_OUTLINE or not theme.style.tint_nodes
+    return fill, colors.stroke if keeps else tint.outline
 
 
 def theme_names() -> list[str]:

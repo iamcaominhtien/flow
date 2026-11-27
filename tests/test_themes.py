@@ -31,7 +31,7 @@ from flowlib.model import (  # noqa: E402
     Tone,
 )
 from flowlib.reader import SpecError  # noqa: E402
-from flowlib.theme import load_theme, theme_names  # noqa: E402
+from flowlib.theme import load_theme, node_colors, theme_names  # noqa: E402
 
 THEMES = ["pastel", "technical", "midnight", "neutral"]
 MIN_FONT_PX = 10
@@ -109,13 +109,17 @@ def test_theme_settings_follow_the_design() -> None:
 
 
 def test_a_toned_node_takes_the_outline_of_its_tone() -> None:
-    """Pastel tints a node and darkens its outline to match; neutral keeps nodes white and grey."""
+    """Pastel tints a step and darkens its outline; an end keeps its own; neutral stays white."""
     pastel, neutral = load_theme("pastel"), load_theme("neutral")
-    for tone in pastel.tones.values():
-        assert tone.outline not in (tone.box, tone.pill)
-    assert {tone.box for tone in neutral.tones.values()} == {"#FFFFFF"}
-    assert len({tone.outline for tone in neutral.tones.values()}) == 1
-    assert len({tone.pill for tone in neutral.tones.values()}) == len(neutral.tones)
+    fill, stroke = node_colors(pastel, Shape.PROCESS, Tone.AMBER)
+    assert (fill, stroke) == (pastel.tones[Tone.AMBER].box, pastel.tones[Tone.AMBER].outline)
+    for shape in (Shape.TERMINATOR, Shape.FAIL, Shape.DECISION):
+        assert node_colors(pastel, shape, Tone.BLUE)[1] == pastel.shapes[shape].stroke
+    assert node_colors(neutral, Shape.PROCESS, Tone.AMBER) == (
+        neutral.shapes[Shape.PROCESS].fill,
+        neutral.shapes[Shape.PROCESS].stroke,
+    )
+    assert neutral.tones[Tone.AMBER].box == pastel.tones[Tone.AMBER].box  # plans keep their tints
 
 
 def test_the_default_theme_is_not_written_to_a_scene_file() -> None:
