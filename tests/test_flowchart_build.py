@@ -212,6 +212,7 @@ def test_build_command_prints_the_brief_beside_the_spec(tmp_path: Path) -> None:
         "- **Question:** how does a user sign in?\n"
         "Reader: new developers\nMedium: screen\n"
         "Sources read: auth/login.py, auth/session.py\nLeft out: password reset\n"
+        "Unknowns: none\n"
     )
     run = subprocess.run(
         [sys.executable, str(FLOW_CLI), "build", str(spec_path)],

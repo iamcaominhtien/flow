@@ -116,8 +116,10 @@ def run_build(arguments: argparse.Namespace) -> int:
         print(f"the overrides next to {spec_path} are not valid:\n{error}", file=sys.stderr)
         return EXIT_INVALID_INPUT
     print(f"wrote {result.scene_path}\nwrote {result.html_path}\nwrote {result.drawio_path}")
-    stem = build.output_stem(spec_path)
-    findings = brief.report_brief(brief.brief_path(spec_path.parent, stem)) + result.findings
+    said = brief.check_brief(brief.brief_path(spec_path.parent, build.output_stem(spec_path)))
+    if said.lines:
+        print("\n".join(said.lines))
+    findings = result.findings + list(said.findings)
     print(check.format_report(findings))
     has_errors = any(finding.severity is check.Severity.ERROR for finding in findings)
     return EXIT_ERRORS_FOUND if has_errors else EXIT_OK
@@ -143,10 +145,13 @@ def run_split(arguments: argparse.Namespace) -> int:
         return EXIT_INVALID_INPUT
     out_dir.mkdir(parents=True, exist_ok=True)
     stem = build.output_stem(spec_path)
-    print(check.format_report(brief.report_brief(brief.brief_path(spec_path.parent, stem))))
+    said = brief.check_brief(brief.brief_path(spec_path.parent, stem))
+    if said.lines:
+        print("\n".join(said.lines))
+    brief_findings = list(said.findings)  # reported once, with the first page
     exit_code = EXIT_OK
     for name, page in pages.items():
-        path = out_dir / f"{build.output_stem(spec_path)}-{name}{build.SPEC_SUFFIX}"
+        path = out_dir / f"{stem}-{name}{build.SPEC_SUFFIX}"
         path.write_text(json.dumps(page, indent=build.JSON_INDENT) + "\n", encoding="utf-8")
         try:
             result = build.build(path, out_dir)
@@ -154,8 +159,9 @@ def run_split(arguments: argparse.Namespace) -> int:
             print(f"{path} is not a valid spec:\n{error}", file=sys.stderr)
             return EXIT_INVALID_INPUT
         print(f"wrote {result.html_path}\nwrote {result.drawio_path}")
-        print(check.format_report(result.findings))
-        if any(f.severity is check.Severity.ERROR for f in result.findings):
+        findings, brief_findings = result.findings + brief_findings, []
+        print(check.format_report(findings))
+        if any(f.severity is check.Severity.ERROR for f in findings):
             exit_code = EXIT_ERRORS_FOUND
     return exit_code
 

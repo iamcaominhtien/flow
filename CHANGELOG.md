@@ -8,7 +8,9 @@ A shared working method for every input and every type, in place of the one-case
 - The brief: `<name>.brief.md` beside the spec, or in the output folder on the author path, with Question, Reader, Medium, Sources read, Left out and Unknowns. `flow.py build`, `flow.py split` and `Canvas.write` print its main lines with the check report, or warn `no-brief`. Nothing in it is judged.
 - Removed from 0.19.0: the warnings `few-shapes` and `long-column`, the flowchart skill's step 0, and the routing by input kind ("a whole system or codebase") in the flowchart and author descriptions. Kept: `end-has-exit` and the balanced fan-out of a split bar.
 - Author skill: the page size follows the medium; "do not drop a step" applies when the input lists its steps, and for raw input what is left out goes in the brief.
-- Found and not changed: Flow has no format for a phone (at 390 px the smallest text of every example is 1.3 to 6.6 px), and `text-too-long` counts words by spaces, which misjudges Vietnamese and ignores Chinese and Japanese.
+- `scripts/view.js`: renders a page with animations stilled, whole (`<name>.png`, to deliver) and fitted to the medium (`<name>.<medium>.png`: phone 390 px at 3x, screen 1440, slide 1280), so step 8 can be done on every path. The type skills point to it instead of saying "you have not seen it".
+- After a review of the code: the brief is read without damaging values and without regard to case; all six lines are printed and missing ones are named in the warning (an empty file no longer passes); the warning comes after the errors; `split` reports the brief once, with its first page.
+- Found and not changed: Flow has no format for a phone (fitted to 390 px, the smallest node text of the 78 examples that have one is 1.3 to 6.6 px; `benchmarks/measure_text_size.py`), and `text-too-long` counts words by spaces, which misjudges Vietnamese and ignores Chinese and Japanese.
 
 ## 0.19.0 (2026-11-27)
 

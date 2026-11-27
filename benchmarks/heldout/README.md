@@ -27,7 +27,7 @@ Unlike `briefs/`, these do not list what to draw. The agent has to work out the 
 
 ## Decision rule (fixed before any run)
 
-Two runs per brief and plugin version, Sonnet, the old version being 0.17.0 (`main`, aeef609). The new version is better if, over the two runs, its mean gain over the control is higher on at least 5 of the 7 briefs, and its count of wrong or invented elements (of the five checked per run) is no higher in total. Otherwise it is not better, whatever else it does. The size of the smallest text is recorded but does not decide: no diagram in `examples/` is readable on a phone at fit-to-width (smallest text 1.3 to 6.6 px at 390 px), so it would only measure a format the plugin does not have yet.
+Two runs per brief and plugin version, Sonnet, the old version being 0.17.0 (`main`, aeef609). The new version is better if, over the two runs, its mean gain over the control is higher on at least 5 of the 7 briefs, and its count of wrong or invented elements (of the five checked per run) is no higher in total. Otherwise it is not better, whatever else it does. The size of the smallest text is recorded but does not decide: no diagram in `examples/` is readable on a phone at fit-to-width (smallest node text 1.3 to 6.6 px at 390 px, `benchmarks/measure_text_size.py`), so it would only measure a format the plugin does not have yet.
 
 ### Amendment (2026-11-27, after the controls and before any run was graded)
 

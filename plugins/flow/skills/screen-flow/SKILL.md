@@ -9,7 +9,7 @@ You write a short **spec**. A script places the screens in device frames, routes
 
 ## Steps
 
-Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write `<name>.brief.md` beside the spec (on the author path, in the output folder) with the lines `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`. The build prints it back. When you deliver, tell the user the sources you read and what you left out.
+Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write the brief, one line each for `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`, as `<name>.brief.md` in the folder of the spec, with the spec's name (on the author path, in the folder and with the name you pass to `canvas.write`). `flow.py build` and `canvas.write` print it back with the check report. Before you deliver, look at the picture at the medium's size (step 8), and tell the user the sources you read and what you left out.
 
 1. Ask, or pick from the stage of the design, the **fidelity** of each screen: L0 names only, L1 skeleton, L2 key elements (see below). There is no default level in the design; a screen with no `fidelity` is drawn as L0.
 2. List the screens (device, id, name), the decisions, the entry points and the arrows: what the person does, which condition decides the path, what happens on the way.

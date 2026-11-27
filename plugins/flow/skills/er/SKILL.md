@@ -9,12 +9,12 @@ You write a short **spec**: the tables, their columns and the relations. A scrip
 
 ## Steps
 
-Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write `<name>.brief.md` beside the spec (on the author path, in the output folder) with the lines `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`. The build prints it back. When you deliver, tell the user the sources you read and what you left out.
+Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write the brief, one line each for `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`, as `<name>.brief.md` in the folder of the spec, with the spec's name (on the author path, in the folder and with the name you pass to `canvas.write`). `flow.py build` and `canvas.write` print it back with the check report. Before you deliver, look at the picture at the medium's size (step 8), and tell the user the sources you read and what you left out.
 
 1. List the tables with their columns, then the relations between them.
 2. Write `diagrams/<name>.spec.json` in the current project.
 3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` and `<name>.drawio` next to the spec and prints a check report. Exit code 0: no error; 2: errors found (files still written); 1: the spec is invalid and the message lists every problem.
-4. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Do not say the diagram "looks good": you have not seen it.
+4. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Then look at the picture as WORKING.md step 8 says (`node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js <name>.html <medium>`); do not say it "looks good" unless you have.
 5. Tell the user where the HTML and the `.drawio` file are.
 
 ## The spec
@@ -55,7 +55,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 - **Placement:** for more than four tables give every table a grid cell, `at: [row, column]`: parents above or to the left of their children, the table the story is about in the middle, the most connected table where it touches the most neighbours, lines short. Columns are 240 px wide with 160 px between them.
 - **Domains:** give each table a `domain` (`"domain": "Orders"`). With `"domain_frames": true` at the top level each domain gets the design's dashed tinted frame with its name in a pill; keep the tables of one domain side by side in the grid so that no frame covers a table of another domain.
 - **Subtype:** `"style": "subtype"` on a relation, from the parent to the child: a hollow triangle at the parent, no mark at the child (the child shares the parent's key).
-- **Size:** about ten tables fit on a page. Past that, split by domain: give every table a `domain` and run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py split diagrams/<name>.spec.json`. It writes `<name>-overview` (one box per domain, one line per foreign key that crosses a domain border, named after the column) and `<name>-<domain>` (the tables of the domain in full; a table of another domain that is joined to them appears once as a grey dashed copy with its key only and a tag such as "See Orders page"), each with its HTML and `.drawio` file, and prints a check report per page.
+- **Size:** about ten tables fit on a page. Past that, split by domain: give every table a `domain` and run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py split diagrams/<name>.spec.json`. It writes `<name>-overview` (one box per domain, one line per foreign key that crosses a domain border, named after the column) and `<name>-<domain>` (the tables of the domain in full; a table of another domain that is joined to them appears once as a grey dashed copy with its key only and a tag such as "See Orders page"), each with its HTML and `.drawio` file, and prints a check report per page. The brief belongs to the whole spec (`<name>.brief.md`); a page rebuilt alone with `build` has no brief of its own and warns `no-brief`.
 - **A table drawn on another page** can also be written by hand: `"see": "See Orders page"` on a table makes it a dashed copy with that tag under it.
 
 ## Icons

@@ -1,10 +1,10 @@
 # Working method: from any input to a diagram
 
-Status: version 2 of the design, after one review (an independent agent, 2026-11-27). Being built; not yet measured. The held-out briefs that will measure it, and the rule that decides, are in `benchmarks/heldout/` and were committed before the build.
+Status: version 2 of the design, after one review (an independent agent, 2026-11-27). Built in 0.20.0 and fixed after a second review of the code; not yet measured. The held-out briefs that will measure it, and the rule that decides, are in `benchmarks/heldout/` and were committed before the build.
 
 ## The gap
 
-Every skill starts from a brief that already lists what to draw: the pipeline is "brief (words) → spec" (`design.md`), the author skill's first step is "Read the brief. List every step", and every benchmark brief enumerates its elements. So the plugin teaches and measures transcription plus layout. It does not teach, and nothing measures, the work before that: what the diagram is for, understanding the source, choosing what to leave out, and checking the picture against the source. On raw input an agent does what the skills ask: it finds something that looks like a brief (in two blind runs on the x-algorithm repo, the README's own box diagram), transcribes it, and stops when the check report is clean.
+Every skill starts from a brief that already lists what to draw: the pipeline is "brief (words) → spec" (`design.md`), the author skill's first step was "Read the brief. List every step", and every benchmark brief enumerates its elements. So the plugin teaches and measures transcription plus layout. It does not teach, and nothing measures, the work before that: what the diagram is for, understanding the source, choosing what to leave out, and checking the picture against the source. On raw input an agent does what the skills ask: it finds something that looks like a brief (in two blind runs on the x-algorithm repo, the README's own box diagram), transcribes it, and stops when the check report is clean.
 
 ## What a person does
 
@@ -21,7 +21,7 @@ Every skill starts from a brief that already lists what to draw: the pipeline is
 
 - Prose alone did not change behaviour: run 2 had "read the source itself (not only its README)" inline in the flowchart skill and still drew from the README. So the method is not only text to read: it produces a file the tools read back and print, and the last step makes the agent tell the user its sources and omissions. That makes a shallow reading visible to the person, which is the only general check of step 3 there is; nothing in the tool judges understanding, and the held-out briefs measure it.
 - No trace table (element → source): self-reported, and "every element → README.md" would pass it.
-- No size check from the medium. Measured on all 80 examples: at a phone's 390 px the smallest text is 1.3 to 6.6 px; even the narrowest one-column flowchart (704 px) gives 6.6 px. The build path has no narrow format, so a warning would fire on every phone diagram and tell the agent nothing it can act on. **Open issue: Flow has no phone format.** That is a gap in the design system (node widths, margins, text sizes), to be designed on its own.
+- No size check from the medium. Measured with `benchmarks/measure_text_size.py` on the 78 examples that have node text: fitted to a phone's 390 px, the smallest node text is 1.3 to 6.6 px (edge labels are smaller still); even the narrowest one-column flowchart (704 px) gives 6.6 px. The build path has no narrow format, so a warning would fire on every phone diagram and tell the agent nothing it can act on. **Open issue: Flow has no phone format.** That is a gap in the design system (node widths, margins, text sizes), to be designed on its own.
 - The text-too-long rule counts words separated by spaces; it fires on short Vietnamese phrases (one word per syllable) and never on Chinese or Japanese. A language proxy; recorded here, not changed now.
 
 ## The change

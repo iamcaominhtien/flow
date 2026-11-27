@@ -9,9 +9,9 @@ The other Flow skills turn a short spec into a diagram with one fixed automatic 
 
 ## Steps
 
-Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write `<name>.brief.md` beside the spec (on the author path, in the output folder) with the lines `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`. The build prints it back. When you deliver, tell the user the sources you read and what you left out.
+Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write the brief, one line each for `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`, as `<name>.brief.md` in the folder of the spec, with the spec's name (on the author path, in the folder and with the name you pass to `canvas.write`). `flow.py build` and `canvas.write` print it back with the check report. Before you deliver, look at the picture at the medium's size (step 8), and tell the user the sources you read and what you left out.
 
-1. Read the brief. List every step and every connection, and keep the list: every one must appear.
+1. From the request and your `<name>.brief.md`, list the steps and connections the question needs, and keep the list: every one on it must appear. When the request itself lists the elements, that list is the one to keep.
 2. Decide the arrangement before you write code. See "Arranging" below. Sketch the rows and columns in a comment.
 3. Write `make.py` next to the output (the script stays with the diagram, so it can be changed later). Use the kit, below.
 4. Run it. Read the check report. Fix every error; read every warning.
@@ -136,7 +136,7 @@ Set `canvas.theme = "technical"` or `"midnight"` (default `"pastel"`) before `ca
 
 ## Looking
 
-You cannot judge a layout from numbers. Render the HTML to an image and open it: with Chromium and Playwright if they are installed (`python3 -c "from playwright.sync_api import sync_playwright"` tells you; if Playwright's own browser is missing but Chrome is installed, launch with `channel="chrome"`), or any other renderer you have, then read the PNG. If the page is larger than the screenshot, crop and resize it. If you have no way to see the picture, say so plainly, rely on the check report, and keep the arrangement simple.
+You cannot judge a layout from numbers. Run `node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js <folder>/<name>.html <medium>` (it needs Chromium and Playwright) and open both files it writes: `<name>.png`, the whole diagram, to judge the arrangement (you may crop it to look at one part closely), and `<name>.<medium>.png`, the diagram as the reader first sees it, to judge whether it can be read there. If you have no way to see the picture, say so plainly, rely on the check report, and keep the arrangement simple.
 
 ## Do not
 

@@ -11,14 +11,14 @@ Scope: flowcharts in the plain or the illustrated style, top to bottom or left t
 
 ## Steps
 
-Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write `<name>.brief.md` beside the spec (on the author path, in the output folder) with the lines `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`. The build prints it back. When you deliver, tell the user the sources you read and what you left out.
+Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKING.md`: know the question, the reader and the medium; read the source as deep as the question needs; choose what is in and what is left out; and write the brief, one line each for `Question:`, `Reader:`, `Medium:`, `Sources read:`, `Left out:` and `Unknowns:`, as `<name>.brief.md` in the folder of the spec, with the spec's name (on the author path, in the folder and with the name you pass to `canvas.write`). `flow.py build` and `canvas.write` print it back with the check report. Before you deliver, look at the picture at the medium's size (step 8), and tell the user the sources you read and what you left out.
 
 1. Work out the steps, the decisions and the places where the flow loops back. Ask only if the process is unclear.
 2. Write `<name>.spec.json` in a `diagrams/` folder of the current project (create it if needed).
 3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` (view and share) and `<name>.drawio` (open and edit in draw.io) next to the spec, and prints a check report.
 4. Read the report. Exit code 0 means no error; 2 means errors were found (the files are still written); 1 means the spec is invalid and the message lists every problem.
 5. Fix errors by changing the spec (see below) and build again, at most three rounds. Warnings may stay; mention them.
-6. Tell the user where the HTML and the `.drawio` file are and what, if anything, the check still reports. Do not say a diagram "looks good": you have not seen it.
+6. Tell the user where the HTML and the `.drawio` file are and what, if anything, the check still reports. Then look at the picture as WORKING.md step 8 says (`node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js <name>.html <medium>`); do not say it "looks good" unless you have.
 
 ## The spec
 

@@ -407,8 +407,9 @@ class Canvas:
     def write(self, folder: str | Path, name: str) -> list[check.Finding]:
         """Write ``<name>.scene.json``, ``.html`` and ``.drawio`` and check the scene.
 
-        The brief ``<folder>/<name>.brief.md`` is read back: its main lines are printed, or a
-        ``no-brief`` warning is added when it is missing.
+        The brief ``<folder>/<name>.brief.md`` is read back: its lines are printed here, so they
+        sit above the report in the script's output, and a ``no-brief`` warning is added when
+        the file or one of its lines is missing.
 
         Args:
             folder: Where to write; it is created when missing.
@@ -423,7 +424,10 @@ class Canvas:
         (target / f"{name}.scene.json").write_text(scene.dumps(final, indent=2), encoding="utf-8")
         (target / f"{name}.html").write_text(render_html.render(final), encoding="utf-8")
         (target / f"{name}.drawio").write_text(render_drawio.render(final), encoding="utf-8")
-        return check.check_scene(final) + brief.report_brief(brief.brief_path(target, name))
+        said = brief.check_brief(brief.brief_path(target, name))
+        if said.lines:
+            print("\n".join(said.lines))
+        return check.check_scene(final) + list(said.findings)
 
 
 @dataclass(frozen=True)
