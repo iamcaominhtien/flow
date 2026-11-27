@@ -29,5 +29,5 @@ Unknowns: <what you could not find out>
 
 ## After drawing
 
-8. **Verify.** Against the source: walk two or three cases (the usual one and a failure or edge case) along the picture and check each step against the source. Against the reader: run `node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js <name>.html <medium>` (phone, screen, slide or editor; it needs Chromium and Playwright), open `<name>.<medium>.png`, the diagram as the reader first sees it, and check the question can be answered from it. `<name>.png` is the whole diagram at full size, to deliver. If you cannot render the page, say so.
+8. **Verify.** Against the source: walk two or three cases (the usual one and a failure or edge case) along the picture and check each step against the source. Against the reader: run `node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js <name>.html <medium>` (phone, screen, slide, editor or print; it needs Chromium and Playwright; the page is next to the spec, or in the folder you passed to `canvas.write`), open `<name>.<medium>.png`, the diagram as the reader first sees it, and check the question can be answered from it. `<name>.png` is the whole diagram at full size, to deliver. If you cannot render the page, say so.
 9. **Deliver.** Give the picture and say, in a few lines: the sources read, what was left out, what is uncertain, and what a next, more detailed diagram could show.

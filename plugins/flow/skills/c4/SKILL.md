@@ -14,7 +14,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 1. Pick one level and answer one question: **1 context** (who uses the system, what does it depend on), **2 containers** (what runs inside it), **3 components** (how one container is built). Level 4 is a UML class diagram: not drawn here.
 2. Write `diagrams/<name>.spec.json` in the current project. Write level 1 first; a lower level names the box it opens.
 3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` and `<name>.drawio` next to the spec and prints a check report. Exit code 0: no error; 2: errors found (files still written); 1: the spec is invalid and the message lists every problem.
-4. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Then look at the picture as WORKING.md step 8 says (`node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js <name>.html <medium>`); do not say it "looks good" unless you have.
+4. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Then look at the picture as WORKING.md step 8 says (`node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js diagrams/<name>.html <medium>`); do not say it "looks good" unless you have.
 5. Tell the user where the HTML and the `.drawio` file are.
 
 ## The spec

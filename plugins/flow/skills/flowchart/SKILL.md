@@ -18,7 +18,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` (view and share) and `<name>.drawio` (open and edit in draw.io) next to the spec, and prints a check report.
 4. Read the report. Exit code 0 means no error; 2 means errors were found (the files are still written); 1 means the spec is invalid and the message lists every problem.
 5. Fix errors by changing the spec (see below) and build again, at most three rounds. Warnings may stay; mention them.
-6. Tell the user where the HTML and the `.drawio` file are and what, if anything, the check still reports. Then look at the picture as WORKING.md step 8 says (`node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js <name>.html <medium>`); do not say it "looks good" unless you have.
+6. Tell the user where the HTML and the `.drawio` file are and what, if anything, the check still reports. Then look at the picture as WORKING.md step 8 says (`node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js diagrams/<name>.html <medium>`); do not say it "looks good" unless you have.
 
 ## The spec
 

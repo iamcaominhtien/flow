@@ -14,7 +14,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 1. Choose the periods (quarters, months) and the lanes (teams or themes), then list each lane's items with the period they start in, whether they are committed, and who owns them. Dates do not belong here: use a Gantt chart.
 2. Write `diagrams/<name>.spec.json` in the current project.
 3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` and `<name>.drawio` next to the spec and prints a check report. Exit code 0: no error; 2: errors found (files still written); 1: the spec is invalid and the message lists every problem.
-4. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Then look at the picture as WORKING.md step 8 says (`node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js <name>.html <medium>`); do not say it "looks good" unless you have.
+4. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Then look at the picture as WORKING.md step 8 says (`node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js diagrams/<name>.html <medium>`); do not say it "looks good" unless you have.
 5. Tell the user where the HTML and the `.drawio` file are.
 
 ## The spec

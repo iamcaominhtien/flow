@@ -14,7 +14,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 1. Decide the shape: a few screens of one task, one desktop screen, a **state set** (the same screen in normal, loading, empty and error) or a **responsive set** (desktop, tablet and phone).
 2. Write `diagrams/<name>.spec.json` in the current project, with real words on buttons and labels.
 3. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/flow.py build diagrams/<name>.spec.json`. It writes `<name>.scene.json`, `<name>.html` and `<name>.drawio` and prints a check report. Exit code 0: no error; 2: errors (files still written); 1: the spec is invalid and the message lists every problem.
-4. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Then look at the picture as WORKING.md step 8 says (`node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js <name>.html <medium>`); do not say it "looks good" unless you have.
+4. Fix errors by changing the spec, at most three rounds. Warnings may stay; mention them. Then look at the picture as WORKING.md step 8 says (`node ${CLAUDE_PLUGIN_ROOT}/scripts/view.js diagrams/<name>.html <medium>`); do not say it "looks good" unless you have.
 5. Tell the user where the HTML and the `.drawio` file are.
 
 ## The spec

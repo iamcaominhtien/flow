@@ -2,10 +2,11 @@
 //
 //   node view.js page.html [medium]
 //
-// medium: phone, screen (the default), slide or editor. It writes, next to the page:
+// medium: phone, screen (the default), slide, editor or print. It writes, next to the page:
 //   <name>.png           the whole diagram at twice its size, to deliver or to inspect
 //   <name>.<medium>.png  the whole diagram fitted to the medium's width, as a reader first sees it
-//                        (phone: 390 css px at 3x; screen and editor: 1440; slide: 1280)
+//                        (phone: 390 css px at 3x; screen and editor: 1440; slide: 1280;
+//                        print: 1123, an A4 page across)
 // Open the second file and read it at that size: if a label cannot be read there, the reader
 // cannot read it either. Animations are stilled (reduced motion), so the picture is final.
 //
@@ -14,6 +15,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const { pathToFileURL } = require('url');
 
 const { chromium } = loadPlaywright();
 
@@ -22,6 +24,7 @@ const MEDIA = {
   screen: { width: 1440, scale: 1 },
   editor: { width: 1440, scale: 1 },
   slide: { width: 1280, scale: 1 },
+  print: { width: 1123, scale: 2 }, // an A4 page across, at 96 dpi
 };
 const WHOLE_SCALE = 2; // the delivered picture is sharp when zoomed in
 const MEASURE_WIDTH = 320; // css px; narrower than any diagram
@@ -54,7 +57,7 @@ async function shootWhole(browser, source, target) {
     reducedMotion: 'reduce',
   });
   const page = await context.newPage();
-  await page.goto(`file://${source}`);
+  await page.goto(pathToFileURL(source).href);
   await page.waitForLoadState('networkidle');
   const size = await page.evaluate(() => ({
     width: document.documentElement.scrollWidth,
