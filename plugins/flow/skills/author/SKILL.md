@@ -99,7 +99,7 @@ canvas.edge(
 
 ## Theme
 
-Set `canvas.theme = "technical"` or `"midnight"` (default `"pastel"`) before `canvas.write(...)` to restyle the whole diagram in HTML and draw.io; an unknown name raises `ValueError`. Details in the flowchart skill ("Themes"). On `midnight` pick tones for the owner or domain as usual; the colours are swapped for you. Do not write colours by hand.
+Set `canvas.theme = "neutral"`, `"technical"` or `"midnight"` (default `"pastel"`) before `canvas.write(...)` to restyle the whole diagram in HTML and draw.io; an unknown name raises `ValueError`. Details in the flowchart skill ("Themes"). On `midnight` pick tones for the owner or domain as usual; the colours are swapped for you. Do not write colours by hand.
 
 ## The design to follow
 

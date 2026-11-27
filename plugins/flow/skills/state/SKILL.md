@@ -48,7 +48,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - **State**: `id`, `label`, optional `kind` (`state` default, `start` the filled dot, `end` the ringed dot, `fail` a rose box for a failure or cancel), `tone`, `icon`, `detail`. A `start` or `end` mark needs no label; more than one `end` is fine. The name is a noun or an adjective (`Paid`, `On the way`).
 - **Activities** under the name, in mono grey: `entry`, `do`, `exit` (text only: `"do": "cook"` is drawn `do / cook`).
 - **Composite state**: put states in a state's `states` list, or give each a `group` name. They are drawn in a frame with the name in a pill. Keep the members next to each other on the happy path.

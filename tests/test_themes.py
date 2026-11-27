@@ -33,7 +33,7 @@ from flowlib.model import (  # noqa: E402
 from flowlib.reader import SpecError  # noqa: E402
 from flowlib.theme import load_theme, theme_names  # noqa: E402
 
-THEMES = ["pastel", "technical", "midnight"]
+THEMES = ["pastel", "technical", "midnight", "neutral"]
 MIN_FONT_PX = 10
 NO_TEXT_SHAPES = (
     Shape.START,
@@ -68,7 +68,7 @@ def _contrast(first: str, second: str) -> float:
     return (high + 0.05) / (low + 0.05)
 
 
-def test_the_known_themes_are_the_three_of_the_design() -> None:
+def test_the_known_themes_are_the_four_of_the_design() -> None:
     """The default comes first."""
     assert theme_names() == THEMES
     assert DEFAULT_THEME == "pastel"
@@ -97,7 +97,7 @@ def test_themes_differ_in_colours_and_in_the_page_background() -> None:
 
 def test_theme_settings_follow_the_design() -> None:
     """Radius, stroke and shadow of each theme, and solid edges in the technical one."""
-    pastel, technical, midnight = (load_theme(name) for name in THEMES)
+    pastel, technical, midnight, neutral = (load_theme(name) for name in THEMES)
     assert (technical.style.corner_radius, technical.style.stroke_width) == (4, 1.5)
     assert not technical.style.shadow
     assert (midnight.style.corner_radius, midnight.style.stroke_width) == (12, 2)
@@ -105,6 +105,17 @@ def test_theme_settings_follow_the_design() -> None:
     assert all(technical.roles[role].dash is None for role in (Role.MAIN, Role.DATA))
     assert technical.roles[Role.MAIN].animation is None
     assert pastel.roles[Role.MAIN].animation is not None
+    assert neutral.style.stroke_width == 1.5
+
+
+def test_a_toned_node_takes_the_outline_of_its_tone() -> None:
+    """Pastel tints a node and darkens its outline to match; neutral keeps nodes white and grey."""
+    pastel, neutral = load_theme("pastel"), load_theme("neutral")
+    for tone in pastel.tones.values():
+        assert tone.outline not in (tone.box, tone.pill)
+    assert {tone.box for tone in neutral.tones.values()} == {"#FFFFFF"}
+    assert len({tone.outline for tone in neutral.tones.values()}) == 1
+    assert len({tone.pill for tone in neutral.tones.values()}) == len(neutral.tones)
 
 
 def test_the_default_theme_is_not_written_to_a_scene_file() -> None:

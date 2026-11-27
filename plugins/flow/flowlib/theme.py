@@ -76,6 +76,7 @@ class ToneColors:
     accent: str
     lane: str
     label: str  # text on the pill tint, such as a key chip; the accent where that reads well
+    outline: str  # the outline of a node filled with this tone: a darker shade of the box tint
 
 
 @dataclass(frozen=True)

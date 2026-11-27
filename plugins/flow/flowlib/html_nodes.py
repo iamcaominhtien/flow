@@ -521,7 +521,8 @@ def node_html(node: Node, theme: Theme) -> str:
         return explain_node_html(node, theme)
     colors = theme.shapes[node.shape]
     if node.tone is not None and node.shape is not Shape.TABLE:
-        colors = replace(colors, fill=theme.tones[node.tone].box)
+        tone = theme.tones[node.tone]
+        colors = replace(colors, fill=tone.box, stroke=tone.outline)
     if node.dashed:
         colors = replace(colors, dash=DASH_PATTERN)
     inside = outline_svg(node.shape, node.width, node.height, colors)

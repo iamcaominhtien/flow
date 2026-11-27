@@ -43,7 +43,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - **System**: `system` is the name written at the top left of the white frame.
 - **Actor**: `id`, `label`, optional `tone` (default: blue, green, teal, amber, violet in turn), `icon` (for the illustrated style), `external: true` for an outside system: it stands on the right of the frame with the tag `external system`; people stand on the left.
 - **Use case**: `id`, `label` (a verb phrase), optional `tone` (default: the tone of the actor that uses it; a use case that only another includes or extends takes the tone of that one). An oval of 240 x 64.

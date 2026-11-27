@@ -104,7 +104,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - `style`: `plain` (default: a card with a circle of initials, the name and the role) or `illustrated` (a name pill, the role and a person icon).
 - **Person**: `name`, `role` (a noun phrase such as `Mobile developer`, not a sentence; the build warns on a long one), optional `id` (needed by `links`), `team`, `tone`, `initials`, `icon` (illustrated style), `children`.
 - **Tint**: `tone` if given, else the tone of the `team`, else, for someone who reports to the top, the tone of the name; the people below keep the tint of their head. The tint comes from the name or team, so a person has the same tint in every diagram. `people` (`{"Ava Lopez": {"initials": "AL", "tone": "blue"}}`) pins initials or a tint.

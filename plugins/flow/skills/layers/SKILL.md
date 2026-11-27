@@ -82,7 +82,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - `flow`: `true` draws a highlighted arrow down between each pair of layers.
 - **Layer**: `label`, optional `tone`, `items`, with at least one item.
 - **Item**: `label`, optional `detail`, `icon`, `tone`.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.22.0 (2026-11-27)
+
+Colour, after the owner judged the default "quite ugly" on a 285-node diagram. Chosen from three palettes rendered on the same section; the owner rated them equal and asked for the default fix and the neutral one.
+
+- A node's outline follows its tone: a darker shade of its tint (new token `outline` per tone), instead of the process blue on every fill. The default outlines of the shapes moved to the same shades.
+- A group's background is the tone's lightest tint (`lane`), lighter than the nodes inside it, with a solid border; it was the same tint as the nodes, so they sank into it. HTML and draw.io.
+- New theme `neutral`: white nodes with grey outlines on a light grey page; groups are told apart by a tinted header only, so the one accent colour marks the main path and green and red keep yes and no.
+- `technical` keeps slate outlines for toned nodes.
+
 ## 0.21.0 (2026-11-27)
 
 **Measured** (`benchmarks/results/2026-11-27-routing-0.21.0.md`): on the held routing set, Sonnet missed Flow in 3 of 30 runs instead of 10 (9 in a rerun of 0.20.0), with no false positives. What made the gain is not known: the new entry skill was loaded in only 2 of those runs; the PNG it promises is one untested reading. Also an honest PNG check.

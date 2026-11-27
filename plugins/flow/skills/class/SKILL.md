@@ -40,7 +40,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - **Class**: `id`, `label` (a singular noun in PascalCase), `attributes` and `operations` (lists of strings; `methods` is accepted for `operations`), optional `kind` (`class`, `abstract`: the name is italic; `interface`: `«interface»` above the name), `stereotype` (own text such as `«enumeration»`), `tone`, `at: [row, column]`. A compartment with nothing in it is left out. The box is 280 px wide; the header has the class tint (default blue, interface gray).
 - **Members** are written as in UML: a visibility mark (`+` public, `-` private, `#` protected), the name, a colon and the type; an operation has its parameters and return type: `+addItem(d: Dish, n: int)`, `+authorise(): bool`. Show the members that explain the relationships, not every field.
 - **Relation**: `from`, `to`, optional `label` (a verb: `places`), `from_label` and `to_label` (the multiplicity at each end: `1`, `0..1`, `0..*`, `1..*`; drawn next to the boxes), and `style`:

@@ -75,7 +75,7 @@ If those steps do not clear an error, fix it by hand with an **overrides** file 
 
 ## Themes
 
-Add `"theme"` at the top level of any spec, of any type, to pick the look: `pastel` (the default: soft tints, radius 10, stroke 2, shadow on the draw.io boxes, animated main path), `technical` (for UML, ER and C4: white boxes with slate outlines, radius 4, stroke 1.5, no shadow, solid lines and no animation) or `midnight` (dark slides: background `#0B1220`, light text, dark tints with bright outlines, radius 12). The HTML page and the `.drawio` file both use it, including the page background. An unknown name is an error that lists the three. In draw.io the lines are written with the weights of the design (main path 3 wide, data stream 1, other lines 2) and the animation runs at 500 ms and 1500 ms.
+Add `"theme"` at the top level of any spec, of any type, to pick the look: `pastel` (the default: soft tints, radius 10, stroke 2, shadow on the draw.io boxes, animated main path), `technical` (for UML, ER and C4: white boxes with slate outlines, radius 4, stroke 1.5, no shadow, solid lines and no animation), `neutral` (white boxes with grey outlines on a light grey page, groups shown by a tinted header only, so one accent colour marks the main path; any type) or `midnight` (dark slides: background `#0B1220`, light text, dark tints with bright outlines, radius 12). The HTML page and the `.drawio` file both use it, including the page background. An unknown name is an error that lists them. In draw.io the lines are written with the weights of the design (main path 3 wide, data stream 1, other lines 2) and the animation runs at 500 ms and 1500 ms.
 
 ## Illustrated style
 

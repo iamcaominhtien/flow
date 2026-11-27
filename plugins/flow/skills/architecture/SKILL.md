@@ -51,7 +51,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 - **Component**: `id`, `label`, `detail` (the technology or the job, never a sentence), `icon`, `tone` (by domain or owner, not by layer: the same part has the same tint everywhere), `zone` (the smallest zone that holds it; none puts it in a row above every layer), `at: [row, column]`. Plain parts are 196 x 68 and layers are 260 px apart; parts of a layer share a centre line and are placed in the order of the spec, the row centred under the widest one. Use `at` to line parts up in columns (a gateway under its callers) or to put a part in another row.
 - **Link**: `from` and `to` (a component, **or a zone** for "any part inside": the line then starts or ends on the edge of the frame, drawn once and labelled once, as in *every service sends metrics here*), `label` (required: a protocol or an action), `kind` or `main: true`. An arrow shows who starts the call, not which way data flows: a read is an arrow *to* the database. Kinds: `call` (ink, thin), `main` (blue, thick, animated; the one route the diagram is about), `event` (violet, thin, slow: queues, topics, streams), `copy` (dashed slate: replication, a fallback, a return you want to show). A second blue route cancels the effect.
 - Leave 90 px of line for a label; parts in a row sit 436 px apart (centres), so 240 px of line when they are joined by a labelled line. Eight to twelve parts is a good size; past about fifteen, split by layer or domain.
-- `theme` (optional): `pastel` (default), `technical` or `midnight`.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`.
 
 ## Patterns
 

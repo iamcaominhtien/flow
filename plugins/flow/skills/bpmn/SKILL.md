@@ -148,7 +148,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - Time runs left to right; `direction` is accepted and ignored. Placement is automatic: an element is one column after the one that leads to it, and a decision sends its alternative branch to the row below. You never write coordinates.
 - **Zone**: `id`, `label`, `tone`, optional `parent`, optional `black_box`. A zone without `parent` is a **pool** (one participant); a zone with a `parent` is a **lane** of that pool. A pool with lanes needs no `label` (its lanes carry the names); each element then names a lane. `"black_box": true` draws the pool as a bar with its name only: no element may name it as its zone, and a message flow may start or end on it by naming its id (for a partner you do not model inside). Pools are stacked in the order written. When there are zones, every element needs a `zone`; with no zones the diagram is flat.
 - **Element**: `id`, `label`, `kind`, `zone`, optional `tone`, `trigger`, `repeat`, `attached_to`, `interrupting`, `column`, `row`, `number`.

@@ -107,7 +107,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - **Time** is read in one of three ways, never mixed. *Dates*: `start` and `end` are ISO dates and `end` is the last day; the first column is the Monday on or before the first date (or `axis_start`), and a month header is drawn above the weeks. *Weeks*: `start` and `end` are week numbers from 1, `end` included (or `length` in weeks instead of `end`); the columns are `W1`, `W2`. *Periods* (older form): `periods` names the columns, `start` counts from 0 and `length` is a number of periods.
 - **Task**: `id`, `label`, `owner` (a name; the circle shows the initials), `group` (the phase: a grey band with its name, in the order first used), `status` (`done` green with a check, `in_progress` blue filled to `progress` from 0 to 1, `planned` grey, `blocked` rose with a dashed outline and a short `reason`, which is required), `after` (an id or a list of ids that must finish first: a thin finish-to-start arrow), `critical: true` to mark the critical path yourself. Without `status` it is worked out from `progress`: none is planned, all is done.
 - **Milestone** (`milestones`): `id`, `label`, and where it falls: `date`, or `at` (a position counted in columns from the left edge: 3 is between W3 and W4), or `after` (the end of a task; an arrow runs into the diamond). `group` puts it in a phase; by default it follows the task it comes after.

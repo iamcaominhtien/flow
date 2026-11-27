@@ -117,8 +117,8 @@ def _frame_html(frame: Frame, theme: Theme) -> str:
         "width": px(frame.width),
         "height": px(frame.height),
         "box-sizing": "border-box",
-        "background": tone.box,
-        "border": f"{px(FRAME_BORDER_PX)} dashed {tone.pill}",
+        "background": tone.lane,  # lighter than the nodes in it, so they stand out
+        "border": f"{px(FRAME_BORDER_PX)} solid {tone.pill}",
         "border-radius": px(theme.style.frame_radius),
     }
     html = tag("div", area, data_id=frame.id)

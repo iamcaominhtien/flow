@@ -9,23 +9,23 @@
   "shapes": {
     "terminator": {
       "fill": "#DCF5E1",
-      "stroke": "#1E7A3C"
+      "stroke": "#3F8F57"
     },
     "fail": {
       "fill": "#FDE4E4",
-      "stroke": "#B42318"
+      "stroke": "#C0453B"
     },
     "process": {
       "fill": "#DCEEFB",
-      "stroke": "#1E5AA8"
+      "stroke": "#3B6FB6"
     },
     "decision": {
       "fill": "#FFF1DD",
-      "stroke": "#B45309"
+      "stroke": "#C27A2C"
     },
     "io": {
       "fill": "#E6E3FB",
-      "stroke": "#4F46A5"
+      "stroke": "#7A62C9"
     },
     "document": {
       "fill": "#FFFFFF",
@@ -33,15 +33,15 @@
     },
     "subprocess": {
       "fill": "#DCEEFB",
-      "stroke": "#1E5AA8"
+      "stroke": "#3B6FB6"
     },
     "preparation": {
       "fill": "#D3F3EF",
-      "stroke": "#0F766E"
+      "stroke": "#2F8C83"
     },
     "connector": {
       "fill": "#FDE4E4",
-      "stroke": "#B42318"
+      "stroke": "#C0453B"
     },
     "bar": {
       "fill": "#DCEEFB",
@@ -69,7 +69,7 @@
     },
     "cylinder": {
       "fill": "#E6E3FB",
-      "stroke": "#4F46A5"
+      "stroke": "#7A62C9"
     },
     "entity": {
       "fill": "#F1F5F9",
@@ -227,7 +227,8 @@
       "stroke": "#60A5FA",
       "accent": "#1D4ED8",
       "lane": "#EEF5FF",
-      "label": "#1D4ED8"
+      "label": "#1D4ED8",
+      "outline": "#3B6FB6"
     },
     "violet": {
       "box": "#E6E3FB",
@@ -235,7 +236,8 @@
       "stroke": "#8B7FE8",
       "accent": "#5B4BD6",
       "lane": "#F3F0FF",
-      "label": "#5B4BD6"
+      "label": "#5B4BD6",
+      "outline": "#7A62C9"
     },
     "amber": {
       "box": "#FFF1DD",
@@ -243,7 +245,8 @@
       "stroke": "#F59E3A",
       "accent": "#B45309",
       "lane": "#FFF5E9",
-      "label": "#B45309"
+      "label": "#B45309",
+      "outline": "#C27A2C"
     },
     "green": {
       "box": "#DCF5E1",
@@ -251,7 +254,8 @@
       "stroke": "#4CC38A",
       "accent": "#15803D",
       "lane": "#EEFAF0",
-      "label": "#15803D"
+      "label": "#15803D",
+      "outline": "#3F8F57"
     },
     "teal": {
       "box": "#D3F3EF",
@@ -259,7 +263,8 @@
       "stroke": "#2BB3A6",
       "accent": "#0F766E",
       "lane": "#E8F8F5",
-      "label": "#0F766E"
+      "label": "#0F766E",
+      "outline": "#2F8C83"
     },
     "gray": {
       "box": "#F1F5F9",
@@ -267,7 +272,8 @@
       "stroke": "#94A3B8",
       "accent": "#475569",
       "lane": "#F6F8FA",
-      "label": "#475569"
+      "label": "#475569",
+      "outline": "#7B8794"
     },
     "red": {
       "box": "#FDE4E4",
@@ -275,7 +281,8 @@
       "stroke": "#F26B6B",
       "accent": "#D92D20",
       "lane": "#FEF0F0",
-      "label": "#B42318"
+      "label": "#B42318",
+      "outline": "#C0453B"
     }
   },
   "roles": {
@@ -1899,6 +1906,29 @@
         "link": {
           "color": "#334155"
         }
+      },
+      "tones": {
+        "blue": {
+          "outline": "#334155"
+        },
+        "violet": {
+          "outline": "#334155"
+        },
+        "amber": {
+          "outline": "#334155"
+        },
+        "green": {
+          "outline": "#334155"
+        },
+        "teal": {
+          "outline": "#334155"
+        },
+        "gray": {
+          "outline": "#334155"
+        },
+        "red": {
+          "outline": "#334155"
+        }
       }
     },
     "midnight": {
@@ -2131,7 +2161,8 @@
           "stroke": "#60A5FA",
           "accent": "#2563EB",
           "lane": "#0F1B2D",
-          "label": "#93C5FD"
+          "label": "#93C5FD",
+          "outline": "#60A5FA"
         },
         "violet": {
           "box": "#1E1B3A",
@@ -2139,7 +2170,8 @@
           "stroke": "#8B7FE8",
           "accent": "#6D5BF0",
           "lane": "#151330",
-          "label": "#C4B5FD"
+          "label": "#C4B5FD",
+          "outline": "#8B7FE8"
         },
         "amber": {
           "box": "#2E2111",
@@ -2147,7 +2179,8 @@
           "stroke": "#F59E3A",
           "accent": "#B45309",
           "lane": "#241A0E",
-          "label": "#FCD34D"
+          "label": "#FCD34D",
+          "outline": "#F59E3A"
         },
         "green": {
           "box": "#11291C",
@@ -2155,7 +2188,8 @@
           "stroke": "#4CC38A",
           "accent": "#15803D",
           "lane": "#0E2016",
-          "label": "#86EFAC"
+          "label": "#86EFAC",
+          "outline": "#4CC38A"
         },
         "teal": {
           "box": "#0F2A28",
@@ -2163,7 +2197,8 @@
           "stroke": "#2BB3A6",
           "accent": "#0F766E",
           "lane": "#0C201F",
-          "label": "#5EEAD4"
+          "label": "#5EEAD4",
+          "outline": "#2BB3A6"
         },
         "gray": {
           "box": "#1A2336",
@@ -2171,7 +2206,8 @@
           "stroke": "#64748B",
           "accent": "#475569",
           "lane": "#131B2B",
-          "label": "#CBD5E1"
+          "label": "#CBD5E1",
+          "outline": "#64748B"
         },
         "red": {
           "box": "#2E1417",
@@ -2179,7 +2215,8 @@
           "stroke": "#F26B6B",
           "accent": "#D92D20",
           "lane": "#241014",
-          "label": "#FCA5A5"
+          "label": "#FCA5A5",
+          "outline": "#F26B6B"
         }
       },
       "roles": {
@@ -2346,6 +2383,89 @@
           "amber": "#B45309",
           "red": "#D92D20"
         }
+      }
+    },
+    "neutral": {
+      "shape_paint": {
+        "fill": "#FFFFFF",
+        "stroke": "#A3AAB5",
+        "except": [
+          "cross",
+          "text",
+          "bar",
+          "fork",
+          "note",
+          "start",
+          "end",
+          "initial",
+          "final",
+          "label"
+        ]
+      },
+      "shapes": {
+        "decision": {
+          "fill": "#FFFFFF",
+          "stroke": "#374151"
+        },
+        "terminator": {
+          "fill": "#FFFFFF",
+          "stroke": "#374151"
+        },
+        "fail": {
+          "fill": "#FEF2F2",
+          "stroke": "#DC2626"
+        },
+        "connector": {
+          "fill": "#FEF2F2",
+          "stroke": "#DC2626"
+        }
+      },
+      "tones": {
+        "blue": {
+          "box": "#FFFFFF",
+          "outline": "#A3AAB5",
+          "lane": "#F6F7F9",
+          "pill": "#DBE6FE"
+        },
+        "violet": {
+          "box": "#FFFFFF",
+          "outline": "#A3AAB5",
+          "lane": "#F6F7F9",
+          "pill": "#E4DEFC"
+        },
+        "amber": {
+          "box": "#FFFFFF",
+          "outline": "#A3AAB5",
+          "lane": "#F6F7F9",
+          "pill": "#F8E3BF"
+        },
+        "green": {
+          "box": "#FFFFFF",
+          "outline": "#A3AAB5",
+          "lane": "#F6F7F9",
+          "pill": "#D3EFD9"
+        },
+        "teal": {
+          "box": "#FFFFFF",
+          "outline": "#A3AAB5",
+          "lane": "#F6F7F9",
+          "pill": "#CDEDE8"
+        },
+        "gray": {
+          "box": "#FFFFFF",
+          "outline": "#A3AAB5",
+          "lane": "#F6F7F9",
+          "pill": "#E5E7EB"
+        },
+        "red": {
+          "box": "#FFFFFF",
+          "outline": "#A3AAB5",
+          "lane": "#F6F7F9",
+          "pill": "#F9D7D7"
+        }
+      },
+      "style": {
+        "stroke_width": 1.5
       }
     }
   }

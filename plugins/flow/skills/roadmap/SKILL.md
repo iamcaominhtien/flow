@@ -40,7 +40,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - `periods`: the columns, a name (`"Now"`, `"Q1"`) or an object with `label`, `detail` (the dates in words, such as `March to April`) and `tone`. The names `Now`, `Next` and `Later` get green, amber and grey. Up to about six columns fit; the column width shrinks from 464 px as they grow.
 - **Lane** (a row, one theme or team): `label`, `tone`, `icon` (drawn large, in its detailed form when there is one: `cart courier bell package team store money target flag idea chart` and the rest of the detailed set), `items`.
 - **Item** (a card): `label`, `period` (a period name, or its number from 0; `start` is the older name for the number), optional `length` (how many periods it spans, default 1), `committed` (default true; `false` draws a dashed card tagged Exploring: an idea under study), `owner` (a name, drawn as a circle with initials like the Gantt and org chart ones; pin the tint with a top-level `people` object), `detail`, `id`. Cards of a lane that share a period are stacked in extra rows.

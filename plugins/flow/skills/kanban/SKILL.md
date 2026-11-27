@@ -39,7 +39,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - **Column**: `label`, optional `tone` (the tint of the column), `limit` (a work-in-progress limit, whole number), `done` (true: every card in it is finished), `cards`. Columns are 360 px wide, in the order work moves (Backlog, In progress, In review, Done).
 - **Card**: `label`, optional `kind` (a tag: `Feature` is blue, `Bug` red, `Chore` grey; any other word is grey, or set `tone`), `owner` (a name, drawn as a circle with initials), `detail` (a small second line), `done` (true: struck through), `tone` (the tint of the tag). A card is 100 px high: keep the title to two lines.
 - **Write the cards in priority order**: the first is drawn at the top of its column.

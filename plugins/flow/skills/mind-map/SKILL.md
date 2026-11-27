@@ -89,7 +89,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - `style`: `illustrated` (the topic is a card with a large icon and a goal line; a branch is a solid colour pill with a round icon; a leaf is a white card with a colour bar and a small icon) or `plain` (default: a dark topic pill, tinted branch pills, leaves as phrases on a coloured underline).
 - **Root**: `label`, `goal` (the line under the topic, written as `Goal: ...`), `icon`. **Item**: `label` (at most four words; the build warns above that), `icon`, `tone`, `children`.
 - **Branches and tones**: the first half of the branches go on the right, the rest on the left; `side` (`left` or `right`) moves one. The branches take the tones blue, violet, amber, teal, green, red, gray in turn, and pass them on to everything below; `tone` sets one. Six branches fit best, three on each side, 300 px apart.

@@ -44,7 +44,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 
 Gane-Sarson shapes: an **external entity** is a square-cornered box with its id (`E1`); a **process** is a rounded box with its number in a header strip (`1.0`); a **data store** is a box open on the right with an id cell (`D1`).
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - **Element**: `id`, `label`, `kind` (`process` default, `external`, `store`), optional `detail` (a few words under a process name), `icon`, `tone`, `number`, `at: [row, column]`. Ids are made up in order: `E1`, `E2` for parties, `D1` for stores, `1.0`, `2.0` for processes (`0` for the one process of level 0). A `number` you give is kept and never made up again. Names: a process is a verb phrase ("Take order"), a party or store a noun.
 - **Flow**: `from`, `to`, `label` (required: the data, as a noun phrase such as "Order ticket", never a verb). `main: true` marks the one blue journey of the data; `status: true` marks a flow that only reports status (violet, thin). A reply is its own flow: two flows between the same two boxes are drawn side by side, 60 px apart.
 - The build **refuses**, with the reason: a flow between two external entities, between two stores, or between an entity and a store (put a process between them); a process with no output (black hole) or no input; a store on level 0.

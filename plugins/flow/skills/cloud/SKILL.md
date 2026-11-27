@@ -54,7 +54,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 - **Link**: `from` and `to` (parts: a link between sites runs from device to device, never frame to frame), `label` (a protocol or what travels: *HTTPS*, *IPsec VPN*, *replication*; required), `kind` (`call` ink, `main` blue, `event` or `copy` violet) or `main: true`. One blue route: one request from user to data. Violet is the event stream or the database copy, or a second site tunnel.
 - **Trust levels**, top to bottom: the internet and the edge (0), a public subnet or a DMZ (1), a private subnet (2), a data subnet (3). The build refuses a database (`database`, `sql-database`, `nosql-database` icon) in a public subnet or a DMZ, a link that skips two levels (internet to data), and zones of one VPC that do not hold the same subnets. Parts that sit in no subnet (a managed queue or storage in the region frame, a part in the VPC frame) are not checked.
 - **Layout**: the row follows the trust level (users above, edge, then public, private and data subnets; 255 px between rows); each zone takes as many columns as its fullest subnet and the same subnets sit on the same rows in every zone; a managed service in the region frame goes right of the VPC; on-premises sites go left of the region, remote users above. Two parts that would share a cell are moved apart. Give `at` to a part to override.
-- `theme` (optional): `pastel` (default), `technical` or `midnight`. Cloud diagrams are plain only; `style: illustrated` is refused.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`. Cloud diagrams are plain only; `style: illustrated` is refused.
 - More than about 16 parts: split by region or by network.
 
 ## Limits to tell the user

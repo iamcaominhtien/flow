@@ -37,7 +37,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - `style` (optional): `plain` (default: a 136 x 44 header box with a small icon) or `illustrated` (a 172 x 116 tinted card with a 64 px icon and a name pill; icons that have a detailed twin, such as `user phone server card store courier`, show it). Only the headers change; every y position moves down by the extra header height. Lifelines are 230 px apart in both styles.
 Items run top to bottom in the order written. An item is one of:
 

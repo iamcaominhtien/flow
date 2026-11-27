@@ -64,7 +64,7 @@ Before step 1, follow the working method in `${CLAUDE_PLUGIN_ROOT}/skills/WORKIN
 }
 ```
 
-- `theme` (optional): `pastel` (default), `technical` or `midnight`; see the flowchart skill.
+- `theme` (optional): `pastel` (default), `neutral`, `technical` or `midnight`; see the flowchart skill.
 - `center`: `label`, optional `detail`, `icon`, `tone`.
 - `items`: 1 to 10 of `label`, optional `detail`, `icon`, `tone`. They are placed clockwise from the top, in the order written.
 - `style`: `plain` (default) or `illustrated`. Illustrated draws each part that has an `icon` as a card (large icon, name pill, detail line); icons with a detailed drawing show it.

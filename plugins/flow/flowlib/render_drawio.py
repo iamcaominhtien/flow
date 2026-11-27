@@ -351,13 +351,18 @@ def _base_pairs(node: Node, theme: Theme) -> dict[str, object]:
     """Return the style pairs every node has: its colours, its outline and its text."""
     colors = theme.shapes[node.shape]
     fill = theme.tones[node.tone].box if node.tone else colors.fill
+    stroke = (
+        theme.tones[node.tone].outline
+        if node.tone and node.shape is not Shape.TABLE
+        else colors.stroke
+    )
     if node.shape is Shape.TABLE and node.card:
         fill = theme.tones[node.tone or Tone.GRAY].pill
     return {
         "html": 1,
         "whiteSpace": "wrap",
         "fillColor": fill,
-        "strokeColor": colors.stroke,
+        "strokeColor": stroke,
         "strokeWidth": fmt(colors.stroke_width),
         "fontColor": theme.ink,
         "fontSize": fmt(node.font_size),
@@ -776,13 +781,11 @@ def _add_frame(root: ET.Element, frame: Frame, theme: Theme) -> None:
         {
             "rounded": 1,
             "arcSize": FRAME_CORNER_PERCENT,
-            "dashed": 1,
-            "dashPattern": FRAME_DASH_PATTERN,
             "container": 1,
             "collapsible": 0,
             "html": 1,
             "verticalAlign": "top",
-            "fillColor": tone.box,
+            "fillColor": tone.lane,
             "strokeColor": tone.pill,
             "strokeWidth": FRAME_STROKE_WIDTH_PX,
         }
