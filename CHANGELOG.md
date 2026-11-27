@@ -2,7 +2,7 @@
 
 ## 0.21.0 (2026-11-27)
 
-A way in for requests that say what to show but not which diagram, and an honest PNG. **Measured** (`benchmarks/results/2026-11-27-routing-0.21.0.md`): on the held routing set, Sonnet missed Flow in 3 of 30 runs instead of 10, with no false positives; the entry skill itself was loaded in only 2 of those runs, and on twelve fresh requests there was no gain.
+**Measured** (`benchmarks/results/2026-11-27-routing-0.21.0.md`): on the held routing set, Sonnet missed Flow in 3 of 30 runs instead of 10 (9 in a rerun of 0.20.0), with no false positives. What made the gain is not known: the new entry skill was loaded in only 2 of those runs; the PNG it promises is one untested reading. Also an honest PNG check.
 
 - `skills/draw/`: draw a diagram of how something works, fits together, moves, is organised or is planned, from any input. It checks that Flow is the tool (not a chart of numbers, an illustration or a text diagram), follows `WORKING.md`, picks the type skill from the structure shown, and delivers a PNG through `view.js` when a headless browser is available. A test keeps its table in step with the skills.
 - `doctor` says whether PNG pictures work here, by running `view.js --check`, which starts the browser the way a render does.
