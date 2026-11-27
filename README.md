@@ -24,7 +24,7 @@ Describe a diagram in plain language. Get a web page you can view and share, and
 
 - **Text to diagram.** Say what you want ("how a customer pays and gets an order delivered") and Claude draws it.
 - **Two outputs.** An HTML page with animated lines (the main path moves, data streams move slowly) and a native `.drawio` file, both from the same positions so they do not drift apart.
-- **25 skills for 20+ diagram types.** A way in for any request to draw (`/flow:draw`), and Flowchart, sequence, ER, architecture, C4, cloud, state, BPMN, use case, class, DFD, screen flow, org chart, mind map, Gantt, roadmap, Kanban, layers, wireframe, concept, and editing of existing `.drawio` files.
+- **25 skills for 20+ diagram types.** A way in for any request to draw (`/flow:draw`), and flowchart, sequence, ER, architecture, C4, cloud, state, BPMN, use case, class, DFD, screen flow, org chart, mind map, Gantt, roadmap, Kanban, layers, wireframe, concept, and editing of existing `.drawio` files.
 - **Two ways to lay a diagram out.** Small diagrams: a short spec and an automatic layout, in seconds. Large or dense diagrams: `/flow:author`, where Claude lays the diagram out itself, looks at its own picture and improves it.
 - **One design.** A shared palette, type, icons (40 flat, 97 detailed) and line roles for every type, in a plain and an illustrated style (cards with a name pill and a large icon).
 - **Checks.** Overlaps, lines through boxes, covered labels and captions, lines on top of each other, crossings, text that does not fit.
