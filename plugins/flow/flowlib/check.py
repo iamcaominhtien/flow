@@ -84,7 +84,6 @@ class Code(StrEnum):
     DECISION_NOT_QUESTION = "decision-not-question"
     DECISION_FEW_EXITS = "decision-few-exits"
     DECISION_NO_ELSE = "decision-no-else"
-    CHART_TOO_BIG = "chart-too-big"
     START_PLACEMENT = "start-placement"
     END_PLACEMENT = "end-placement"
     SEQUENCE_LABEL_LONG = "sequence-label-long"

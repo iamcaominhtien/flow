@@ -657,7 +657,6 @@
     "card_icon_fraction": 0.55,
     "lane_tab": 44,
     "fork_overhang": 30,
-    "fold_extent_lanes": 3400,
     "lane_size_plain": 210,
     "lane_size_card": 240,
     "table_stereotype_height": 16

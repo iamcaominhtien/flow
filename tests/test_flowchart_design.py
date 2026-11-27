@@ -152,8 +152,8 @@ def test_lane_change_runs_straight_across() -> None:
     assert centre["checkout"] == centre["create"] == centre["auth"]
 
 
-def test_lint_flags_text_decisions_and_size() -> None:
-    """Long text, a decision that is not a question, one exit, and a long chart are warned."""
+def test_lint_flags_text_and_decisions() -> None:
+    """Long text, a decision that is not a question and a decision with one exit are warned."""
     nodes = [
         {"id": "a", "kind": "process", "text": "Check the stock of every shop"},
         {"id": "d", "kind": "decision", "text": "Done"},
@@ -161,9 +161,15 @@ def test_lint_flags_text_decisions_and_size() -> None:
     ]
     found = codes(chart(nodes, [{"from": "a", "to": "d"}, {"from": "d", "to": "e"}]))
     assert {"text-too-long", "decision-not-question", "decision-few-exits"} <= found
-    many = [{"id": f"n{i}", "kind": "process", "text": "Step"} for i in range(16)]
-    links = [{"from": f"n{i}", "to": f"n{i + 1}"} for i in range(15)]
-    assert Code.CHART_TOO_BIG.value in codes(chart(many, links))
+
+
+def test_a_long_chart_keeps_one_column() -> None:
+    """A flowchart has no step limit: forty steps stay in one column, with nothing reported."""
+    many = [{"id": f"n{i}", "kind": "process", "text": "Step"} for i in range(40)]
+    links = [{"from": f"n{i}", "to": f"n{i + 1}"} for i in range(39)]
+    laid = chart(many, links)
+    assert len({node.x for node in laid.nodes}) == 1
+    assert not codes(laid)
 
 
 def test_lint_asks_for_else_last() -> None:

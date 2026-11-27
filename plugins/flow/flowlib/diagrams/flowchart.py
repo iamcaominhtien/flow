@@ -38,8 +38,11 @@ def layout(spec: Spec, rules: LayoutRules | None = None) -> Scene:
     frames = placement.frames
     edges = tuple(route_edges(spec, grid, placement, rules))
     caption_port = Port.RIGHT if spec.direction is Direction.RIGHT else Port.BOTTOM
-    folded = fold(Folded(nodes, frames, edges), _fold_rules(spec, rules), caption_port)
-    nodes, frames, edges = folded.nodes, folded.frames, folded.edges
+    # A flowchart is read along its flow, so it keeps one column however long it is. Only the
+    # other types that share this layout (tables, screens) are folded into bands.
+    if not spec.is_flowchart:
+        folded = fold(Folded(nodes, frames, edges), rules, caption_port)
+        nodes, frames, edges = folded.nodes, folded.frames, folded.edges
     if spec.direction is Direction.RIGHT:
         nodes = tuple(transpose.node(node) for node in nodes)
         frames = tuple(transpose.frame(frame) for frame in frames)
@@ -54,13 +57,6 @@ def layout(spec: Spec, rules: LayoutRules | None = None) -> Scene:
         edges=edges,
     )
     return fit_canvas(place_labels(scene))
-
-
-def _fold_rules(spec: Spec, rules: LayoutRules) -> LayoutRules:
-    """Return the rules to fold with: a chart of swimlanes is read whole, so it folds later."""
-    if spec.lanes and spec.is_flowchart:
-        return replace(rules, fold_extent=rules.fold_extent_lanes)
-    return rules
 
 
 def layout_raw(raw: object) -> Scene:

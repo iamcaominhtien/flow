@@ -15,7 +15,6 @@ from .theme import load_theme
 FLOWCHART = "flowchart"
 SEQUENCE = "sequence"
 MAX_WORDS = 4  # words in a node, as the flowchart page allows
-MAX_NODES = 15  # nodes in one chart, past which a split is suggested
 MIN_EXITS = 2  # exits of a decision
 MULTIWAY_EXITS = 3  # exits from which the last one is called else
 ELSE_LABEL = "else"
@@ -52,19 +51,10 @@ def lint_scene(scene: Scene) -> list[Finding]:
 
 
 def lint_flowchart(scene: Scene) -> list[Finding]:
-    """Check the text, the decisions, the size and the start and end of a flowchart."""
+    """Check the text, the decisions and the start and end of a flowchart."""
     steps = [node for node in scene.nodes if node.shape not in NOT_DRAWN_AS_NODES]
     findings = [_too_long(node) for node in steps if _has_too_many_words(node)]
     findings += _decision_findings(scene)
-    if len(steps) > MAX_NODES:
-        findings.append(
-            _warn(
-                Code.CHART_TOO_BIG,
-                f"the chart has {len(steps)} steps; more than about {MAX_NODES} is hard to read, "
-                "so split it with a subprocess or an off-page connector",
-                (),
-            )
-        )
     return findings + _placement_findings(scene)
 
 

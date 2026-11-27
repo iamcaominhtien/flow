@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.0 (2026-11-27)
+
+- Flowchart: no step limit. A long flowchart keeps one column (one row going right) instead of being folded into bands side by side; the warning `chart-too-big` (more than 15 steps) and the theme value `fold_extent_lanes` are gone. Other types that share the layout (tables, screens) still fold past `fold_extent`.
+- Flowchart skill: the "about ten steps per chart" advice and the 15-element threshold for the author skill are removed.
+- Not checked: how a chart of several hundred steps looks in a browser or in draw.io; only a 40-step chain is tested.
+
 ## 0.17.0 (2026-10-29)
 
 Release of 0.11.3 to 0.16.1 to `main`, with no change of its own. In short, for the screen flow:

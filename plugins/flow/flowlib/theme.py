@@ -192,7 +192,6 @@ class LayoutRules:
     card_pill_padding: float
     card_icon_fraction: float
     fork_overhang: float
-    fold_extent_lanes: float
     lane_size_plain: float
     lane_size_card: float
 

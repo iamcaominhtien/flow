@@ -51,12 +51,12 @@ Scope: flowcharts in the plain or the illustrated style, top to bottom or left t
 - A process starts with a verb (*Check stock*). A terminator names a state (*Order placed*). Four words or fewer, sentence case. Do not break lines yourself; the script wraps and widens boxes. Start in the top left and end at the bottom or the right.
 - A decision is a question that ends with `?`. It has at least two exits, labelled `Yes` and `No`. Give the exit that continues the happy path the role `yes` so it stays straight; the other exit leaves sideways. A decision with one exit is a process.
 - A line that returns to an earlier step has the role `back`. Never draw a loop with a normal edge.
-- Every step except the first has an incoming edge, and every step except an end has an outgoing one. About ten steps fit one chart; split a larger process with a `subprocess` step.
+- Every step except the first has an incoming edge, and every step except an end has an outgoing one.
 - Pick icons only where they help a reader scan; skip them on most nodes.
 
 ## Reading the report
 
-`line-through-node`, `nodes-overlap`, `label-covers` and `outside-canvas` are errors. `text-may-not-fit` and `lines-cross` are warnings, and so are the writing rules: `text-too-long` (more than four words), `decision-not-question`, `decision-few-exits`, `decision-no-else` (three or more exits and the last is not `else`), `chart-too-big` (more than about 15 steps), `start-placement` and `end-placement`. Fix an error by:
+`line-through-node`, `nodes-overlap`, `label-covers` and `outside-canvas` are errors. `text-may-not-fit` and `lines-cross` are warnings, and so are the writing rules: `text-too-long` (more than four words), `decision-not-question`, `decision-few-exits`, `decision-no-else` (three or more exits and the last is not `else`), `start-placement` and `end-placement`. Fix an error by:
 
 1. Shortening the text of the nodes involved.
 2. Moving a branch with `side`, or changing which exit has the role `yes`.
@@ -89,4 +89,4 @@ Built-in icon names: `user phone cart card bell clock pin pot check box bike ref
 
 Tone values: `blue`, `violet`, `amber`, `green`, `teal`, `gray`. Any other value is refused by the build.
 
-For a large or dense diagram (more than about 15 elements, many groups, or a hub with many lines) the automatic layout gives long pages and bundled lines; use the `author` skill (`/flow:author`) instead, which lays the diagram out by hand and looks at the result.
+A flowchart has no step limit: a long one keeps one column (one row going right) and is not folded. For a dense diagram (many groups, or a hub with many lines) the automatic layout gives bundled lines and detours; use the `author` skill (`/flow:author`) instead, which lays the diagram out by hand and looks at the result.
