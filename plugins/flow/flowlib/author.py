@@ -36,6 +36,7 @@ from .model import (
     Shape,
     Tone,
 )
+from .ports import middle
 from .screen_parts import screen_size
 from .sizing import (
     FittedNode,
@@ -367,7 +368,7 @@ class Canvas:
         if not route.label:
             return None, ()
         kind = LABEL_KIND_OF_ROLE.get(route.role) or LabelKind.PLAIN
-        return EdgeLabel(route.label, _middle(points), kind), ()
+        return EdgeLabel(route.label, middle(points), kind), ()
 
     def conditions(self, corner: Point) -> Box:
         """Add the conditions table: one row for each arrow written as a code, in order.
@@ -614,12 +615,3 @@ def _right_angled(corners: list[Point]) -> list[Point]:
             points.append((end[0], start[1]))
         points.append(end)
     return points
-
-
-def _middle(points: list[Point]) -> Point:
-    """Return the middle of the longest segment of a line."""
-    start, end = max(
-        pairwise(points),
-        key=lambda pair: abs(pair[0][0] - pair[1][0]) + abs(pair[0][1] - pair[1][1]),
-    )
-    return (start[0] + end[0]) / 2, (start[1] + end[1]) / 2

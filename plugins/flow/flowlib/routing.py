@@ -16,19 +16,24 @@ from .layered import Grid, continuations
 from .model import SYMBOL_HEADS, Direction, Edge, EdgeLabel, LabelKind, Node, Point, Role, Shape
 from .pathfind import SearchSpace, find_route, path_cost
 from .placement import Placement
+from .ports import (
+    OUTWARD,
+    SAME_LINE_TOLERANCE_PX,
+    SEARCH_MARGIN_PX,
+    STUB_PX,
+    Port,
+    end_side,
+    hits,
+    spread_ends,
+)
 from .spec import Spec, SpecEdge
 from .theme import LayoutRules, load_theme
-from .untangle import OUTWARD, Port, end_side, spread_ends
 
 END_LABEL_ALONG_PX = 24.0  # distance of an end label from the end of its line
 END_LABEL_ACROSS_PX = 12.0  # and how far it sits to the side of the line
 BUS_ABOVE_TARGET_PX = 28.0  # a line between columns turns this far above its target
 BUS_BELOW_SOURCE_PX = 12.0  # but never closer than this to the bottom of its source
-SAME_LINE_TOLERANCE_PX = 1.0  # two centres closer than this count as on one line
-CLEARANCE_PX = 4.0  # how far a line must stay from a node it passes
-SEARCH_MARGIN_PX = 12.0  # how far a searched route keeps from every box
 MULTIWAY_EXITS = 3  # a decision with this many exits fans them out
-STUB_PX = 16.0  # a searched route leaves a box straight for this far before it may turn
 PORT_REUSE_COST_PX = 60.0  # a searched route prefers a side of a box that is still free
 REROUTE_ROUNDS: int = 3  # times each line that meets another is searched again once all are drawn
 STRAIGHT_LINE_POINTS: int = 2  # a route of one straight stretch: the best a line can have
@@ -98,18 +103,6 @@ def _caption_box(node: Node, caption_port: Port) -> tuple[float, float, float, f
     return (center_x - half, node.y + node.height, center_x + half, node.y + node.height + reach)
 
 
-def _hits(node: Node, start: Point, end: Point) -> bool:
-    """Tell whether an horizontal or vertical segment passes through a node, with clearance."""
-    low_x, high_x = sorted((start[0], end[0]))
-    low_y, high_y = sorted((start[1], end[1]))
-    return (
-        low_x < node.x + node.width + CLEARANCE_PX
-        and high_x > node.x - CLEARANCE_PX
-        and low_y < node.y + node.height + CLEARANCE_PX
-        and high_y > node.y - CLEARANCE_PX
-    )
-
-
 def _hits_caption(node: Node, start: Point, end: Point, caption_port: Port) -> bool:
     """Tell whether a segment passes over the caption of a node."""
     box = _caption_box(node, caption_port)
@@ -142,7 +135,7 @@ def _is_clear(points: list[Point], context: _Context, ends: tuple[str, str]) -> 
             attaches = (node_id == source_id and index == 0) or (
                 node_id == target_id and index == last
             )
-            if not attaches and _hits(node, start, end):
+            if not attaches and hits(node, start, end):
                 return False
             if _hits_caption(node, start, end, context.caption_port):
                 return False
