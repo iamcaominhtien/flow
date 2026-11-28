@@ -50,6 +50,7 @@ from .sizing import (
 )
 from .text_area import text_area_width
 from .theme import LayoutRules, load_theme, theme_names
+from .untangle import untangle
 
 CAPTIONED_SHAPES = {Shape.START, Shape.END, Shape.INTERMEDIATE, Shape.ACTOR}  # the text goes under
 LABEL_KIND_OF_ROLE = {Role.YES: LabelKind.YES, Role.NO: LabelKind.NO, Role.BACK: LabelKind.BACK}
@@ -386,7 +387,10 @@ class Canvas:
         return self._add(conditions_table(rows, corner, 0, load_theme().layout))
 
     def scene(self) -> Scene:
-        """Return the finished scene: labels moved off boxes, canvas sized to hold everything.
+        """Return the finished scene: lines untangled, labels moved off boxes, canvas sized.
+
+        Lines of different kinds that leave one tip of a decision, run on top of each other or
+        end at one point are given ways of their own (``untangle``).
 
         Raises:
             ValueError: If ``theme`` is not one of the themes.
@@ -395,14 +399,15 @@ class Canvas:
             raise ValueError(
                 f"unknown theme '{self.theme}'; use one of: {', '.join(theme_names())}"
             )
+        nodes = {box.node.id: box.node for box in self.boxes.values()}
         done = Scene(
             width=0,
             height=0,
             title=self.title,
             description=self.description,
             frames=tuple(self.frames),
-            nodes=tuple(box.node for box in self.boxes.values()),
-            edges=tuple(self.edges),
+            nodes=tuple(nodes.values()),
+            edges=tuple(untangle(self.edges, nodes)),
             theme=self.theme,
         )
         return fit_canvas(place_labels(done))
