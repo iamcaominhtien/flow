@@ -14,8 +14,7 @@ from .spec import Spec, SpecEdge
 CONTINUATION_ORDER = {Role.MAIN: 0, Role.YES: 0, Role.NEXT: 0, Role.DATA: 1, Role.NO: 2}
 MULTIWAY_EXITS = 3  # a decision with this many exits spreads them over columns, the middle straight
 LATE_ORDER = 3  # roles not listed above are placed after the others
-SIDEWAYS_ROLES = (Role.NO,)  # a "no" exit stays on the row of its decision ...
-CONTINUING_ROLES = (Role.YES, Role.NEXT, Role.MAIN)  # ... when another exit continues the flow
+SIDEWAYS_ROLES = (Role.NO,)  # a "no" exit stays on the row of its decision unless it continues
 
 
 @dataclass(frozen=True)
@@ -67,11 +66,47 @@ def _descendants(start: str, edges: list[SpecEdge]) -> set[str]:
     return seen
 
 
+def continuations(forward: list[SpecEdge]) -> dict[str, SpecEdge]:
+    """Pick, for every node with forward exits, the exit that continues its column.
+
+    An exit marked as the main path wins, then the role (yes and next before no), and among
+    exits of the same role the one that leads to the longest forward path, so the flow runs
+    straight down and short branches go to the side whatever order the spec lists them in.
+    A flow that continues through a "no" answer should mark that exit as the main path.
+
+    Args:
+        forward: The forward edges, without cycles.
+
+    Returns:
+        Node id to the edge that continues it.
+    """
+    targets: dict[str, list[str]] = defaultdict(list)
+    for edge in forward:
+        targets[edge.source].append(edge.target)
+    reach: dict[str, int] = {}
+
+    def depth(node_id: str) -> int:
+        """Return the number of nodes on the longest forward path from a node."""
+        if node_id not in reach:
+            reach[node_id] = 1 + max((depth(child) for child in targets[node_id]), default=0)
+        return reach[node_id]
+
+    def preference(edge: SpecEdge) -> tuple[bool, int, int]:
+        """Rank an exit as a continuation: the main path, then its role, then the deepest."""
+        return (edge.role is not Role.MAIN, _role_order(edge), -depth(edge.target))
+
+    chosen: dict[str, SpecEdge] = {}
+    for edge in forward:
+        best = chosen.get(edge.source)
+        if best is None or preference(edge) < preference(best):
+            chosen[edge.source] = edge
+    return chosen
+
+
 def sideways_edges(forward: list[SpecEdge]) -> set[SpecEdge]:
     """Pick the exits that leave sideways instead of continuing down.
 
-    A "no" exit leaves sideways only when its node has another exit that continues the flow;
-    when it is the only forward exit, it is the continuation and goes down.
+    A "no" exit leaves sideways unless it is the exit that continues its node's column.
 
     Args:
         forward: The forward edges.
@@ -79,8 +114,10 @@ def sideways_edges(forward: list[SpecEdge]) -> set[SpecEdge]:
     Returns:
         The edges that are placed beside their source, on the same row.
     """
-    continuing = {edge.source for edge in forward if edge.role in CONTINUING_ROLES}
-    return {edge for edge in forward if edge.role in SIDEWAYS_ROLES and edge.source in continuing}
+    first = continuations(forward)
+    return {
+        edge for edge in forward if edge.role in SIDEWAYS_ROLES and first[edge.source] is not edge
+    }
 
 
 def assign_ranks(
@@ -111,10 +148,39 @@ def assign_ranks(
     return rank
 
 
-def _children_in_order(node_id: str, forward: list[SpecEdge]) -> list[SpecEdge]:
-    """Return the forward edges of a node, the main continuation first."""
+def _role_order(edge: SpecEdge) -> int:
+    """Return where an exit of this role goes among its node's exits."""
+    return CONTINUATION_ORDER.get(edge.role, LATE_ORDER)
+
+
+def _children_in_order(
+    node_id: str, forward: list[SpecEdge], first: dict[str, SpecEdge]
+) -> list[SpecEdge]:
+    """Return the forward edges of a node, its continuation first, then by role."""
     own = [edge for edge in forward if edge.source == node_id]
-    return sorted(own, key=lambda edge: CONTINUATION_ORDER.get(edge.role, LATE_ORDER))
+    return sorted(own, key=lambda edge: (edge is not first.get(node_id), _role_order(edge)))
+
+
+def _fanning_nodes(spec: Spec) -> set[str]:
+    """Return the nodes whose exits fan out on both sides: decisions and split bars.
+
+    A split bar fans its branches out as a decision does, so that the flow after the join
+    comes back to the column it left from.
+    """
+    return {node.id for node in spec.nodes if node.kind in (Shape.DECISION, Shape.FORK)}
+
+
+def _wanted_column(
+    wants: dict[str, list[int]], straight: dict[str, list[int]], node_id: str
+) -> int:
+    """Return the column a node asks for: below a parent it continues, else between its parents.
+
+    A node where a branch rejoins the flow stays in the column of the step it continues, so a
+    chain with many side branches does not drift half a column at every join.
+    """
+    if straight[node_id]:
+        return min(straight[node_id], key=abs)
+    return round(sum(wants[node_id]) / len(wants[node_id]))
 
 
 def _free_column(taken: set[tuple[int, int]], start: int, row: int, step: int) -> int:
@@ -142,41 +208,61 @@ def assign_columns(
     Returns:
         Node id to column; columns may be negative when a branch asks for the left side.
     """
-    sides = {node.id: node.side for node in spec.nodes}
-    # A split bar fans its branches out on both sides, as a decision does, so that the flow
-    # after the join comes back to the column it left from.
-    fans = {node.id for node in spec.nodes if node.kind in (Shape.DECISION, Shape.FORK)}
+    placer = _ColumnPlacer(spec, rank, forward, sideways)
     has_parent = {edge.target for edge in forward}
-    column: dict[str, int] = {}
-    taken: set[tuple[int, int]] = set()
-
-    def place(node_id: str, wanted: int, step: int) -> None:
-        """Put a node in the nearest free column at or after ``wanted``."""
-        chosen = _free_column(taken, wanted, rank[node_id], step)
-        column[node_id] = chosen
-        taken.add((rank[node_id], chosen))
-
     roots = [node.id for node in spec.nodes if node.id not in has_parent]
     for position, root in enumerate(roots):
-        place(root, position, 1)
-    waiting = Counter(edge.target for edge in forward)
-    wants: dict[str, list[int]] = defaultdict(list)
+        placer.place(root, position, 1)
     pending = deque(roots)
     while pending:
-        node_id = pending.popleft()
-        children = _children_in_order(node_id, forward)
+        pending.extend(placer.visit(pending.popleft()))
+    return placer.column
+
+
+@dataclass
+class _ColumnPlacer:
+    """The state of ``assign_columns``: the columns chosen so far and what each node asks for."""
+
+    spec: Spec
+    rank: dict[str, int]
+    forward: list[SpecEdge]
+    sideways: set[SpecEdge]
+    column: dict[str, int] = field(default_factory=dict)
+    taken: set[tuple[int, int]] = field(default_factory=set)
+    wants: dict[str, list[int]] = field(default_factory=lambda: defaultdict(list))
+    straight: dict[str, list[int]] = field(default_factory=lambda: defaultdict(list))
+
+    def __post_init__(self) -> None:
+        """Work out once what every visit needs: sides, fanning nodes, continuations, counts."""
+        self.sides = {node.id: node.side for node in self.spec.nodes}
+        self.fans = _fanning_nodes(self.spec)
+        self.first = continuations(self.forward)
+        self.waiting = Counter(edge.target for edge in self.forward)
+
+    def place(self, node_id: str, wanted: int, step: int) -> None:
+        """Put a node in the nearest free column at or after ``wanted``."""
+        chosen = _free_column(self.taken, wanted, self.rank[node_id], step)
+        self.column[node_id] = chosen
+        self.taken.add((self.rank[node_id], chosen))
+
+    def visit(self, node_id: str) -> list[str]:
+        """Record what a placed node's children ask for; place and return those now complete."""
+        children = _children_in_order(node_id, self.forward, self.first)
+        ready = []
         for index, edge in enumerate(children):
-            step = -1 if sides[edge.target] is Side.LEFT else 1
-            offset = 0 if index == 0 and edge not in sideways else step
-            if node_id in fans and len(children) >= MULTIWAY_EXITS:
+            step = -1 if self.sides[edge.target] is Side.LEFT else 1
+            offset = 0 if index == 0 and edge not in self.sideways else step
+            if node_id in self.fans and len(children) >= MULTIWAY_EXITS:
                 offset = index - (len(children) - 1) // 2
-            wants[edge.target].append(column[node_id] + offset)
-            waiting[edge.target] -= 1
-            if waiting[edge.target] == 0:
-                average = sum(wants[edge.target]) / len(wants[edge.target])
-                place(edge.target, round(average), step)
-                pending.append(edge.target)
-    return column
+            self.wants[edge.target].append(self.column[node_id] + offset)
+            if offset == 0:
+                self.straight[edge.target].append(self.column[node_id])
+            self.waiting[edge.target] -= 1
+            if self.waiting[edge.target] == 0:
+                wanted = _wanted_column(self.wants, self.straight, edge.target)
+                self.place(edge.target, wanted, step)
+                ready.append(edge.target)
+        return ready
 
 
 def separate_lane_cells(

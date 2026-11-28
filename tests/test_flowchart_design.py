@@ -257,3 +257,44 @@ def test_payment_example_matches_the_design_parts() -> None:
     assert {Shape.SUBPROCESS, Shape.DOCUMENT, Shape.PREPARATION} <= shapes
     assert {"3a", "5a"} <= {node.number for node in laid.nodes}
     assert any(edge.role is Role.BACK for edge in laid.edges)
+
+
+def _decision_chain(count: int, *, retry_every: int) -> dict[str, object]:
+    """Return a chain of steps where every decision sends one answer to a side step.
+
+    The answers carry labels but no roles, and the side step is listed first, so neither the
+    roles nor the spec order say which exit continues. Every ``retry_every``-th side step loops
+    back; the others rejoin the chain at the next step.
+    """
+    nodes: list[dict[str, str]] = [{"id": "s", "kind": "terminator", "text": "Start"}]
+    edges: list[dict[str, str]] = []
+    previous = "s"
+    for i in range(1, count + 1):
+        decision, side, step = f"d{i}", f"x{i}", f"p{i}"
+        nodes += [
+            {"id": decision, "kind": "decision", "text": "Check?"},
+            {"id": side, "kind": "process", "text": "Handle case"},
+            {"id": step, "kind": "process", "text": "Next step"},
+        ]
+        rejoin = {"from": side, "to": step}
+        if i % retry_every == 0:
+            rejoin = {"from": side, "to": decision, "label": "retry"}
+        edges += [
+            {"from": previous, "to": decision},
+            {"from": decision, "to": side, "label": "No"},
+            {"from": decision, "to": step, "label": "Yes"},
+            rejoin,
+        ]
+        previous = step
+    nodes.append({"id": "e", "kind": "terminator", "text": "Done"})
+    edges.append({"from": previous, "to": "e"})
+    return {"type": "flowchart", "title": "Chain", "nodes": nodes, "edges": edges}
+
+
+def test_a_long_chain_of_decisions_does_not_drift_sideways() -> None:
+    """The chain keeps one column however many side steps rejoin or loop back."""
+    scene = diagrams.layout(_decision_chain(30, retry_every=3))
+    by_id = {node.id: node for node in scene.nodes}
+    centres = {round(by_id[f"p{i}"].x + by_id[f"p{i}"].width / 2) for i in range(1, 31)}
+    assert len(centres) == 1
+    assert scene.width < 1000
