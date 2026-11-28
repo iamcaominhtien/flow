@@ -17,13 +17,14 @@ from flowlib.arrange import (  # noqa: E402
     fit_zone,
     listing,
 )
-from flowlib.author import Canvas  # noqa: E402
+from flowlib.author import Canvas, NodeOptions, Route  # noqa: E402
 from flowlib.check import Severity, check_scene  # noqa: E402
 from flowlib.model import Shape, Tone  # noqa: E402
 
 STEP_COUNT: int = 11
 ROW_WIDTH_PX: float = 1000.0
 LONG_LIST: int = 22
+LINE_SWING_X: float = 100.0  # where a hand-drawn line swings out left of its nodes
 
 
 def _steps(count: int) -> list[Step]:
@@ -120,3 +121,23 @@ def test_connect_routes_around_the_nodes_between() -> None:
         crosses_y = min(y1, y2) < wall.y + wall.height and max(y1, y2) > wall.y
         assert not (crosses_x and crosses_y)
     assert line.points[0][0] >= canvas.boxes["a"].node.x + canvas.boxes["a"].node.width - 1
+
+
+def test_a_zone_holds_the_lines_that_run_round_its_nodes() -> None:
+    """A line between two members that swings out past them stays inside the zone."""
+    canvas = Canvas("Zone", None)
+    canvas.node("a", Shape.PROCESS, "A", NodeOptions((300, 100)))
+    canvas.node("b", Shape.PROCESS, "B", NodeOptions((300, 300)))
+    canvas.edge("a", "b", Route("left", "left", via=((100, 100), (100, 300))))
+    bounds = fit_zone(canvas, "z", ("Zone", Tone.BLUE), ["a", "b"])
+    assert bounds.left < LINE_SWING_X
+
+
+def test_a_label_can_be_placed_by_hand() -> None:
+    """A label given a place sits there, not at the middle of the longest stretch."""
+    canvas = Canvas("Label", None)
+    canvas.node("a", Shape.PROCESS, "A", NodeOptions((100, 100)))
+    canvas.node("b", Shape.PROCESS, "B", NodeOptions((500, 100)))
+    line = canvas.edge("a", "b", Route("right", "left", label="No", label_at=(220, 100)))
+    assert line.label is not None
+    assert line.label.at == (220, 100)

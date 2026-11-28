@@ -174,7 +174,9 @@ def listing(canvas: Canvas, items: "Listing", corner: tuple[float, float]) -> li
 
 
 def fit_zone(canvas: Canvas, name: str, label: tuple[str, Tone], members: list[str]) -> Bounds:
-    """Draw a zone tightly around the nodes it holds, with room above them for its name.
+    """Draw a zone tightly around the nodes it holds and the lines between them, named on top.
+
+    Draw the lines inside the zone first: a line that runs round its nodes is kept inside.
 
     Args:
         canvas: The diagram.
@@ -185,7 +187,7 @@ def fit_zone(canvas: Canvas, name: str, label: tuple[str, Tone], members: list[s
     Returns:
         The rectangle of the zone, to place the next thing below or beside it.
     """
-    inner = cover(canvas, members)
+    inner = _with_lines(cover(canvas, members), canvas, set(members))
     theme = load_theme()
     pill = estimate_text_width(label[0], theme.layout, theme.type_scale.pill.size) + PILL_ROOM_PX
     right = max(inner.right + ZONE_PAD_PX, inner.left - ZONE_PAD_PX + pill)
@@ -194,6 +196,28 @@ def fit_zone(canvas: Canvas, name: str, label: tuple[str, Tone], members: list[s
     )
     canvas.zone(name, label[0], label[1], (bounds.left, bounds.top, bounds.width, bounds.height))
     return bounds
+
+
+def _with_lines(inner: Bounds, canvas: Canvas, members: set[str]) -> Bounds:
+    """Grow a rectangle to hold every line drawn between two of the members.
+
+    Args:
+        inner: The rectangle around the members.
+        canvas: The diagram.
+        members: The ids of the nodes inside the zone.
+
+    Returns:
+        The grown rectangle.
+    """
+    points = [
+        point
+        for edge in canvas.edges
+        if edge.source in members and edge.target in members
+        for point in edge.points
+    ]
+    xs = [inner.left, inner.right] + [x for x, _ in points]
+    ys = [inner.top, inner.bottom] + [y for _, y in points]
+    return Bounds(min(xs), min(ys), max(xs), max(ys))
 
 
 def block(

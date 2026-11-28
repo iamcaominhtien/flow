@@ -368,7 +368,7 @@ class Canvas:
         if not route.label:
             return None, ()
         kind = LABEL_KIND_OF_ROLE.get(route.role) or LabelKind.PLAIN
-        return EdgeLabel(route.label, middle(points), kind), ()
+        return EdgeLabel(route.label, route.label_at or middle(points), kind), ()
 
     def conditions(self, corner: Point) -> Box:
         """Add the conditions table: one row for each arrow written as a code, in order.
@@ -470,6 +470,7 @@ class Route:
     dashed: bool = False
     head: Head = Head.FILLED
     tail: Head = Head.NONE
+    label_at: Point | None = None  # where the label sits; else the middle of the longest stretch
 
 
 def _screen_node(name: str, text: str, options: "NodeOptions") -> Node:
