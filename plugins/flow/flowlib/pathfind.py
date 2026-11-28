@@ -6,6 +6,7 @@ and a stretch along another line cost extra, so the cheapest route is short, str
 """
 
 import heapq
+from bisect import bisect_left, bisect_right
 from dataclasses import dataclass
 from itertools import count, pairwise
 
@@ -17,7 +18,8 @@ Segment = tuple[Point, Point]
 BEND_COST_PX = 30.0
 CROSSING_COST_PX = 60.0
 OVERLAP_COST_PER_PX = 6.0
-TRACK_GAP_PX = 10.0  # a route may run this far beside a line already drawn
+BESIDE_COST_PER_PX: float = 3.0  # running closer than a track gap beside a line reads as touching
+TRACK_GAP_PX = 16.0  # a route may run this far beside a line already drawn, and no closer
 TRACK_REACH_PX = 150.0  # but only for lines that pass this close to an end of the route
 OUTSIDE_MARGIN_PX = 40.0
 MIN_CORRIDOR_PX = 8.0  # a gap narrower than this gets no middle line
@@ -96,24 +98,83 @@ def _grid(space: SearchSpace, ends: tuple[Point, Point]) -> tuple[list[float], l
     return _corridors(xs), _corridors(ys)
 
 
-def _line_cost(space: SearchSpace, start: Point, end: Point) -> float:
-    """Return the extra cost of a step: along another line, or across one."""
+class _LineIndex:
+    """The lines drawn, split by direction and sorted by the coordinate they keep, for lookups.
+
+    A step of the search only meets the lines near it, so finding them by bisection keeps a
+    search fast when hundreds of lines are drawn.
+    """
+
+    def __init__(self, lines: tuple[Segment, ...]) -> None:
+        """Sort every line under its direction: 0 for horizontal, 1 for vertical.
+
+        Args:
+            lines: The segments already drawn.
+        """
+        by_axis: dict[int, list[tuple[float, float, float]]] = {0: [], 1: []}
+        for first, second in lines:
+            along = 0 if abs(first[1] - second[1]) < SAME_LINE_PX else 1
+            low, high = sorted((first[along], second[along]))
+            by_axis[along].append((first[1 - along], low, high))
+        self.lines = {along: sorted(found) for along, found in by_axis.items()}
+        self.keys = {along: [line[0] for line in found] for along, found in self.lines.items()}
+
+    def between(self, along: int, low: float, high: float) -> list[tuple[float, float, float]]:
+        """Return the lines of one direction whose kept coordinate lies from ``low`` to ``high``."""
+        keys = self.keys[along]
+        return self.lines[along][bisect_left(keys, low) : bisect_right(keys, high)]
+
+
+def _line_cost(index: _LineIndex, start: Point, end: Point) -> float:
+    """Return the extra cost of a step: along another line, beside one, or across one.
+
+    A line that the step reaches counts as crossed, and one it leaves from does not, so a
+    crossing is paid once even though the grid always has a line on the crossed one.
+    """
     extra = 0.0
-    horizontal = abs(start[1] - end[1]) < SAME_LINE_PX
-    low, high = sorted((start[0], end[0]) if horizontal else (start[1], end[1]))
-    fixed = start[1] if horizontal else start[0]
-    for first, second in space.lines:
-        other_horizontal = abs(first[1] - second[1]) < SAME_LINE_PX
-        other_low, other_high = sorted(
-            (first[0], second[0]) if other_horizontal else (first[1], second[1])
-        )
-        other_fixed = first[1] if other_horizontal else first[0]
-        if other_horizontal == horizontal:
-            if abs(other_fixed - fixed) < SAME_LINE_PX:
-                extra += OVERLAP_COST_PER_PX * max(0.0, min(high, other_high) - max(low, other_low))
-        elif low < other_fixed < high and other_low < fixed < other_high:
+    along = 0 if abs(start[1] - end[1]) < SAME_LINE_PX else 1
+    low, high = sorted((start[along], end[along]))
+    fixed = start[1 - along]
+    for other_fixed, other_low, other_high in index.between(
+        along, fixed - TRACK_GAP_PX, fixed + TRACK_GAP_PX
+    ):
+        shared = max(0.0, min(high, other_high) - max(low, other_low))
+        extra += shared * _beside_cost(abs(other_fixed - fixed))
+    for other_fixed, other_low, other_high in index.between(1 - along, low, high):
+        if other_low < fixed < other_high and _reaches(start[along], end[along], other_fixed):
             extra += CROSSING_COST_PX
     return extra
+
+
+def _beside_cost(gap: float) -> float:
+    """Return the cost per pixel of running this far from a parallel line."""
+    if gap < SAME_LINE_PX:
+        return OVERLAP_COST_PER_PX
+    if gap < TRACK_GAP_PX - SAME_LINE_PX:
+        return BESIDE_COST_PER_PX
+    return 0.0
+
+
+def _reaches(start: float, end: float, mark: float) -> bool:
+    """Tell whether a step from ``start`` to ``end`` passes or stops on ``mark``, not leaves it."""
+    return min(start, end) < mark <= max(start, end) if end > start else end <= mark < start
+
+
+def path_cost(space: SearchSpace, points: list[Point]) -> float:
+    """Return what a drawn route costs by the measure the search uses.
+
+    Args:
+        space: The lines the route should stay off; obstacles are not looked at.
+        points: The route, at least two points.
+
+    Returns:
+        Its length, plus the cost of every bend, crossing and stretch along or beside a line.
+    """
+    steps = [(start, end) for start, end in pairwise(points) if start != end]
+    cost = sum(abs(end[0] - start[0]) + abs(end[1] - start[1]) for start, end in steps)
+    index = _LineIndex(space.lines)
+    cost += sum(_line_cost(index, start, end) for start, end in steps)
+    return cost + BEND_COST_PX * max(0, len(steps) - 1)
 
 
 def _simplify(points: list[Point]) -> list[Point]:
@@ -145,6 +206,7 @@ class _Search:
             end: Where the route ends.
         """
         self.space = space
+        self.index = _LineIndex(space.lines)
         self.xs, self.ys = _grid(space, (start, end))
         self.goal = (self.xs.index(end[0]), self.ys.index(end[1]))
         self.first: State = (self.xs.index(start[0]), self.ys.index(start[1]), -1)
@@ -170,7 +232,7 @@ class _Search:
                 self.steps[key] = None
             else:
                 length = abs(end[0] - start[0]) + abs(end[1] - start[1])
-                self.steps[key] = length + _line_cost(self.space, start, end)
+                self.steps[key] = length + _line_cost(self.index, start, end)
         return self.steps[key]
 
     def expand(self, state: State) -> None:

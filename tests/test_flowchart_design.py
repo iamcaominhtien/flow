@@ -298,3 +298,55 @@ def test_a_long_chain_of_decisions_does_not_drift_sideways() -> None:
     centres = {round(by_id[f"p{i}"].x + by_id[f"p{i}"].width / 2) for i in range(1, 31)}
     assert len(centres) == 1
     assert scene.width < 1000
+
+
+def _look(edge: object) -> tuple[object, bool]:
+    """Return what tells lines apart on the page: their role and whether they are dashed."""
+    return edge.role, edge.dashed
+
+
+def _ends_of_different_lines_meet(scene: Scene) -> bool:
+    """Tell whether lines that look different start or end at one point of one node."""
+    seen: dict[tuple[str, tuple[float, float]], set[tuple[object, bool]]] = {}
+    for edge in scene.edges:
+        for node_id, point in ((edge.source, edge.points[0]), (edge.target, edge.points[-1])):
+            seen.setdefault((node_id, point), set()).add(_look(edge))
+    return any(len(looks) > 1 for looks in seen.values())
+
+
+def _branchy_chart() -> Scene:
+    """Lay out a flow where a side branch rejoins the main path and failures share one step."""
+    nodes = [
+        {"id": "s", "kind": "terminator", "text": "Start"},
+        {"id": "d1", "kind": "decision", "text": "Cached?"},
+        {"id": "d2", "kind": "decision", "text": "Fresh?"},
+        {"id": "d3", "kind": "decision", "text": "Checked?"},
+        {"id": "ok", "kind": "process", "text": "Use it"},
+        {"id": "bad", "kind": "process", "text": "Drop it"},
+        {"id": "e", "kind": "terminator", "text": "Done"},
+    ]
+    edges = [
+        {"from": "s", "to": "d1", "role": "main"},
+        {"from": "d1", "to": "d2", "label": "No", "role": "main"},
+        {"from": "d1", "to": "d3", "label": "Yes", "role": "yes"},
+        {"from": "d2", "to": "ok", "label": "Yes", "role": "main"},
+        {"from": "d2", "to": "bad", "label": "No", "role": "no"},
+        {"from": "d3", "to": "ok", "label": "Yes", "role": "yes"},
+        {"from": "d3", "to": "bad", "label": "No", "role": "no"},
+        {"from": "ok", "to": "e", "role": "main"},
+        {"from": "bad", "to": "e"},
+    ]
+    return chart(nodes, edges)
+
+
+def test_two_exits_of_a_decision_never_leave_one_tip() -> None:
+    """The answer that does not continue down leaves by a side tip, even to a lower row."""
+    scene = _branchy_chart()
+    for decision in ("d1", "d2", "d3"):
+        starts = [edge.points[0] for edge in scene.edges if edge.source == decision]
+        assert len(set(starts)) == len(starts)
+
+
+def test_lines_of_different_kinds_never_meet_at_one_point() -> None:
+    """A main line and a Yes or No line into one step arrive at two points, not on top."""
+    assert not _ends_of_different_lines_meet(_branchy_chart())

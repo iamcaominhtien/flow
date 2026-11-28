@@ -50,6 +50,7 @@ WORDS_KINDS = (
     LabelKind.EFFECT,
 )  # the kinds that carry the words of a screen flow transition
 WRAPPING_CHARS = 2  # the brackets of a guard, or the slash and space of an effect
+FLOWCHART: str = "flowchart"  # the type whose router keeps lines of different kinds apart
 MIN_SHARED_BUS_PX = 240.0  # lines of one kind that leave one node may share a bus this long
 DESCRIPTION_LINES = 2  # the title block holds the title and two lines of the description
 DESCRIPTION_SCALE = 0.98  # the description is set at 400, about 2% narrower than the 500 widths
@@ -740,20 +741,27 @@ def _share_a_node(first: Edge, second: Edge) -> bool:
 def check_overlaps(scene: Scene) -> list[Finding]:
     """Report lines that run on top of each other, so one cannot be told from the other.
 
-    Lines that leave or reach the same node may share a short trunk; lines of different
-    kinds (solid and dashed) may not share more than a junction.
+    Lines of one kind that leave or reach the same node may share a short trunk; lines of
+    different kinds (solid and dashed) may not share more than a junction, because the reader
+    can no longer tell which is which. A flowchart's router also keeps lines of different roles
+    apart (a "no" line never runs along the main path), so there it is an error.
     """
     findings = []
     drawn = [edge for edge in scene.edges if _is_content(edge) and edge.role is not Role.REPORTS]
+    is_flowchart = scene.diagram == FLOWCHART
+    severity = Severity.ERROR if is_flowchart else Severity.WARNING
     for first, second in combinations(drawn, 2):
         shared = _longest_shared(first, second)
         limit = MIN_OVERLAP_PX
-        if first.dashed == second.dashed and _share_a_node(first, second):
+        same_kind = first.dashed == second.dashed and (
+            first.role is second.role or not is_flowchart
+        )
+        if same_kind and _share_a_node(first, second):
             limit = MIN_SHARED_BUS_PX
         if shared >= limit:
             findings.append(
                 Finding(
-                    Severity.WARNING,
+                    severity,
                     Code.LINES_OVERLAP,
                     f"lines '{first.id}' and '{second.id}' run on top of each other",
                     (first.id, second.id),

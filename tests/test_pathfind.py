@@ -7,7 +7,13 @@ PLUGIN_DIR = Path(__file__).resolve().parent.parent / "plugins" / "flow"
 
 sys.path.insert(0, str(PLUGIN_DIR))
 
-from flowlib.pathfind import SearchSpace, find_route  # noqa: E402
+from flowlib.pathfind import (  # noqa: E402
+    CROSSING_COST_PX,
+    TRACK_GAP_PX,
+    SearchSpace,
+    find_route,
+    path_cost,
+)
 
 BOX = (40.0, -30.0, 60.0, 30.0)
 
@@ -38,3 +44,18 @@ def test_a_line_already_drawn_is_not_shared_when_there_is_room() -> None:
     found = find_route(SearchSpace((), drawn), (0, 0), (100, 0))
     assert found is not None
     assert found.points != [(0, 0), (100, 0)]
+
+
+def test_a_crossing_is_paid_once() -> None:
+    """A route across a drawn line costs its length plus one crossing, not its length alone."""
+    drawn = (((50.0, -20.0), (50.0, 20.0)),)
+    found = find_route(SearchSpace((), drawn), (0, 0), (100, 0))
+    assert found is not None
+    assert found.cost == 100 + CROSSING_COST_PX
+
+
+def test_running_close_beside_a_line_costs_more_than_running_clear_of_it() -> None:
+    """A stretch a few pixels from a parallel line is charged; one a track away is not."""
+    space = SearchSpace((), (((0.0, 0.0), (100.0, 0.0)),))
+    assert path_cost(space, [(0, 4), (100, 4)]) > 100
+    assert path_cost(space, [(0, TRACK_GAP_PX), (100, TRACK_GAP_PX)]) == 100

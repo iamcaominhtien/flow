@@ -6,6 +6,7 @@ the flow, in a channel outside the nodes.
 """
 
 import math
+from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import StrEnum
 from itertools import pairwise
@@ -14,7 +15,7 @@ from .forks import is_inside
 from .html_nodes import CAPTION_WIDTH_PX
 from .layered import Grid
 from .model import SYMBOL_HEADS, Direction, Edge, EdgeLabel, LabelKind, Node, Point, Role, Shape
-from .pathfind import SearchSpace, find_route
+from .pathfind import SearchSpace, find_route, path_cost
 from .placement import Placement
 from .spec import Spec, SpecEdge
 from .theme import LayoutRules, load_theme
@@ -29,6 +30,10 @@ SEARCH_MARGIN_PX = 12.0  # how far a searched route keeps from every box
 MULTIWAY_EXITS = 3  # a decision with this many exits fans them out
 STUB_PX = 16.0  # a searched route leaves a box straight for this far before it may turn
 PORT_REUSE_COST_PX = 60.0  # a searched route prefers a side of a box that is still free
+REROUTE_ROUNDS: int = 3  # times each line that meets another is searched again once all are drawn
+END_GAP_PX: float = 24.0  # lines of different kinds meeting one point of a side are this far apart
+ONE_STRETCH_POINTS: int = 2  # a route of this many points is one straight stretch
+SIDE_PORTS: tuple[str, ...] = ("left", "right")  # a side of a node one line at most leaves from
 
 
 class Port(StrEnum):
@@ -287,8 +292,11 @@ def _pin_to_bars(
 
 def _forward_points(
     source: Node, target: Node, slot: tuple[float, float] | None, caption_port: Port
-) -> tuple[list[Point], Port]:
-    """Return the direct route between two nodes and the port it leaves from.
+) -> _Route:
+    """Return the direct route between two nodes.
+
+    A decision leaves by its bottom tip only towards the node straight below it; any other
+    exit leaves by the side tip that faces its target, so two exits never share one tip.
 
     Args:
         source: Where the line starts.
@@ -298,26 +306,27 @@ def _forward_points(
         caption_port: The side the captions hang from.
 
     Returns:
-        The points, and the port of the source that the line leaves from.
+        The route, with the ports it leaves and enters by.
     """
     (source_x, source_y), (target_x, target_y) = _center(source), _center(target)
     same_row = abs(source_y - target_y) < SAME_LINE_TOLERANCE_PX
-    if slot is not None and not (source.shape is Shape.DECISION and source_x != slot[0]):
+    straight_below = abs(source_x - target_x) < SAME_LINE_TOLERANCE_PX
+    by_side = source.shape is Shape.DECISION and not straight_below
+    if slot is not None and not by_side:
         exit_x, entry_x = slot
         start, end = (exit_x, _attach(source, Port.BOTTOM, caption_port)[1]), (entry_x, target.y)
         if abs(exit_x - entry_x) < SAME_LINE_TOLERANCE_PX:
-            return [start, end], Port.BOTTOM
+            return _Route([start, end], Port.BOTTOM, Port.TOP, None)
         bus_y = max(start[1] + BUS_BELOW_SOURCE_PX, end[1] - BUS_ABOVE_TARGET_PX)
-        return [start, (exit_x, bus_y), (entry_x, bus_y), end], Port.BOTTOM
+        return _Route([start, (exit_x, bus_y), (entry_x, bus_y), end], Port.BOTTOM, Port.TOP, None)
     leaving = Port.RIGHT if target_x > source_x else Port.LEFT
     if same_row:
         arriving = Port.LEFT if leaving is Port.RIGHT else Port.RIGHT
-        return [
-            _attach(source, leaving, caption_port),
-            _attach(target, arriving, caption_port),
-        ], leaving
+        points = [_attach(source, leaving, caption_port), _attach(target, arriving, caption_port)]
+        return _Route(points, leaving, arriving, None)
     corner = (target_x, source_y)
-    return [_attach(source, leaving, caption_port), corner, _attach(target, Port.TOP)], leaving
+    points = [_attach(source, leaving, caption_port), corner, _attach(target, Port.TOP)]
+    return _Route(points, leaving, Port.TOP, None)
 
 
 def _peek_channel_x(side: Port, rows: tuple[float, float], context: _Context) -> float:
@@ -383,9 +392,9 @@ def _returning_route(source: Node, target: Node, context: _Context) -> _Route:
     """Choose the route of a line that loops back to an earlier step.
 
     The candidates are tried in order: a channel on the right, a channel on the left, an arc
-    over the top, and an arc under the bottom. The first one that is clear of other nodes and
-    uses ports that are still free wins; failing that, the first clear one; failing that, the
-    first.
+    over the top, and an arc under the bottom. The first one that is clear of other nodes, uses
+    ports that are still free and runs along no line already drawn wins; failing that, a route
+    searched around every node and line; failing that, the first clear one, or the first.
 
     Args:
         source: Where the line starts.
@@ -409,11 +418,46 @@ def _returning_route(source: Node, target: Node, context: _Context) -> _Route:
         if (source.id, route.leaves) not in context.used_ports
         and (target.id, route.arrives) not in context.used_ports
     ]
-    chosen = (free or clear or candidates)[0]
+    apart = [route for route in free or clear if not _follows_line(route.points, context.lines)]
+    if not apart:
+        found = _search_route(source, target, context)
+        apart = [found] if found is not None else []
+    chosen = (apart or free or clear or candidates)[0]
     if chosen.channel is not None:
         context.channels_used[chosen.channel] = context.channels_used.get(chosen.channel, 0) + 1
     context.used_ports.add((target.id, chosen.arrives))
     return chosen
+
+
+def _follows_line(points: list[Point], lines: list[tuple[Point, Point]]) -> bool:
+    """Tell whether a route runs on top of a line already drawn for more than a junction.
+
+    A line that meets the route at one of its ends is left out: two lines into one point are
+    moved apart once all are drawn (``_spread_ends``).
+    """
+    ends = {points[0], points[-1]}
+    return any(
+        _overlap(stretch, line) > SAME_LINE_TOLERANCE_PX
+        for stretch in pairwise(points)
+        for line in lines
+        if not ends & set(line)
+    )
+
+
+def _overlap(first: tuple[Point, Point], second: tuple[Point, Point]) -> float:
+    """Return how long two horizontal or vertical segments run on one line together."""
+    for along in (0, 1):
+        across = 1 - along
+        coordinates = (first[0][across], first[1][across], second[0][across], second[1][across])
+        if max(coordinates) - min(coordinates) < SAME_LINE_TOLERANCE_PX:
+            low = max(
+                min(first[0][along], first[1][along]), min(second[0][along], second[1][along])
+            )
+            high = min(
+                max(first[0][along], first[1][along]), max(second[0][along], second[1][along])
+            )
+            return max(0.0, high - low)
+    return 0.0
 
 
 def _segment_length(segment: tuple[Point, Point]) -> float:
@@ -587,18 +631,179 @@ def _route_one(spec_edge: SpecEdge, returning: bool, context: _Context) -> list[
         The points of the route.
     """
     source, target = context.nodes[spec_edge.source], context.nodes[spec_edge.target]
-    points, port = _forward_points(
-        source, target, context.slots.get(spec_edge), context.caption_port
-    )
-    route = _Route(points, leaves=port, arrives=Port.TOP, channel=None)
     if returning:
         route = _returning_route(source, target, context)
-    elif not _is_clear(points, context, (source.id, target.id)):
-        route = _search_route(source, target, context) or _returning_route(source, target, context)
+    else:
+        direct = _forward_points(source, target, context.slots.get(spec_edge), context.caption_port)
+        route = _forward_route(source, target, direct, context)
     context.used_ports.add((source.id, route.leaves))
     context.used_ports.add((target.id, route.arrives))
     context.lines.extend(pairwise(route.points))
     return route.points
+
+
+def _forward_route(source: Node, target: Node, direct: _Route, context: _Context) -> _Route:
+    """Keep the direct route when it is clear, else take a searched one when that costs less.
+
+    The direct route is clear when it passes through no node, leaves by a side that no other
+    line leaves from, and crosses, follows or runs beside no line already drawn.
+
+    Args:
+        source: Where the line starts.
+        target: Where the line ends.
+        direct: The route ``_forward_points`` gives.
+        context: The router state; it is not changed.
+
+    Returns:
+        The route to draw.
+    """
+    misses_nodes = _is_clear(direct.points, context, (source.id, target.id))
+    side_taken = direct.leaves in SIDE_PORTS and (source.id, direct.leaves) in context.used_ports
+    if misses_nodes and not side_taken and not _meets_lines(direct.points, context.lines):
+        return direct
+    found = _search_route(source, target, context)
+    if found is None:
+        return direct if misses_nodes else _returning_route(source, target, context)
+    if (
+        misses_nodes
+        and not side_taken
+        and _cost(direct.points, context.lines) <= _cost(found.points, context.lines)
+    ):
+        return direct
+    return found
+
+
+def _cost(points: list[Point], lines: list[tuple[Point, Point]]) -> float:
+    """Return what a route costs among the lines drawn: length, bends, crossings, stretches."""
+    return path_cost(SearchSpace((), tuple(lines)), points)
+
+
+def _meets_lines(points: list[Point], lines: list[tuple[Point, Point]]) -> bool:
+    """Tell whether a route crosses, follows or runs close beside one of the lines."""
+    return _cost(points, lines) > _cost(points, [])
+
+
+def _reroute_meeting(
+    routed: dict[SpecEdge, list[Point]], returning: set[SpecEdge], context: _Context
+) -> dict[SpecEdge, list[Point]]:
+    """Search again every forward line that meets another, now that all are drawn.
+
+    A line drawn early could not avoid the lines drawn after it; each is searched with every
+    other line in place and replaced when the new route costs less, for a few rounds. A
+    returning line keeps its way round the flow.
+
+    Args:
+        routed: Each edge's route.
+        returning: The edges that loop back.
+        context: The router state; its lines are rebuilt for every search.
+
+    Returns:
+        Each edge's route, some replaced.
+    """
+    routes = dict(routed)
+    for _ in range(REROUTE_ROUNDS):
+        changed = False
+        for edge, points in routes.items():
+            context.lines = [
+                segment
+                for other, drawn in routes.items()
+                if other is not edge
+                for segment in pairwise(drawn)
+            ]
+            if edge in returning or not _meets_lines(points, context.lines):
+                continue
+            ends = context.nodes[edge.source], context.nodes[edge.target]
+            found = _search_route(*ends, context)
+            if found and _cost(found.points, context.lines) < _cost(points, context.lines):
+                routes[edge] = found.points
+                changed = True
+        if not changed:
+            break
+    return routes
+
+
+def _spread_ends(
+    routes: dict[SpecEdge, list[Point]], nodes: dict[str, Node]
+) -> dict[SpecEdge, list[Point]]:
+    """Move apart the ends of lines of different kinds that meet a node at one point.
+
+    Lines of one kind (role and dash) that meet at one point merge there, as a trunk does; lines
+    of different kinds would draw two arrowheads, or two starts, on top of each other. They are
+    spread along the side, in the order they come from, so that they do not cross.
+
+    Args:
+        routes: Each edge's route.
+        nodes: The placed nodes.
+
+    Returns:
+        Each edge's route, some with an end moved along its side.
+    """
+    meeting: dict[tuple[str, Point], list[tuple[SpecEdge, bool]]] = defaultdict(list)
+    for edge, points in routes.items():
+        meeting[(edge.source, points[0])].append((edge, True))
+        meeting[(edge.target, points[-1])].append((edge, False))
+    moved = dict(routes)
+    for (node_id, _), ends in meeting.items():
+        if len({(edge.role, edge.dashed) for edge, _ in ends}) == 1:
+            continue
+        ends.sort(key=lambda end: _approach(moved[end[0]], end[1]))
+        step = _end_step(nodes[node_id], _end_side(moved[ends[0][0]], ends[0][1]), len(ends))
+        for index, (edge, at_start) in enumerate(ends):
+            offset = (index - (len(ends) - 1) / 2) * step
+            moved[edge] = _shift_end(moved[edge], at_start, nodes[node_id], offset)
+    return moved
+
+
+def _end_side(points: list[Point], at_start: bool) -> Port:
+    """Return the side of its node that a route leaves (``at_start``) or enters by."""
+    end, inner = (points[0], points[1]) if at_start else (points[-1], points[-2])
+    if abs(inner[0] - end[0]) > abs(inner[1] - end[1]):
+        return Port.LEFT if inner[0] < end[0] else Port.RIGHT
+    return Port.TOP if inner[1] < end[1] else Port.BOTTOM
+
+
+def _approach(points: list[Point], at_start: bool) -> float:
+    """Return where a route goes after it leaves its side, to order the ends along that side."""
+    ordered = points if at_start else points[::-1]
+    far = ordered[min(2, len(ordered) - 1)]
+    return far[1] if _end_side(points, at_start) in (Port.LEFT, Port.RIGHT) else far[0]
+
+
+def _end_step(node: Node, side: Port, count: int) -> float:
+    """Return the distance between ends spread along one side, so all of them fit on it."""
+    length = node.height if side in (Port.LEFT, Port.RIGHT) else node.width
+    return min(END_GAP_PX, length / (count + 1))
+
+
+def _shift_end(points: list[Point], at_start: bool, node: Node, offset: float) -> list[Point]:
+    """Slide one end of a route along its side, with the stretch that comes straight into it.
+
+    A route of one straight stretch has no bend to absorb the move, so it is left as it is.
+    """
+    if len(points) <= ONE_STRETCH_POINTS or not offset:
+        return points
+    moved = list(points) if at_start else list(reversed(points))
+    side = _end_side(moved, True)
+    across = 1 if side in (Port.LEFT, Port.RIGHT) else 0
+    for index in (0, 1):
+        point = list(moved[index])
+        point[across] += offset
+        moved[index] = (point[0], point[1])
+    moved[0] = _on_border(node, side, moved[0])
+    return moved if at_start else list(reversed(moved))
+
+
+def _on_border(node: Node, side: Port, point: Point) -> Point:
+    """Move a point that was slid along a side of a diamond back onto its slanted border."""
+    if node.shape is not Shape.DECISION:
+        return point
+    center_x, center_y = _center(node)
+    half_width, half_height = node.width / 2, node.height / 2
+    if side in (Port.LEFT, Port.RIGHT):
+        inset = abs(point[1] - center_y) * half_width / half_height
+        return (point[0] + (inset if side is Port.LEFT else -inset), point[1])
+    inset = abs(point[0] - center_x) * half_height / half_width
+    return (point[0], point[1] + (inset if side is Port.TOP else -inset))
 
 
 def route_across(
@@ -647,6 +852,7 @@ def route_edges(spec: Spec, grid: Grid, placement: Placement, rules: LayoutRules
     context.slots = _slots(list(grid.forward), placement.nodes)
     order = sorted(spec.edges, key=lambda edge: edge in returning)
     routed = {edge: _route_one(edge, edge in returning, context) for edge in order}
+    routed = _spread_ends(_reroute_meeting(routed, returning, context), placement.nodes)
     edges = []
     for index, spec_edge in enumerate(spec.edges, start=1):
         points = routed[spec_edge]
