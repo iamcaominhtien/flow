@@ -2460,8 +2460,7 @@
       "style": {
         "stroke_width": 1.5,
         "tint_nodes": false
-      },
-      "canvas": "#FFFFFF"
+      }
     }
   }
 }

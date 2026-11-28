@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.23.0 (2026-11-28)
+
+The arrangement kit for large hand-laid diagrams, and zones that no longer share the colour of what they hold (the owner, on a 157-node diagram: "the big block's background uses the same colour as the items").
+
+- A zone is the page's paper colour with a full-width header band in its tone and a border in the same tint; nodes keep their tones. HTML and draw.io; a zone imported back from draw.io takes its tone from the band.
+- `flowlib.arrange`: `chain` (steps in reading order, wrapping like text), `listing` (a set as one titled table, numbered when ordered, in columns when long), `fit_zone` and `cover`. The author skill says to decide what each part is before placing it.
+- `Canvas.node` with a forced width sizes the height to the text wrapped at that width.
+- Fixes from review of 0.22.0: ends and decisions keep their own outline whatever the tone; `neutral` keeps nodes white but not plan and board tints.
+
 ## 0.22.0 (2026-11-27)
 
 Colour, after the owner judged the default "quite ugly" on a 285-node diagram. Chosen from three palettes rendered on the same section; the owner rated them equal and asked for the default fix and the neutral one.

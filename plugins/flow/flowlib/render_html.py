@@ -59,10 +59,9 @@ BADGE_FONT_SIZE_PX = 11
 # Frame
 FRAME_BORDER_PX = 1.5
 FRAME_PILL_INSET_X_PX = 16
-FRAME_PILL_INSET_Y_PX = 12
-PILL_HEIGHT_PX = 22
 PILL_PADDING_X_PX = 12
 PILL_RADIUS_PX = 999
+ZONE_BAND_PX = 34  # the header band of a zone: the old pill's inset and height together
 
 LANE_BORDER_PX = 1  # the thin outline of a swimlane
 LANE_TAB_FONT_SIZE_PX = 13
@@ -117,29 +116,32 @@ def _frame_html(frame: Frame, theme: Theme) -> str:
         "width": px(frame.width),
         "height": px(frame.height),
         "box-sizing": "border-box",
-        "background": tone.lane,  # lighter than the nodes in it, so they stand out
+        "background": theme.paper,  # never the tint of the nodes inside; the tone is the band
         "border": f"{px(FRAME_BORDER_PX)} solid {tone.pill}",
         "border-radius": px(theme.style.frame_radius),
+        "overflow": "hidden",
     }
-    html = tag("div", area, data_id=frame.id)
+    band = ""
     if frame.label:
-        pill = {
-            **ABSOLUTE,
-            "left": px(frame.x + FRAME_PILL_INSET_X_PX),
-            "top": px(frame.y + FRAME_PILL_INSET_Y_PX),
-            "height": px(PILL_HEIGHT_PX),
-            "padding": f"0 {px(PILL_PADDING_X_PX)}",
-            "box-sizing": "border-box",
-            "border-radius": px(PILL_RADIUS_PX),
-            "background": tone.pill,
-            "color": theme.ink,
-            "font-size": px(theme.type_scale.pill.size),
-            "font-weight": str(theme.type_scale.pill.weight),
-            "line-height": px(PILL_HEIGHT_PX),
-            "white-space": "nowrap",
-        }
-        html += tag("div", pill, esc(frame.label))
-    return html
+        band = tag("div", _band_style(tone.pill, theme), esc(frame.label))
+    return tag("div", area, band, data_id=frame.id)
+
+
+def _band_style(fill: str, theme: Theme) -> dict[str, str]:
+    """Return the style of a zone's header band: its full width, its name at the left."""
+    return {
+        "height": px(ZONE_BAND_PX),
+        "padding": f"0 {px(FRAME_PILL_INSET_X_PX)}",
+        "box-sizing": "border-box",
+        "background": fill,
+        "color": theme.ink,
+        "font-size": px(theme.type_scale.pill.size),
+        "font-weight": str(theme.type_scale.pill.weight),
+        "line-height": px(ZONE_BAND_PX),
+        "white-space": "nowrap",
+        "overflow": "hidden",
+        "text-overflow": "ellipsis",
+    }
 
 
 def _lane_html(frame: Frame, theme: Theme) -> str:

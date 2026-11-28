@@ -91,10 +91,8 @@ FRAME_CORNER_PERCENT = 6
 LANE_TAB_FONT_SIZE = 13
 FRAME_DASH_PATTERN = "4 3"  # design 01 section 3: the container
 FRAME_STROKE_WIDTH_PX = 1.5
+ZONE_BAND_PX = 34  # the header band of a zone, as in the HTML
 FRAME_PILL_LEFT_PX = 16
-FRAME_PILL_TOP_PX = 12
-FRAME_PILL_HEIGHT_PX = 22
-FRAME_PILL_PADDING_PX = 12
 ROUNDED_SHAPES = (
     Shape.PROCESS,
     Shape.TASK,
@@ -790,7 +788,7 @@ def _add_frame(root: ET.Element, frame: Frame, theme: Theme) -> None:
             "collapsible": 0,
             "html": 1,
             "verticalAlign": "top",
-            "fillColor": tone.lane,
+            "fillColor": theme.paper,
             "strokeColor": tone.pill,
             "strokeWidth": FRAME_STROKE_WIDTH_PX,
         }
@@ -802,15 +800,16 @@ def _add_frame(root: ET.Element, frame: Frame, theme: Theme) -> None:
 
 
 def _add_frame_pill(root: ET.Element, frame: Frame, theme: Theme) -> None:
-    """Add the pill with the name of a frame, in the style of design 01 section 3."""
+    """Add the header band of a zone: its full width in the zone's tint, its name at the left."""
     tone = theme.tones[frame.tone]
     pill = theme.type_scale.pill
     style = style_string(
         {
-            "rounded": 1,
-            "arcSize": PILL_ARC_PERCENT,
+            "rounded": 0,
             "whiteSpace": "wrap",
             "html": 1,
+            "align": "left",
+            "spacingLeft": FRAME_PILL_LEFT_PX,
             "fillColor": tone.pill,
             "strokeColor": "none",
             "fontColor": theme.ink,
@@ -819,11 +818,10 @@ def _add_frame_pill(root: ET.Element, frame: Frame, theme: Theme) -> None:
             "fontFamily": theme.fonts.sans,
         }
     )
-    label = frame.label or ""
-    width = estimate_text_width(label, theme.layout, pill.size) + 2 * FRAME_PILL_PADDING_PX
-    cell = add_vertex(root, f"{FRAME_LABEL_PREFIX}frame-{frame.id}", esc(label), style)
-    left, top = frame.x + FRAME_PILL_LEFT_PX, frame.y + FRAME_PILL_TOP_PX
-    add_geometry(cell, (left, top, width, FRAME_PILL_HEIGHT_PX))
+    inset = FRAME_STROKE_WIDTH_PX
+    cell = add_vertex(root, f"{FRAME_LABEL_PREFIX}frame-{frame.id}", esc(frame.label or ""), style)
+    band = (frame.x + inset, frame.y + inset, frame.width - 2 * inset, ZONE_BAND_PX)
+    add_geometry(cell, band)
 
 
 def _add_lane(root: ET.Element, frame: Frame, theme: Theme) -> None:

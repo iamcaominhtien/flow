@@ -188,11 +188,11 @@ def _shape_of(style: dict[str, str], width: float, height: float) -> Shape:
 
 
 def _tone_of(fill: str | None) -> Tone | None:
-    """Return the tone whose box or zone colour is ``fill``, or None."""
+    """Return the tone whose box, zone or band colour is ``fill``, or None."""
     if fill is None:
         return None
     for tone, colors in load_theme().tones.items():
-        if fill.lower() in (colors.box.lower(), colors.lane.lower()):
+        if fill.lower() in (colors.box.lower(), colors.lane.lower(), colors.pill.lower()):
             return tone
     return None
 
@@ -392,7 +392,11 @@ class _Import:
             pill = _frame_label_cell(cell, self.cells)
             if pill is not None:
                 label = plain_lines(pill.get("value", ""))
-                self.frames[-1] = replace(self.frames[-1], label=label[0] if label else None)
+                band_tone = _tone_of(parse_style(pill.get("style", "")).get("fillColor"))
+                tone = self.frames[-1].tone if self.frames[-1].tone is not Tone.GRAY else band_tone
+                self.frames[-1] = replace(
+                    self.frames[-1], label=label[0] if label else None, tone=tone or Tone.GRAY
+                )
         elif "image" in style.get("shape", ""):
             self.skipped_images += 1
         elif _is_label_only(style) and FLOW_SHAPE_KEY not in style:
