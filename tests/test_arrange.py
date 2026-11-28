@@ -12,6 +12,7 @@ from flowlib.arrange import (  # noqa: E402
     Listing,
     Step,
     chain,
+    connect,
     cover,
     fit_zone,
     listing,
@@ -104,3 +105,18 @@ def test_a_zone_is_wide_enough_for_its_name() -> None:
     name = "A rather long name for a group that holds a single small step"
     zone = fit_zone(canvas, "z", (name, Tone.TEAL), ["a"])
     assert zone.width > cover(canvas, ["a"]).width + 200
+
+
+def test_connect_routes_around_the_nodes_between() -> None:
+    """A line between two parts goes round a node standing between them, on facing sides."""
+    canvas = Canvas("Connect", None)
+    chain(canvas, [Step("a", "Start here")], ChainSpace(100, 200, ROW_WIDTH_PX))
+    chain(canvas, [Step("wall", "In the way")], ChainSpace(400, 200, ROW_WIDTH_PX))
+    chain(canvas, [Step("b", "End here")], ChainSpace(700, 200, ROW_WIDTH_PX))
+    line = connect(canvas, "a", "b")
+    wall = canvas.boxes["wall"].node
+    for (x1, y1), (x2, y2) in pairwise(line.points):
+        crosses_x = min(x1, x2) < wall.x + wall.width and max(x1, x2) > wall.x
+        crosses_y = min(y1, y2) < wall.y + wall.height and max(y1, y2) > wall.y
+        assert not (crosses_x and crosses_y)
+    assert line.points[0][0] >= canvas.boxes["a"].node.x + canvas.boxes["a"].node.width - 1
