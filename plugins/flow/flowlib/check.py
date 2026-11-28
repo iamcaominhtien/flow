@@ -30,6 +30,7 @@ from .render_html import DESCRIPTION_FONT_SIZE_PX, DESCRIPTION_MAX_WIDTH_PX, TIT
 from .screen_part import Part, PartKind
 from .screen_parts import screen_parts
 from .sizing import LINE_HEIGHT_FACTOR, estimate_text_width
+from .spec import FLOWCHART
 from .text_area import text_area_width
 from .theme import LayoutRules, Theme, load_theme
 
@@ -50,7 +51,6 @@ WORDS_KINDS = (
     LabelKind.EFFECT,
 )  # the kinds that carry the words of a screen flow transition
 WRAPPING_CHARS = 2  # the brackets of a guard, or the slash and space of an effect
-FLOWCHART: str = "flowchart"  # the type whose router keeps lines of different kinds apart
 MIN_SHARED_BUS_PX = 240.0  # lines of one kind that leave one node may share a bus this long
 DESCRIPTION_LINES = 2  # the title block holds the title and two lines of the description
 DESCRIPTION_SCALE = 0.98  # the description is set at 400, about 2% narrower than the 500 widths
@@ -763,7 +763,8 @@ def check_overlaps(scene: Scene) -> list[Finding]:
                 Finding(
                     severity,
                     Code.LINES_OVERLAP,
-                    f"lines '{first.id}' and '{second.id}' run on top of each other",
+                    f"lines '{first.id}' and '{second.id}' run on top of each other; move one"
+                    " of their ends to another row or column, so that each has its own way",
                     (first.id, second.id),
                 )
             )

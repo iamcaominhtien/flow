@@ -1,0 +1,258 @@
+{
+ "type": "flowchart",
+ "title": "Bytecode cache checks",
+ "nodes": [
+  {
+   "id": "cfs",
+   "kind": "process",
+   "text": "cache_from_source"
+  },
+  {
+   "id": "stat",
+   "kind": "decision",
+   "text": "Stat and pyc readable?"
+  },
+  {
+   "id": "cls",
+   "kind": "process",
+   "text": "_classify_pyc"
+  },
+  {
+   "id": "magic",
+   "kind": "decision",
+   "text": "Magic number matches?"
+  },
+  {
+   "id": "badm",
+   "kind": "process",
+   "text": "Bad magic ImportError"
+  },
+  {
+   "id": "hdr",
+   "kind": "decision",
+   "text": "Header and flags valid?"
+  },
+  {
+   "id": "hash",
+   "kind": "decision",
+   "text": "Hash-based pyc?"
+  },
+  {
+   "id": "mt",
+   "kind": "decision",
+   "text": "Mtime and size match?"
+  },
+  {
+   "id": "want",
+   "kind": "decision",
+   "text": "Source check wanted?"
+  },
+  {
+   "id": "hm",
+   "kind": "decision",
+   "text": "Source hash matches?"
+  },
+  {
+   "id": "acc",
+   "kind": "process",
+   "text": "Accept cached bytecode"
+  },
+  {
+   "id": "comp",
+   "kind": "process",
+   "text": "_compile_bytecode"
+  },
+  {
+   "id": "ign",
+   "kind": "process",
+   "text": "Ignore cached bytecode"
+  },
+  {
+   "id": "s2c",
+   "kind": "process",
+   "text": "source_to_code"
+  },
+  {
+   "id": "may",
+   "kind": "decision",
+   "text": "Bytecode may be written?"
+  },
+  {
+   "id": "hl",
+   "kind": "decision",
+   "text": "Hash-based layout?"
+  },
+  {
+   "id": "chp",
+   "kind": "process",
+   "text": "_code_to_hash_pyc"
+  },
+  {
+   "id": "ctp",
+   "kind": "process",
+   "text": "_code_to_timestamp_pyc"
+  },
+  {
+   "id": "cb",
+   "kind": "process",
+   "text": "_cache_bytecode"
+  },
+  {
+   "id": "ret",
+   "kind": "terminator",
+   "text": "Return code object"
+  }
+ ],
+ "edges": [
+  {
+   "from": "cfs",
+   "to": "stat",
+   "role": "main"
+  },
+  {
+   "from": "stat",
+   "to": "cls",
+   "label": "Yes",
+   "role": "main"
+  },
+  {
+   "from": "stat",
+   "to": "s2c",
+   "label": "No",
+   "role": "no"
+  },
+  {
+   "from": "cls",
+   "to": "magic",
+   "role": "main"
+  },
+  {
+   "from": "magic",
+   "to": "hdr",
+   "label": "Yes",
+   "role": "main"
+  },
+  {
+   "from": "magic",
+   "to": "badm",
+   "label": "No",
+   "role": "no"
+  },
+  {
+   "from": "badm",
+   "to": "ign"
+  },
+  {
+   "from": "hdr",
+   "to": "hash",
+   "label": "Yes",
+   "role": "main"
+  },
+  {
+   "from": "hdr",
+   "to": "ign",
+   "label": "No",
+   "role": "no"
+  },
+  {
+   "from": "hash",
+   "to": "mt",
+   "label": "No",
+   "role": "main"
+  },
+  {
+   "from": "hash",
+   "to": "want",
+   "label": "Yes",
+   "role": "yes"
+  },
+  {
+   "from": "mt",
+   "to": "acc",
+   "label": "Yes",
+   "role": "main"
+  },
+  {
+   "from": "mt",
+   "to": "ign",
+   "label": "No",
+   "role": "no"
+  },
+  {
+   "from": "want",
+   "to": "hm",
+   "label": "flag set"
+  },
+  {
+   "from": "want",
+   "to": "acc",
+   "label": "flag clear"
+  },
+  {
+   "from": "hm",
+   "to": "acc",
+   "label": "Yes",
+   "role": "yes"
+  },
+  {
+   "from": "hm",
+   "to": "ign",
+   "label": "No",
+   "role": "no"
+  },
+  {
+   "from": "acc",
+   "to": "comp",
+   "role": "main"
+  },
+  {
+   "from": "comp",
+   "to": "ret",
+   "role": "main"
+  },
+  {
+   "from": "ign",
+   "to": "s2c"
+  },
+  {
+   "from": "s2c",
+   "to": "may"
+  },
+  {
+   "from": "may",
+   "to": "hl",
+   "label": "Yes",
+   "role": "yes"
+  },
+  {
+   "from": "may",
+   "to": "ret",
+   "label": "No",
+   "role": "no"
+  },
+  {
+   "from": "hl",
+   "to": "chp",
+   "label": "Yes",
+   "role": "yes"
+  },
+  {
+   "from": "hl",
+   "to": "ctp",
+   "label": "No",
+   "role": "no"
+  },
+  {
+   "from": "chp",
+   "to": "cb"
+  },
+  {
+   "from": "ctp",
+   "to": "cb"
+  },
+  {
+   "from": "cb",
+   "to": "ret"
+  }
+ ]
+}

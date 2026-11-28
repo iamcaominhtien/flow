@@ -1,8 +1,9 @@
 """Route the lines of a flowchart as horizontal and vertical segments, and place their labels.
 
 A forward line runs straight when it can, in an L-shape when its ends are in different
-columns, and around the flow when a node is in the way. A returning line always runs around
-the flow, in a channel outside the nodes.
+columns, and around the nodes and lines in its way otherwise. A returning line runs around
+the flow, in a channel outside the nodes, unless every way round is blocked. Two lines never
+leave one tip of a decision, and lines of different kinds never meet a node at one point.
 """
 
 import math
@@ -32,8 +33,6 @@ STUB_PX = 16.0  # a searched route leaves a box straight for this far before it 
 PORT_REUSE_COST_PX = 60.0  # a searched route prefers a side of a box that is still free
 REROUTE_ROUNDS: int = 3  # times each line that meets another is searched again once all are drawn
 END_GAP_PX: float = 24.0  # lines of different kinds meeting one point of a side are this far apart
-ONE_STRETCH_POINTS: int = 2  # a route of this many points is one straight stretch
-SIDE_PORTS: tuple[str, ...] = ("left", "right")  # a side of a node one line at most leaves from
 
 
 class Port(StrEnum):
@@ -45,6 +44,7 @@ class Port(StrEnum):
     RIGHT = "right"
 
 
+SIDE_PORTS: tuple[Port, ...] = (Port.LEFT, Port.RIGHT)  # a side one line at most leaves from
 ANSWER_KINDS = {"yes": LabelKind.YES, "no": LabelKind.NO}  # a Yes or No chip keeps its colour
 LABEL_KIND_OF_ROLE = {Role.YES: LabelKind.YES, Role.NO: LabelKind.NO, Role.BACK: LabelKind.BACK}
 
@@ -70,6 +70,7 @@ class _Context:
     caption_port: Port = Port.BOTTOM
     slots: dict[SpecEdge, tuple[float, float]] = field(default_factory=dict)
     lines: list[tuple[Point, Point]] = field(default_factory=list)
+    exits: set[tuple[str, Port]] = field(default_factory=set)  # the sides lines leave nodes by
 
 
 def _attach(node: Node, port: Port, caption_port: Port = Port.BOTTOM) -> Point:
@@ -563,7 +564,8 @@ def _search_route(source: Node, target: Node, context: _Context) -> _Route | Non
     """Search for a route around the boxes and the lines already drawn.
 
     The sides that face the other node are tried first; every side is tried only when those
-    find no route, because each pair of sides costs a search.
+    find no route, because each pair of sides costs a search. A tip of a decision that another
+    line already uses is never tried, so two lines never leave one tip.
 
     Args:
         source: Where the line starts.
@@ -574,14 +576,23 @@ def _search_route(source: Node, target: Node, context: _Context) -> _Route | Non
         The cheapest route found, or None when no pair of sides can be joined.
     """
     space = SearchSpace(_obstacles(context), tuple(context.lines))
-    pairs = [
-        (leave, arrive) for leave in _facing(source, target) for arrive in _facing(target, source)
-    ]
+    sides = [port for port in Port if not _is_taken_tip(source, port, context)]
+    facing = [port for port in _facing(source, target) if port in sides]
+    pairs = [(leave, arrive) for leave in facing for arrive in _facing(target, source)]
     best = _best_of(pairs, (source, target), space, context)
     if best is None:
-        pairs = [(leave, arrive) for leave in Port for arrive in Port]
+        pairs = [(leave, arrive) for leave in sides for arrive in Port]
         best = _best_of(pairs, (source, target), space, context)
     return None if best is None else best[1]
+
+
+def _is_taken_tip(node: Node, port: Port, context: _Context) -> bool:
+    """Tell whether a line may not leave this side: a tip another exit of a decision leaves by.
+
+    A line that enters by that tip does not take it: the exit has the tip, and the two ends are
+    moved apart once all lines are drawn.
+    """
+    return node.shape is Shape.DECISION and (node.id, port) in context.exits
 
 
 def _best_of(
@@ -638,6 +649,7 @@ def _route_one(spec_edge: SpecEdge, returning: bool, context: _Context) -> list[
         route = _forward_route(source, target, direct, context)
     context.used_ports.add((source.id, route.leaves))
     context.used_ports.add((target.id, route.arrives))
+    context.exits.add((source.id, route.leaves))
     context.lines.extend(pairwise(route.points))
     return route.points
 
@@ -658,7 +670,8 @@ def _forward_route(source: Node, target: Node, direct: _Route, context: _Context
         The route to draw.
     """
     misses_nodes = _is_clear(direct.points, context, (source.id, target.id))
-    side_taken = direct.leaves in SIDE_PORTS and (source.id, direct.leaves) in context.used_ports
+    side_taken = (source.id, direct.leaves) in context.used_ports and direct.leaves in SIDE_PORTS
+    side_taken = side_taken or _is_taken_tip(source, direct.leaves, context)
     if misses_nodes and not side_taken and not _meets_lines(direct.points, context.lines):
         return direct
     found = _search_route(source, target, context)
@@ -688,14 +701,15 @@ def _reroute_meeting(
 ) -> dict[SpecEdge, list[Point]]:
     """Search again every forward line that meets another, now that all are drawn.
 
-    A line drawn early could not avoid the lines drawn after it; each is searched with every
-    other line in place and replaced when the new route costs less, for a few rounds. A
+    A line drawn early could not avoid the lines drawn after it, nor see which tip of a decision
+    a later line took. Each is searched with every other line in place and replaced when the new
+    route costs less, or when it shares a decision's tip with another line, for a few rounds. A
     returning line keeps its way round the flow.
 
     Args:
         routed: Each edge's route.
         returning: The edges that loop back.
-        context: The router state; its lines are rebuilt for every search.
+        context: The router state; its lines and ports describe every route when this returns.
 
     Returns:
         Each edge's route, some replaced.
@@ -703,37 +717,77 @@ def _reroute_meeting(
     routes = dict(routed)
     for _ in range(REROUTE_ROUNDS):
         changed = False
-        for edge, points in routes.items():
-            context.lines = [
-                segment
-                for other, drawn in routes.items()
-                if other is not edge
-                for segment in pairwise(drawn)
-            ]
-            if edge in returning or not _meets_lines(points, context.lines):
-                continue
-            ends = context.nodes[edge.source], context.nodes[edge.target]
-            found = _search_route(*ends, context)
-            if found and _cost(found.points, context.lines) < _cost(points, context.lines):
-                routes[edge] = found.points
-                changed = True
+        for edge in [edge for edge in routes if edge not in returning]:
+            changed = _reroute_one(edge, routes, context) or changed
         if not changed:
             break
+    context.lines = [segment for drawn in routes.values() for segment in pairwise(drawn)]
+    context.used_ports = _ports_of(routes, None)
+    context.exits = {(edge.source, _end_side(drawn, True)) for edge, drawn in routes.items()}
     return routes
 
 
+def _reroute_one(edge: SpecEdge, routes: dict[SpecEdge, list[Point]], context: _Context) -> bool:
+    """Search one line again among all the others; replace its route and return True if better.
+
+    Args:
+        edge: The line to search again.
+        routes: Each edge's route; the edge's entry is replaced when a better route is found.
+        context: The router state; its lines and ports are set to those of the other routes.
+
+    Returns:
+        Whether the route was replaced.
+    """
+    points = routes[edge]
+    context.lines = [
+        segment
+        for other, drawn in routes.items()
+        if other is not edge
+        for segment in pairwise(drawn)
+    ]
+    context.used_ports = _ports_of(routes, edge)
+    context.exits = {
+        (other.source, _end_side(drawn, True))
+        for other, drawn in routes.items()
+        if other is not edge
+    }
+    source, target = context.nodes[edge.source], context.nodes[edge.target]
+    clashes = _is_taken_tip(source, _end_side(points, True), context)
+    if not clashes and not _meets_lines(points, context.lines):
+        return False
+    found = _search_route(source, target, context)
+    if found is None or not (
+        clashes or _cost(found.points, context.lines) < _cost(points, context.lines)
+    ):
+        return False
+    routes[edge] = found.points
+    return True
+
+
+def _ports_of(routes: dict[SpecEdge, list[Point]], skip: SpecEdge | None) -> set[tuple[str, Port]]:
+    """Return the sides of nodes that the routes leave or enter by, but those of ``skip``."""
+    ports = set()
+    for edge, points in routes.items():
+        if edge is not skip:
+            ports.add((edge.source, _end_side(points, True)))
+            ports.add((edge.target, _end_side(points, False)))
+    return ports
+
+
 def _spread_ends(
-    routes: dict[SpecEdge, list[Point]], nodes: dict[str, Node]
+    routes: dict[SpecEdge, list[Point]], context: _Context
 ) -> dict[SpecEdge, list[Point]]:
     """Move apart the ends of lines of different kinds that meet a node at one point.
 
     Lines of one kind (role and dash) that meet at one point merge there, as a trunk does; lines
     of different kinds would draw two arrowheads, or two starts, on top of each other. They are
-    spread along the side, in the order they come from, so that they do not cross.
+    spread along the side, in the order they come from, so that they do not cross. A straight
+    line has no bend to absorb a move, so it keeps its place and the others move round it; a
+    move that would take a line through a node is not made.
 
     Args:
         routes: Each edge's route.
-        nodes: The placed nodes.
+        context: The router state.
 
     Returns:
         Each edge's route, some with an end moved along its side.
@@ -744,14 +798,34 @@ def _spread_ends(
         meeting[(edge.target, points[-1])].append((edge, False))
     moved = dict(routes)
     for (node_id, _), ends in meeting.items():
-        if len({(edge.role, edge.dashed) for edge, _ in ends}) == 1:
-            continue
-        ends.sort(key=lambda end: _approach(moved[end[0]], end[1]))
-        step = _end_step(nodes[node_id], _end_side(moved[ends[0][0]], ends[0][1]), len(ends))
-        for index, (edge, at_start) in enumerate(ends):
-            offset = (index - (len(ends) - 1) / 2) * step
-            moved[edge] = _shift_end(moved[edge], at_start, nodes[node_id], offset)
+        if len({(edge.role, edge.dashed) for edge, _ in ends}) > 1:
+            _spread_group(ends, context.nodes[node_id], moved, context)
     return moved
+
+
+def _spread_group(
+    ends: list[tuple[SpecEdge, bool]],
+    node: Node,
+    moved: dict[SpecEdge, list[Point]],
+    context: _Context,
+) -> None:
+    """Spread the ends that meet one point of a node; ``moved`` is changed in place.
+
+    Args:
+        ends: Each edge with True when its start is at the point, False when its end is.
+        node: The node they meet.
+        moved: Each edge's route.
+        context: The router state.
+    """
+    ends.sort(key=lambda end: _approach(moved[end[0]], end[1]))
+    step = _end_step(node, _end_side(moved[ends[0][0]], ends[0][1]), len(ends))
+    offsets = [index * step for index in range(len(ends))]
+    fixed = [i for i, (edge, at_start) in enumerate(ends) if not _can_shift(moved[edge], at_start)]
+    anchor = offsets[fixed[0]] if fixed else (offsets[0] + offsets[-1]) / 2
+    for (edge, at_start), offset in zip(ends, offsets, strict=True):
+        shifted = _shift_end(moved[edge], at_start, node, offset - anchor)
+        if _is_clear(shifted, context, (edge.source, edge.target)):
+            moved[edge] = shifted
 
 
 def _end_side(points: list[Point], at_start: bool) -> Port:
@@ -775,17 +849,37 @@ def _end_step(node: Node, side: Port, count: int) -> float:
     return min(END_GAP_PX, length / (count + 1))
 
 
-def _shift_end(points: list[Point], at_start: bool, node: Node, offset: float) -> list[Point]:
-    """Slide one end of a route along its side, with the stretch that comes straight into it.
+def _run_from_end(points: list[Point], at_start: bool) -> int:
+    """Return how many points from one end lie on the straight stretch that meets the node."""
+    ordered = points if at_start else points[::-1]
+    side = _end_side(ordered, True)
+    across = 1 if side in (Port.LEFT, Port.RIGHT) else 0
+    count = 1
+    while count < len(ordered) and abs(ordered[count][across] - ordered[0][across]) < (
+        SAME_LINE_TOLERANCE_PX
+    ):
+        count += 1
+    return count
 
-    A route of one straight stretch has no bend to absorb the move, so it is left as it is.
+
+def _can_shift(points: list[Point], at_start: bool) -> bool:
+    """Tell whether an end can slide along its side: the route bends somewhere."""
+    return _run_from_end(points, at_start) < len(points)
+
+
+def _shift_end(points: list[Point], at_start: bool, node: Node, offset: float) -> list[Point]:
+    """Slide one end of a route along its side, with the straight stretch that comes into it.
+
+    Every point of that stretch moves, so the stretch stays straight and the bend at its far
+    end absorbs the move. A route with no bend is returned as it is.
     """
-    if len(points) <= ONE_STRETCH_POINTS or not offset:
+    run = _run_from_end(points, at_start)
+    if run == len(points) or not offset:
         return points
     moved = list(points) if at_start else list(reversed(points))
     side = _end_side(moved, True)
     across = 1 if side in (Port.LEFT, Port.RIGHT) else 0
-    for index in (0, 1):
+    for index in range(run):
         point = list(moved[index])
         point[across] += offset
         moved[index] = (point[0], point[1])
@@ -852,7 +946,7 @@ def route_edges(spec: Spec, grid: Grid, placement: Placement, rules: LayoutRules
     context.slots = _slots(list(grid.forward), placement.nodes)
     order = sorted(spec.edges, key=lambda edge: edge in returning)
     routed = {edge: _route_one(edge, edge in returning, context) for edge in order}
-    routed = _spread_ends(_reroute_meeting(routed, returning, context), placement.nodes)
+    routed = _spread_ends(_reroute_meeting(routed, returning, context), context)
     edges = []
     for index, spec_edge in enumerate(spec.edges, start=1):
         points = routed[spec_edge]

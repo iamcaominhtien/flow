@@ -1,13 +1,21 @@
 """Tests for the flowchart rules of design 03: bars, fans, notes, lanes and the lint."""
 
 import json
+import math
 import sys
+from itertools import pairwise
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PLUGIN_DIR = ROOT / "plugins" / "flow"
 DELIVERY = ROOT / "examples" / "delivery-flowchart.spec.json"
 PAYMENT = ROOT / "examples" / "payment-flowchart.spec.json"
+BYTECODE_CACHE = ROOT / "tests" / "data" / "bytecode-cache.spec.json"  # part of a real import chart
+FLOWCHART_EXAMPLES = [
+    path
+    for path in sorted((ROOT / "examples").glob("*.spec.json"))
+    if json.loads(path.read_text()).get("type") == "flowchart"
+]
 LANE_PLAIN_PX = 210
 LANE_CARD_PX = 240
 BAR_THICKNESS_PX = 8
@@ -16,8 +24,9 @@ sys.path.insert(0, str(PLUGIN_DIR))
 
 from flowlib import diagrams, render_drawio, render_html, scene as scene_io  # noqa: E402,I001
 from flowlib.check import Code, Severity, check_scene  # noqa: E402
+from flowlib.pathfind import TRACK_GAP_PX  # noqa: E402
 from flowlib.import_drawio import convert  # noqa: E402
-from flowlib.model import FrameVariant, LabelKind, Role, Scene, Shape  # noqa: E402
+from flowlib.model import Edge, FrameVariant, LabelKind, Role, Scene, Shape  # noqa: E402
 
 
 def chart(nodes: list[dict], edges: list[dict], **extra: object) -> Scene:
@@ -300,14 +309,14 @@ def test_a_long_chain_of_decisions_does_not_drift_sideways() -> None:
     assert scene.width < 1000
 
 
-def _look(edge: object) -> tuple[object, bool]:
+def _look(edge: Edge) -> tuple[Role, bool]:
     """Return what tells lines apart on the page: their role and whether they are dashed."""
     return edge.role, edge.dashed
 
 
 def _ends_of_different_lines_meet(scene: Scene) -> bool:
     """Tell whether lines that look different start or end at one point of one node."""
-    seen: dict[tuple[str, tuple[float, float]], set[tuple[object, bool]]] = {}
+    seen: dict[tuple[str, tuple[float, float]], set[tuple[Role, bool]]] = {}
     for edge in scene.edges:
         for node_id, point in ((edge.source, edge.points[0]), (edge.target, edge.points[-1])):
             seen.setdefault((node_id, point), set()).add(_look(edge))
@@ -339,12 +348,36 @@ def _branchy_chart() -> Scene:
     return chart(nodes, edges)
 
 
-def test_two_exits_of_a_decision_never_leave_one_tip() -> None:
-    """The answer that does not continue down leaves by a side tip, even to a lower row."""
-    scene = _branchy_chart()
-    for decision in ("d1", "d2", "d3"):
+def _decisions_share_a_tip(scene: Scene) -> bool:
+    """Tell whether two lines leave one decision closer together than a track apart."""
+    decisions = {node.id for node in scene.nodes if node.shape is Shape.DECISION}
+    for decision in decisions:
         starts = [edge.points[0] for edge in scene.edges if edge.source == decision]
-        assert len(set(starts)) == len(starts)
+        for i, first in enumerate(starts):
+            if any(math.dist(first, second) < TRACK_GAP_PX for second in starts[i + 1 :]):
+                return True
+    return False
+
+
+def test_two_exits_of_a_decision_never_leave_one_tip() -> None:
+    """The answer that does not continue down leaves by its own tip.
+
+    That holds for an answer to a lower row too, and when its route is searched because the
+    way down is taken.
+    """
+    assert not _decisions_share_a_tip(_branchy_chart())
+    assert not _decisions_share_a_tip(diagrams.layout(_decision_chain(12, retry_every=3)))
+
+
+def test_every_flowchart_line_is_horizontal_or_vertical() -> None:
+    """No stretch of a routed line runs at a slant, whatever moved its ends."""
+    scenes = [_branchy_chart(), diagrams.layout(_decision_chain(12, retry_every=3))]
+    paths = [*FLOWCHART_EXAMPLES, BYTECODE_CACHE]
+    scenes += [diagrams.layout(json.loads(path.read_text())) for path in paths]
+    for scene in scenes:
+        for edge in scene.edges:
+            for start, end in pairwise(edge.points):
+                assert start[0] == end[0] or start[1] == end[1], (edge.id, start, end)
 
 
 def test_lines_of_different_kinds_never_meet_at_one_point() -> None:

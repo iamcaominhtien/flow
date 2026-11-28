@@ -24,6 +24,7 @@ TRACK_REACH_PX = 150.0  # but only for lines that pass this close to an end of t
 OUTSIDE_MARGIN_PX = 40.0
 MIN_CORRIDOR_PX = 8.0  # a gap narrower than this gets no middle line
 SAME_LINE_PX = 2.0
+INDEX_CELL_PX: float = 200.0  # the side of a cell of the box index
 DIRECTIONS = ((1, 0), (-1, 0), (0, 1), (0, -1))
 
 
@@ -49,14 +50,38 @@ def _inside(rect: Rect, point: Point) -> bool:
     return left < point[0] < right and top < point[1] < bottom
 
 
-def _blocked(space: SearchSpace, start: Point, end: Point) -> bool:
-    """Tell whether an axis-aligned segment passes through the inside of an obstacle."""
-    low_x, high_x = sorted((start[0], end[0]))
-    low_y, high_y = sorted((start[1], end[1]))
-    return any(
-        low_x < right and high_x > left and low_y < bottom and high_y > top
-        for left, top, right, bottom in space.obstacles
-    )
+class _BoxIndex:
+    """The obstacles, filed by the square cells of the page they touch, for lookups.
+
+    A step of the search is short and meets only the boxes near it.
+    """
+
+    def __init__(self, obstacles: tuple[Rect, ...]) -> None:
+        """File every obstacle under each cell it touches.
+
+        Args:
+            obstacles: The boxes a route may not cross.
+        """
+        self.cells: dict[tuple[int, int], list[Rect]] = {}
+        for rect in obstacles:
+            for cell in _cells(rect):
+                self.cells.setdefault(cell, []).append(rect)
+
+    def blocks(self, start: Point, end: Point) -> bool:
+        """Tell whether an axis-aligned segment passes through the inside of an obstacle."""
+        low_x, high_x = sorted((start[0], end[0]))
+        low_y, high_y = sorted((start[1], end[1]))
+        return any(
+            low_x < right and high_x > left and low_y < bottom and high_y > top
+            for cell in _cells((low_x, low_y, high_x, high_y))
+            for left, top, right, bottom in self.cells.get(cell, ())
+        )
+
+
+def _cells(rect: Rect) -> list[tuple[int, int]]:
+    """Return the cells of the box index that a rectangle touches."""
+    left, top, right, bottom = (int(value // INDEX_CELL_PX) for value in rect)
+    return [(x, y) for x in range(left, right + 1) for y in range(top, bottom + 1)]
 
 
 def _corridors(edges: set[float]) -> list[float]:
@@ -157,7 +182,9 @@ def _beside_cost(gap: float) -> float:
 
 def _reaches(start: float, end: float, mark: float) -> bool:
     """Tell whether a step from ``start`` to ``end`` passes or stops on ``mark``, not leaves it."""
-    return min(start, end) < mark <= max(start, end) if end > start else end <= mark < start
+    if end > start:
+        return start < mark <= end
+    return end <= mark < start
 
 
 def path_cost(space: SearchSpace, points: list[Point]) -> float:
@@ -207,6 +234,7 @@ class _Search:
         """
         self.space = space
         self.index = _LineIndex(space.lines)
+        self.boxes = _BoxIndex(space.obstacles)
         self.xs, self.ys = _grid(space, (start, end))
         self.goal = (self.xs.index(end[0]), self.ys.index(end[1]))
         self.first: State = (self.xs.index(start[0]), self.ys.index(start[1]), -1)
@@ -228,7 +256,7 @@ class _Search:
         key = (here, there)
         if key not in self.steps:
             start, end = self.point(*here), self.point(*there)
-            if _blocked(self.space, start, end):
+            if self.boxes.blocks(start, end):
                 self.steps[key] = None
             else:
                 length = abs(end[0] - start[0]) + abs(end[1] - start[1])
