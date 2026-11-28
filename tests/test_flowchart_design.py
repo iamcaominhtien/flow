@@ -383,3 +383,21 @@ def test_every_flowchart_line_is_horizontal_or_vertical() -> None:
 def test_lines_of_different_kinds_never_meet_at_one_point() -> None:
     """A main line and a Yes or No line into one step arrive at two points, not on top."""
     assert not _ends_of_different_lines_meet(_branchy_chart())
+
+
+def test_the_main_path_runs_straight_down_whatever_order_the_spec_lists_exits_in() -> None:
+    """A branch listed before the main exit does not take the way straight down from it."""
+    nodes = [
+        {"id": "ask", "kind": "decision", "text": "Skip it?"},
+        {"id": "step", "kind": "process", "text": "Do the step"},
+        {"id": "end", "kind": "terminator", "text": "Done"},
+    ]
+    edges = [
+        {"from": "ask", "to": "end", "label": "Yes", "role": "yes"},
+        {"from": "ask", "to": "step", "label": "No", "role": "main"},
+        {"from": "step", "to": "end", "role": "main"},
+    ]
+    scene = chart(nodes, edges)
+    main = next(edge for edge in scene.edges if edge.source == "ask" and edge.target == "step")
+    assert len(main.points) == 2  # one straight stretch
+    assert main.points[0][0] == main.points[1][0]

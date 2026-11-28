@@ -14,7 +14,7 @@ from itertools import pairwise
 
 from .forks import is_inside
 from .html_nodes import CAPTION_WIDTH_PX
-from .layered import Grid
+from .layered import Grid, continuations
 from .model import SYMBOL_HEADS, Direction, Edge, EdgeLabel, LabelKind, Node, Point, Role, Shape
 from .pathfind import SearchSpace, find_route, path_cost
 from .placement import Placement
@@ -32,6 +32,7 @@ MULTIWAY_EXITS = 3  # a decision with this many exits fans them out
 STUB_PX = 16.0  # a searched route leaves a box straight for this far before it may turn
 PORT_REUSE_COST_PX = 60.0  # a searched route prefers a side of a box that is still free
 REROUTE_ROUNDS: int = 3  # times each line that meets another is searched again once all are drawn
+STRAIGHT_LINE_POINTS: int = 2  # a route of one straight stretch: the best a line can have
 END_GAP_PX: float = 24.0  # lines of different kinds meeting one point of a side are this far apart
 
 
@@ -704,7 +705,8 @@ def _reroute_meeting(
     A line drawn early could not avoid the lines drawn after it, nor see which tip of a decision
     a later line took. Each is searched with every other line in place and replaced when the new
     route costs less, or when it shares a decision's tip with another line, for a few rounds. A
-    returning line keeps its way round the flow.
+    returning line keeps its way round the flow, and a straight line keeps its place: the main
+    path runs straight down, and the other lines give way to it.
 
     Args:
         routed: Each edge's route.
@@ -739,6 +741,8 @@ def _reroute_one(edge: SpecEdge, routes: dict[SpecEdge, list[Point]], context: _
         Whether the route was replaced.
     """
     points = routes[edge]
+    if len(points) == STRAIGHT_LINE_POINTS:
+        return False
     context.lines = [
         segment
         for other, drawn in routes.items()
@@ -927,6 +931,17 @@ def route_across(
     return [start, (start[0], end[1]), end]
 
 
+def _routing_order(spec: Spec, grid: Grid) -> list[SpecEdge]:
+    """Order the edges to route: each node's continuation, then its other exits, then returns.
+
+    The line that continues a node's column takes the way straight down before a branch can
+    take that tip, whatever order the spec lists them in.
+    """
+    returning = set(grid.returning)
+    first = set(continuations(list(grid.forward)).values())
+    return sorted(spec.edges, key=lambda edge: (edge in returning, edge not in first))
+
+
 def route_edges(spec: Spec, grid: Grid, placement: Placement, rules: LayoutRules) -> list[Edge]:
     """Route every edge of a flowchart and place its label.
 
@@ -944,7 +959,7 @@ def route_edges(spec: Spec, grid: Grid, placement: Placement, rules: LayoutRules
     context = _Context(placement.nodes, rules, set(), {}, caption_port)
     returning = set(grid.returning)
     context.slots = _slots(list(grid.forward), placement.nodes)
-    order = sorted(spec.edges, key=lambda edge: edge in returning)
+    order = _routing_order(spec, grid)
     routed = {edge: _route_one(edge, edge in returning, context) for edge in order}
     routed = _spread_ends(_reroute_meeting(routed, returning, context), context)
     edges = []
