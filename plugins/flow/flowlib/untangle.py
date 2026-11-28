@@ -10,8 +10,9 @@ of a node cannot be told apart. The author kit runs these passes on the lines as
    a new way is searched.
 3. The ends that still meet at one point are spread along the side (``ports.spread_ends``).
 
-Each move is weighed: it may pass through no new node, and it may add at most one crossing,
-because a line on top of another hides it and a crossing does not.
+A push or a new way is weighed: it may pass through no new node, and each line may gain at
+most one crossing over all its moves, because a line on top of another hides it and a crossing
+does not. Spreading the ends only keeps lines out of new nodes; it may add crossings.
 """
 
 from dataclasses import dataclass, field, replace
@@ -49,6 +50,7 @@ class _Lines:
     nodes: dict[str, Node]
     keep: frozenset[Edge]
     failed: set[tuple[Edge, tuple[Point, ...]]] = field(default_factory=set)
+    added: dict[Edge, int] = field(default_factory=dict)  # crossings each line's moves added
 
     def others(self, edge: Edge) -> list[tuple[Point, Point]]:
         """Return the stretches of every line but one.
@@ -59,12 +61,7 @@ class _Lines:
         Returns:
             The stretches.
         """
-        return [
-            stretch
-            for other, points in self.routes.items()
-            if other is not edge
-            for stretch in pairwise(points)
-        ]
+        return _stretches_but(self.routes, edge)
 
     def is_clear(self, points: list[Point], ends: tuple[str, str]) -> bool:
         """Tell whether a route passes through no node; it may touch its ends where it attaches.
@@ -86,25 +83,53 @@ class _Lines:
                     return False
         return True
 
-    def take(self, edge: Edge, points: list[Point]) -> bool:
-        """Put a new route in place when it is clear of new nodes and adds at most one crossing.
+    def take(self, moves: dict[Edge, list[Point]]) -> bool:
+        """Put new routes in place when each is clear of new nodes and keeps to its crossings.
+
+        A line may add at most one crossing over all its moves: parting it from a line of
+        another kind is worth one, not one each time it moves.
 
         Args:
-            edge: The line.
-            points: Its new route.
+            moves: Each line to move, and its new route; they move together or not at all.
 
         Returns:
-            Whether the route was taken.
+            Whether the routes were taken.
         """
-        old = self.routes[edge]
-        ends = (edge.source, edge.target)
-        if not self.is_clear(points, ends) and self.is_clear(old, ends):
-            return False
-        lines = self.others(edge)
-        if _crossings(points, lines) > _crossings(old, lines) + CROSSINGS_A_PART_MAY_ADD:
-            return False
-        self.routes[edge] = points
+        trial = {**self.routes, **moves}
+        added = {}
+        for edge, points in moves.items():
+            old = self.routes[edge]
+            ends = (edge.source, edge.target)
+            if not self.is_clear(points, ends) and self.is_clear(old, ends):
+                return False
+            lines = _stretches_but(trial, edge)
+            more = max(
+                0, _crossings(points, lines) - _crossings(old, _stretches_but(self.routes, edge))
+            )
+            added[edge] = self.added.get(edge, 0) + more
+            if added[edge] > CROSSINGS_A_PART_MAY_ADD:
+                return False
+        self.routes.update(moves)
+        self.added.update(added)
         return True
+
+
+def _stretches_but(routes: dict[Edge, list[Point]], edge: Edge) -> list[tuple[Point, Point]]:
+    """Return the stretches of every route but one.
+
+    Args:
+        routes: Each line's points.
+        edge: The line left out.
+
+    Returns:
+        The stretches.
+    """
+    return [
+        stretch
+        for other, points in routes.items()
+        if other is not edge
+        for stretch in pairwise(points)
+    ]
 
 
 @dataclass(frozen=True)
@@ -184,7 +209,7 @@ def _free_tips(lines: _Lines) -> None:
                     _Ends(source, target, frozenset(Port) - free), lines.others(edge), lines.nodes
                 )
                 if found is not None:
-                    lines.take(edge, found)
+                    lines.take({edge: found})
 
 
 def _exits_by_tip(lines: _Lines) -> dict[tuple[str, Port], list[Edge]]:
@@ -276,8 +301,9 @@ def _nudge(edge: Edge, lines: _Lines) -> bool:
     """Push a stretch of a line that runs on top of another kind a track or two aside.
 
     Only a stretch between two bends moves; the bends absorb the move, so the line stays
-    right-angled and keeps its ends. The push is kept when the line then runs on top of no line
-    of another kind.
+    right-angled and keeps its ends. Lines of the same kind along that stretch move with it, so
+    a trunk is never split around the other kind. The push is kept when the lines then run on
+    top of no line of another kind.
 
     Args:
         edge: The line to push.
@@ -288,11 +314,46 @@ def _nudge(edge: Edge, lines: _Lines) -> bool:
     """
     points = lines.routes[edge]
     for index in range(1, len(points) - 2):
+        stretch = (points[index], points[index + 1])
+        bundle = _along(stretch, edge, lines)
+        if bundle is None:
+            continue
         for offset in NUDGE_OFFSETS_PX:
-            tried = _pushed(points, index, offset)
-            if not _runs_on_other_kind(edge, tried, lines.routes) and lines.take(edge, tried):
+            moves = {line: _pushed(lines.routes[line], at, offset) for line, at in bundle.items()}
+            parted = not any(
+                _runs_on_other_kind(line, route, {**lines.routes, **moves})
+                for line, route in moves.items()
+            )
+            if parted and lines.take(moves):
                 return True
     return False
+
+
+def _along(stretch: tuple[Point, Point], edge: Edge, lines: _Lines) -> dict[Edge, int] | None:
+    """Return the lines of one kind that run along a stretch, with the index of their stretch.
+
+    Args:
+        stretch: The stretch of ``edge`` to push.
+        edge: The line it belongs to.
+        lines: The lines.
+
+    Returns:
+        Each line and the index of its stretch on that one, the edge itself included; None when
+        one of them cannot move there (it is kept, or the stretch is at one of its ends).
+    """
+    bundle = {}
+    for other, points in lines.routes.items():
+        if kind_of(other) != kind_of(edge):
+            continue
+        for index, pair in enumerate(pairwise(points)):
+            if other is edge and pair != stretch:
+                continue
+            if other is edge or _overlap(pair, stretch) >= MIN_OVERLAP_PX:
+                if other in lines.keep or index in (0, len(points) - 2):
+                    return None
+                bundle[other] = index
+                break
+    return bundle
 
 
 def _new_way(edge: Edge, lines: _Lines) -> bool:
@@ -325,7 +386,7 @@ def _new_way(edge: Edge, lines: _Lines) -> bool:
     if found is None or _runs_on_other_kind(edge, found, lines.routes):
         return False
     space = SearchSpace((), tuple(lines.others(edge)))
-    return path_cost(space, found) < path_cost(space, old) and lines.take(edge, found)
+    return path_cost(space, found) < path_cost(space, old) and lines.take({edge: found})
 
 
 def _pushed(points: list[Point], index: int, offset: float) -> list[Point]:

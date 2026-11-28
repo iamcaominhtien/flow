@@ -9,10 +9,13 @@ sys.path.insert(0, str(PLUGIN_DIR))
 
 from flowlib.author import Canvas, NodeOptions, Route  # noqa: E402
 from flowlib.model import Edge, Role, Scene, Shape  # noqa: E402
-from flowlib.ports import end_side  # noqa: E402
+from flowlib.ports import end_side, hits  # noqa: E402
 from flowlib.untangle import MIN_OVERLAP_PX, shared_length  # noqa: E402
 
 SWITCH_BRANCHES: int = 3
+KINDS_MEETING: int = 2  # a main line and a failure line
+PUSHED_LINE_POINTS: int = 4  # a start, two bends and an end: the shape the line was drawn in
+Stretch = tuple[tuple[float, float], tuple[float, float]]
 
 
 def _line(scene: Scene, source: str, target: str) -> Edge:
@@ -30,7 +33,7 @@ def _crossings(scene: Scene) -> int:
     )
 
 
-def _cross(first: tuple, second: tuple) -> bool:
+def _cross(first: Stretch, second: Stretch) -> bool:
     """Tell whether a horizontal and a vertical segment cross inside both."""
     for flat, upright in ((first, second), (second, first)):
         if flat[0][1] == flat[1][1] and upright[0][0] == upright[1][0]:
@@ -44,7 +47,7 @@ def _right_angled_and_attached(scene: Scene) -> bool:
     """Tell whether every line is horizontal or vertical and starts and ends on its nodes."""
     nodes = {node.id: node for node in scene.nodes}
     for edge in scene.edges:
-        if any(a[0] != b[0] and a[1] != b[1] for a, b in pairwise(edge.points)):
+        if any(start[0] != end[0] and start[1] != end[1] for start, end in pairwise(edge.points)):
             return False
         for node_id, point in ((edge.source, edge.points[0]), (edge.target, edge.points[-1])):
             node = nodes[node_id]
@@ -53,6 +56,21 @@ def _right_angled_and_attached(scene: Scene) -> bool:
             if not (inside_x and inside_y):
                 return False
     return True
+
+
+def _passes_through_a_node(scene: Scene) -> bool:
+    """Tell whether a line runs through a node other than where it attaches."""
+    nodes = {node.id: node for node in scene.nodes}
+    for edge in scene.edges:
+        last = len(edge.points) - 2
+        for index, (start, end) in enumerate(pairwise(edge.points)):
+            for node_id, node in nodes.items():
+                attaches = (node_id == edge.source and index == 0) or (
+                    node_id == edge.target and index == last
+                )
+                if not attaches and hits(node, start, end):
+                    return True
+    return False
 
 
 def _two_answers_down() -> Scene:
@@ -88,8 +106,9 @@ def _stacked_column() -> Scene:
         ("d", (400, 500)),
     ):
         canvas.node(name, Shape.PROCESS, name.upper(), NodeOptions(centre))
-    canvas.edge("a", "d", Route("right", "left", via=((250, 100), (250, 300), (250, 500))))
-    canvas.edge("c", "b", Route("left", "right", via=((250, 100), (250, 500)), role=Role.NO))
+    canvas.edge("a", "d", Route("right", "left", via=((250, 100), (250, 500))))
+    via = ((250, 100), (250, 300), (250, 500))  # a point mid-way on the line that will move
+    canvas.edge("c", "b", Route("left", "right", via=via, role=Role.NO))
     return canvas.scene()
 
 
@@ -118,7 +137,7 @@ def test_ends_of_different_kinds_part_without_crossing() -> None:
     """Lines of two kinds into one point end apart, each where it comes from, crossing nothing."""
     scene = _two_kinds_into_one_point()
     ends = {edge.points[-1] for edge in scene.edges if edge.target == "t"}
-    assert len(ends) == len(("main", "no"))
+    assert len(ends) == KINDS_MEETING
     assert _crossings(scene) == 0
 
 
@@ -165,7 +184,7 @@ def test_a_push_keeps_the_shape_of_the_line() -> None:
     """A stack with room beside it is parted by moving one stretch: ends and bends stay."""
     scene = _stacked_column()
     pushed = _line(scene, "c", "b")
-    assert len(pushed.points) == len(("start", "bend", "bend", "end"))
+    assert len(pushed.points) == PUSHED_LINE_POINTS
     assert pushed.points[0][1] == pushed.points[1][1]
 
 
@@ -175,3 +194,24 @@ def test_a_stack_with_no_room_beside_it_is_searched_anew() -> None:
     first, second = _line(scene, "a", "d"), _line(scene, "c", "b")
     assert shared_length(list(first.points), list(second.points)) < MIN_OVERLAP_PX
     assert _right_angled_and_attached(scene)
+    assert not _passes_through_a_node(scene)
+
+
+def _one_kind_from_both_ways() -> Scene:
+    """Draw failure lines from above and below and a main line straight in, all to one point."""
+    canvas = Canvas("Both ways", None)
+    canvas.node("up", Shape.PROCESS, "Above", NodeOptions((100, 100)))
+    canvas.node("mid", Shape.PROCESS, "Beside", NodeOptions((100, 300)))
+    canvas.node("down", Shape.PROCESS, "Below", NodeOptions((100, 500)))
+    canvas.node("t", Shape.PROCESS, "Target", NodeOptions((400, 300)))
+    canvas.edge("mid", "t", Route("right", "left", role=Role.MAIN))
+    canvas.edge("up", "t", Route("right", "left", via=((250, 100), (250, 300)), role=Role.NO))
+    canvas.edge("down", "t", Route("right", "left", via=((250, 500), (250, 300)), role=Role.NO))
+    return canvas.scene()
+
+
+def test_one_kind_from_both_ways_parts_round_a_straight_line() -> None:
+    """Failure lines from above and below take the places on their own way, crossing nothing."""
+    scene = _one_kind_from_both_ways()
+    assert _crossings(scene) == 0
+    assert len({edge.points[-1] for edge in scene.edges}) == len(scene.edges)

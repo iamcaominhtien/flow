@@ -61,6 +61,14 @@ class _End:
     at_start: bool
 
 
+@dataclass(frozen=True)
+class _Rules:
+    """What a move of ends must respect: no new node in the way, and lines that must stay."""
+
+    is_clear: ClearTest
+    keep: frozenset[Hashable]
+
+
 def spread_ends(
     routes: dict[LineKey, list[Point]],
     nodes: dict[str, Node],
@@ -93,7 +101,7 @@ def spread_ends(
     for (node_id, _), ends in meeting.items():
         if len({kind_of(end.line) for end in ends}) > 1:
             groups = _groups(ends, moved)
-            _place_groups(groups, nodes[node_id], moved, (is_clear, keep))
+            _place_groups(groups, nodes[node_id], moved, _Rules(is_clear, keep))
     return moved
 
 
@@ -311,7 +319,7 @@ def _place_groups(
     groups: list[list[_End]],
     node: Node,
     routes: dict[LineKey, list[Point]],
-    tests: tuple[ClearTest, frozenset[LineKey]],
+    rules: "_Rules",
 ) -> None:
     """Give each group of ends its place along the side; ``routes`` is changed in place.
 
@@ -319,9 +327,9 @@ def _place_groups(
         groups: The groups of ends, in their order along the side.
         node: The node they meet.
         routes: Each line's points; changed in place.
-        tests: The test of whether a route is clear of nodes, and the lines that must not move.
+        rules: The test of whether a route is clear of nodes, and the lines that must not move.
     """
-    is_clear, keep = tests
+    is_clear, keep = rules.is_clear, rules.keep
     first = groups[0][0]
     step = _end_step(node, end_side(routes[first.line], first.at_start), len(groups))
     fixed = [
